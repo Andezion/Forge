@@ -3,77 +3,105 @@ class AppStrings {
   static const String appName = 'Fitness Tracker';
 
   // Authentication
-  static const String login = 'Вход';
-  static const String register = 'Регистрация';
+  static const String login = 'Login';
+  static const String register = 'Register';
   static const String email = 'Email';
-  static const String password = 'Пароль';
-  static const String confirmPassword = 'Подтвердите пароль';
-  static const String name = 'Имя';
-  static const String forgotPassword = 'Забыли пароль?';
-  static const String dontHaveAccount = 'Нет аккаунта?';
-  static const String alreadyHaveAccount = 'Уже есть аккаунт?';
-  static const String signIn = 'Войти';
-  static const String signUp = 'Зарегистрироваться';
-  static const String logout = 'Выйти';
+  static const String password = 'Password';
+  static const String confirmPassword = 'Confirm Password';
+  static const String name = 'Name';
+  static const String forgotPassword = 'Forgot Password?';
+  static const String dontHaveAccount = "Don't have an account?";
+  static const String alreadyHaveAccount = 'Already have an account?';
+  static const String signIn = 'Sign In';
+  static const String signUp = 'Sign Up';
+  static const String logout = 'Logout';
 
   // Navigation
-  static const String home = 'Главная';
-  static const String profile = 'Профиль';
-  static const String friends = 'Друзья';
-  static const String programs = 'Программы';
-  static const String workshop = 'Мастерская';
+  static const String home = 'Home';
+  static const String profile = 'Profile';
+  static const String friends = 'Friends';
+  static const String programs = 'Programs';
+  static const String workshop = 'Workshop';
 
   // Training
-  static const String training = 'Тренировка';
-  static const String workout = 'Упражнение';
-  static const String exercises = 'Упражнения';
-  static const String sets = 'Подходы';
-  static const String reps = 'Повторения';
-  static const String weight = 'Вес';
-  static const String startWorkout = 'Начать тренировку';
-  static const String finishWorkout = 'Завершить тренировку';
-  static const String saveWorkout = 'Сохранить тренировку';
+  static const String training = 'Training';
+  static const String workout = 'Workout';
+  static const String workouts = 'Workouts';
+  static const String exercise = 'Exercise';
+  static const String exercises = 'Exercises';
+  static const String sets = 'Sets';
+  static const String reps = 'Reps';
+  static const String weight = 'Weight';
+  static const String startWorkout = 'Start Workout';
+  static const String finishWorkout = 'Finish Workout';
+  static const String saveWorkout = 'Save Workout';
+  static const String createWorkout = 'Create Workout';
+  static const String workoutName = 'Workout Name';
+  static const String addExercise = 'Add Exercise';
+  static const String createExercise = 'Create Exercise';
+  static const String exerciseName = 'Exercise Name';
+  static const String description = 'Description';
+  static const String difficulty = 'Difficulty';
+  static const String easy = 'Easy';
+  static const String medium = 'Medium';
+  static const String hard = 'Hard';
+  static const String duration = 'Duration';
+  static const String completed = 'Completed';
+  static const String inProgress = 'In Progress';
+  static const String actualReps = 'Actual Reps';
+  static const String targetReps = 'Target Reps';
 
   // Programs
-  static const String streetlifting = 'Стритлифтинг';
-  static const String armwrestling = 'Армрестлинг';
-  static const String powerlifting = 'Пауэрлифтинг';
-  static const String customProgram = 'Своя программа';
+  static const String streetlifting = 'Streetlifting';
+  static const String armwrestling = 'Arm Wrestling';
+  static const String powerlifting = 'Powerlifting';
+  static const String customProgram = 'Custom Program';
 
   // Wellness
-  static const String howDoYouFeel = 'Как вы себя чувствуете?';
-  static const String howTired = 'Насколько вы устали?';
-  static const String howFrustrated = 'Насколько вы расстроены?';
-  static const String wellness = 'Самочувствие';
+  static const String howDoYouFeel = 'How do you feel?';
+  static const String howTired = 'How tired are you?';
+  static const String howFrustrated = 'How frustrated are you?';
+  static const String wellness = 'Wellness';
 
   // Progress
-  static const String progress = 'Прогресс';
-  static const String bodyWeight = 'Вес тела';
-  static const String oneRepMax = '1ПМ (Максимум)';
-  static const String charts = 'Графики';
+  static const String progress = 'Progress';
+  static const String bodyWeight = 'Body Weight';
+  static const String height = 'Height';
+  static const String oneRepMax = '1RM (One Rep Max)';
+  static const String maxes = 'Personal Records';
+  static const String rating = 'Rating';
+  static const String overallRating = 'Overall Rating';
+  static const String charts = 'Charts';
+  static const String statistics = 'Statistics';
 
   // Common
-  static const String save = 'Сохранить';
-  static const String cancel = 'Отмена';
-  static const String delete = 'Удалить';
-  static const String edit = 'Редактировать';
-  static const String add = 'Добавить';
-  static const String done = 'Готово';
-  static const String skip = 'Пропустить';
-  static const String next = 'Далее';
-  static const String back = 'Назад';
-  static const String search = 'Поиск';
-  static const String filter = 'Фильтр';
-  static const String loading = 'Загрузка...';
-  static const String error = 'Ошибка';
-  static const String success = 'Успешно';
+  static const String save = 'Save';
+  static const String cancel = 'Cancel';
+  static const String delete = 'Delete';
+  static const String edit = 'Edit';
+  static const String add = 'Add';
+  static const String done = 'Done';
+  static const String skip = 'Skip';
+  static const String next = 'Next';
+  static const String back = 'Back';
+  static const String search = 'Search';
+  static const String filter = 'Filter';
+  static const String loading = 'Loading...';
+  static const String error = 'Error';
+  static const String success = 'Success';
+  static const String select = 'Select';
+  static const String start = 'Start';
+  static const String stop = 'Stop';
+  static const String pause = 'Pause';
+  static const String resume = 'Resume';
+  static const String create = 'Create';
 
   // Errors
-  static const String errorGeneric = 'Что-то пошло не так';
-  static const String errorNetwork = 'Проверьте подключение к интернету';
-  static const String errorInvalidEmail = 'Неверный формат email';
+  static const String errorGeneric = 'Something went wrong';
+  static const String errorNetwork = 'Check your internet connection';
+  static const String errorInvalidEmail = 'Invalid email format';
   static const String errorPasswordTooShort =
-      'Пароль должен быть не менее 6 символов';
-  static const String errorPasswordsDontMatch = 'Пароли не совпадают';
-  static const String errorFieldRequired = 'Это поле обязательно';
+      'Password must be at least 6 characters';
+  static const String errorPasswordsDontMatch = 'Passwords do not match';
+  static const String errorFieldRequired = 'This field is required';
 }

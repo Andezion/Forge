@@ -2,9 +2,92 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
+import '../models/workout.dart';
+import 'create_workout_screen.dart';
+import 'workout_execution_screen.dart';
 
-class WorkshopScreen extends StatelessWidget {
+class WorkshopScreen extends StatefulWidget {
   const WorkshopScreen({super.key});
+
+  @override
+  State<WorkshopScreen> createState() => _WorkshopScreenState();
+}
+
+class _WorkshopScreenState extends State<WorkshopScreen> {
+  List<Workout> _workouts = [];
+
+  void _navigateToCreateWorkout() async {
+    final result = await Navigator.of(context).push<Workout>(
+      MaterialPageRoute(
+        builder: (context) => const CreateWorkoutScreen(),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _workouts.add(result);
+      });
+    }
+  }
+
+  void _navigateToEditWorkout(Workout workout, int index) async {
+    final result = await Navigator.of(context).push<Workout>(
+      MaterialPageRoute(
+        builder: (context) => CreateWorkoutScreen(existingWorkout: workout),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _workouts[index] = result;
+      });
+    }
+  }
+
+  void _deleteWorkout(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Workout'),
+        content:
+            Text('Are you sure you want to delete "${_workouts[index].name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(AppStrings.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _workouts.removeAt(index);
+              });
+              Navigator.of(context).pop();
+            },
+            child:
+                const Text('Delete', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _startWorkout(Workout workout) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WorkoutExecutionScreen(workout: workout),
+      ),
+    );
+
+    if (result != null) {
+      // TODO: Handle completed workout session
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Workout completed!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +105,12 @@ class WorkshopScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Создайте свою тренировку',
+            'Create Your Workout',
             style: AppTextStyles.h3,
           ),
           const SizedBox(height: 8),
           Text(
-            'Настройте программу под свои цели',
+            'Customize your training program',
             style: AppTextStyles.body2,
           ),
           const SizedBox(height: 24),
@@ -40,15 +123,7 @@ class WorkshopScreen extends StatelessWidget {
             ),
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                // TODO: Navigate to workout creation
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Создание новой тренировки...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
+              onTap: _navigateToCreateWorkout,
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -67,7 +142,7 @@ class WorkshopScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Создать новую тренировку',
+                      'Create New Workout',
                       style: AppTextStyles.h4.copyWith(
                         color: AppColors.primary,
                       ),
@@ -82,49 +157,37 @@ class WorkshopScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           Text(
-            'Мои тренировки',
+            'My Workouts',
             style: AppTextStyles.h4,
           ),
           const SizedBox(height: 12),
 
-          // Custom workouts list (demo)
-          _buildWorkoutCard(
-            context,
-            'Моя силовая программа',
-            '4 упражнения',
-            'Понедельник, Среда, Пятница',
-            Icons.fitness_center,
-            AppColors.primary,
-          ),
-          _buildWorkoutCard(
-            context,
-            'Тренировка рук',
-            '6 упражнений',
-            'Вторник, Четверг',
-            Icons.sports_martial_arts,
-            AppColors.accent,
-          ),
-          _buildWorkoutCard(
-            context,
-            'Программа для ног',
-            '5 упражнений',
-            'Суббота',
-            Icons.directions_run,
-            AppColors.success,
-          ),
+          // Workouts list
+          if (_workouts.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  'No workouts yet. Create your first workout!',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          else
+            ..._workouts.asMap().entries.map((entry) {
+              final index = entry.key;
+              final workout = entry.value;
+              return _buildWorkoutCard(workout, index);
+            }).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildWorkoutCard(
-    BuildContext context,
-    String title,
-    String exerciseCount,
-    String schedule,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildWorkoutCard(Workout workout, int index) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -136,26 +199,41 @@ class WorkshopScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: color, size: 28),
+          child: const Icon(Icons.fitness_center,
+              color: AppColors.primary, size: 28),
         ),
         title: Text(
-          title,
+          workout.name,
           style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(exerciseCount, style: AppTextStyles.caption),
-            Text(schedule, style: AppTextStyles.caption),
+            Text(
+              '${workout.exercises.length} exercises',
+              style: AppTextStyles.caption,
+            ),
           ],
         ),
         trailing: PopupMenuButton(
           icon: const Icon(Icons.more_vert),
           itemBuilder: (context) => [
+            PopupMenuItem(
+              child: Row(
+                children: [
+                  const Icon(Icons.play_arrow, size: 20),
+                  const SizedBox(width: 8),
+                  Text(AppStrings.start),
+                ],
+              ),
+              onTap: () {
+                Future.delayed(Duration.zero, () => _startWorkout(workout));
+              },
+            ),
             PopupMenuItem(
               child: Row(
                 children: [
@@ -165,7 +243,8 @@ class WorkshopScreen extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                // TODO: Edit workout
+                Future.delayed(Duration.zero,
+                    () => _navigateToEditWorkout(workout, index));
               },
             ),
             PopupMenuItem(
@@ -178,20 +257,12 @@ class WorkshopScreen extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                // TODO: Delete workout
+                Future.delayed(Duration.zero, () => _deleteWorkout(index));
               },
             ),
           ],
         ),
-        onTap: () {
-          // TODO: Navigate to workout details
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Открыть: $title'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        },
+        onTap: () => _startWorkout(workout),
       ),
     );
   }
