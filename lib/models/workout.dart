@@ -4,7 +4,7 @@ class WorkoutExercise {
   final Exercise exercise;
   final int sets;
   final int targetReps;
-  final double weight; // in kg
+  final double weight;
 
   WorkoutExercise({
     required this.exercise,
