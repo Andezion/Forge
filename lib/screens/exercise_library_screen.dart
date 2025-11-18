@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../models/exercise.dart';
+import '../services/data_manager.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   final Function(Exercise) onExerciseSelected;
@@ -18,7 +19,7 @@ class ExerciseLibraryScreen extends StatefulWidget {
 
 class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Exercise> _exercises = [];
+  final _dataManager = DataManager();
   List<Exercise> _filteredExercises = [];
 
   @override
@@ -34,54 +35,15 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   }
 
   void _loadExercises() {
-    // TODO: Load from database
-    // For now, add some demo exercises
-    _exercises = [
-      Exercise(
-        id: '1',
-        name: 'Pull-ups',
-        description: 'Upper body exercise focusing on back and biceps',
-        difficulty: ExerciseDifficulty.medium,
-        createdAt: DateTime.now(),
-      ),
-      Exercise(
-        id: '2',
-        name: 'Push-ups',
-        description: 'Bodyweight exercise for chest, shoulders and triceps',
-        difficulty: ExerciseDifficulty.easy,
-        createdAt: DateTime.now(),
-      ),
-      Exercise(
-        id: '3',
-        name: 'Squats',
-        description: 'Lower body compound exercise',
-        difficulty: ExerciseDifficulty.medium,
-        createdAt: DateTime.now(),
-      ),
-      Exercise(
-        id: '4',
-        name: 'Bench Press',
-        description: 'Chest and triceps compound exercise',
-        difficulty: ExerciseDifficulty.hard,
-        createdAt: DateTime.now(),
-      ),
-      Exercise(
-        id: '5',
-        name: 'Deadlift',
-        description: 'Full body compound exercise',
-        difficulty: ExerciseDifficulty.hard,
-        createdAt: DateTime.now(),
-      ),
-    ];
-    _filteredExercises = List.from(_exercises);
+    _filteredExercises = List.from(_dataManager.exercises);
   }
 
   void _filterExercises(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredExercises = List.from(_exercises);
+        _filteredExercises = List.from(_dataManager.exercises);
       } else {
-        _filteredExercises = _exercises
+        _filteredExercises = _dataManager.exercises
             .where((exercise) =>
                 exercise.name.toLowerCase().contains(query.toLowerCase()))
             .toList();
@@ -94,9 +56,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       context: context,
       builder: (context) => CreateExerciseDialog(
         onExerciseCreated: (exercise) {
+          _dataManager.addExercise(exercise);
           setState(() {
-            _exercises.add(exercise);
-            _filteredExercises = List.from(_exercises);
+            _filteredExercises = List.from(_dataManager.exercises);
           });
         },
       ),
@@ -117,7 +79,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       ),
       body: Column(
         children: [
-          // Search bar
           Container(
             padding: const EdgeInsets.all(16),
             color: AppColors.surface,
@@ -138,8 +99,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               ),
             ),
           ),
-
-          // Exercise list
           Expanded(
             child: _filteredExercises.isEmpty
                 ? Center(
@@ -318,8 +277,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-
-                // Exercise name
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -336,8 +293,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // Description
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 3,
@@ -355,8 +310,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // Difficulty selector
                 Text(
                   AppStrings.difficulty,
                   style: AppTextStyles.body1.copyWith(
@@ -392,8 +345,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Buttons
                 Row(
                   children: [
                     Expanded(

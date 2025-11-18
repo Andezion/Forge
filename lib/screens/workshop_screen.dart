@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../models/workout.dart';
+import '../services/data_manager.dart';
 import 'create_workout_screen.dart';
 import 'workout_execution_screen.dart';
 
@@ -14,7 +15,7 @@ class WorkshopScreen extends StatefulWidget {
 }
 
 class _WorkshopScreenState extends State<WorkshopScreen> {
-  List<Workout> _workouts = [];
+  final _dataManager = DataManager();
 
   void _navigateToCreateWorkout() async {
     final result = await Navigator.of(context).push<Workout>(
@@ -25,7 +26,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
 
     if (result != null) {
       setState(() {
-        _workouts.add(result);
+        _dataManager.addWorkout(result);
       });
     }
   }
@@ -39,7 +40,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
 
     if (result != null) {
       setState(() {
-        _workouts[index] = result;
+        _dataManager.updateWorkout(index, result);
       });
     }
   }
@@ -49,8 +50,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Workout'),
-        content:
-            Text('Are you sure you want to delete "${_workouts[index].name}"?'),
+        content: Text(
+            'Are you sure you want to delete "${_dataManager.workouts[index].name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -59,7 +60,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           TextButton(
             onPressed: () {
               setState(() {
-                _workouts.removeAt(index);
+                _dataManager.removeWorkout(index);
               });
               Navigator.of(context).pop();
             },
@@ -114,8 +115,6 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             style: AppTextStyles.body2,
           ),
           const SizedBox(height: 24),
-
-          // Create new workout button
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -153,17 +152,13 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
-
           Text(
             'My Workouts',
             style: AppTextStyles.h4,
           ),
           const SizedBox(height: 12),
-
-          // Workouts list
-          if (_workouts.isEmpty)
+          if (_dataManager.workouts.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -177,7 +172,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               ),
             )
           else
-            ..._workouts.asMap().entries.map((entry) {
+            ..._dataManager.workouts.asMap().entries.map((entry) {
               final index = entry.key;
               final workout = entry.value;
               return _buildWorkoutCard(workout, index);

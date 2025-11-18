@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
+import '../services/data_manager.dart';
+import '../models/workout.dart';
+import 'workout_execution_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +15,116 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDate = DateTime.now();
+  final _dataManager = DataManager();
+
+  void _showWorkoutSelectionDialog() {
+    if (_dataManager.workouts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No workouts available. Create one in Workshop!'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Select Workout',
+                style: AppTextStyles.h3,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Today's recommended workout
+              if (_dataManager.getTodayWorkout() != null) ...[
+                Text(
+                  'Recommended for Today',
+                  style: AppTextStyles.body1.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildWorkoutTile(
+                  _dataManager.getTodayWorkout()!,
+                  isRecommended: true,
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // All workouts
+              Text(
+                'All Workouts',
+                style: AppTextStyles.body1.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ..._dataManager.workouts
+                  .map((workout) => _buildWorkoutTile(workout))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkoutTile(Workout workout, {bool isRecommended = false}) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: isRecommended
+          ? AppColors.primary.withOpacity(0.1)
+          : AppColors.surface,
+      child: ListTile(
+        leading: Icon(
+          Icons.fitness_center,
+          color: isRecommended ? AppColors.primary : AppColors.textSecondary,
+        ),
+        title: Text(
+          workout.name,
+          style: AppTextStyles.body1.copyWith(
+            fontWeight: isRecommended ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        subtitle: Text('${workout.exercises.length} exercises'),
+        trailing: const Icon(Icons.play_arrow),
+        onTap: () {
+          Navigator.of(context).pop(); // Close dialog
+          _startWorkout(workout);
+        },
+      ),
+    );
+  }
+
+  void _startWorkout(Workout workout) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WorkoutExecutionScreen(workout: workout),
+      ),
+    );
+
+    if (result != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Workout completed!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Сегодняшняя тренировка',
+                    'Today\'s Workout',
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 16),
@@ -93,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // Quick stats
                   Text(
-                    'Статистика',
+                    'Statistics',
                     style: AppTextStyles.h4,
                   ),
                   const SizedBox(height: 12),
@@ -102,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: _buildStatCard(
-                          'Тренировок в этом месяце',
+                          'Workouts this month',
                           '12',
                           Icons.fitness_center,
                           AppColors.primary,
@@ -111,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatCard(
-                          'Дней подряд',
+                          'Day streak',
                           '5',
                           Icons.local_fire_department,
                           AppColors.warning,
@@ -126,9 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Navigate to workout start
-        },
+        onPressed: _showWorkoutSelectionDialog,
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         icon: const Icon(Icons.play_arrow),
@@ -179,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           // Calendar days (simplified for now)
           Text(
-            'Календарь (будет реализован)',
+            'Calendar (to be implemented)',
             style: AppTextStyles.caption,
           ),
         ],
@@ -217,11 +328,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Силовая тренировка А',
+                        'Strength Training A',
                         style: AppTextStyles.h4,
                       ),
                       Text(
-                        'Пауэрлифтинг',
+                        'Powerlifting',
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -231,15 +342,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Упражнения:',
+              'Exercises:',
               style: AppTextStyles.body2.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            _buildExerciseItem('Приседания', '4x8'),
-            _buildExerciseItem('Жим лежа', '4x8'),
-            _buildExerciseItem('Становая тяга', '3x5'),
+            _buildExerciseItem('Squats', '4x8'),
+            _buildExerciseItem('Bench Press', '4x8'),
+            _buildExerciseItem('Deadlift', '3x5'),
           ],
         ),
       ),

@@ -22,54 +22,46 @@ class ProgramsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Выберите программу тренировок',
+            'Select a training program',
             style: AppTextStyles.h3,
           ),
           const SizedBox(height: 16),
-
-          // Streetlifting
           _buildProgramCategory(
             context,
             AppStrings.streetlifting,
-            'Тренировки с собственным весом',
+            'Bodyweight training',
             Icons.sports_gymnastics,
             AppColors.streetlifting,
             [
-              'Базовая программа для начинающих',
-              'Продвинутая программа',
-              'Программа для выхода силой',
+              'Beginner basic program',
+              'Advanced program',
+              'Program for strength exit',
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // Armwrestling
           _buildProgramCategory(
             context,
             AppStrings.armwrestling,
-            'Специализированные тренировки',
+            'Specialized training',
             Icons.back_hand,
             AppColors.armwrestling,
             [
-              'Базовая программа армрестлинга',
-              'Тренировка хвата и предплечий',
-              'Программа для соревнований',
+              'Basic armwrestling program',
+              'Grip and forearm training',
+              'Competition program',
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // Powerlifting
           _buildProgramCategory(
             context,
             AppStrings.powerlifting,
-            'Программы для максимальной силы',
+            'Programs for maximum strength',
             Icons.fitness_center,
             AppColors.powerlifting,
             [
-              'Начальная программа 5x5',
-              'Программа для среднего уровня',
-              'Программа предсоревновательной подготовки',
+              'Beginner 5x5 program',
+              'Intermediate program',
+              'Pre-competition preparation program',
             ],
           ),
         ],
