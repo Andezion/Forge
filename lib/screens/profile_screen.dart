@@ -30,7 +30,6 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Profile header
             Container(
               width: double.infinity,
               color: AppColors.primary,
@@ -48,7 +47,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Имя Пользователя',
+                    'User Name',
                     style: AppTextStyles.h3.copyWith(
                       color: AppColors.textOnPrimary,
                     ),
@@ -63,8 +62,6 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Stats section
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -75,21 +72,19 @@ class ProfileScreen extends StatelessWidget {
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 16),
-
-                  // Quick stats
                   Row(
                     children: [
                       Expanded(
                         child: _buildStatCard(
-                          'Вес тела',
-                          '75 кг',
+                          'Body Weight',
+                          '75 kg',
                           Icons.monitor_weight,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatCard(
-                          'Тренировок',
+                          'Workouts',
                           '42',
                           Icons.fitness_center,
                         ),
@@ -97,11 +92,9 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Menu items
                   _buildMenuItem(
                     context,
-                    'Графики прогресса',
+                    'Progress Charts',
                     Icons.show_chart,
                     () {
                       // TODO: Navigate to progress charts
@@ -132,8 +125,6 @@ class ProfileScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 24),
-
-                  // Logout button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

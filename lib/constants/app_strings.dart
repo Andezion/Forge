@@ -1,8 +1,6 @@
 class AppStrings {
-  // App
   static const String appName = 'Fitness Tracker';
 
-  // Authentication
   static const String login = 'Login';
   static const String register = 'Register';
   static const String email = 'Email';
@@ -16,14 +14,12 @@ class AppStrings {
   static const String signUp = 'Sign Up';
   static const String logout = 'Logout';
 
-  // Navigation
   static const String home = 'Home';
   static const String profile = 'Profile';
   static const String friends = 'Friends';
   static const String programs = 'Programs';
   static const String workshop = 'Workshop';
 
-  // Training
   static const String training = 'Training';
   static const String workout = 'Workout';
   static const String workouts = 'Workouts';
@@ -51,19 +47,16 @@ class AppStrings {
   static const String actualReps = 'Actual Reps';
   static const String targetReps = 'Target Reps';
 
-  // Programs
   static const String streetlifting = 'Streetlifting';
   static const String armwrestling = 'Arm Wrestling';
   static const String powerlifting = 'Powerlifting';
   static const String customProgram = 'Custom Program';
 
-  // Wellness
   static const String howDoYouFeel = 'How do you feel?';
   static const String howTired = 'How tired are you?';
   static const String howFrustrated = 'How frustrated are you?';
   static const String wellness = 'Wellness';
 
-  // Progress
   static const String progress = 'Progress';
   static const String bodyWeight = 'Body Weight';
   static const String height = 'Height';
@@ -74,7 +67,6 @@ class AppStrings {
   static const String charts = 'Charts';
   static const String statistics = 'Statistics';
 
-  // Common
   static const String save = 'Save';
   static const String cancel = 'Cancel';
   static const String delete = 'Delete';
@@ -96,7 +88,6 @@ class AppStrings {
   static const String resume = 'Resume';
   static const String create = 'Create';
 
-  // Errors
   static const String errorGeneric = 'Something went wrong';
   static const String errorNetwork = 'Check your internet connection';
   static const String errorInvalidEmail = 'Invalid email format';

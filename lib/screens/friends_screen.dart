@@ -41,7 +41,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
       ),
       body: Column(
         children: [
-          // Search bar
           Container(
             padding: const EdgeInsets.all(16),
             color: AppColors.surface,
@@ -61,17 +60,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
               ),
             ),
           ),
-
-          // Friends list
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: 5, // Demo data
+              itemCount: 5,
               itemBuilder: (context, index) {
                 return _buildFriendCard(
-                  'Друг ${index + 1}',
-                  'Последняя тренировка: ${index + 1} день назад',
-                  '${70 + index * 5} кг',
+                  'Friend ${index + 1}',
+                  'Last workout: ${index + 1} day(s) ago',
+                  '${70 + index * 5} kg',
                 );
               },
             ),
@@ -112,7 +109,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 const Icon(Icons.fitness_center,
                     size: 12, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
-                Text('Вес: $weight', style: AppTextStyles.caption),
+                Text('Weight: $weight', style: AppTextStyles.caption),
               ],
             ),
           ],

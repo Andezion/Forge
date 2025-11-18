@@ -228,7 +228,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
         key: _formKey,
         child: Column(
           children: [
-            // Workout name
             Container(
               padding: const EdgeInsets.all(16),
               color: AppColors.surface,
@@ -248,8 +247,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
                 },
               ),
             ),
-
-            // Exercises list
             Expanded(
               child: _workoutExercises.isEmpty
                   ? Center(

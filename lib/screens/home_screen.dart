@@ -46,8 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-
-              // Today's recommended workout
               if (_dataManager.getTodayWorkout() != null) ...[
                 Text(
                   'Recommended for Today',
@@ -63,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
-
-              // All workouts
               Text(
                 'All Workouts',
                 style: AppTextStyles.body1.copyWith(
@@ -102,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
         subtitle: Text('${workout.exercises.length} exercises'),
         trailing: const Icon(Icons.play_arrow),
         onTap: () {
-          Navigator.of(context).pop(); // Close dialog
+          Navigator.of(context).pop();
           _startWorkout(workout);
         },
       ),
@@ -141,7 +137,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Calendar widget placeholder
           Container(
             padding: const EdgeInsets.all(16),
             color: AppColors.surface,
@@ -179,14 +174,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Simplified calendar grid
                 _buildCalendarGrid(),
               ],
             ),
           ),
           const SizedBox(height: 16),
-
-          // Today's workout section
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -198,19 +190,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 16),
-
-                  // Workout card
                   _buildWorkoutCard(),
-
                   const SizedBox(height: 24),
-
-                  // Quick stats
                   Text(
                     'Statistics',
                     style: AppTextStyles.h4,
                   ),
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
@@ -250,18 +236,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _getMonthYearString(DateTime date) {
     const months = [
-      'Январь',
-      'Февраль',
-      'Март',
-      'Апрель',
-      'Май',
-      'Июнь',
-      'Июль',
-      'Август',
-      'Сентябрь',
-      'Октябрь',
-      'Ноябрь',
-      'Декабрь'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return '${months[date.month - 1]} ${date.year}';
   }
@@ -271,10 +257,9 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(8),
       child: Column(
         children: [
-          // Weekday headers
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+            children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
                 .map((day) => SizedBox(
                       width: 40,
                       child: Text(
@@ -288,7 +273,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 .toList(),
           ),
           const SizedBox(height: 8),
-          // Calendar days (simplified for now)
           Text(
             'Calendar (to be implemented)',
             style: AppTextStyles.caption,

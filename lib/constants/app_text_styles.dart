@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  // Headlines
   static const TextStyle h1 = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
@@ -29,7 +28,6 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  // Body text
   static const TextStyle body1 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.normal,
@@ -50,7 +48,6 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // Button text
   static const TextStyle button = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
@@ -63,7 +60,6 @@ class AppTextStyles {
     letterSpacing: 0.5,
   );
 
-  // Input text
   static const TextStyle input = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.normal,
