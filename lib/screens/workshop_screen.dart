@@ -176,7 +176,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               final index = entry.key;
               final workout = entry.value;
               return _buildWorkoutCard(workout, index);
-            }).toList(),
+            }),
         ],
       ),
     );

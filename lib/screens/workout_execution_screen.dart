@@ -27,7 +27,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   int _setDurationSeconds = 0;
   int _totalDurationSeconds = 0;
   bool _isSetInProgress = false;
-  List<ExerciseResult> _exerciseResults = [];
+  final List<ExerciseResult> _exerciseResults = [];
   ExerciseResult? _currentExerciseResult;
 
   @override
@@ -569,7 +569,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 24),
                     ],
                   ],

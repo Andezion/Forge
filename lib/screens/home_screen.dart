@@ -69,8 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               ..._dataManager.workouts
-                  .map((workout) => _buildWorkoutTile(workout))
-                  .toList(),
+                  .map((workout) => _buildWorkoutTile(workout)),
             ],
           ),
         ),
