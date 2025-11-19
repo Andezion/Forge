@@ -246,8 +246,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 ElevatedButton(
                   onPressed: selectedDifficulty != null
                       ? () {
-                          _completeExercise(selectedDifficulty!);
                           Navigator.of(context).pop();
+                          _completeExercise(selectedDifficulty!);
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

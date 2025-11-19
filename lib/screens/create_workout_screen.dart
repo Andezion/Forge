@@ -40,16 +40,19 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
   }
 
   void _addExercise() async {
-    Navigator.of(context).push(
+    final selectedExercise = await Navigator.of(context).push<Exercise>(
       MaterialPageRoute(
         builder: (context) => ExerciseLibraryScreen(
           onExerciseSelected: (exercise) {
-            Navigator.of(context).pop(); // Close library screen
-            _showExerciseConfigDialog(exercise);
+            Navigator.of(context).pop(exercise);
           },
         ),
       ),
     );
+
+    if (selectedExercise != null && mounted) {
+      _showExerciseConfigDialog(selectedExercise);
+    }
   }
 
   void _showExerciseConfigDialog(Exercise exercise,
@@ -144,18 +147,19 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
                             weight: double.parse(weightController.text),
                           );
 
-                          setState(() {
-                            if (existing != null) {
-                              final index = _workoutExercises.indexOf(existing);
-                              _workoutExercises[index] = workoutExercise;
-                            } else {
-                              _workoutExercises.add(workoutExercise);
-                            }
-                          });
-
                           Navigator.of(context).pop();
 
                           if (mounted) {
+                            setState(() {
+                              if (existing != null) {
+                                final index =
+                                    _workoutExercises.indexOf(existing);
+                                _workoutExercises[index] = workoutExercise;
+                              } else {
+                                _workoutExercises.add(workoutExercise);
+                              }
+                            });
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
