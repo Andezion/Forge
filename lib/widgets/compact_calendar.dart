@@ -26,7 +26,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
   @override
   void initState() {
     super.initState();
-    _selectedDay = widget.focusedDay;
+    _selectedDay = DateTime.now();
     _focusedDay = widget.focusedDay;
   }
 
@@ -90,7 +90,8 @@ class _CompactCalendarState extends State<CompactCalendar> {
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            selectedDayPredicate: (day) =>
+                isSameDay(_selectedDay, day) || isSameDay(day, DateTime.now()),
             calendarFormat: CalendarFormat.week,
             startingDayOfWeek: StartingDayOfWeek.monday,
             headerVisible: false,

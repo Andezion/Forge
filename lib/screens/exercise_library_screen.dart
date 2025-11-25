@@ -65,6 +65,28 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     );
   }
 
+  Widget _buildCreateExerciseButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: _showCreateExerciseDialog,
+          icon: const Icon(Icons.add),
+          label: Text(AppStrings.createExercise),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.textOnPrimary,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +101,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       ),
       body: Column(
         children: [
+          _buildCreateExerciseButton(),
           Container(
             padding: const EdgeInsets.all(16),
             color: AppColors.surface,
@@ -131,13 +154,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showCreateExerciseDialog,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        icon: const Icon(Icons.add),
-        label: Text(AppStrings.createExercise),
-      ),
     );
   }
 
@@ -154,7 +170,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         difficultyColor = AppColors.error;
         break;
     }
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -179,37 +194,13 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           exercise.name,
           style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              exercise.description,
-              style: AppTextStyles.caption,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: difficultyColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                exercise.difficulty.name.toUpperCase(),
-                style: AppTextStyles.caption.copyWith(
-                  color: difficultyColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+        subtitle: Text(
+          exercise.description,
+          style: AppTextStyles.body2,
         ),
         trailing: const Icon(Icons.add_circle_outline),
         onTap: () {
           widget.onExerciseSelected(exercise);
-          Navigator.of(context).pop();
         },
       ),
     );

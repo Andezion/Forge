@@ -263,6 +263,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         key: _formKey,
         child: Column(
           children: [
+            _buildAddExerciseButton(),
             Container(
               padding: const EdgeInsets.all(16),
               color: AppColors.surface,
@@ -330,13 +331,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addExercise,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        icon: const Icon(Icons.add),
-        label: Text(AppStrings.addExercise),
-      ),
     );
   }
 
@@ -354,7 +348,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         difficultyColor = AppColors.error;
         break;
     }
-
     return Card(
       key: key,
       margin: const EdgeInsets.only(bottom: 12),
@@ -378,7 +371,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               child: Icon(
                 Icons.fitness_center,
                 color: difficultyColor,
-                size: 24,
               ),
             ),
           ],
@@ -387,42 +379,41 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
           workoutExercise.exercise.name,
           style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              '${workoutExercise.sets} sets × ${workoutExercise.targetReps} reps',
-              style: AppTextStyles.caption,
-            ),
-            if (workoutExercise.weight > 0)
-              Text(
-                'Weight: ${workoutExercise.weight} kg',
-                style: AppTextStyles.caption,
-              ),
-          ],
+        subtitle: Text(
+          '${workoutExercise.sets} sets x ${workoutExercise.targetReps} reps, ${workoutExercise.weight} kg',
+          style: AppTextStyles.body2,
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit, size: 20),
-              onPressed: () {
-                _showExerciseConfigDialog(
-                  workoutExercise.exercise,
-                  workoutExercise,
-                );
-              },
+        trailing: IconButton(
+          icon: const Icon(Icons.delete_outline),
+          onPressed: () {
+            setState(() {
+              _workoutExercises.removeAt(index);
+            });
+          },
+        ),
+        onTap: () => _showExerciseConfigDialog(
+            workoutExercise.exercise, workoutExercise),
+      ),
+    );
+  }
+
+  Widget _buildAddExerciseButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: _addExercise,
+          icon: const Icon(Icons.add),
+          label: Text(AppStrings.addExercise),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.textOnPrimary,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete, size: 20, color: AppColors.error),
-              onPressed: () {
-                setState(() {
-                  _workoutExercises.removeAt(index);
-                });
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

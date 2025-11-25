@@ -37,7 +37,8 @@ class DataManager {
       _exercises = exercisesJson
           .map((json) => Exercise.fromJson(jsonDecode(json)))
           .toList();
-      print('📦 [DATA_MANAGER] Loaded ${_exercises.length} exercises');
+      print(
+          '📦 [DATA_MANAGER] Loaded ${_exercises.length} exercises: ${_exercises.map((e) => e.name).toList()}');
     }
 
     final workoutsJson = _prefs?.getStringList('workouts') ?? [];
@@ -48,7 +49,8 @@ class DataManager {
       _workouts = workoutsJson
           .map((json) => Workout.fromJson(jsonDecode(json)))
           .toList();
-      print('📦 [DATA_MANAGER] Loaded ${_workouts.length} workouts');
+      print(
+          '📦 [DATA_MANAGER] Loaded ${_workouts.length} workouts: ${_workouts.map((w) => w.name).toList()}');
     }
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
@@ -60,6 +62,10 @@ class DataManager {
 
   Future<void> _saveData() async {
     print('📦 [DATA_MANAGER] Saving data to storage...');
+    print(
+        '📦 [DATA_MANAGER] Exercises to save: ${_exercises.map((e) => e.name).toList()}');
+    print(
+        '📦 [DATA_MANAGER] Workouts to save: ${_workouts.map((w) => w.name).toList()}');
 
     final exercisesJson =
         _exercises.map((e) => jsonEncode(e.toJson())).toList();
@@ -194,20 +200,30 @@ class DataManager {
     print(
         '📦 [DATA_MANAGER] Workout has ${workout.exercises.length} exercises');
     _workouts.add(workout);
+    print(
+        '📦 [DATA_MANAGER] Workouts after add: ${_workouts.map((w) => w.name).toList()}');
     _saveData();
     print('📦 [DATA_MANAGER] Total workouts now: ${_workouts.length}');
   }
 
   void updateWorkout(int index, Workout workout) {
     if (index >= 0 && index < _workouts.length) {
+      print(
+          '📦 [DATA_MANAGER] Updating workout at index $index: ${workout.name}');
       _workouts[index] = workout;
+      print(
+          '📦 [DATA_MANAGER] Workouts after update: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
     }
   }
 
   void removeWorkout(int index) {
     if (index >= 0 && index < _workouts.length) {
+      print(
+          '📦 [DATA_MANAGER] Removing workout at index $index: ${_workouts[index].name}');
       _workouts.removeAt(index);
+      print(
+          '📦 [DATA_MANAGER] Workouts after remove: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
     }
   }
