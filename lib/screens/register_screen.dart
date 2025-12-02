@@ -211,7 +211,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       elevation: 2,
                     ),
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(

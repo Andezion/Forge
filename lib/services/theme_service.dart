@@ -17,6 +17,9 @@ class AppColor extends ChangeNotifier {
     if (value != null) {
       _color = Color(value);
       AppColors.primary = _color;
+      // Update contrast color for text on primary
+      AppColors.textOnPrimary =
+          _color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
       notifyListeners();
     }
   }
@@ -24,6 +27,8 @@ class AppColor extends ChangeNotifier {
   Future<void> setColor(Color newColor) async {
     _color = newColor;
     AppColors.primary = newColor;
+    AppColors.textOnPrimary =
+        newColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_prefsKey, newColor.value);

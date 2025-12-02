@@ -1,15 +1,43 @@
+import 'dart:math' as math;
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/profile_service.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import 'login_screen.dart';
 import 'customization_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 4))
+          ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final profile = Provider.of<ProfileService>(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -37,15 +65,7 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 32, top: 16),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppColors.surface,
-                    child: Icon(
-                      Icons.person,
-                      size: 50,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  _buildFramedAvatar(profile),
                   const SizedBox(height: 16),
                   Text(
                     'User Name',
@@ -197,6 +217,98 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildFramedAvatar(ProfileService profile) {
+    final imagePath = profile.imagePath;
+    final idx = profile.frameIndex;
+
+    Widget content;
+    if (imagePath != null) {
+      content = ClipOval(
+        child: Image.file(
+          File(imagePath),
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      content = CircleAvatar(
+        radius: 50,
+        backgroundColor: AppColors.surface,
+        child: Icon(
+          Icons.person,
+          size: 50,
+          color: AppColors.primary,
+        ),
+      );
+    }
+
+    if (idx == 1) {
+      return AnimatedBuilder(
+        animation: _animController,
+        builder: (context, child) {
+          final rotation = _animController.value * 2 * math.pi;
+          return Container(
+            width: 110,
+            height: 110,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: SweepGradient(
+                colors: [AppColors.primary, Colors.pink, AppColors.primary],
+                transform: GradientRotation(rotation),
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                  child: SizedBox(width: 100, height: 100, child: content)),
+            ),
+          );
+        },
+      );
+    }
+
+    final decor = _avatarFrameDecoration(idx, AppColors.primary);
+    return Container(
+      width: 110,
+      height: 110,
+      padding: const EdgeInsets.all(4),
+      decoration: decor,
+      child: ClipOval(child: SizedBox(width: 100, height: 100, child: content)),
+    );
+  }
+
+  BoxDecoration _avatarFrameDecoration(int idx, Color primary) {
+    switch (idx) {
+      case 0:
+        return BoxDecoration(
+          shape: BoxShape.circle,
+          color: primary.withOpacity(0.85),
+        );
+      case 2:
+        return BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.black,
+          border: Border.all(color: primary, width: 4),
+        );
+      case 3:
+        return BoxDecoration(
+          shape: BoxShape.circle,
+          color: primary.withOpacity(0.6),
+        );
+      default:
+        return BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+              colors: [primary.withOpacity(0.8), primary.withOpacity(0.4)]),
+        );
+    }
   }
 
   Widget _buildMenuItem(
