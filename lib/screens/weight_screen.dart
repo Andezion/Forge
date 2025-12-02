@@ -101,6 +101,8 @@ class _WeightScreenState extends State<WeightScreen> {
                           _selectedGramsIndex = 0;
                         });
                       },
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.black),
                       child: const Text('Reset'),
                     ),
                   ),
@@ -113,7 +115,8 @@ class _WeightScreenState extends State<WeightScreen> {
                         if (mounted) Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary),
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.black),
                       child: const Text('Save'),
                     ),
                   ),
