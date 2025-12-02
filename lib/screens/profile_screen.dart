@@ -9,6 +9,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import 'login_screen.dart';
 import 'customization_screen.dart';
+import 'weight_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -154,7 +155,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     AppStrings.bodyWeight,
                     Icons.monitor_weight,
                     () {
-                      // TODO: Navigate to body weight tracking
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const WeightScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 24),
