@@ -91,7 +91,9 @@ class CustomizationScreen extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: appColor.color),
+                          backgroundColor: appColor.color,
+                          foregroundColor: Colors.black,
+                        ),
                         child: const Text('Choose Photo'),
                       ),
                       const SizedBox(height: 8),
@@ -152,17 +154,6 @@ class CustomizationScreen extends StatelessWidget {
                   .toList(),
             ),
             const SizedBox(height: 24),
-            Text('Current color', style: AppTextStyles.body1),
-            const SizedBox(height: 8),
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: appColor.color,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black12),
-              ),
-            ),
           ],
         ),
       ),

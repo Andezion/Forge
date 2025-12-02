@@ -613,27 +613,30 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: AppColors.surface,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed:
-                      _isSetInProgress ? _showCompleteSetDialog : _startSet,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isSetInProgress
-                        ? AppColors.success
-                        : AppColors.primary,
-                    foregroundColor: AppColors.textOnPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: AppColors.surface,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed:
+                        _isSetInProgress ? _showCompleteSetDialog : _startSet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isSetInProgress
+                          ? AppColors.success
+                          : AppColors.primary,
+                      foregroundColor: AppColors.textOnPrimary,
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    _isSetInProgress ? 'Complete Set' : 'Start Set',
-                    style: AppTextStyles.button.copyWith(fontSize: 18),
+                    child: Text(
+                      _isSetInProgress ? 'Complete Set' : 'Start Set',
+                      style: AppTextStyles.button.copyWith(fontSize: 18),
+                    ),
                   ),
                 ),
               ),
