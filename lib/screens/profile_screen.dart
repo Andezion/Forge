@@ -119,7 +119,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   _buildMenuItem(
                     context,
-                    'Кастомизация',
+                    'Customisation',
                     Icons.color_lens,
                     () {
                       Navigator.of(context).push(
