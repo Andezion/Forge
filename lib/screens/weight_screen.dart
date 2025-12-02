@@ -87,35 +87,38 @@ class _WeightScreenState extends State<WeightScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _selectedKg = 75;
-                        _selectedGramsIndex = 0;
-                      });
-                    },
-                    child: const Text('Reset'),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        setState(() {
+                          _selectedKg = 75;
+                          _selectedGramsIndex = 0;
+                        });
+                      },
+                      child: const Text('Reset'),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final weight = _composeWeight();
-                      await profile.setWeightKg(weight);
-                      if (mounted) Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary),
-                    child: const Text('Save'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final weight = _composeWeight();
+                        await profile.setWeightKg(weight);
+                        if (mounted) Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary),
+                      child: const Text('Save'),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
