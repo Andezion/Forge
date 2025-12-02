@@ -5,6 +5,7 @@ import 'constants/app_strings.dart';
 import 'screens/login_screen.dart';
 import 'services/data_manager.dart';
 import 'services/theme_service.dart';
+import 'services/profile_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +15,15 @@ void main() async {
   final appColor = AppColor();
   await appColor.load();
 
+  final profileService = ProfileService();
+  await profileService.load();
+
   runApp(
-    ChangeNotifierProvider.value(
-      value: appColor,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: appColor),
+        ChangeNotifierProvider.value(value: profileService),
+      ],
       child: const MyApp(),
     ),
   );

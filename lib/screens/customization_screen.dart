@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../services/theme_service.dart';
+import '../services/profile_service.dart';
 import '../constants/app_text_styles.dart';
 
 class CustomizationScreen extends StatelessWidget {
@@ -31,7 +36,113 @@ class CustomizationScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Pick main color!', style: AppTextStyles.h3),
+            Text('Профиль', style: AppTextStyles.h3),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    final picker = ImagePicker();
+                    final file = await picker.pickImage(
+                        source: ImageSource.gallery, maxWidth: 1200);
+                    if (file != null) {
+                      final profile =
+                          Provider.of<ProfileService>(context, listen: false);
+                      await profile.setImagePath(file.path);
+                    }
+                  },
+                  child: Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: appColor.color, width: 3),
+                    ),
+                    child: ClipOval(
+                      child: Consumer<ProfileService>(
+                        builder: (context, profile, _) {
+                          if (profile.imagePath != null) {
+                            return Image.file(File(profile.imagePath!),
+                                fit: BoxFit.cover);
+                          }
+                          return Icon(Icons.person,
+                              size: 56, color: appColor.color);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Изображение профиля', style: AppTextStyles.body1),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final picker = ImagePicker();
+                          final file = await picker.pickImage(
+                              source: ImageSource.gallery, maxWidth: 1200);
+                          if (file != null) {
+                            final profile = Provider.of<ProfileService>(context,
+                                listen: false);
+                            await profile.setImagePath(file.path);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: appColor.color),
+                        child: const Text('Выбрать фото'),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () async {
+                          final profile = Provider.of<ProfileService>(context,
+                              listen: false);
+                          await profile.setImagePath(null);
+                        },
+                        child: const Text('Удалить фото'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text('Рамка профиля', style: AppTextStyles.h3),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 88,
+              child: Consumer<ProfileService>(
+                builder: (context, profile, _) => ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 4,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, idx) {
+                    final selected = profile.frameIndex == idx;
+                    final decor = _frameDecoration(idx, appColor.color);
+                    return GestureDetector(
+                      onTap: () async => await profile.setFrameIndex(idx),
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: decor.copyWith(
+                            border: selected
+                                ? Border.all(color: Colors.black, width: 3)
+                                : decor.border),
+                        child: Center(
+                          child: Text('F${idx + 1}',
+                              style: AppTextStyles.body1
+                                  .copyWith(color: Colors.white)),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text('Выберите основной цвет приложения', style: AppTextStyles.h3),
             const SizedBox(height: 16),
             Wrap(
               spacing: 12,
@@ -76,5 +187,36 @@ class CustomizationScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  BoxDecoration _frameDecoration(int idx, Color primary) {
+    switch (idx) {
+      case 0:
+        return BoxDecoration(
+          color: primary.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
+          ],
+        );
+      case 1:
+        return BoxDecoration(
+          gradient: LinearGradient(colors: [primary, Colors.deepPurple]),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white38, width: 2),
+        );
+      case 2:
+        return BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primary, width: 4),
+        );
+      default:
+        return BoxDecoration(
+          color: primary.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(12),
+        );
+    }
   }
 }
