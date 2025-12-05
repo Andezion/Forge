@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/data_manager.dart';
+import 'package:provider/provider.dart';
 import '../models/workout_history.dart';
 
 class FullCalendarScreen extends StatefulWidget {
@@ -239,8 +240,10 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
                   _focusedDay = focusedDay;
                 });
 
+                final dataManager =
+                    Provider.of<DataManager>(context, listen: false);
                 final workouts =
-                    DataManager().getWorkoutHistoryForDate(selectedDay);
+                    dataManager.getWorkoutHistoryForDate(selectedDay);
                 if (workouts.isNotEmpty) {
                   _showWorkoutDetails(workouts);
                 }
@@ -251,7 +254,8 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
                 });
               },
               eventLoader: (day) {
-                final hasWorkout = DataManager().hasWorkoutOnDate(day);
+                final dataManager = Provider.of<DataManager>(context);
+                final hasWorkout = dataManager.hasWorkoutOnDate(day);
                 return hasWorkout ? [true] : [];
               },
             ),

@@ -10,7 +10,8 @@ import 'services/profile_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await DataManager().initialize();
+  final dataManager = DataManager();
+  await dataManager.initialize();
 
   final appColor = AppColor();
   await appColor.load();
@@ -21,6 +22,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: dataManager),
         ChangeNotifierProvider.value(value: appColor),
         ChangeNotifierProvider.value(value: profileService),
       ],

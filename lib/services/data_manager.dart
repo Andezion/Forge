@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 
-class DataManager {
+class DataManager extends ChangeNotifier {
   static final DataManager _instance = DataManager._internal();
   factory DataManager() => _instance;
 
@@ -204,6 +205,7 @@ class DataManager {
         '📦 [DATA_MANAGER] Workouts after add: ${_workouts.map((w) => w.name).toList()}');
     _saveData();
     print('📦 [DATA_MANAGER] Total workouts now: ${_workouts.length}');
+    notifyListeners();
   }
 
   void updateWorkout(int index, Workout workout) {
@@ -214,6 +216,7 @@ class DataManager {
       print(
           '📦 [DATA_MANAGER] Workouts after update: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
+      notifyListeners();
     }
   }
 
@@ -225,6 +228,7 @@ class DataManager {
       print(
           '📦 [DATA_MANAGER] Workouts after remove: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
+      notifyListeners();
     }
   }
 
@@ -247,6 +251,7 @@ class DataManager {
     print('📦 [DATA_MANAGER] Adding workout history for ${history.date}');
     _workoutHistory.add(history);
     _saveData();
+    notifyListeners();
   }
 
   List<WorkoutHistory> getWorkoutHistoryForDate(DateTime date) {
@@ -293,5 +298,32 @@ class DataManager {
       }
     }
     return streak;
+  }
+
+  int totalWorkouts() => _workoutHistory.length;
+
+  int totalDaysTrained() {
+    final days = _workoutHistory.map((h) => h.dateOnly).toSet();
+    return days.length;
+  }
+
+  int longestStreak() {
+    if (_workoutHistory.isEmpty) return 0;
+    final dates = _workoutHistory.map((h) => h.dateOnly).toSet().toList()
+      ..sort();
+    int longest = 0;
+    int current = 1;
+    for (var i = 1; i < dates.length; i++) {
+      final prev = dates[i - 1];
+      final cur = dates[i];
+      if (cur.difference(prev).inDays == 1) {
+        current += 1;
+      } else {
+        if (current > longest) longest = current;
+        current = 1;
+      }
+    }
+    if (current > longest) longest = current;
+    return longest;
   }
 }

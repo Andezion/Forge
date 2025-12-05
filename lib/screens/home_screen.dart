@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
+import 'package:provider/provider.dart';
 import '../services/data_manager.dart';
 import '../models/workout.dart';
 import '../widgets/compact_calendar.dart';
@@ -17,7 +18,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDate = DateTime.now();
-  final _dataManager = DataManager();
+
+  DataManager get _dataManager =>
+      Provider.of<DataManager>(context, listen: false);
 
   void _showWorkoutSelectionDialog() {
     if (_dataManager.workouts.isEmpty) {
@@ -125,8 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final workoutsThisMonth = _dataManager.workoutsThisMonth();
-    final currentStreak = _dataManager.currentStreak();
+    final dataManager = Provider.of<DataManager>(context);
+    final workoutsThisMonth = dataManager.workoutsThisMonth();
+    final currentStreak = dataManager.currentStreak();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(

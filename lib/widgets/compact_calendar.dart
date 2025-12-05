@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/data_manager.dart';
+import 'package:provider/provider.dart';
 
 class CompactCalendar extends StatefulWidget {
   final DateTime focusedDay;
@@ -143,8 +144,8 @@ class _CompactCalendarState extends State<CompactCalendar> {
               ),
             ),
             eventLoader: (day) {
-              // Return events for days with workouts
-              final hasWorkout = DataManager().hasWorkoutOnDate(day);
+              final dataManager = Provider.of<DataManager>(context);
+              final hasWorkout = dataManager.hasWorkoutOnDate(day);
               return hasWorkout ? [true] : [];
             },
           ),
