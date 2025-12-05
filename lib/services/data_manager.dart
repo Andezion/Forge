@@ -270,4 +270,28 @@ class DataManager {
     final dateOnly = DateTime(date.year, date.month, date.day);
     return _workoutHistory.any((h) => h.dateOnly == dateOnly);
   }
+
+  int workoutsThisMonth([DateTime? forDate]) {
+    final now = forDate ?? DateTime.now();
+    return _workoutHistory
+        .where((h) => h.date.year == now.year && h.date.month == now.month)
+        .length;
+  }
+
+  int currentStreak() {
+    if (_workoutHistory.isEmpty) return 0;
+    int streak = 0;
+    DateTime day = DateTime.now();
+    while (true) {
+      final dayOnly = DateTime(day.year, day.month, day.day);
+      final has = _workoutHistory.any((h) => h.dateOnly == dayOnly);
+      if (has) {
+        streak += 1;
+        day = day.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
 }

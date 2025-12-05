@@ -125,6 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final workoutsThisMonth = _dataManager.workoutsThisMonth();
+    final currentStreak = _dataManager.currentStreak();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -207,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: _buildStatCard(
                           'Workouts this month',
-                          '12',
+                          workoutsThisMonth.toString(),
                           Icons.fitness_center,
                           AppColors.primary,
                         ),
@@ -216,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: _buildStatCard(
                           'Day streak',
-                          '5',
+                          currentStreak.toString(),
                           Icons.local_fire_department,
                           AppColors.warning,
                         ),
