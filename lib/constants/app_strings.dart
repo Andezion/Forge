@@ -1,5 +1,5 @@
 class AppStrings {
-  static const String appName = 'Fitness Tracker';
+  static const String appName = 'Forge';
 
   static const String login = 'Login';
   static const String register = 'Register';
