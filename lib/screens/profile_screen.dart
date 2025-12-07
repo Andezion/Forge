@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
+import '../services/data_manager.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -39,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileService>(context);
+    final dataManager = Provider.of<DataManager>(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -99,7 +101,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Expanded(
                         child: _buildStatCard(
                           'Body Weight',
-                          '75 kg',
+                          profile.weightKg != null
+                              ? '${profile.weightKg!.toStringAsFixed(1)} kg'
+                              : '—',
                           Icons.monitor_weight,
                         ),
                       ),
@@ -107,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Expanded(
                         child: _buildStatCard(
                           'Workouts',
-                          '42',
+                          dataManager.totalWorkouts().toString(),
                           Icons.fitness_center,
                         ),
                       ),
