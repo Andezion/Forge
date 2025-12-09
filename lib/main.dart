@@ -6,6 +6,7 @@ import 'screens/login_screen.dart';
 import 'services/data_manager.dart';
 import 'services/theme_service.dart';
 import 'services/profile_service.dart';
+import 'services/wellness_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,12 +20,16 @@ void main() async {
   final profileService = ProfileService();
   await profileService.load();
 
+  final wellnessService = WellnessService();
+  await wellnessService.load();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: dataManager),
         ChangeNotifierProvider.value(value: appColor),
         ChangeNotifierProvider.value(value: profileService),
+        ChangeNotifierProvider.value(value: wellnessService),
       ],
       child: const MyApp(),
     ),

@@ -11,6 +11,7 @@ import '../constants/app_strings.dart';
 import 'login_screen.dart';
 import 'customization_screen.dart';
 import 'weight_screen.dart';
+import 'wellness_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -139,7 +140,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     AppStrings.wellness,
                     Icons.favorite,
                     () {
-                      // TODO: Navigate to wellness tracking
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const WellnessScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildMenuItem(
