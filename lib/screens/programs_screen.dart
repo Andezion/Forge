@@ -101,24 +101,69 @@ class ProgramsScreen extends StatelessWidget {
             description,
             style: AppTextStyles.caption,
           ),
-          children: programs.map((program) {
-            return ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-              leading: Icon(Icons.play_arrow, color: color, size: 20),
-              title: Text(program, style: AppTextStyles.body2),
-              trailing: const Icon(Icons.chevron_right, size: 20),
-              onTap: () {
-                // TODO: Navigate to program details
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Открыть программу: $program'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-            );
-          }).toList(),
+          children: [
+            SizedBox(
+              height: 180,
+              child: PageView.builder(
+                itemCount: programs.length,
+                controller: PageController(viewportFraction: 0.85),
+                itemBuilder: (context, index) {
+                  final program = programs[index];
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Open program: $program'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 3,
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(Icons.play_arrow, color: color),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(program, style: AppTextStyles.body1),
+                                    const SizedBox(height: 6),
+                                    Text(title, style: AppTextStyles.caption),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right, size: 24),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
