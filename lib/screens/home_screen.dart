@@ -41,41 +41,49 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Select Workout',
-                style: AppTextStyles.h3,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              if (_dataManager.getTodayWorkout() != null) ...[
-                Text(
-                  'Recommended for Today',
-                  style: AppTextStyles.body1.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              // limit dialog height to a portion of the screen so content can scroll
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Select Workout',
+                    style: AppTextStyles.h3,
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: 12),
-                _buildWorkoutTile(
-                  _dataManager.getTodayWorkout()!,
-                  isRecommended: true,
-                ),
-                const SizedBox(height: 24),
-              ],
-              Text(
-                'All Workouts',
-                style: AppTextStyles.body1.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                  const SizedBox(height: 24),
+                  if (_dataManager.getTodayWorkout() != null) ...[
+                    Text(
+                      'Recommended for Today',
+                      style: AppTextStyles.body1.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildWorkoutTile(
+                      _dataManager.getTodayWorkout()!,
+                      isRecommended: true,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                  Text(
+                    'All Workouts',
+                    style: AppTextStyles.body1.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ..._dataManager.workouts
+                      .map((workout) => _buildWorkoutTile(workout)),
+                ],
               ),
-              const SizedBox(height: 12),
-              ..._dataManager.workouts
-                  .map((workout) => _buildWorkoutTile(workout)),
-            ],
+            ),
           ),
         ),
       ),
