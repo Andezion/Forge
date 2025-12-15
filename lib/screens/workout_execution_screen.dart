@@ -87,6 +87,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
   void _showCompleteSetDialog() {
     final repsController = TextEditingController();
+    final weightController = TextEditingController(
+      text: _currentExerciseResult!.targetWeight > 0
+          ? _currentExerciseResult!.targetWeight.toString()
+          : '',
+    );
 
     showDialog(
       context: context,
@@ -124,12 +129,29 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: weightController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: '${AppStrings.weight} (kg)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
                   final actualReps = int.tryParse(repsController.text) ?? 0;
+                  final parsedWeight = double.tryParse(weightController.text);
+                  final actualWeight = parsedWeight ??
+                      _currentExerciseResult!.targetWeight
+                          .clamp(0.0, double.infinity);
+
                   if (actualReps > 0) {
-                    _completeSet(actualReps);
+                    _completeSet(actualReps, actualWeight);
                     Navigator.of(context).pop();
                   }
                 },
@@ -150,7 +172,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     );
   }
 
-  void _completeSet(int actualReps) {
+  void _completeSet(int actualReps, double weight) {
     print('⏱️ [WORKOUT_EXEC] Completing set $_currentSetNumber');
     if (_currentExerciseResult!.setResults
         .any((s) => s.setNumber == _currentSetNumber)) {
@@ -164,7 +186,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       final setResult = ExerciseSetResult(
         setNumber: _currentSetNumber,
         actualReps: actualReps,
-        weight: _currentExerciseResult!.targetWeight,
+        weight: weight,
         timestamp: DateTime.now(),
         durationSeconds: _setDurationSeconds,
       );
@@ -600,6 +622,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                               ),
                             ),
                             title: Text('${setResult.actualReps} reps'),
+                            subtitle: Text('${setResult.weight} kg'),
                             trailing: Text(
                               _formatDuration(setResult.durationSeconds),
                               style: AppTextStyles.caption,
