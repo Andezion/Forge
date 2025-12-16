@@ -24,6 +24,8 @@ class WorkoutExecutionScreen extends StatefulWidget {
 class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   late WorkoutSession _session;
   int _currentExerciseIndex = 0;
+  late List<WorkoutExercise> _exerciseQueue;
+  final Map<String, int> _skipCounts = {};
   int _currentSetNumber = 1;
   Timer? _timer;
   int _setDurationSeconds = 0;
@@ -56,11 +58,13 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       totalDurationSeconds: 0,
     );
 
+    _exerciseQueue = List<WorkoutExercise>.from(widget.workout.exercises);
+
     _currentExerciseResult = ExerciseResult(
-      exercise: widget.workout.exercises[0].exercise,
-      targetSets: widget.workout.exercises[0].sets,
-      targetReps: widget.workout.exercises[0].targetReps,
-      targetWeight: widget.workout.exercises[0].weight,
+      exercise: _exerciseQueue[0].exercise,
+      targetSets: _exerciseQueue[0].sets,
+      targetReps: _exerciseQueue[0].targetReps,
+      targetWeight: _exerciseQueue[0].weight,
       setResults: [],
     );
   }
@@ -173,10 +177,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   }
 
   void _completeSet(int actualReps, double weight) {
-    print('⏱️ [WORKOUT_EXEC] Completing set $_currentSetNumber');
+    print('[WORKOUT_EXEC] Completing set $_currentSetNumber');
     if (_currentExerciseResult!.setResults
         .any((s) => s.setNumber == _currentSetNumber)) {
-      print('⚠️ [WORKOUT_EXEC] Set already completed, ignoring duplicate');
+      print('[WORKOUT_EXEC] Set already completed, ignoring duplicate');
       return;
     }
 
@@ -193,23 +197,23 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
       _currentExerciseResult!.setResults.add(setResult);
       print(
-          '⏱️ [WORKOUT_EXEC] Set completed. Total sets done: ${_currentExerciseResult!.setResults.length}/${_currentExerciseResult!.targetSets}');
+          '[WORKOUT_EXEC] Set completed. Total sets done: ${_currentExerciseResult!.setResults.length}/${_currentExerciseResult!.targetSets}');
 
       if (_currentSetNumber >= _currentExerciseResult!.targetSets) {
         print(
-            '⏱️ [WORKOUT_EXEC] All sets completed for exercise. Showing difficulty dialog...');
+            '[WORKOUT_EXEC] All sets completed for exercise. Showing difficulty dialog...');
 
         Future.microtask(() => _showExerciseDifficultyDialog());
       } else {
         _currentSetNumber++;
         _setDurationSeconds = 0;
-        print('⏱️ [WORKOUT_EXEC] Moving to set $_currentSetNumber');
+        print('[WORKOUT_EXEC] Moving to set $_currentSetNumber');
       }
     });
   }
 
   void _showExerciseDifficultyDialog() {
-    print('🟠 [WORKOUT_EXEC] Showing exercise difficulty dialog...');
+    print('[WORKOUT_EXEC] Showing exercise difficulty dialog...');
     ExerciseDifficulty? selectedDifficulty;
 
     showDialog(
@@ -280,9 +284,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                   onPressed: selectedDifficulty != null
                       ? () {
                           print(
-                              '✅ [WORKOUT_EXEC] Difficulty selected: $selectedDifficulty. Closing dialog...');
+                              '[WORKOUT_EXEC] Difficulty selected: $selectedDifficulty. Closing dialog...');
                           Navigator.of(context).pop();
-                          print('✅ [WORKOUT_EXEC] Difficulty dialog closed.');
+                          print('[WORKOUT_EXEC] Difficulty dialog closed.');
                           _completeExercise(selectedDifficulty!);
                         }
                       : null,
@@ -337,10 +341,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
   void _completeExercise(ExerciseDifficulty perceivedDifficulty) {
     print(
-        '✅ [WORKOUT_EXEC] Completing exercise: ${_currentExerciseResult!.exercise.name}');
-    print('✅ [WORKOUT_EXEC] Perceived difficulty: $perceivedDifficulty');
+        '[WORKOUT_EXEC] Completing exercise: ${_currentExerciseResult!.exercise.name}');
+    print('[WORKOUT_EXEC] Perceived difficulty: $perceivedDifficulty');
     print(
-        '✅ [WORKOUT_EXEC] Current exercise index: $_currentExerciseIndex, Total exercises: ${widget.workout.exercises.length}');
+        '[WORKOUT_EXEC] Current exercise index: $_currentExerciseIndex, Total exercises: ${_exerciseQueue.length}');
 
     setState(() {
       _currentExerciseResult = _currentExerciseResult!.copyWith(
@@ -348,29 +352,67 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       );
       _exerciseResults.add(_currentExerciseResult!);
       print(
-          '✅ [WORKOUT_EXEC] Exercise result saved. Total completed: ${_exerciseResults.length}');
+          '[WORKOUT_EXEC] Exercise result saved. Total completed: ${_exerciseResults.length}');
 
-      if (_currentExerciseIndex < widget.workout.exercises.length - 1) {
+      if (_currentExerciseIndex < _exerciseQueue.length - 1) {
         _currentExerciseIndex++;
         _currentSetNumber = 1;
         _setDurationSeconds = 0;
         print(
-            '✅ [WORKOUT_EXEC] Moving to next exercise (index $_currentExerciseIndex): ${widget.workout.exercises[_currentExerciseIndex].exercise.name}');
+            '[WORKOUT_EXEC] Moving to next exercise (index $_currentExerciseIndex): ${_exerciseQueue[_currentExerciseIndex].exercise.name}');
 
         _currentExerciseResult = ExerciseResult(
-          exercise: widget.workout.exercises[_currentExerciseIndex].exercise,
-          targetSets: widget.workout.exercises[_currentExerciseIndex].sets,
-          targetReps:
-              widget.workout.exercises[_currentExerciseIndex].targetReps,
-          targetWeight: widget.workout.exercises[_currentExerciseIndex].weight,
+          exercise: _exerciseQueue[_currentExerciseIndex].exercise,
+          targetSets: _exerciseQueue[_currentExerciseIndex].sets,
+          targetReps: _exerciseQueue[_currentExerciseIndex].targetReps,
+          targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
           setResults: [],
         );
         print(
-            '✅ [WORKOUT_EXEC] Next exercise initialized: ${_currentExerciseResult!.exercise.name}');
+            '[WORKOUT_EXEC] Next exercise initialized: ${_currentExerciseResult!.exercise.name}');
       } else {
-        print('✅ [WORKOUT_EXEC] No more exercises. Finishing workout...');
+        print('[WORKOUT_EXEC] No more exercises. Finishing workout...');
         _finishWorkout();
       }
+    });
+  }
+
+  void _skipCurrentExercise() {
+    if (_exerciseQueue.isEmpty) return;
+    final current = _exerciseQueue[_currentExerciseIndex];
+    final id = current.exercise.id;
+    _skipCounts[id] = (_skipCounts[id] ?? 0) + 1;
+    final count = _skipCounts[id]!;
+    print('[WORKOUT_EXEC] Skipping ${current.exercise.name} (skip #$count)');
+
+    setState(() {
+      if (count >= 2) {
+        _exerciseQueue.removeAt(_currentExerciseIndex);
+        print('[WORKOUT_EXEC] Removed ${current.exercise.name} after 2 skips');
+      } else {
+        final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
+        _exerciseQueue.add(moved);
+        print('[WORKOUT_EXEC] Moved ${current.exercise.name} to end');
+      }
+
+      if (_exerciseQueue.isEmpty) {
+        _finishWorkout();
+        return;
+      }
+
+      if (_currentExerciseIndex >= _exerciseQueue.length) {
+        _currentExerciseIndex = 0;
+      }
+
+      _currentSetNumber = 1;
+      _setDurationSeconds = 0;
+      _currentExerciseResult = ExerciseResult(
+        exercise: _exerciseQueue[_currentExerciseIndex].exercise,
+        targetSets: _exerciseQueue[_currentExerciseIndex].sets,
+        targetReps: _exerciseQueue[_currentExerciseIndex].targetReps,
+        targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
+        setResults: [],
+      );
     });
   }
 
@@ -390,7 +432,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       session: completedSession,
     );
     DataManager().addWorkoutHistory(history);
-    print('📅 [WORKOUT_EXEC] Workout history saved for ${history.dateOnly}');
+    print('[WORKOUT_EXEC] Workout history saved for ${history.dateOnly}');
 
     showDialog(
       context: context,
@@ -467,9 +509,38 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentExercise = widget.workout.exercises[_currentExerciseIndex];
-    final progress =
-        (_currentExerciseIndex + 1) / widget.workout.exercises.length;
+    if (_exerciseQueue.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _finishWorkout();
+        }
+      });
+
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textOnPrimary,
+          title: Text(
+            widget.workout.name,
+            style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'No remaining exercises',
+              style: AppTextStyles.h3,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final currentExercise = _exerciseQueue[_currentExerciseIndex];
+    final progress = (_currentExerciseIndex + 1) / _exerciseQueue.length;
 
     return WillPopScope(
       onWillPop: () async {
@@ -542,14 +613,35 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                         child: Column(
                           children: [
                             Text(
-                              'Exercise ${_currentExerciseIndex + 1} of ${widget.workout.exercises.length}',
+                              'Exercise ${_currentExerciseIndex + 1} of ${_exerciseQueue.length}',
                               style: AppTextStyles.caption,
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              currentExercise.exercise.name,
-                              style: AppTextStyles.h2,
-                              textAlign: TextAlign.center,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    currentExercise.exercise.name,
+                                    style: AppTextStyles.h2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                if ((_skipCounts[currentExercise.exercise.id] ??
+                                        0) ==
+                                    1)
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.warning,
+                                      shape: BoxShape.circle,
+                                      border:
+                                          Border.all(color: AppColors.surface),
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -641,26 +733,47 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 color: AppColors.surface,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed:
-                        _isSetInProgress ? _showCompleteSetDialog : _startSet,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isSetInProgress
-                          ? AppColors.success
-                          : AppColors.primary,
-                      foregroundColor: AppColors.textOnPrimary,
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      height: 56,
+                      child: OutlinedButton(
+                        onPressed: _skipCurrentExercise,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.warning),
+                          foregroundColor: AppColors.warning,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(AppStrings.skip),
                       ),
                     ),
-                    child: Text(
-                      _isSetInProgress ? 'Complete Set' : 'Start Set',
-                      style: AppTextStyles.button.copyWith(fontSize: 18),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: _isSetInProgress
+                              ? _showCompleteSetDialog
+                              : _startSet,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _isSetInProgress
+                                ? AppColors.success
+                                : AppColors.primary,
+                            foregroundColor: AppColors.textOnPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            _isSetInProgress ? 'Complete Set' : 'Start Set',
+                            style: AppTextStyles.button.copyWith(fontSize: 18),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
