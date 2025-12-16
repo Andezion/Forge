@@ -43,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              // limit dialog height to a portion of the screen so content can scroll
               maxHeight: MediaQuery.of(context).size.height * 0.6,
             ),
             child: SingleChildScrollView(
