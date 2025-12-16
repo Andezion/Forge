@@ -8,7 +8,7 @@ class ProfileService extends ChangeNotifier {
 
   String? _imagePath;
   int _frameIndex = 0;
-  double? _weightKg; // stored as kilograms, e.g. 75.25
+  double? _weightKg;
 
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
