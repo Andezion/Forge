@@ -17,7 +17,7 @@ class AppColor extends ChangeNotifier {
     if (value != null) {
       _color = Color(value);
       AppColors.primary = _color;
-      // Update contrast color for text on primary
+
       AppColors.textOnPrimary =
           _color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
       notifyListeners();
