@@ -20,53 +20,53 @@ class DataManager extends ChangeNotifier {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    print('📦 [DATA_MANAGER] Initializing...');
+    print('[DATA_MANAGER] Initializing...');
     _prefs = await SharedPreferences.getInstance();
     await _loadData();
     _isInitialized = true;
-    print('📦 [DATA_MANAGER] Initialization complete');
+    print('[DATA_MANAGER] Initialization complete');
   }
 
   Future<void> _loadData() async {
-    print('📦 [DATA_MANAGER] Loading data from storage...');
+    print('[DATA_MANAGER] Loading data from storage...');
 
     final exercisesJson = _prefs?.getStringList('exercises') ?? [];
     if (exercisesJson.isEmpty) {
-      print('📦 [DATA_MANAGER] No saved exercises, loading defaults...');
+      print('[DATA_MANAGER] No saved exercises, loading defaults...');
       _loadDefaultExercises();
     } else {
       _exercises = exercisesJson
           .map((json) => Exercise.fromJson(jsonDecode(json)))
           .toList();
       print(
-          '📦 [DATA_MANAGER] Loaded ${_exercises.length} exercises: ${_exercises.map((e) => e.name).toList()}');
+          '[DATA_MANAGER] Loaded ${_exercises.length} exercises: ${_exercises.map((e) => e.name).toList()}');
     }
 
     final workoutsJson = _prefs?.getStringList('workouts') ?? [];
     if (workoutsJson.isEmpty) {
-      print('📦 [DATA_MANAGER] No saved workouts, creating demo...');
+      print('[DATA_MANAGER] No saved workouts, creating demo...');
       _initializeDemoWorkout();
     } else {
       _workouts = workoutsJson
           .map((json) => Workout.fromJson(jsonDecode(json)))
           .toList();
       print(
-          '📦 [DATA_MANAGER] Loaded ${_workouts.length} workouts: ${_workouts.map((w) => w.name).toList()}');
+          '[DATA_MANAGER] Loaded ${_workouts.length} workouts: ${_workouts.map((w) => w.name).toList()}');
     }
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
     _workoutHistory = historyJson
         .map((json) => WorkoutHistory.fromJson(jsonDecode(json)))
         .toList();
-    print('📦 [DATA_MANAGER] Loaded ${_workoutHistory.length} history entries');
+    print('[DATA_MANAGER] Loaded ${_workoutHistory.length} history entries');
   }
 
   Future<void> _saveData() async {
-    print('📦 [DATA_MANAGER] Saving data to storage...');
+    print('[DATA_MANAGER] Saving data to storage...');
     print(
-        '📦 [DATA_MANAGER] Exercises to save: ${_exercises.map((e) => e.name).toList()}');
+        '[DATA_MANAGER] Exercises to save: ${_exercises.map((e) => e.name).toList()}');
     print(
-        '📦 [DATA_MANAGER] Workouts to save: ${_workouts.map((w) => w.name).toList()}');
+        '[DATA_MANAGER] Workouts to save: ${_workouts.map((w) => w.name).toList()}');
 
     final exercisesJson =
         _exercises.map((e) => jsonEncode(e.toJson())).toList();
@@ -79,7 +79,7 @@ class DataManager extends ChangeNotifier {
         _workoutHistory.map((h) => jsonEncode(h.toJson())).toList();
     await _prefs?.setStringList('workout_history', historyJson);
 
-    print('📦 [DATA_MANAGER] Data saved successfully');
+    print('[DATA_MANAGER] Data saved successfully');
   }
 
   List<Exercise> get exercises => List.unmodifiable(_exercises);
@@ -179,7 +179,7 @@ class DataManager extends ChangeNotifier {
   void addExercise(Exercise exercise) {
     _exercises.add(exercise);
     _saveData();
-    print('📦 [DATA_MANAGER] Exercise added: ${exercise.name}');
+    print('[DATA_MANAGER] Exercise added: ${exercise.name}');
   }
 
   void removeExercise(String id) {
@@ -196,25 +196,22 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkout(Workout workout) {
-    print(
-        '📦 [DATA_MANAGER] Adding workout: ${workout.name} (ID: ${workout.id})');
-    print(
-        '📦 [DATA_MANAGER] Workout has ${workout.exercises.length} exercises');
+    print('[DATA_MANAGER] Adding workout: ${workout.name} (ID: ${workout.id})');
+    print('[DATA_MANAGER] Workout has ${workout.exercises.length} exercises');
     _workouts.add(workout);
     print(
-        '📦 [DATA_MANAGER] Workouts after add: ${_workouts.map((w) => w.name).toList()}');
+        '[DATA_MANAGER] Workouts after add: ${_workouts.map((w) => w.name).toList()}');
     _saveData();
-    print('📦 [DATA_MANAGER] Total workouts now: ${_workouts.length}');
+    print('[DATA_MANAGER] Total workouts now: ${_workouts.length}');
     notifyListeners();
   }
 
   void updateWorkout(int index, Workout workout) {
     if (index >= 0 && index < _workouts.length) {
-      print(
-          '📦 [DATA_MANAGER] Updating workout at index $index: ${workout.name}');
+      print('[DATA_MANAGER] Updating workout at index $index: ${workout.name}');
       _workouts[index] = workout;
       print(
-          '📦 [DATA_MANAGER] Workouts after update: ${_workouts.map((w) => w.name).toList()}');
+          '[DATA_MANAGER] Workouts after update: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
       notifyListeners();
     }
@@ -223,10 +220,10 @@ class DataManager extends ChangeNotifier {
   void removeWorkout(int index) {
     if (index >= 0 && index < _workouts.length) {
       print(
-          '📦 [DATA_MANAGER] Removing workout at index $index: ${_workouts[index].name}');
+          '[DATA_MANAGER] Removing workout at index $index: ${_workouts[index].name}');
       _workouts.removeAt(index);
       print(
-          '📦 [DATA_MANAGER] Workouts after remove: ${_workouts.map((w) => w.name).toList()}');
+          '[DATA_MANAGER] Workouts after remove: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
       notifyListeners();
     }
@@ -248,7 +245,7 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkoutHistory(WorkoutHistory history) {
-    print('📦 [DATA_MANAGER] Adding workout history for ${history.date}');
+    print('[DATA_MANAGER] Adding workout history for ${history.date}');
     _workoutHistory.add(history);
     _saveData();
     notifyListeners();
