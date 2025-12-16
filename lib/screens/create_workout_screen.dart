@@ -44,14 +44,14 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
   }
 
   void _addExercise() async {
-    print('🔵 [CREATE_WORKOUT] Opening exercise library as dialog...');
+    print('[CREATE_WORKOUT] Opening exercise library as dialog...');
 
     final selectedExercise = await showDialog<Exercise>(
       context: context,
       builder: (dialogContext) => Dialog.fullscreen(
         child: ExerciseLibraryScreen(
           onExerciseSelected: (exercise) {
-            print('🔵 [CREATE_WORKOUT] Exercise selected: ${exercise.name}');
+            print('[CREATE_WORKOUT] Exercise selected: ${exercise.name}');
             Navigator.of(dialogContext).pop(exercise);
           },
         ),
@@ -59,7 +59,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
 
     print(
-        '🔵 [CREATE_WORKOUT] Returned from library dialog. Selected: ${selectedExercise?.name ?? "null"}, mounted: $mounted');
+        '[CREATE_WORKOUT] Returned from library dialog. Selected: ${selectedExercise?.name ?? "null"}, mounted: $mounted');
     if (selectedExercise != null && mounted) {
       _showExerciseConfigDialog(selectedExercise);
     }
@@ -150,7 +150,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          print('🟢 [CREATE_WORKOUT] Save button pressed');
+                          print('[CREATE_WORKOUT] Save button pressed');
                           final workoutExercise = WorkoutExercise(
                             exercise: exercise,
                             sets: int.parse(setsController.text),
@@ -158,10 +158,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                             weight: double.parse(weightController.text),
                           );
                           print(
-                              '🟢 [CREATE_WORKOUT] Created WorkoutExercise: ${exercise.name}, sets: ${workoutExercise.sets}');
+                              '[CREATE_WORKOUT] Created WorkoutExercise: ${exercise.name}, sets: ${workoutExercise.sets}');
 
                           print(
-                              '🟢 [CREATE_WORKOUT] Returning workout exercise and closing dialog...');
+                              '[CREATE_WORKOUT] Returning workout exercise and closing dialog...');
 
                           Navigator.of(dialogContext).pop(workoutExercise);
                         },
@@ -186,23 +186,23 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
 
     print(
-        '🟢 [CREATE_WORKOUT] Dialog closed. Result: ${result != null ? result.exercise.name : "null"}, Mounted: $mounted');
+        '[CREATE_WORKOUT] Dialog closed. Result: ${result != null ? result.exercise.name : "null"}, Mounted: $mounted');
 
     if (result != null && mounted) {
-      print('🟢 [CREATE_WORKOUT] Processing result...');
+      print('[CREATE_WORKOUT] Processing result...');
       setState(() {
         if (existing != null) {
           final index = _workoutExercises.indexOf(existing);
           _workoutExercises[index] = result;
-          print('🟢 [CREATE_WORKOUT] Updated exercise at index $index');
+          print('[CREATE_WORKOUT] Updated exercise at index $index');
         } else {
           _workoutExercises.add(result);
           print(
-              '🟢 [CREATE_WORKOUT] Added new exercise. Total exercises: ${_workoutExercises.length}');
+              '[CREATE_WORKOUT] Added new exercise. Total exercises: ${_workoutExercises.length}');
         }
       });
 
-      print('🟢 [CREATE_WORKOUT] Showing SnackBar...');
+      print('[CREATE_WORKOUT] Showing SnackBar...');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
