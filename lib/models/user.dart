@@ -129,3 +129,69 @@ class User {
     );
   }
 }
+
+enum ExperienceLevel { beginner, intermediate, advanced }
+
+enum TrainingGoal {
+  strength,
+  hypertrophy,
+  endurance,
+  fat_loss,
+  general_fitness
+}
+
+enum TrainingIntensity { light, moderate, intense }
+
+class UserProfile {
+  final List<TrainingGoal> goals;
+  final ExperienceLevel experienceLevel;
+  final List<String> trainingFocus; // e.g. ['legs','upper body','core']
+  final TrainingIntensity preferredIntensity;
+
+  UserProfile({
+    required this.goals,
+    required this.experienceLevel,
+    required this.trainingFocus,
+    required this.preferredIntensity,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'goals': goals.map((g) => g.name).toList(),
+      'experienceLevel': experienceLevel.name,
+      'trainingFocus': trainingFocus,
+      'preferredIntensity': preferredIntensity.name,
+    };
+  }
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      goals: (json['goals'] as List)
+          .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
+              orElse: () => TrainingGoal.general_fitness))
+          .toList(),
+      experienceLevel: ExperienceLevel.values.firstWhere(
+          (e) => e.name == json['experienceLevel'],
+          orElse: () => ExperienceLevel.intermediate),
+      trainingFocus:
+          (json['trainingFocus'] as List).map((e) => e.toString()).toList(),
+      preferredIntensity: TrainingIntensity.values.firstWhere(
+          (e) => e.name == json['preferredIntensity'],
+          orElse: () => TrainingIntensity.moderate),
+    );
+  }
+
+  UserProfile copyWith({
+    List<TrainingGoal>? goals,
+    ExperienceLevel? experienceLevel,
+    List<String>? trainingFocus,
+    TrainingIntensity? preferredIntensity,
+  }) {
+    return UserProfile(
+      goals: goals ?? this.goals,
+      experienceLevel: experienceLevel ?? this.experienceLevel,
+      trainingFocus: trainingFocus ?? this.trainingFocus,
+      preferredIntensity: preferredIntensity ?? this.preferredIntensity,
+    );
+  }
+}
