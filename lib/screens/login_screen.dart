@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import 'register_screen.dart';
 import 'main_screen.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,17 +35,30 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      // TODO: Implement actual authentication
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+      final auth = Provider.of<AuthService>(context, listen: false);
+      try {
+        await auth.signInWithEmail(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
         );
+
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.toString())),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -144,8 +160,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {
-                        // TODO: Implement forgot password
+                      onPressed: () async {
+                        final auth =
+                            Provider.of<AuthService>(context, listen: false);
+                        final email = _emailController.text.trim();
+                        if (email.isEmpty || !email.contains('@')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(AppStrings.errorInvalidEmail)),
+                          );
+                          return;
+                        }
+                        try {
+                          await auth.sendPasswordReset(email);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Password reset email sent.')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
                       },
                       child: Text(
                         AppStrings.forgotPassword,

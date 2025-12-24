@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'services/auth_service.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'screens/login_screen.dart';
@@ -10,6 +13,7 @@ import 'services/wellness_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   final dataManager = DataManager();
   await dataManager.initialize();
@@ -23,6 +27,8 @@ void main() async {
   final wellnessService = WellnessService();
   await wellnessService.load();
 
+  final authService = AuthService();
+
   runApp(
     MultiProvider(
       providers: [
@@ -30,6 +36,7 @@ void main() async {
         ChangeNotifierProvider.value(value: appColor),
         ChangeNotifierProvider.value(value: profileService),
         ChangeNotifierProvider.value(value: wellnessService),
+        ChangeNotifierProvider.value(value: authService),
       ],
       child: const MyApp(),
     ),
