@@ -145,7 +145,7 @@ enum TrainingIntensity { light, moderate, intense }
 class UserProfile {
   final List<TrainingGoal> goals;
   final ExperienceLevel experienceLevel;
-  final List<String> trainingFocus; // e.g. ['legs','upper body','core']
+  final List<String> trainingFocus;
   final TrainingIntensity preferredIntensity;
 
   UserProfile({

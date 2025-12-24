@@ -1,6 +1,7 @@
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
+import '../models/user.dart';
 
 class ProgressMetrics {
   final double completionRate;
@@ -97,6 +98,7 @@ class ProgressionService {
     Workout workout,
     List<WorkoutHistory> histories, {
     int lookback = 5,
+    UserProfile? profile,
   }) {
     final adjustedExercises = <WorkoutExercise>[];
     final reasons = <String, String>{};
@@ -112,16 +114,55 @@ class ProgressionService {
       if (metrics.sessionsCount == 0) {
         reason = 'No recent data — keep as is';
       } else {
+        double baseIncreasePct;
+        double baseDecreasePct;
+        switch (profile?.experienceLevel ?? ExperienceLevel.intermediate) {
+          case ExperienceLevel.beginner:
+            baseIncreasePct = 0.03;
+            baseDecreasePct = 0.03;
+            break;
+          case ExperienceLevel.intermediate:
+            baseIncreasePct = 0.05;
+            baseDecreasePct = 0.05;
+            break;
+          case ExperienceLevel.advanced:
+            baseIncreasePct = 0.08;
+            baseDecreasePct = 0.06;
+            break;
+        }
+
+        final intensity =
+            profile?.preferredIntensity ?? TrainingIntensity.moderate;
+        double intensityMultiplier;
+        switch (intensity) {
+          case TrainingIntensity.light:
+            intensityMultiplier = 0.6;
+            break;
+          case TrainingIntensity.moderate:
+            intensityMultiplier = 1.0;
+            break;
+          case TrainingIntensity.intense:
+            intensityMultiplier = 1.4;
+            break;
+        }
+
+        final increaseFactor = 1.0 + (baseIncreasePct * intensityMultiplier);
+        final decreaseFactor = 1.0 - (baseDecreasePct * intensityMultiplier);
+
         final c = metrics.completionRate;
         final perceived = metrics.lastPerceivedDifficulty;
 
         if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
-            newReps = we.targetReps + 1;
-            reason = 'Bodyweight: completed easily — +1 rep';
+            final add =
+                profile?.experienceLevel == ExperienceLevel.advanced ? 2 : 1;
+            newReps = we.targetReps + add;
+            reason = 'Bodyweight: completed easily — +$add rep(s)';
           } else if (c < 0.7 || perceived == ExerciseDifficulty.hard) {
-            newReps = we.targetReps - 1 > 0 ? we.targetReps - 1 : 1;
-            reason = 'Bodyweight: struggled — -1 rep';
+            final sub =
+                profile?.experienceLevel == ExperienceLevel.beginner ? 1 : 2;
+            newReps = we.targetReps - sub > 0 ? we.targetReps - sub : 1;
+            reason = 'Bodyweight: struggled — -$sub rep(s)';
           } else {
             reason = 'Bodyweight: keep reps';
           }
@@ -129,19 +170,20 @@ class ProgressionService {
           if (c >= 0.95 &&
               metrics.avgRepsPerSet >= we.targetReps &&
               perceived != ExerciseDifficulty.hard) {
-            newWeight = (we.weight * 1.05);
-            reason = 'Completed targets comfortably — increase weight by 5%';
+            newWeight = (we.weight * increaseFactor);
+            reason = 'Completed targets comfortably — increase weight';
           } else if (c < 0.75 || perceived == ExerciseDifficulty.hard) {
-            newWeight = (we.weight * 0.95).clamp(0.0, double.infinity);
+            newWeight =
+                (we.weight * decreaseFactor).clamp(0.0, double.infinity);
             if (c < 0.6)
               newReps = (we.targetReps - 2) > 1 ? we.targetReps - 2 : 1;
             else
               newReps = (we.targetReps - 1) > 1 ? we.targetReps - 1 : 1;
-            reason = 'Struggled — reduce weight by 5% and lower reps';
+            reason = 'Struggled — reduce weight and lower reps';
           } else {
             final avgDur = metrics.avgDurationSeconds;
             if (avgDur > 90 && c < 0.9) {
-              newWeight = (we.weight * 0.97);
+              newWeight = (we.weight * (1.0 - 0.02 * intensityMultiplier));
               reason =
                   'Sets took long and completion low — slight weight reduction';
             } else {

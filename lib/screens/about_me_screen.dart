@@ -4,6 +4,7 @@ import '../services/profile_service.dart';
 import '../models/user.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../constants/app_strings.dart';
 
 class AboutMeScreen extends StatefulWidget {
   const AboutMeScreen({super.key});
@@ -14,6 +15,18 @@ class AboutMeScreen extends StatefulWidget {
 
 class _AboutMeScreenState extends State<AboutMeScreen> {
   final _focusController = TextEditingController();
+  final List<String> _focusList = [];
+  static const List<String> _suggestedFocus = [
+    'legs',
+    'upper body',
+    'core',
+    'glutes',
+    'back',
+    'chest',
+    'shoulders',
+    'arms',
+    'cardio',
+  ];
   final Map<TrainingGoal, bool> _selectedGoals = {};
   ExperienceLevel? _experience;
   TrainingIntensity? _intensity;
@@ -36,6 +49,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             (e) => e.name == profile.preferredIntensity,
             orElse: () => TrainingIntensity.moderate)
         : TrainingIntensity.moderate;
+    _focusList.addAll(profile.trainingFocus);
     _focusController.text = profile.trainingFocus.join(', ');
   }
 
@@ -57,7 +71,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Goals', style: AppTextStyles.h3),
+            Text(AppStrings.training, style: AppTextStyles.h3),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -84,14 +98,63 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               onChanged: (v) => setState(() => _experience = v),
             ),
             const SizedBox(height: 16),
-            Text('Training Focus (comma separated)', style: AppTextStyles.h3),
+            Text('Training Focus', style: AppTextStyles.h3),
             const SizedBox(height: 8),
-            TextField(
-              controller: _focusController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'e.g. legs, upper body, core',
-              ),
+            Wrap(
+              spacing: 8,
+              children: _focusList
+                  .map((f) => Chip(
+                        label: Text(f),
+                        onDeleted: () => setState(() => _focusList.remove(f)),
+                      ))
+                  .toList(),
+            ),
+            const SizedBox(height: 8),
+            Autocomplete<String>(
+              optionsBuilder: (textEditingValue) {
+                final input = textEditingValue.text.toLowerCase();
+                if (input.isEmpty) return const Iterable<String>.empty();
+                return _suggestedFocus.where((s) =>
+                    s.toLowerCase().contains(input) && !_focusList.contains(s));
+              },
+              fieldViewBuilder:
+                  (context, controller, focusNode, onFieldSubmitted) {
+                controller.text = _focusController.text;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: 'e.g. legs, upper body, core',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        final val = controller.text.trim();
+                        if (val.isNotEmpty && !_focusList.contains(val)) {
+                          setState(() {
+                            _focusList.add(val);
+                            controller.clear();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  onSubmitted: (v) {
+                    final val = v.trim();
+                    if (val.isNotEmpty && !_focusList.contains(val)) {
+                      setState(() {
+                        _focusList.add(val);
+                        controller.clear();
+                      });
+                    }
+                  },
+                );
+              },
+              onSelected: (selection) {
+                if (!_focusList.contains(selection)) {
+                  setState(() => _focusList.add(selection));
+                }
+              },
             ),
             const SizedBox(height: 16),
             Text('Preferred Intensity', style: AppTextStyles.h3),
@@ -109,11 +172,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               }).toList(),
             ),
             const SizedBox(height: 16),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _save,
-                child: const Text('Save'),
+                child: Text(AppStrings.save),
               ),
             ),
           ],
@@ -128,15 +192,17 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         .where((e) => e.value)
         .map((e) => e.key.name)
         .toList();
-    final focus = _focusController.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+
+    if (selectedGoals.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.errorFieldRequired)),
+      );
+      return;
+    }
 
     await profile.setGoals(selectedGoals);
     await profile.setExperienceLevel(_experience?.name);
-    await profile.setTrainingFocus(focus);
+    await profile.setTrainingFocus(_focusList);
     await profile.setPreferredIntensity(_intensity?.name);
 
     if (mounted) Navigator.of(context).pop();
