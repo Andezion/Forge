@@ -12,6 +12,7 @@ import 'login_screen.dart';
 import 'customization_screen.dart';
 import 'weight_screen.dart';
 import 'wellness_screen.dart';
+import 'about_me_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -125,6 +126,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                     Icons.show_chart,
                     () {
                       // TODO: Navigate to progress charts
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
+                    'About Me',
+                    Icons.fitness_center,
+                    () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AboutMeScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildMenuItem(
