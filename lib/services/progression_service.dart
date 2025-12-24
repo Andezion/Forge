@@ -101,7 +101,6 @@ class ProgressionService {
     int lookback = 5,
     UserProfile? profile,
   }) async {
-    // If no profile supplied, try to load persisted preferences
     if (profile == null) {
       final ps = ProfileService();
       await ps.load();
