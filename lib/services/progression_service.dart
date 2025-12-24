@@ -2,6 +2,7 @@ import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
 import '../models/user.dart';
+import 'profile_service.dart';
 
 class ProgressMetrics {
   final double completionRate;
@@ -94,12 +95,39 @@ class ProgressionService {
     );
   }
 
-  Map<String, dynamic> suggestNextWorkout(
+  Future<Map<String, dynamic>> suggestNextWorkout(
     Workout workout,
     List<WorkoutHistory> histories, {
     int lookback = 5,
     UserProfile? profile,
-  }) {
+  }) async {
+    // If no profile supplied, try to load persisted preferences
+    if (profile == null) {
+      final ps = ProfileService();
+      await ps.load();
+      final goals = ps.goals
+          .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
+              orElse: () => TrainingGoal.general_fitness))
+          .toList();
+      final experience = ps.experienceLevel != null
+          ? ExperienceLevel.values.firstWhere(
+              (e) => e.name == ps.experienceLevel,
+              orElse: () => ExperienceLevel.intermediate)
+          : ExperienceLevel.intermediate;
+      final focus = ps.trainingFocus;
+      final intensity = ps.preferredIntensity != null
+          ? TrainingIntensity.values.firstWhere(
+              (e) => e.name == ps.preferredIntensity,
+              orElse: () => TrainingIntensity.moderate)
+          : TrainingIntensity.moderate;
+
+      profile = UserProfile(
+        goals: goals,
+        experienceLevel: experience,
+        trainingFocus: focus,
+        preferredIntensity: intensity,
+      );
+    }
     final adjustedExercises = <WorkoutExercise>[];
     final reasons = <String, String>{};
 
