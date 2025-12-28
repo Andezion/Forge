@@ -2,6 +2,7 @@ import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
 import '../models/user.dart';
+import '../models/exercise.dart';
 import 'profile_service.dart';
 
 class ProgressMetrics {
@@ -127,6 +128,7 @@ class ProgressionService {
         preferredIntensity: intensity,
       );
     }
+    final prof = profile;
     final adjustedExercises = <WorkoutExercise>[];
     final reasons = <String, String>{};
 
@@ -143,7 +145,7 @@ class ProgressionService {
       } else {
         double baseIncreasePct;
         double baseDecreasePct;
-        switch (profile?.experienceLevel ?? ExperienceLevel.intermediate) {
+        switch (prof.experienceLevel) {
           case ExperienceLevel.beginner:
             baseIncreasePct = 0.03;
             baseDecreasePct = 0.03;
@@ -158,8 +160,7 @@ class ProgressionService {
             break;
         }
 
-        final intensity =
-            profile?.preferredIntensity ?? TrainingIntensity.moderate;
+        final intensity = prof.preferredIntensity;
         double intensityMultiplier;
         switch (intensity) {
           case TrainingIntensity.light:
@@ -182,12 +183,12 @@ class ProgressionService {
         if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
             final add =
-                profile?.experienceLevel == ExperienceLevel.advanced ? 2 : 1;
+                prof.experienceLevel == ExperienceLevel.advanced ? 2 : 1;
             newReps = we.targetReps + add;
             reason = 'Bodyweight: completed easily — +$add rep(s)';
           } else if (c < 0.7 || perceived == ExerciseDifficulty.hard) {
             final sub =
-                profile?.experienceLevel == ExperienceLevel.beginner ? 1 : 2;
+                prof.experienceLevel == ExperienceLevel.beginner ? 1 : 2;
             newReps = we.targetReps - sub > 0 ? we.targetReps - sub : 1;
             reason = 'Bodyweight: struggled — -$sub rep(s)';
           } else {
@@ -202,10 +203,11 @@ class ProgressionService {
           } else if (c < 0.75 || perceived == ExerciseDifficulty.hard) {
             newWeight =
                 (we.weight * decreaseFactor).clamp(0.0, double.infinity);
-            if (c < 0.6)
+            if (c < 0.6) {
               newReps = (we.targetReps - 2) > 1 ? we.targetReps - 2 : 1;
-            else
+            } else {
               newReps = (we.targetReps - 1) > 1 ? we.targetReps - 1 : 1;
+            }
             reason = 'Struggled — reduce weight and lower reps';
           } else {
             final avgDur = metrics.avgDurationSeconds;

@@ -133,7 +133,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                     Card(
                       child: ListTile(
                         title: Text(
-                            '${e.timestamp.toLocal().toString().split('.')[0]}'),
+                            e.timestamp.toLocal().toString().split('.')[0]),
                         subtitle: Text(
                             'Avg: ${e.averageScore.toStringAsFixed(1)} — ${e.answers.values.join(', ')}'),
                       ),
