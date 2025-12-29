@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
+import '../models/user.dart' as app_user;
+import '../services/auth_service.dart';
 import '../services/data_manager.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -42,6 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileService>(context);
+    final auth = Provider.of<AuthService>(context);
+    final firebaseUser = auth.firebaseUser;
     final dataManager = Provider.of<DataManager>(context);
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -72,15 +76,45 @@ class _ProfileScreenState extends State<ProfileScreen>
                 children: [
                   _buildFramedAvatar(profile),
                   const SizedBox(height: 16),
-                  Text(
-                    'User Name',
-                    style: AppTextStyles.h3.copyWith(
-                      color: AppColors.textOnPrimary,
+                  if (firebaseUser?.displayName != null &&
+                      (firebaseUser!.displayName ?? '').trim().isNotEmpty)
+                    Text(
+                      firebaseUser.displayName!,
+                      style: AppTextStyles.h3.copyWith(
+                        color: AppColors.textOnPrimary,
+                      ),
+                    )
+                  else if (firebaseUser != null)
+                    FutureBuilder<app_user.User?>(
+                      future: auth.getUserProfile(firebaseUser.uid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return Text(
+                            'User Name',
+                            style: AppTextStyles.h3.copyWith(
+                              color: AppColors.textOnPrimary,
+                            ),
+                          );
+                        }
+                        final u = snapshot.data;
+                        return Text(
+                          u?.name ?? 'User Name',
+                          style: AppTextStyles.h3.copyWith(
+                            color: AppColors.textOnPrimary,
+                          ),
+                        );
+                      },
+                    )
+                  else
+                    Text(
+                      'User Name',
+                      style: AppTextStyles.h3.copyWith(
+                        color: AppColors.textOnPrimary,
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 4),
                   Text(
-                    'user@example.com',
+                    firebaseUser?.email ?? '—',
                     style: AppTextStyles.body2.copyWith(
                       color: AppColors.textOnPrimary.withOpacity(0.8),
                     ),
@@ -188,7 +222,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final authService =
+                            Provider.of<AuthService>(context, listen: false);
+                        await authService.signOut();
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (context) => const LoginScreen(),

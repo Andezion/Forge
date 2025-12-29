@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -21,12 +22,37 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      if (auth.firebaseUser != null) {
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+          return;
+        }
+      }
+      final prefs = await SharedPreferences.getInstance();
+      _rememberMe = prefs.getBool('remember_email') ?? false;
+      final last = prefs.getString('last_email');
+      if (_rememberMe && last != null && mounted) {
+        _emailController.text = last;
+      }
+      if (mounted) setState(() {});
+    });
   }
 
   Future<void> _handleLogin() async {
@@ -40,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await auth.signInWithEmail(
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          remember: _rememberMe,
         );
 
         if (mounted) {
@@ -49,8 +76,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } catch (e) {
         if (mounted) {
+          String msg = e is Exception ? e.toString() : '$e';
+          msg = msg.replaceFirst('Exception: ', '');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString())),
+            SnackBar(content: Text(msg)),
           );
         }
       } finally {
@@ -178,8 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 content: Text('Password reset email sent.')),
                           );
                         } catch (e) {
+                          String msg = e is Exception ? e.toString() : '$e';
+                          msg = msg.replaceFirst('Exception: ', '');
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())),
+                            SnackBar(content: Text(msg)),
                           );
                         }
                       },
@@ -192,6 +223,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: (v) async {
+                          if (v == null) return;
+                          setState(() {
+                            _rememberMe = v;
+                          });
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('remember_email', _rememberMe);
+                          if (!_rememberMe) {
+                            await prefs.remove('last_email');
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Text('Remember me', style: AppTextStyles.body2),
+                    ],
+                  ),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(

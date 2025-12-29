@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -23,6 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  bool _rememberMe = true;
 
   @override
   void dispose() {
@@ -45,6 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          remember: _rememberMe,
         );
 
         if (mounted) {
@@ -54,8 +57,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       } catch (e) {
         if (mounted) {
+          String msg = e is Exception ? e.toString() : '$e';
+          msg = msg.replaceFirst('Exception: ', '');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString())),
+            SnackBar(content: Text(msg)),
           );
         }
       } finally {
@@ -216,6 +221,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: (v) async {
+                          if (v == null) return;
+                          setState(() {
+                            _rememberMe = v;
+                          });
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('remember_email', _rememberMe);
+                          if (!_rememberMe) await prefs.remove('last_email');
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Text('Remember me', style: AppTextStyles.body2),
+                    ],
+                  ),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
