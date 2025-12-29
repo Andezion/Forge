@@ -96,6 +96,30 @@ class _ProfileScreenState extends State<ProfileScreen>
                             ),
                           );
                         }
+                        if (snapshot.hasError) {
+                          return Column(
+                            children: [
+                              Text(
+                                'User Name',
+                                style: AppTextStyles.h3.copyWith(
+                                  color: AppColors.textOnPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {});
+                                },
+                                child: Text(
+                                  'Retry',
+                                  style: AppTextStyles.buttonSmall.copyWith(
+                                    color: AppColors.textOnPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
                         final u = snapshot.data;
                         return Text(
                           u?.name ?? 'User Name',
