@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user.dart' as app_user;
 
@@ -26,46 +27,81 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    final cred = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    _firebaseUser = cred.user;
+      _firebaseUser = cred.user;
 
-    if (_firebaseUser != null) {
-      await _firebaseUser!.updateDisplayName(name);
+      if (_firebaseUser != null) {
+        await _firebaseUser!.updateDisplayName(name);
 
-      final profile = {
-        'id': _firebaseUser!.uid,
-        'name': name,
-        'email': email,
-        'height': 0.0,
-        'weight': 0.0,
-        'exerciseMaxes': [],
-        'overallRating': 0.0,
-        'createdAt': DateTime.now().toIso8601String(),
-        'lastWorkoutDate': null,
-      };
+        final profile = {
+          'id': _firebaseUser!.uid,
+          'name': name,
+          'email': email,
+          'height': 0.0,
+          'weight': 0.0,
+          'exerciseMaxes': [],
+          'overallRating': 0.0,
+          'createdAt': DateTime.now().toIso8601String(),
+          'lastWorkoutDate': null,
+        };
 
-      await _db.collection('users').doc(_firebaseUser!.uid).set(profile);
+        await _db.collection('users').doc(_firebaseUser!.uid).set(profile);
+
+        // remember last signed-in email for convenience
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('last_email', email);
+      }
+
+      notifyListeners();
+      return cred;
+    } on fb_auth.FirebaseAuthException catch (e) {
+      String message = 'Registration failed.';
+      if (e.code == 'weak-password') {
+        message = 'The password is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'The email address is already in use.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is invalid.';
+      }
+      throw Exception(message);
     }
-
-    notifyListeners();
-    return cred;
   }
 
   Future<fb_auth.UserCredential> signInWithEmail({
     required String email,
     required String password,
   }) async {
-    final cred = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    _firebaseUser = cred.user;
-    notifyListeners();
-    return cred;
+    try {
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _firebaseUser = cred.user;
+
+      // remember last signed-in email
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_email', email);
+
+      notifyListeners();
+      return cred;
+    } on fb_auth.FirebaseAuthException catch (e) {
+      String message = 'Sign in failed.';
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Incorrect password.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is invalid.';
+      } else if (e.code == 'user-disabled') {
+        message = 'This user has been disabled.';
+      }
+      throw Exception(message);
+    }
   }
 
   Future<void> signOut() async {
