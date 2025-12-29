@@ -9,6 +9,9 @@ class ProfileService extends ChangeNotifier {
   static const _keyExperience = 'profile_experience';
   static const _keyFocus = 'profile_focus';
   static const _keyIntensity = 'profile_intensity';
+  static const _keyAge = 'profile_age';
+  static const _keyHeight = 'profile_height';
+  static const _keyYearsTraining = 'profile_years_training';
 
   String? _imagePath;
   int _frameIndex = 0;
@@ -17,6 +20,9 @@ class ProfileService extends ChangeNotifier {
   String? _experienceLevel;
   List<String> _trainingFocus = [];
   String? _preferredIntensity;
+  int? _age;
+  double? _heightCm;
+  double? _yearsTraining;
 
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
@@ -25,6 +31,9 @@ class ProfileService extends ChangeNotifier {
   String? get experienceLevel => _experienceLevel;
   List<String> get trainingFocus => _trainingFocus;
   String? get preferredIntensity => _preferredIntensity;
+  int? get age => _age;
+  double? get heightCm => _heightCm;
+  double? get yearsTraining => _yearsTraining;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,6 +45,12 @@ class ProfileService extends ChangeNotifier {
     _experienceLevel = prefs.getString(_keyExperience);
     _trainingFocus = prefs.getStringList(_keyFocus) ?? [];
     _preferredIntensity = prefs.getString(_keyIntensity);
+    _age = prefs.containsKey(_keyAge) ? prefs.getInt(_keyAge) : null;
+    _heightCm =
+        prefs.containsKey(_keyHeight) ? prefs.getDouble(_keyHeight) : null;
+    _yearsTraining = prefs.containsKey(_keyYearsTraining)
+        ? prefs.getDouble(_keyYearsTraining)
+        : null;
     notifyListeners();
   }
 
@@ -101,6 +116,39 @@ class ProfileService extends ChangeNotifier {
       await prefs.remove(_keyIntensity);
     } else {
       await prefs.setString(_keyIntensity, intensity);
+    }
+  }
+
+  Future<void> setAge(int? age) async {
+    _age = age;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (age == null) {
+      await prefs.remove(_keyAge);
+    } else {
+      await prefs.setInt(_keyAge, age);
+    }
+  }
+
+  Future<void> setHeightCm(double? height) async {
+    _heightCm = height;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (height == null) {
+      await prefs.remove(_keyHeight);
+    } else {
+      await prefs.setDouble(_keyHeight, height);
+    }
+  }
+
+  Future<void> setYearsTraining(double? years) async {
+    _yearsTraining = years;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (years == null) {
+      await prefs.remove(_keyYearsTraining);
+    } else {
+      await prefs.setDouble(_keyYearsTraining, years);
     }
   }
 }
