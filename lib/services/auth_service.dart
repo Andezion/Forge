@@ -5,6 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user.dart' as app_user;
 
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+  @override
+  String toString() => message;
+}
+
 class AuthService extends ChangeNotifier {
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -26,6 +33,7 @@ class AuthService extends ChangeNotifier {
     required String name,
     required String email,
     required String password,
+    bool remember = false,
   }) async {
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
@@ -52,9 +60,11 @@ class AuthService extends ChangeNotifier {
 
         await _db.collection('users').doc(_firebaseUser!.uid).set(profile);
 
-        // remember last signed-in email for convenience
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('last_email', email);
+        if (remember) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('last_email', email);
+          await prefs.setBool('remember_email', true);
+        }
       }
 
       notifyListeners();
@@ -68,13 +78,14 @@ class AuthService extends ChangeNotifier {
       } else if (e.code == 'invalid-email') {
         message = 'The email address is invalid.';
       }
-      throw Exception(message);
+      throw AuthException(message);
     }
   }
 
   Future<fb_auth.UserCredential> signInWithEmail({
     required String email,
     required String password,
+    bool remember = false,
   }) async {
     try {
       final cred = await _auth.signInWithEmailAndPassword(
@@ -83,9 +94,11 @@ class AuthService extends ChangeNotifier {
       );
       _firebaseUser = cred.user;
 
-      // remember last signed-in email
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('last_email', email);
+      if (remember) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('last_email', email);
+        await prefs.setBool('remember_email', true);
+      }
 
       notifyListeners();
       return cred;
@@ -100,7 +113,7 @@ class AuthService extends ChangeNotifier {
       } else if (e.code == 'user-disabled') {
         message = 'This user has been disabled.';
       }
-      throw Exception(message);
+      throw AuthException(message);
     }
   }
 
