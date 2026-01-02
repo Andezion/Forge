@@ -5,7 +5,6 @@ import '../models/workout.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
-/// Экран для просмотра рекомендаций алгоритма прогрессии
 class ProgressionInsightsScreen extends StatefulWidget {
   final Workout workout;
 
@@ -42,14 +41,12 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
       await _dataManager.load();
       final histories = _dataManager.workoutHistories;
 
-      // Получить рекомендации
       final result = await _progressionService.suggestNextWorkout(
         widget.workout,
         histories,
         lookback: 5,
       );
 
-      // Получить детальные метрики для каждого упражнения
       final metrics = <String, ProgressMetrics>{};
       for (var exercise in widget.workout.exercises) {
         metrics[exercise.exercise.id] =
