@@ -285,29 +285,29 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
             if (metrics.sessionsCount > 0) ...[
               const Divider(height: 24),
               _buildMetricRow(
-                'Выполнено за последние тренировки:',
+                'Completed in recent workouts:',
                 '${(metrics.completionRate * 100).toStringAsFixed(0)}%',
               ),
               _buildMetricRow(
-                'Средний вес:',
+                'Average weight:',
                 '${metrics.avgWeight.toStringAsFixed(1)} kg',
               ),
               _buildMetricRow(
-                'Средние повторения:',
+                'Average reps:',
                 metrics.avgRepsPerSet.toStringAsFixed(1),
               ),
               if (metrics.estimated1RM > 0)
                 _buildMetricRow(
-                  'Расчётный 1RM:',
+                  'Estimated 1RM:',
                   '${metrics.estimated1RM.toStringAsFixed(1)} kg',
                 ),
               _buildMetricRow(
-                'Тренд веса:',
+                'Weight trend:',
                 metrics.weightTrend > 0
-                    ? '↑ Растёт (+${metrics.weightTrend.toStringAsFixed(1)} kg)'
+                    ? '↑ Rising (+${metrics.weightTrend.toStringAsFixed(1)} kg)'
                     : metrics.weightTrend < 0
-                        ? '↓ Падает (${metrics.weightTrend.toStringAsFixed(1)} kg)'
-                        : '→ Стабильно',
+                        ? '↓ Falling (${metrics.weightTrend.toStringAsFixed(1)} kg)'
+                        : '→ Stable',
                 color: metrics.weightTrend > 0
                     ? Colors.green
                     : metrics.weightTrend < 0
@@ -315,7 +315,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                         : null,
               ),
               _buildMetricRow(
-                'Дней с последней тренировки:',
+                'Days since last session:',
                 metrics.daysSinceLastSession.toString(),
               ),
             ],
