@@ -349,7 +349,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildFrequencyView() {
     if (_frequencyData == null) {
-      return const Center(child: Text('Нет данных'));
+      return const Center(child: Text('No data'));
     }
 
     return ListView(
@@ -359,7 +359,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           children: [
             Expanded(
               child: _buildMiniStatsCard(
-                'Тренировок/Неделю',
+                'Workouts/Week',
                 _frequencyData!.currentWeekFrequency.toStringAsFixed(1),
                 Icons.fitness_center,
               ),
@@ -368,7 +368,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             Expanded(
               child: _buildMiniStatsCard(
                 'Streak',
-                '${_frequencyData!.currentStreak} дней',
+                '${_frequencyData!.currentStreak} days',
                 Icons.local_fire_department,
               ),
             ),
@@ -376,13 +376,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildStatsCard(
-          'Всего Тренировок',
+          'Total Workouts',
           '${_frequencyData!.totalWorkouts}',
           0,
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Частота Тренировок (тренировок в неделю)',
+          'Workout Frequency (workouts per week)',
           _buildBarChart(_frequencyData!.weeklyFrequencyData),
         ),
       ],
@@ -391,14 +391,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildConsistencyView() {
     if (_consistencyData == null) {
-      return const Center(child: Text('Нет данных'));
+      return const Center(child: Text('No data'));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildStatsCard(
-          'Процент Завершения',
+          'Completion Rate',
           '${_consistencyData!.overallCompletionRate.toStringAsFixed(1)}%',
           0,
         ),
@@ -409,19 +409,19 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Статистика', style: AppTextStyles.h2),
+                Text('Statistics', style: AppTextStyles.h2),
                 const SizedBox(height: 12),
-                _buildInfoRow('Завершено подходов',
+                _buildInfoRow('Sets Completed',
                     '${_consistencyData!.totalSetsCompleted}'),
-                _buildInfoRow('Запланировано подходов',
-                    '${_consistencyData!.totalSetsPlanned}'),
+                _buildInfoRow(
+                    'Sets Planned', '${_consistencyData!.totalSetsPlanned}'),
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Процент Завершения по Тренировкам',
+          'Workout Completion Rate',
           _buildLineChart(
             _consistencyData!.completionRateData,
             color: Colors.purple,
@@ -442,7 +442,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Выберите Упражнение', style: AppTextStyles.h2),
+              Text('Select Exercise', style: AppTextStyles.h2),
               const SizedBox(height: 12),
               DropdownButtonFormField<Exercise>(
                 value: _selectedExercise,
@@ -451,7 +451,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-                hint: const Text('Выберите упражнение'),
+                hint: const Text('Select Exercise'),
                 items: _availableExercises.map((exercise) {
                   return DropdownMenuItem(
                     value: exercise,
@@ -477,7 +477,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                           size: 64, color: AppColors.textSecondary),
                       const SizedBox(height: 16),
                       Text(
-                        'Выберите упражнение для просмотра прогресса',
+                        'Select an exercise to view progress',
                         style: AppTextStyles.body1.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -500,13 +500,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         _buildStatsCard(
-          'Максимальный Вес',
-          '${_exerciseProgressData!.currentMax.toStringAsFixed(1)} кг',
+          'Maximum Weight',
+          '${_exerciseProgressData!.currentMax.toStringAsFixed(1)} kg',
           _exerciseProgressData!.progressPercentage,
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Прогресс Максимального Веса',
+          'Maximum Weight Progress',
           _buildLineChart(
             _exerciseProgressData!.maxWeightData,
             color: AppColors.primary,
@@ -514,7 +514,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Объем (вес × повторения)',
+          'Volume (weight × repetitions)',
           _buildLineChart(
             _exerciseProgressData!.volumeData,
             color: Colors.green,
@@ -522,7 +522,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Интенсивность (%)',
+          'Intensity (%)',
           _buildLineChart(
             _exerciseProgressData!.intensityData,
             color: Colors.orange,
@@ -636,7 +636,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Вклад по Упражнениям', style: AppTextStyles.h2),
+            Text('Exercise Contributions', style: AppTextStyles.h2),
             const SizedBox(height: 12),
             ...sorted.take(5).map((entry) {
               return Padding(
@@ -684,7 +684,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     double? maxY,
   }) {
     if (data.isEmpty) {
-      return const Center(child: Text('Нет данных для отображения'));
+      return const Center(child: Text('No data to display'));
     }
 
     final spots = data
@@ -773,7 +773,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildBarChart(List<ChartDataPoint> data) {
     if (data.isEmpty) {
-      return const Center(child: Text('Нет данных для отображения'));
+      return const Center(child: Text('No data to display'));
     }
 
     final barGroups = data
