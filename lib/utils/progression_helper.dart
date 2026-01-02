@@ -15,7 +15,7 @@ class ProgressionHelper {
     DataManager dataManager,
   ) async {
     try {
-      final histories = dataManager.workoutHistories;
+      final histories = dataManager.workoutHistory;
 
       if (histories.length < 2) {
         return originalWorkout;

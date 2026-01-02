@@ -38,8 +38,8 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _dataManager.load();
-      final histories = _dataManager.workoutHistories;
+      await _dataManager.initialize();
+      final histories = _dataManager.workoutHistory;
 
       final result = await _progressionService.suggestNextWorkout(
         widget.workout,
@@ -123,7 +123,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                 children: [
                   Text(
                     'Рекомендуется разгрузочная неделя!',
-                    style: AppTextStyles.heading2.copyWith(
+                    style: AppTextStyles.h2.copyWith(
                       color: Colors.orange.shade900,
                     ),
                   ),
@@ -150,7 +150,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Сравнение тренировок', style: AppTextStyles.heading2),
+            Text('Сравнение тренировок', style: AppTextStyles.h2),
             const SizedBox(height: 16),
             Table(
               columnWidths: const {
@@ -253,7 +253,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Детальный анализ', style: AppTextStyles.heading2),
+        Text('Детальный анализ', style: AppTextStyles.h2),
         const SizedBox(height: 16),
         ...widget.workout.exercises.map((exercise) {
           final metrics = _exerciseMetrics![exercise.exercise.id];
@@ -278,7 +278,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
           children: [
             Text(
               exercise.exercise.name,
-              style: AppTextStyles.heading3,
+              style: AppTextStyles.h3,
             ),
             const SizedBox(height: 12),
             _buildMetricRow('Причина изменения:', reason),

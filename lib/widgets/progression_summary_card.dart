@@ -3,8 +3,6 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/progression_service.dart';
 import '../services/data_manager.dart';
-import '../models/workout.dart';
-import '../screens/progression_insights_screen.dart';
 
 class ProgressionSummaryCard extends StatefulWidget {
   const ProgressionSummaryCard({super.key});
@@ -36,9 +34,9 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
 
     try {
       final dataManager = DataManager();
-      await dataManager.load();
+      await dataManager.initialize();
 
-      final histories = dataManager.workoutHistories;
+      final histories = dataManager.workoutHistory;
 
       if (histories.isEmpty) {
         setState(() {
@@ -156,7 +154,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
                   const SizedBox(width: 12),
                   Text(
                     'Прогресс тренировок',
-                    style: AppTextStyles.heading2,
+                    style: AppTextStyles.h2,
                   ),
                 ],
               ),
