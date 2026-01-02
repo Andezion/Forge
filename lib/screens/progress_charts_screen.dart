@@ -61,13 +61,12 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
       _overallStrengthData = _analyticsService.analyzeOverallStrength(
         histories,
-        currentUser,
         lookbackDays: _lookbackDays,
       );
 
       _bodyWeightData = _analyticsService.analyzeBodyWeight(
         histories,
-        currentUser,
+        _profileService.weightKg ?? 70.0,
         lookbackDays: _lookbackDays,
       );
 

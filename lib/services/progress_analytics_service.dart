@@ -156,7 +156,7 @@ class ProgressAnalyticsService {
         if (exerciseCount > 0) {
           averageStrengthPoints.add(ChartDataPoint(
             date: history.date,
-            value: sessionTotalStrength / exerciseCount,
+            value: sessionTotalStrength / exerciseCount.toDouble(),
           ));
         }
       }
@@ -237,10 +237,10 @@ class ProgressAnalyticsService {
       ..sort((a, b) => a.date.compareTo(b.date));
 
     final currentWeek =
-        weeklyVolumePoints.isNotEmpty ? weeklyVolumePoints.last.value : 0;
+        weeklyVolumePoints.isNotEmpty ? weeklyVolumePoints.last.value : 0.0;
     final previousWeek = weeklyVolumePoints.length > 1
         ? weeklyVolumePoints[weeklyVolumePoints.length - 2].value
-        : 0;
+        : 0.0;
 
     final averageVolume = weeklyVolumePoints.isNotEmpty
         ? weeklyVolumePoints.map((p) => p.value).reduce((a, b) => a + b) /
@@ -282,8 +282,9 @@ class ProgressAnalyticsService {
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    final currentWeekFreq =
-        weeklyFrequencyPoints.isNotEmpty ? weeklyFrequencyPoints.last.value : 0;
+    final currentWeekFreq = weeklyFrequencyPoints.isNotEmpty
+        ? weeklyFrequencyPoints.last.value
+        : 0.0;
 
     final averageFreq = weeklyFrequencyPoints.isNotEmpty
         ? weeklyFrequencyPoints.map((p) => p.value).reduce((a, b) => a + b) /
