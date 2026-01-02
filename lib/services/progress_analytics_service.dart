@@ -1,10 +1,8 @@
 import '../models/chart_data.dart';
 import '../models/workout_history.dart';
-import '../models/workout_session.dart';
 import '../models/user.dart';
 
 class ProgressAnalyticsService {
-  /// Analyze exercise progress for a specific exercise
   ExerciseProgressData analyzeExerciseProgress(
     String exerciseId,
     String exerciseName,
@@ -13,13 +11,11 @@ class ProgressAnalyticsService {
   }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
-    // Filter relevant histories
     final relevantHistories = histories
         .where((h) => h.date.isAfter(cutoffDate))
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    // Collect max weight data points
     final maxWeightPoints = <ChartDataPoint>[];
     final volumePoints = <ChartDataPoint>[];
     final intensityPoints = <ChartDataPoint>[];
@@ -31,7 +27,6 @@ class ProgressAnalyticsService {
     for (var history in relevantHistories) {
       for (var exerciseResult in history.session.exerciseResults) {
         if (exerciseResult.exercise.id == exerciseId) {
-          // Calculate max weight for this session
           double maxWeight = 0;
           double totalVolume = 0;
 
@@ -42,7 +37,6 @@ class ProgressAnalyticsService {
             totalVolume += set.weight * set.actualReps;
           }
 
-          // Update max weights
           if (!foundCurrent && maxWeight > 0) {
             currentMax = maxWeight;
             foundCurrent = true;
@@ -60,7 +54,6 @@ class ProgressAnalyticsService {
             value: totalVolume,
           ));
 
-          // Intensity = average weight / max weight
           if (exerciseResult.setResults.isNotEmpty && maxWeight > 0) {
             final avgWeight = exerciseResult.setResults
                     .map((s) => s.weight)
@@ -75,7 +68,6 @@ class ProgressAnalyticsService {
       }
     }
 
-    // Calculate progress percentage
     double progressPercentage = 0;
     if (previousMax > 0) {
       progressPercentage = ((currentMax - previousMax) / previousMax) * 100;
@@ -93,7 +85,6 @@ class ProgressAnalyticsService {
     );
   }
 
-  /// Analyze body weight changes
   BodyWeightData analyzeBodyWeight(
     List<WorkoutHistory> histories,
     User currentUser, {
@@ -103,14 +94,11 @@ class ProgressAnalyticsService {
 
     final weightPoints = <ChartDataPoint>[];
 
-    // Add current weight as the most recent point
     weightPoints.add(ChartDataPoint(
       date: DateTime.now(),
       value: currentUser.weight,
     ));
 
-    // In a real app, you'd track weight history separately
-    // For now, we'll use the current weight as baseline
     final startWeight = currentUser.weight;
     final currentWeight = currentUser.weight;
     final weightChange = currentWeight - startWeight;
