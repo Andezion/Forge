@@ -50,6 +50,20 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       await _profileService.load();
       final histories = _dataManager.workoutHistory;
 
+      if (histories.isEmpty) {
+        setState(() => _isLoading = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'No data available for analysis. Complete at least one workout!'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+
       final exerciseMap = <String, Exercise>{};
       for (var history in histories) {
         for (var result in history.session.exerciseResults) {
@@ -64,21 +78,29 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         lookbackDays: _lookbackDays,
       );
 
+      await Future.delayed(const Duration(milliseconds: 10));
+
       _bodyWeightData = _analyticsService.analyzeBodyWeight(
         histories,
         _profileService.weightKg ?? 70.0,
         lookbackDays: _lookbackDays,
       );
 
+      await Future.delayed(const Duration(milliseconds: 10));
+
       _volumeData = _analyticsService.analyzeWorkoutVolume(
         histories,
         lookbackDays: _lookbackDays,
       );
 
+      await Future.delayed(const Duration(milliseconds: 10));
+
       _frequencyData = _analyticsService.analyzeWorkoutFrequency(
         histories,
         lookbackDays: _lookbackDays,
       );
+
+      await Future.delayed(const Duration(milliseconds: 10));
 
       _consistencyData = _analyticsService.analyzeConsistency(
         histories,
@@ -86,7 +108,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       );
 
       setState(() => _isLoading = false);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error loading progress data: $e');
+      print('Stack trace: $stackTrace');
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -151,13 +175,57 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _buildTabBar(),
-                Expanded(child: _buildContent()),
-              ],
-            ),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading data...',
+                    style: AppTextStyles.body1.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : _availableExercises.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.show_chart,
+                          size: 80,
+                          color: AppColors.textSecondary,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'No data available for display',
+                          style: AppTextStyles.h2,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Complete at least one workout to see progress charts',
+                          style: AppTextStyles.body1.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Column(
+                  children: [
+                    _buildTabBar(),
+                    Expanded(child: _buildContent()),
+                  ],
+                ),
     );
   }
 

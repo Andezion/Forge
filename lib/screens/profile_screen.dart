@@ -15,6 +15,7 @@ import 'customization_screen.dart';
 import 'weight_screen.dart';
 import 'wellness_screen.dart';
 import 'about_me_screen.dart';
+import 'progress_charts_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,6 +27,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
+  app_user.User? _cachedUser;
+  bool _isLoadingUser = false;
 
   @override
   void initState() {
@@ -33,6 +36,33 @@ class _ProfileScreenState extends State<ProfileScreen>
     _animController =
         AnimationController(vsync: this, duration: const Duration(seconds: 4))
           ..repeat();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    if (_isLoadingUser) return;
+
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final firebaseUser = auth.firebaseUser;
+
+    if (firebaseUser != null &&
+        (firebaseUser.displayName == null ||
+            firebaseUser.displayName!.trim().isEmpty)) {
+      setState(() => _isLoadingUser = true);
+      try {
+        final user = await auth.getUserProfile(firebaseUser.uid);
+        if (mounted) {
+          setState(() {
+            _cachedUser = user;
+            _isLoadingUser = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoadingUser = false);
+        }
+      }
+    }
   }
 
   @override
@@ -84,54 +114,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         color: AppColors.textOnPrimary,
                       ),
                     )
-                  else if (firebaseUser != null)
-                    FutureBuilder<app_user.User?>(
-                      future: auth.getUserProfile(firebaseUser.uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState != ConnectionState.done) {
-                          return Text(
-                            'User Name',
-                            style: AppTextStyles.h3.copyWith(
-                              color: AppColors.textOnPrimary,
-                            ),
-                          );
-                        }
-                        if (snapshot.hasError) {
-                          return Column(
-                            children: [
-                              Text(
-                                'User Name',
-                                style: AppTextStyles.h3.copyWith(
-                                  color: AppColors.textOnPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                child: Text(
-                                  'Retry',
-                                  style: AppTextStyles.buttonSmall.copyWith(
-                                    color: AppColors.textOnPrimary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                        final u = snapshot.data;
-                        return Text(
-                          u?.name ?? 'User Name',
-                          style: AppTextStyles.h3.copyWith(
-                            color: AppColors.textOnPrimary,
-                          ),
-                        );
-                      },
+                  else if (_isLoadingUser)
+                    const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.textOnPrimary,
+                      ),
                     )
                   else
                     Text(
-                      'User Name',
+                      _cachedUser?.name ?? 'User Name',
                       style: AppTextStyles.h3.copyWith(
                         color: AppColors.textOnPrimary,
                       ),
@@ -183,7 +177,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     'Progress Charts',
                     Icons.show_chart,
                     () {
-                      // TODO: Navigate to progress charts
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ProgressChartsScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildMenuItem(
