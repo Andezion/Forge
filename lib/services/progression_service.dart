@@ -304,13 +304,11 @@ class ProgressionService {
             break;
         }
 
-        // Корректировка на восстановление
         final recoveryModifier = getRecoveryModifier(
           metrics.daysSinceLastSession,
           userAge,
         );
 
-        // Итоговые факторы
         final increaseFactor =
             1.0 + (baseIncreasePct * intensityMultiplier * recoveryModifier);
         final decreaseFactor = 1.0 - (baseDecreasePct * intensityMultiplier);
@@ -318,29 +316,22 @@ class ProgressionService {
         final c = metrics.completionRate;
         final perceived = metrics.lastPerceivedDifficulty;
 
-        // Если нужна разгрузка - снижаем на 20-30%
         if (needsDeload) {
           if (we.weight > 0) {
-            newWeight = we.weight * 0.70; // -30% от веса
+            newWeight = we.weight * 0.70;
           }
-          newSets =
-              (we.sets * 0.75).round().clamp(1, we.sets); // Меньше подходов
+          newSets = (we.sets * 0.75).round().clamp(1, we.sets);
           reason = 'Deload week — reduce intensity for recovery';
-        }
-        // Упражнения с собственным весом (вес = 0)
-        else if (we.weight <= 0.0) {
+        } else if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
-            // Прогрессия через увеличение повторений
             final add =
                 prof.experienceLevel == ExperienceLevel.advanced ? 2 : 1;
             newReps = we.targetReps + add;
             reason = 'Bodyweight: excellent completion — +$add rep(s)';
           } else if (c >= 0.90 && metrics.performanceTrend > 0) {
-            // Хорошая прогрессия - увеличиваем сеты
             newSets = we.sets + 1;
             reason = 'Bodyweight: good progress — +1 set';
           } else if (c < 0.70 || perceived == ExerciseDifficulty.hard) {
-            // Слишком тяжело - снижаем повторения
             final sub =
                 prof.experienceLevel == ExperienceLevel.beginner ? 1 : 2;
             newReps = (we.targetReps - sub).clamp(1, we.targetReps);
@@ -348,17 +339,13 @@ class ProgressionService {
           } else {
             reason = 'Bodyweight: maintain current level';
           }
-        }
-        // Упражнения с весом
-        else {
-          // Отличная производительность - увеличиваем вес
+        } else {
           if (c >= 0.95 &&
               metrics.avgRepsPerSet >= we.targetReps &&
               perceived != ExerciseDifficulty.hard &&
               metrics.performanceTrend >= 0) {
             newWeight = we.weight * increaseFactor;
 
-            // Если тренд очень хороший, можно добавить повторения
             if (metrics.performanceTrend > 5.0 && c >= 0.98) {
               newReps = we.targetReps + 1;
               reason = 'Excellent progress — increase weight & reps';
@@ -366,14 +353,10 @@ class ProgressionService {
               reason =
                   'Strong performance — increase weight by ${((increaseFactor - 1) * 100).toStringAsFixed(1)}%';
             }
-          }
-          // Хорошая производительность, но не идеальная
-          else if (c >= 0.85 &&
+          } else if (c >= 0.85 &&
               c < 0.95 &&
               perceived != ExerciseDifficulty.hard) {
-            // Используем 1RM для более точной прогрессии
             if (metrics.estimated1RM > 0) {
-              // Увеличиваем расчётный 1RM на небольшой процент
               final new1RM = metrics.estimated1RM * (1.0 + baseIncreasePct / 2);
               newWeight = calculateWeightForReps(new1RM, we.targetReps);
               reason = 'Good progress — calculated weight from estimated 1RM';
@@ -381,12 +364,9 @@ class ProgressionService {
               newWeight = we.weight * (1.0 + baseIncreasePct / 2);
               reason = 'Steady progress — small weight increase';
             }
-          }
-          // Плохая производительность - снижаем вес и/или повторения
-          else if (c < 0.75 || perceived == ExerciseDifficulty.hard) {
+          } else if (c < 0.75 || perceived == ExerciseDifficulty.hard) {
             newWeight = we.weight * decreaseFactor;
 
-            // Если совсем плохо - снижаем и повторения
             if (c < 0.60) {
               newReps = (we.targetReps - 2).clamp(1, we.targetReps);
               reason = 'Struggling significantly — reduce weight & reps';
@@ -394,33 +374,24 @@ class ProgressionService {
               newReps = (we.targetReps - 1).clamp(1, we.targetReps);
               reason = 'Hard workout — reduce weight & reps slightly';
             }
-          }
-          // Негативный тренд - пользователь регрессирует
-          else if (metrics.performanceTrend < -5.0 && metrics.weightTrend < 0) {
-            newWeight = we.weight * 0.90; // -10%
+          } else if (metrics.performanceTrend < -5.0 &&
+              metrics.weightTrend < 0) {
+            newWeight = we.weight * 0.90;
             reason = 'Negative trend detected — reduce intensity';
-          }
-          // Слишком долгое выполнение сетов
-          else if (metrics.avgDurationSeconds > 120) {
-            newWeight = we.weight * 0.95; // -5%
+          } else if (metrics.avgDurationSeconds > 120) {
+            newWeight = we.weight * 0.95;
             reason = 'Sets taking too long — reduce weight for better form';
-          }
-          // Недостаточное восстановление
-          else if (recoveryModifier < 0.95) {
+          } else if (recoveryModifier < 0.95) {
             newWeight = we.weight * recoveryModifier;
             reason = 'Insufficient recovery time — adjusted for fatigue';
-          }
-          // Всё стабильно - оставляем как есть
-          else {
+          } else {
             reason = 'Performance stable — maintain current prescription';
           }
         }
       }
 
-      // Округляем вес до ближайших 0.5 кг
       newWeight = (newWeight * 2).round() / 2.0;
 
-      // Ограничения безопасности
       newReps = newReps.clamp(1, 50);
       newSets = newSets.clamp(1, 10);
 
