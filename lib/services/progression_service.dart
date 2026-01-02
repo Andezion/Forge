@@ -85,10 +85,8 @@ class ProgressionService {
   }
 
   double getRecoveryModifier(int daysSinceLastWorkout, int userAge) {
-    // Базовое оптимальное время восстановления: 2-3 дня
     const optimalRecoveryDays = 2.5;
 
-    // Корректировка на возраст (старше = дольше восстановление)
     double ageModifier = 1.0;
     if (userAge > 40) {
       ageModifier = 1.2;
@@ -101,17 +99,14 @@ class ProgressionService {
     final optimalWithAge = optimalRecoveryDays * ageModifier;
 
     if (daysSinceLastWorkout < optimalWithAge) {
-      // Недостаточно восстановился - снизить нагрузку на 5-10%
       return 0.90 + (daysSinceLastWorkout / optimalWithAge) * 0.10;
     } else if (daysSinceLastWorkout > optimalWithAge * 2.5) {
-      // Слишком долгий перерыв - снизить нагрузку на 10-20%
       final daysOver = daysSinceLastWorkout - (optimalWithAge * 2.5);
-      final reduction =
-          (daysOver / 7.0) * 0.05; // -5% за каждую неделю перерыва
+      final reduction = (daysOver / 7.0) * 0.05;
       return (1.0 - reduction).clamp(0.80, 1.0);
     }
 
-    return 1.0; // Оптимальное время восстановления
+    return 1.0;
   }
 
   ProgressMetrics analyzeExerciseHistory(
@@ -154,7 +149,6 @@ class ProgressionService {
     int totalDuration = 0;
     ExerciseDifficulty? lastPerceived;
 
-    // Для расчёта тренда
     final weights = <double>[];
     final completionRates = <double>[];
     double maxEstimated1RM = 0.0;
@@ -179,7 +173,6 @@ class ProgressionService {
       totalDuration += er.setResults.fold(0, (s, r) => s + r.durationSeconds);
       lastPerceived = er.perceivedDifficulty ?? lastPerceived;
 
-      // Расчёт максимального 1RM за все сессии
       for (var setResult in er.setResults) {
         final estimated = calculate1RM(setResult.weight, setResult.actualReps);
         if (estimated > maxEstimated1RM) {
@@ -190,7 +183,6 @@ class ProgressionService {
 
     final count = sessions.length;
 
-    // Расчёт тренда веса (положительный = растёт, отрицательный = падает)
     double weightTrend = 0.0;
     if (weights.length >= 2) {
       final firstHalf =
@@ -202,7 +194,6 @@ class ProgressionService {
       weightTrend = secondHalf - firstHalf;
     }
 
-    // Расчёт тренда производительности (комбинация веса и completion rate)
     double performanceTrend = 0.0;
     if (completionRates.length >= 2 && weights.length >= 2) {
       final firstPerf = (completionRates[0] * weights[0]);
@@ -210,7 +201,6 @@ class ProgressionService {
       performanceTrend = lastPerf - firstPerf;
     }
 
-    // Дней с последней тренировки
     final daysSince = sessionDates.isNotEmpty
         ? DateTime.now().difference(sessionDates.last).inDays
         : 0;
@@ -268,11 +258,9 @@ class ProgressionService {
     final adjustedExercises = <WorkoutExercise>[];
     final reasons = <String, String>{};
 
-    // Определяем, нужна ли разгрузочная неделя
     final needsDeload = shouldDeload(histories);
 
-    // Возраст пользователя для расчёта восстановления
-    final userAge = prof.age ?? 30; // По умолчанию 30 лет
+    final userAge = prof.age ?? 30;
 
     for (var we in workout.exercises) {
       final metrics =
@@ -283,29 +271,25 @@ class ProgressionService {
       String reason = 'No history — keep prescription';
 
       if (metrics.sessionsCount == 0) {
-        // Нет истории - используем начальные значения
         reason = 'No recent data — keep as is';
       } else {
-        // Определяем базовые параметры прогрессии в зависимости от уровня
         double baseIncreasePct;
         double baseDecreasePct;
         switch (prof.experienceLevel) {
           case ExperienceLevel.beginner:
-            baseIncreasePct = 0.05; // 5% для начинающих
+            baseIncreasePct = 0.05;
             baseDecreasePct = 0.05;
             break;
           case ExperienceLevel.intermediate:
-            baseIncreasePct = 0.025; // 2.5% для средних
+            baseIncreasePct = 0.025;
             baseDecreasePct = 0.05;
             break;
           case ExperienceLevel.advanced:
-            baseIncreasePct =
-                0.0125; // 1.25% для продвинутых (медленная прогрессия)
+            baseIncreasePct = 0.0125;
             baseDecreasePct = 0.0375;
             break;
         }
 
-        // Корректировка на интенсивность
         final intensity = prof.preferredIntensity;
         double intensityMultiplier;
         switch (intensity) {
