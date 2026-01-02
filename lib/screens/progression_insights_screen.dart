@@ -68,7 +68,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка загрузки: $e')),
+          SnackBar(content: Text('Error loading data: $e')),
         );
       }
     }
@@ -79,7 +79,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Рекомендации по прогрессии'),
+        title: const Text('Progression Recommendations'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
       ),
@@ -92,7 +92,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
   Widget _buildContent() {
     if (_suggestedWorkout == null) {
       return const Center(
-        child: Text('Недостаточно данных для рекомендаций'),
+        child: Text('Not enough data for recommendations'),
       );
     }
 
@@ -122,14 +122,14 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Рекомендуется разгрузочная неделя!',
+                    'Recommended Deload Week!',
                     style: AppTextStyles.h2.copyWith(
                       color: Colors.orange.shade900,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Последние тренировки были тяжёлыми. Снизьте нагрузку для восстановления.',
+                    'Recent workouts have been hard. Reduce the load for recovery.',
                     style: AppTextStyles.body2.copyWith(
                       color: Colors.orange.shade800,
                     ),
@@ -150,7 +150,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Сравнение тренировок', style: AppTextStyles.h2),
+            Text('Workout Comparison', style: AppTextStyles.h2),
             const SizedBox(height: 16),
             Table(
               columnWidths: const {
@@ -164,9 +164,9 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                     color: AppColors.primary.withOpacity(0.1),
                   ),
                   children: [
-                    _buildTableHeader('Упражнение'),
-                    _buildTableHeader('Текущее'),
-                    _buildTableHeader('Рекомендуем'),
+                    _buildTableHeader('Exercise'),
+                    _buildTableHeader('Current'),
+                    _buildTableHeader('Suggested'),
                   ],
                 ),
                 ...widget.workout.exercises.map((original) {
@@ -253,7 +253,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Детальный анализ', style: AppTextStyles.h2),
+        Text('Detailed analysis', style: AppTextStyles.h2),
         const SizedBox(height: 16),
         ...widget.workout.exercises.map((exercise) {
           final metrics = _exerciseMetrics![exercise.exercise.id];
@@ -281,7 +281,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
               style: AppTextStyles.h3,
             ),
             const SizedBox(height: 12),
-            _buildMetricRow('Причина изменения:', reason),
+            _buildMetricRow('Reason for change:', reason),
             if (metrics.sessionsCount > 0) ...[
               const Divider(height: 24),
               _buildMetricRow(
