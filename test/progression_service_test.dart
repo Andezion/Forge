@@ -28,26 +28,20 @@ void main() {
 
     test('getRecoveryModifier returns correct values for different scenarios',
         () {
-      // Оптимальное восстановление (2-3 дня)
       final optimal = service.getRecoveryModifier(3, 30);
       expect(optimal, equals(1.0));
 
-      // Недостаточное восстановление (1 день)
       final insufficient = service.getRecoveryModifier(1, 30);
       expect(insufficient, lessThan(1.0));
 
-      // Слишком долгий перерыв (14 дней)
       final tooLong = service.getRecoveryModifier(14, 30);
       expect(tooLong, lessThan(1.0));
 
-      // Возрастная корректировка (60 лет)
       final elderly = service.getRecoveryModifier(2, 60);
-      // Для пожилых людей даже 2 дня может быть недостаточно
       expect(elderly, lessThan(1.0));
     });
 
     test('shouldDeload detects when deload is needed', () {
-      // Создаём историю с большим количеством тяжёлых тренировок
       final exercise = Exercise(
         id: 'ex1',
         name: 'Bench Press',
@@ -71,7 +65,7 @@ void main() {
               durationSeconds: 60,
             ),
           ],
-          perceivedDifficulty: ExerciseDifficulty.hard, // Все тяжёлые
+          perceivedDifficulty: ExerciseDifficulty.hard,
         );
 
         return WorkoutHistory(
@@ -102,8 +96,6 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      // Создаём прогрессивную историю (вес растёт)
-      // История должна быть в порядке от новых к старым
       final histories = [
         _createHistory(exercise, 90.0, 10, 10,
             DateTime.now().subtract(const Duration(days: 2))),
@@ -119,13 +111,11 @@ void main() {
 
       final metrics = service.analyzeExerciseHistory('ex1', histories);
 
-      expect(metrics.completionRate, equals(1.0)); // Все повторения выполнены
+      expect(metrics.completionRate, equals(1.0));
       expect(metrics.sessionsCount, equals(5));
-      expect(metrics.weightTrend, greaterThan(0)); // Вес растёт
-      expect(metrics.performanceTrend,
-          greaterThan(0)); // Производительность растёт
-      expect(
-          metrics.estimated1RM, greaterThan(100)); // 1RM должен быть > 100 кг
+      expect(metrics.weightTrend, greaterThan(0));
+      expect(metrics.performanceTrend, greaterThan(0));
+      expect(metrics.estimated1RM, greaterThan(100));
       expect(metrics.daysSinceLastSession, equals(2));
     });
 
