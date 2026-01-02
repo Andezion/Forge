@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         side: BorderSide(color: AppColors.primary, width: 1.5),
                       ),
                       icon: const Icon(Icons.analytics),
-                      label: const Text('Просмотр Графиков Прогресса'),
+                      label: const Text('Progress Charts'),
                     ),
                   ),
                 ],
