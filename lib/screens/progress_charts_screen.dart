@@ -20,17 +20,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   final _dataManager = DataManager();
 
   bool _isLoading = true;
-  String _selectedTab =
-      'overall'; // overall, exercise, body, volume, frequency, consistency
+  String _selectedTab = 'overall';
 
-  // Data
   OverallStrengthData? _overallStrengthData;
   BodyWeightData? _bodyWeightData;
   WorkoutVolumeData? _volumeData;
   WorkoutFrequencyData? _frequencyData;
   ConsistencyData? _consistencyData;
 
-  // Exercise selection
   Exercise? _selectedExercise;
   List<Exercise> _availableExercises = [];
   ExerciseProgressData? _exerciseProgressData;
@@ -51,7 +48,6 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       final histories = _dataManager.workoutHistory;
       final currentUser = _dataManager.currentUser!;
 
-      // Collect all exercises from workout history
       final exerciseMap = <String, Exercise>{};
       for (var history in histories) {
         for (var result in history.session.exerciseResults) {
@@ -61,7 +57,6 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       _availableExercises = exerciseMap.values.toList()
         ..sort((a, b) => a.name.compareTo(b.name));
 
-      // Load overall data
       _overallStrengthData = _analyticsService.analyzeOverallStrength(
         histories,
         currentUser,
@@ -94,7 +89,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка загрузки данных: $e')),
+          SnackBar(content: Text('Error loading data: $e')),
         );
       }
     }
@@ -124,7 +119,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка загрузки данных упражнения: $e')),
+          SnackBar(content: Text('Error loading exercise data: $e')),
         );
       }
     }
@@ -135,7 +130,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Графики Прогресса'),
+        title: const Text('Progress Charts'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         actions: [
@@ -146,10 +141,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               _loadData();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 30, child: Text('30 дней')),
-              const PopupMenuItem(value: 90, child: Text('90 дней')),
-              const PopupMenuItem(value: 180, child: Text('180 дней')),
-              const PopupMenuItem(value: 365, child: Text('1 год')),
+              const PopupMenuItem(value: 30, child: Text('30 days')),
+              const PopupMenuItem(value: 90, child: Text('90 days')),
+              const PopupMenuItem(value: 180, child: Text('180 days')),
+              const PopupMenuItem(value: 365, child: Text('1 year')),
             ],
           ),
         ],
@@ -172,12 +167,12 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildTabButton('overall', 'Общая Сила', Icons.trending_up),
-            _buildTabButton('body', 'Вес Тела', Icons.monitor_weight),
-            _buildTabButton('volume', 'Объем', Icons.fitness_center),
-            _buildTabButton('frequency', 'Частота', Icons.calendar_month),
+            _buildTabButton('overall', 'Overall Strength', Icons.trending_up),
+            _buildTabButton('body', 'Body Weight', Icons.monitor_weight),
+            _buildTabButton('volume', 'Volume', Icons.fitness_center),
+            _buildTabButton('frequency', 'Frequency', Icons.calendar_month),
             _buildTabButton('consistency', 'Consistency', Icons.check_circle),
-            _buildTabButton('exercise', 'Упражнения', Icons.list),
+            _buildTabButton('exercise', 'Exercises', Icons.list),
           ],
         ),
       ),
@@ -234,26 +229,26 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       case 'exercise':
         return _buildExerciseView();
       default:
-        return const Center(child: Text('Выберите вкладку'));
+        return const Center(child: Text('Select a tab'));
     }
   }
 
   Widget _buildOverallStrengthView() {
     if (_overallStrengthData == null) {
-      return const Center(child: Text('Нет данных'));
+      return const Center(child: Text('No data'));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildStatsCard(
-          'Текущая Общая Сила',
-          '${_overallStrengthData!.currentTotalStrength.toStringAsFixed(1)} кг',
+          'Current Overall Strength',
+          '${_overallStrengthData!.currentTotalStrength.toStringAsFixed(1)} kg',
           _overallStrengthData!.progressPercentage,
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Общая Сила',
+          'Overall Strength Progress',
           _buildLineChart(
             _overallStrengthData!.totalStrengthData,
             color: AppColors.primary,
@@ -261,7 +256,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Средняя Сила на Упражнение',
+          'Average Strength per Exercise',
           _buildLineChart(
             _overallStrengthData!.averageStrengthData,
             color: Colors.orange,
@@ -275,15 +270,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildBodyWeightView() {
     if (_bodyWeightData == null) {
-      return const Center(child: Text('Нет данных'));
+      return const Center(child: Text('No data'));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildStatsCard(
-          'Текущий Вес',
-          '${_bodyWeightData!.currentWeight.toStringAsFixed(1)} кг',
+          'Current Weight',
+          '${_bodyWeightData!.currentWeight.toStringAsFixed(1)} kg',
           (_bodyWeightData!.weightChange / _bodyWeightData!.startWeight) * 100,
         ),
         const SizedBox(height: 16),
@@ -293,12 +288,12 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Информация', style: AppTextStyles.h2),
+                Text('Information', style: AppTextStyles.h2),
                 const SizedBox(height: 12),
-                _buildInfoRow('Стартовый вес',
-                    '${_bodyWeightData!.startWeight.toStringAsFixed(1)} кг'),
-                _buildInfoRow('Изменение',
-                    '${_bodyWeightData!.weightChange >= 0 ? '+' : ''}${_bodyWeightData!.weightChange.toStringAsFixed(1)} кг'),
+                _buildInfoRow('Starting Weight',
+                    '${_bodyWeightData!.startWeight.toStringAsFixed(1)} kg'),
+                _buildInfoRow('Change',
+                    '${_bodyWeightData!.weightChange >= 0 ? '+' : ''}${_bodyWeightData!.weightChange.toStringAsFixed(1)} kg'),
               ],
             ),
           ),
@@ -308,7 +303,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Text(
-              '💡 Совет: Для полного отслеживания веса используйте функцию "Вес" в главном меню',
+              'Tip: For complete weight tracking, use the "Weight" feature in the main menu',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
           ),
@@ -319,15 +314,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildVolumeView() {
     if (_volumeData == null) {
-      return const Center(child: Text('Нет данных'));
+      return const Center(child: Text('No data'));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildStatsCard(
-          'Объем Текущей Недели',
-          '${_volumeData!.currentWeekVolume.toStringAsFixed(0)} кг',
+          'Current Week Volume',
+          '${_volumeData!.currentWeekVolume.toStringAsFixed(0)} kg',
           _volumeData!.previousWeekVolume > 0
               ? ((_volumeData!.currentWeekVolume -
                           _volumeData!.previousWeekVolume) /
@@ -337,12 +332,12 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Недельный Объем',
+          'Weekly Volume',
           _buildBarChart(_volumeData!.weeklyVolumeData),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Дневной Объем',
+          'Daily Volume',
           _buildLineChart(
             _volumeData!.dailyVolumeData,
             color: Colors.green,
