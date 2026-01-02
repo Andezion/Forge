@@ -83,20 +83,20 @@ class ProgressionHelper {
     Color color = Colors.blue;
 
     if (metrics.performanceTrend > 5.0) {
-      message = 'Отличный прогресс! Производительность растёт 📈';
+      message = 'Go progress! Performance is improving';
       icon = Icons.trending_up;
       color = Colors.green;
     } else if (metrics.performanceTrend < -5.0) {
-      message = 'Производительность снижается. Возможно, нужен отдых 😔';
+      message = 'Performance is declining. Maybe you need a rest';
       icon = Icons.trending_down;
       color = Colors.orange;
     } else if (metrics.completionRate >= 0.95) {
       message =
-          'Отличное выполнение! ${(metrics.completionRate * 100).toStringAsFixed(0)}% 💪';
+          'Great job! ${(metrics.completionRate * 100).toStringAsFixed(0)}%';
       icon = Icons.check_circle;
       color = Colors.green;
     } else if (metrics.completionRate < 0.75) {
-      message = 'Сложновато. Может, снизить вес? 🤔';
+      message = 'Having a hard time? Maybe reduce the weight?';
       icon = Icons.warning;
       color = Colors.orange;
     }
@@ -151,7 +151,7 @@ class _OptimizationDialog extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              needsDeload ? 'Разгрузочная неделя' : 'Оптимизация тренировки',
+              needsDeload ? 'Deload Week' : 'Workout Optimization',
               style: AppTextStyles.h2,
             ),
           ),
@@ -170,7 +170,7 @@ class _OptimizationDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Последние тренировки были тяжёлыми. Рекомендуем снизить нагрузку для восстановления.',
+                  'Recent workouts have been intense. We recommend reducing the load for recovery.',
                   style: AppTextStyles.body2.copyWith(
                     color: Colors.orange.shade900,
                   ),
@@ -179,7 +179,7 @@ class _OptimizationDialog extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             Text(
-              'На основе ваших предыдущих тренировок, мы рекомендуем:',
+              'Based on your previous workouts, we recommend:',
               style: AppTextStyles.body1,
             ),
             const SizedBox(height: 16),
@@ -195,7 +195,7 @@ class _OptimizationDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text('Использовать оригинал'),
+          child: const Text('Use Original'),
         ),
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
@@ -203,7 +203,7 @@ class _OptimizationDialog extends StatelessWidget {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Применить рекомендации'),
+          child: const Text('Apply Recommendations'),
         ),
       ],
     );
@@ -244,7 +244,7 @@ class _OptimizationDialog extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Было:', style: AppTextStyles.caption),
+                    Text('Was:', style: AppTextStyles.caption),
                     Text(
                       _formatExercise(original),
                       style: AppTextStyles.body2,
@@ -258,7 +258,7 @@ class _OptimizationDialog extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Станет:', style: AppTextStyles.caption),
+                    Text('Will be:', style: AppTextStyles.caption),
                     Text(
                       _formatExercise(optimized),
                       style: AppTextStyles.body2.copyWith(
