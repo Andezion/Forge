@@ -171,13 +171,11 @@ class ProgressAnalyticsService {
     }
 
     final progressPercentage = previousTotal > 0
-        ? ((currentTotal - previousTotal) / previousTotal) * 100
-        : 0;
+        ? ((currentTotal - previousTotal) / previousTotal) * 100.0
+        : 0.0;
 
-    // Calculate exercise contributions from max weights in history
     final contributions = <String, double>{};
     for (var exerciseId in exerciseMaxes.keys) {
-      // Find exercise name from last occurrence
       for (var history in relevantHistories.reversed) {
         for (var result in history.session.exerciseResults) {
           if (result.exercise.id == exerciseId) {
