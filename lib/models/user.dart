@@ -147,12 +147,18 @@ class UserProfile {
   final ExperienceLevel experienceLevel;
   final List<String> trainingFocus;
   final TrainingIntensity preferredIntensity;
+  final int? age;
+  final double? weightKg;
+  final double? yearsTraining;
 
   UserProfile({
     required this.goals,
     required this.experienceLevel,
     required this.trainingFocus,
     required this.preferredIntensity,
+    this.age,
+    this.weightKg,
+    this.yearsTraining,
   });
 
   Map<String, dynamic> toJson() {
@@ -161,6 +167,9 @@ class UserProfile {
       'experienceLevel': experienceLevel.name,
       'trainingFocus': trainingFocus,
       'preferredIntensity': preferredIntensity.name,
+      'age': age,
+      'weightKg': weightKg,
+      'yearsTraining': yearsTraining,
     };
   }
 
@@ -178,6 +187,13 @@ class UserProfile {
       preferredIntensity: TrainingIntensity.values.firstWhere(
           (e) => e.name == json['preferredIntensity'],
           orElse: () => TrainingIntensity.moderate),
+      age: json['age'],
+      weightKg: json['weightKg'] != null
+          ? (json['weightKg'] as num).toDouble()
+          : null,
+      yearsTraining: json['yearsTraining'] != null
+          ? (json['yearsTraining'] as num).toDouble()
+          : null,
     );
   }
 
@@ -186,12 +202,18 @@ class UserProfile {
     ExperienceLevel? experienceLevel,
     List<String>? trainingFocus,
     TrainingIntensity? preferredIntensity,
+    int? age,
+    double? weightKg,
+    double? yearsTraining,
   }) {
     return UserProfile(
       goals: goals ?? this.goals,
       experienceLevel: experienceLevel ?? this.experienceLevel,
       trainingFocus: trainingFocus ?? this.trainingFocus,
       preferredIntensity: preferredIntensity ?? this.preferredIntensity,
+      age: age ?? this.age,
+      weightKg: weightKg ?? this.weightKg,
+      yearsTraining: yearsTraining ?? this.yearsTraining,
     );
   }
 }
