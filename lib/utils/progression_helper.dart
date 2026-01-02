@@ -152,7 +152,7 @@ class _OptimizationDialog extends StatelessWidget {
           Expanded(
             child: Text(
               needsDeload ? 'Разгрузочная неделя' : 'Оптимизация тренировки',
-              style: AppTextStyles.heading2,
+              style: AppTextStyles.h2,
             ),
           ),
         ],
