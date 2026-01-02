@@ -12,11 +12,10 @@ class ProgressMetrics {
   final int sessionsCount;
   final int avgDurationSeconds;
   final ExerciseDifficulty? lastPerceivedDifficulty;
-  final double
-      weightTrend; // Положительный = рост веса, отрицательный = снижение
-  final double performanceTrend; // Общий тренд производительности
-  final double estimated1RM; // Расчётный максимум на 1 повтор
-  final int daysSinceLastSession; // Дней с последней тренировки
+  final double weightTrend;
+  final double performanceTrend;
+  final double estimated1RM;
+  final int daysSinceLastSession;
 
   ProgressMetrics({
     required this.completionRate,
@@ -47,31 +46,24 @@ class SuggestedExerciseAdjustment {
 }
 
 class ProgressionService {
-  /// Расчёт 1RM (One-Rep Max) по формуле Эпли
-  /// 1RM = вес × (1 + повторения / 30)
   double calculate1RM(double weight, int reps) {
     if (weight <= 0 || reps <= 0) return 0.0;
     if (reps == 1) return weight;
     return weight * (1 + reps / 30.0);
   }
 
-  /// Расчёт веса для заданного количества повторений на основе 1RM
   double calculateWeightForReps(double oneRM, int targetReps) {
     if (oneRM <= 0 || targetReps <= 0) return 0.0;
     if (targetReps == 1) return oneRM;
-    // Обратная формула: вес = 1RM / (1 + reps / 30)
     return oneRM / (1 + targetReps / 30.0);
   }
 
-  /// Определение необходимости разгрузочной недели
-  /// Возвращает true, если пользователь должен взять лёгкую неделю
   bool shouldDeload(
     List<WorkoutHistory> recentHistories, {
     int checkLastWorkouts = 6,
   }) {
     if (recentHistories.length < checkLastWorkouts) return false;
 
-    // Считаем тяжёлые тренировки (воспринимаемая сложность = hard)
     int hardWorkouts = 0;
     int totalExercises = 0;
 
@@ -85,7 +77,6 @@ class ProgressionService {
       }
     }
 
-    // Если более 60% упражнений были тяжёлыми, нужна разгрузка
     if (totalExercises > 0 && (hardWorkouts / totalExercises) > 0.6) {
       return true;
     }
@@ -93,7 +84,6 @@ class ProgressionService {
     return false;
   }
 
-  /// Расчёт корректировки в зависимости от времени восстановления
   double getRecoveryModifier(int daysSinceLastWorkout, int userAge) {
     // Базовое оптимальное время восстановления: 2-3 дня
     const optimalRecoveryDays = 2.5;
