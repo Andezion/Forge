@@ -112,7 +112,6 @@ class ProgressAnalyticsService {
     );
   }
 
-  /// Analyze overall strength across all exercises
   OverallStrengthData analyzeOverallStrength(
     List<WorkoutHistory> histories,
     User currentUser, {
@@ -134,7 +133,6 @@ class ProgressAnalyticsService {
       int exerciseCount = 0;
 
       for (var exerciseResult in history.session.exerciseResults) {
-        // Find max weight for this exercise in this session
         double maxWeight = 0;
         for (var set in exerciseResult.setResults) {
           if (set.weight > maxWeight) {
@@ -146,7 +144,6 @@ class ProgressAnalyticsService {
           sessionTotalStrength += maxWeight;
           exerciseCount++;
 
-          // Update exercise max
           final exerciseId = exerciseResult.exercise.id;
           if (!exerciseMaxes.containsKey(exerciseId) ||
               exerciseMaxes[exerciseId]! < maxWeight) {
@@ -183,7 +180,6 @@ class ProgressAnalyticsService {
         ? ((currentTotal - previousTotal) / previousTotal) * 100
         : 0;
 
-    // Calculate exercise contributions
     final contributions = <String, double>{};
     for (var max in currentUser.exerciseMaxes) {
       contributions[max.exerciseName] = max.maxWeight;
@@ -199,7 +195,6 @@ class ProgressAnalyticsService {
     );
   }
 
-  /// Analyze workout volume over time
   WorkoutVolumeData analyzeWorkoutVolume(
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
@@ -228,7 +223,6 @@ class ProgressAnalyticsService {
         value: dailyVolume,
       ));
 
-      // Calculate weekly volume
       final weekStart = _getWeekStart(history.date);
       weeklyVolumes[weekStart] = (weeklyVolumes[weekStart] ?? 0) + dailyVolume;
     }
@@ -258,7 +252,6 @@ class ProgressAnalyticsService {
     );
   }
 
-  /// Analyze workout frequency
   WorkoutFrequencyData analyzeWorkoutFrequency(
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
@@ -293,7 +286,6 @@ class ProgressAnalyticsService {
             weeklyFrequencyPoints.length
         : 0;
 
-    // Calculate streak
     int streak = 0;
     final sortedDates = relevantHistories
         .map((h) => h.dateOnly)
@@ -326,7 +318,6 @@ class ProgressAnalyticsService {
     );
   }
 
-  /// Analyze consistency (completion rate of sets)
   ConsistencyData analyzeConsistency(
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
