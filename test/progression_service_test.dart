@@ -142,13 +142,12 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      // История с отличной производительностью
       final histories = List.generate(5, (i) {
         return _createHistory(
           exercise,
           80.0,
           10,
-          10, // Все 10 повторений выполнены
+          10,
           DateTime.now().subtract(Duration(days: (i + 1) * 3)),
         );
       });
@@ -172,7 +171,6 @@ void main() {
       final suggestedWorkout = result['workout'] as Workout;
       final suggestedExercise = suggestedWorkout.exercises.first;
 
-      // Вес должен увеличиться
       expect(suggestedExercise.weight, greaterThan(80.0));
     });
 
@@ -199,7 +197,6 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      // История с плохой производительностью
       final histories = List.generate(3, (i) {
         final exerciseResult = ExerciseResult(
           exercise: exercise,
@@ -209,7 +206,7 @@ void main() {
           setResults: [
             ExerciseSetResult(
               setNumber: 1,
-              actualReps: 6, // Только 6 из 10
+              actualReps: 6,
               weight: 120.0,
               timestamp: DateTime.now(),
               durationSeconds: 90,
@@ -266,7 +263,6 @@ void main() {
       final suggestedWorkout = result['workout'] as Workout;
       final suggestedExercise = suggestedWorkout.exercises.first;
 
-      // Вес и/или повторения должны уменьшиться
       expect(
         suggestedExercise.weight < 120.0 || suggestedExercise.targetReps < 10,
         isTrue,
@@ -275,7 +271,6 @@ void main() {
   });
 }
 
-// Вспомогательная функция для создания истории тренировок
 WorkoutHistory _createHistory(
   Exercise exercise,
   double weight,
