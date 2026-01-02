@@ -6,7 +6,6 @@ import '../services/data_manager.dart';
 import '../models/workout.dart';
 import '../screens/progression_insights_screen.dart';
 
-/// Компактный виджет, показывающий краткую сводку прогресса
 class ProgressionSummaryCard extends StatefulWidget {
   const ProgressionSummaryCard({super.key});
 
@@ -49,10 +48,8 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
         return;
       }
 
-      // Проверяем необходимость разгрузки
       final needsDeload = _progressionService.shouldDeload(histories);
 
-      // Анализируем тренды по всем упражнениям
       int improving = 0;
       int declining = 0;
       int stable = 0;
@@ -136,8 +133,6 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          // Переход к детальному экрану
-          // TODO: передать текущую тренировку
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content:
