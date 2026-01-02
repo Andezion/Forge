@@ -8,6 +8,7 @@ import '../models/workout.dart';
 import '../widgets/compact_calendar.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
+import 'progress_charts_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -235,6 +236,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProgressChartsScreen(),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      icon: const Icon(Icons.analytics),
+                      label: const Text('Просмотр Графиков Прогресса'),
+                    ),
                   ),
                 ],
               ),

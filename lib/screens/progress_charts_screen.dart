@@ -5,6 +5,7 @@ import '../models/chart_data.dart';
 import '../models/exercise.dart';
 import '../services/progress_analytics_service.dart';
 import '../services/data_manager.dart';
+import '../services/profile_service.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
@@ -18,6 +19,7 @@ class ProgressChartsScreen extends StatefulWidget {
 class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   final _analyticsService = ProgressAnalyticsService();
   final _dataManager = DataManager();
+  final _profileService = ProfileService();
 
   bool _isLoading = true;
   String _selectedTab = 'overall';
@@ -45,8 +47,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
     try {
       await _dataManager.initialize();
+      await _profileService.load();
       final histories = _dataManager.workoutHistory;
-      final currentUser = _dataManager.currentUser!;
 
       final exerciseMap = <String, Exercise>{};
       for (var history in histories) {

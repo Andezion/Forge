@@ -1,6 +1,5 @@
 import '../models/chart_data.dart';
 import '../models/workout_history.dart';
-import '../models/user.dart';
 
 class ProgressAnalyticsService {
   ExerciseProgressData analyzeExerciseProgress(
@@ -87,21 +86,18 @@ class ProgressAnalyticsService {
 
   BodyWeightData analyzeBodyWeight(
     List<WorkoutHistory> histories,
-    User currentUser, {
+    double currentWeight, {
     int lookbackDays = 90,
   }) {
-    final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
-
     final weightPoints = <ChartDataPoint>[];
 
     weightPoints.add(ChartDataPoint(
       date: DateTime.now(),
-      value: currentUser.weight,
+      value: currentWeight,
     ));
 
-    final startWeight = currentUser.weight;
-    final currentWeight = currentUser.weight;
-    final weightChange = currentWeight - startWeight;
+    final startWeight = currentWeight;
+    final weightChange = 0.0;
 
     return BodyWeightData(
       weightData: weightPoints,
@@ -113,8 +109,7 @@ class ProgressAnalyticsService {
   }
 
   OverallStrengthData analyzeOverallStrength(
-    List<WorkoutHistory> histories,
-    User currentUser, {
+    List<WorkoutHistory> histories, {
     int lookbackDays = 90,
   }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
@@ -167,9 +162,8 @@ class ProgressAnalyticsService {
       }
     }
 
-    final currentTotal = currentUser.exerciseMaxes
-        .map((e) => e.maxWeight)
-        .fold(0.0, (a, b) => a + b);
+    final currentTotal =
+        totalStrengthPoints.isNotEmpty ? totalStrengthPoints.last.value : 0.0;
 
     double previousTotal = 0;
     if (totalStrengthPoints.length > 1) {
@@ -180,9 +174,19 @@ class ProgressAnalyticsService {
         ? ((currentTotal - previousTotal) / previousTotal) * 100
         : 0;
 
+    // Calculate exercise contributions from max weights in history
     final contributions = <String, double>{};
-    for (var max in currentUser.exerciseMaxes) {
-      contributions[max.exerciseName] = max.maxWeight;
+    for (var exerciseId in exerciseMaxes.keys) {
+      // Find exercise name from last occurrence
+      for (var history in relevantHistories.reversed) {
+        for (var result in history.session.exerciseResults) {
+          if (result.exercise.id == exerciseId) {
+            contributions[result.exercise.name] = exerciseMaxes[exerciseId]!;
+            break;
+          }
+        }
+        if (contributions.length == exerciseMaxes.length) break;
+      }
     }
 
     return OverallStrengthData(
@@ -214,7 +218,7 @@ class ProgressAnalyticsService {
 
       for (var exerciseResult in history.session.exerciseResults) {
         for (var set in exerciseResult.setResults) {
-          dailyVolume += set.weight * set.actualReps;
+          dailyVolume += set.weight * set.actualReps.toDouble();
         }
       }
 
@@ -240,8 +244,8 @@ class ProgressAnalyticsService {
 
     final averageVolume = weeklyVolumePoints.isNotEmpty
         ? weeklyVolumePoints.map((p) => p.value).reduce((a, b) => a + b) /
-            weeklyVolumePoints.length
-        : 0;
+            weeklyVolumePoints.length.toDouble()
+        : 0.0;
 
     return WorkoutVolumeData(
       weeklyVolumeData: weeklyVolumePoints,
@@ -283,8 +287,8 @@ class ProgressAnalyticsService {
 
     final averageFreq = weeklyFrequencyPoints.isNotEmpty
         ? weeklyFrequencyPoints.map((p) => p.value).reduce((a, b) => a + b) /
-            weeklyFrequencyPoints.length
-        : 0;
+            weeklyFrequencyPoints.length.toDouble()
+        : 0.0;
 
     int streak = 0;
     final sortedDates = relevantHistories
@@ -348,13 +352,15 @@ class ProgressAnalyticsService {
       if (sessionPlanned > 0) {
         completionRatePoints.add(ChartDataPoint(
           date: history.date,
-          value: (sessionCompleted / sessionPlanned) * 100,
+          value:
+              (sessionCompleted.toDouble() / sessionPlanned.toDouble()) * 100,
         ));
       }
     }
 
-    final overallRate =
-        totalPlanned > 0 ? (totalCompleted / totalPlanned) * 100 : 0;
+    final overallRate = totalPlanned > 0
+        ? (totalCompleted.toDouble() / totalPlanned.toDouble()) * 100
+        : 0.0;
 
     return ConsistencyData(
       completionRateData: completionRatePoints,
