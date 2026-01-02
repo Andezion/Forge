@@ -6,11 +6,9 @@ import '../services/data_manager.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
-/// Помощник для работы с прогрессией тренировок
 class ProgressionHelper {
   static final _progressionService = ProgressionService();
 
-  /// Показывает диалог с предложением использовать оптимизированную тренировку
   static Future<Workout?> suggestOptimizedWorkout(
     BuildContext context,
     Workout originalWorkout,
@@ -20,11 +18,9 @@ class ProgressionHelper {
       final histories = dataManager.workoutHistories;
 
       if (histories.length < 2) {
-        // Недостаточно данных для оптимизации
         return originalWorkout;
       }
 
-      // Получаем рекомендации
       final result = await _progressionService.suggestNextWorkout(
         originalWorkout,
         histories,
@@ -34,7 +30,6 @@ class ProgressionHelper {
       final reasons = result['reasons'] as Map<String, String>;
       final needsDeload = result['needsDeload'] as bool;
 
-      // Проверяем, есть ли изменения
       bool hasChanges = false;
       for (int i = 0; i < originalWorkout.exercises.length; i++) {
         final original = originalWorkout.exercises[i];
@@ -49,11 +44,9 @@ class ProgressionHelper {
       }
 
       if (!hasChanges && !needsDeload) {
-        // Нет изменений - используем оригинальную тренировку
         return originalWorkout;
       }
 
-      // Показываем диалог с предложением
       final shouldUseOptimized = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -72,7 +65,6 @@ class ProgressionHelper {
     }
   }
 
-  /// Показывает краткую подсказку о прогрессе упражнения
   static Future<void> showExerciseProgressTip(
     BuildContext context,
     String exerciseId,
@@ -127,7 +119,6 @@ class ProgressionHelper {
     }
   }
 
-  /// Получает процент изменения веса
   static double getWeightChange(
       WorkoutExercise original, WorkoutExercise optimized) {
     if (original.weight == 0) return 0;
