@@ -41,7 +41,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       if (histories.isEmpty) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Недостаточно данных';
+          _errorMessage = 'Not enough data';
         });
         return;
       }
@@ -87,7 +87,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Ошибка загрузки: $e';
+        _errorMessage = 'Error loading data: $e';
       });
     }
   }
@@ -133,8 +133,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content:
-                  Text('Выберите тренировку для просмотра детальной аналитики'),
+              content: Text('Select a workout to view detailed analytics'),
             ),
           );
         },
@@ -153,7 +152,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Прогресс тренировок',
+                    'Workout Progress',
                     style: AppTextStyles.h2,
                   ),
                 ],
@@ -194,7 +193,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Рекомендуется разгрузочная неделя',
+              'Recommended Deload Week',
               style: AppTextStyles.body2.copyWith(
                 color: Colors.orange.shade900,
                 fontWeight: FontWeight.w600,
@@ -211,7 +210,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
 
     if (total == 0) {
       return Text(
-        'Выполните больше тренировок для анализа',
+        'Complete more workouts for analysis',
         style: AppTextStyles.body2.copyWith(
           color: AppColors.textSecondary,
         ),
@@ -222,21 +221,21 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       children: [
         _buildStatRow(
           icon: Icons.trending_up,
-          label: 'Улучшается',
+          label: 'Improving',
           value: _improvingExercises,
           color: Colors.green,
         ),
         const SizedBox(height: 8),
         _buildStatRow(
           icon: Icons.trending_flat,
-          label: 'Стабильно',
+          label: 'Stable',
           value: _stableExercises,
-          color: Colors.blue,
+          color: Colors.limeAccent,
         ),
         const SizedBox(height: 8),
         _buildStatRow(
           icon: Icons.trending_down,
-          label: 'Снижается',
+          label: 'Declining',
           value: _decliningExercises,
           color: Colors.red,
         ),
