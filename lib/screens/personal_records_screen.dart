@@ -1086,7 +1086,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
 
     history.sort((a, b) => a.date.compareTo(b.date));
 
-    // Keep only best record per month to avoid clutter
     final monthlyBest = <String, PersonalRecord>{};
     for (final record in history) {
       final key = '${record.date.year}-${record.date.month}';
@@ -1102,7 +1101,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   }
 
   String _getWeightClass(double weight) {
-    // Men's weight classes (IPF)
     if (weight <= 59) return '-59 kg';
     if (weight <= 66) return '-66 kg';
     if (weight <= 74) return '-74 kg';
