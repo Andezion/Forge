@@ -348,17 +348,16 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
   Color _getRankColor(int rank) {
     switch (rank) {
       case 1:
-        return const Color(0xFFFFD700); // Gold
+        return const Color(0xFFFFD700);
       case 2:
-        return const Color(0xFFC0C0C0); // Silver
+        return const Color(0xFFC0C0C0);
       case 3:
-        return const Color(0xFFCD7F32); // Bronze
+        return const Color(0xFFCD7F32);
       default:
         return AppColors.primary;
     }
   }
 
-  // Mock data methods - replace with actual API calls
   List<LeaderboardUser> _getWorkoutsLeaderboard() {
     // TODO: Fetch from Firebase/backend
     return [
