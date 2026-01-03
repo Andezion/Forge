@@ -262,7 +262,7 @@ class _FriendsScreenState extends State<FriendsScreen>
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.access_time,
+                Icon(Icons.access_time,
                     size: 12, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
                 Text(
@@ -277,7 +277,7 @@ class _FriendsScreenState extends State<FriendsScreen>
               const SizedBox(height: 2),
               Row(
                 children: [
-                  const Icon(Icons.fitness_center,
+                  Icon(Icons.fitness_center,
                       size: 12, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
@@ -465,7 +465,7 @@ class _FriendsScreenState extends State<FriendsScreen>
         leading: CircleAvatar(
           radius: 24,
           backgroundColor: AppColors.textSecondary.withValues(alpha: 0.1),
-          child: const Icon(Icons.schedule, color: AppColors.textSecondary),
+          child: Icon(Icons.schedule, color: AppColors.textSecondary),
         ),
         title: Text(
           request.toUserEmail,

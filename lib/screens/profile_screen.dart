@@ -432,8 +432,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: ListTile(
         leading: Icon(icon, color: AppColors.primary),
         title: Text(title, style: AppTextStyles.body1),
-        trailing:
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+        trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,
       ),
     );

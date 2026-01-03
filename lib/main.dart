@@ -64,8 +64,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: appColor.color,
           primary: appColor.color,
+          brightness: appColor.isDarkMode ? Brightness.dark : Brightness.light,
         ),
         useMaterial3: true,
+        brightness: appColor.isDarkMode ? Brightness.dark : Brightness.light,
         scaffoldBackgroundColor: AppColors.background,
         appBarTheme: AppBarTheme(
           backgroundColor: appColor.color,
@@ -85,6 +87,14 @@ class MyApp extends StatelessWidget {
           ),
           filled: true,
           fillColor: AppColors.surface,
+        ),
+        iconTheme: IconThemeData(
+          color: AppColors.textPrimary,
+        ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: AppColors.textPrimary),
+          bodyMedium: TextStyle(color: AppColors.textPrimary),
+          bodySmall: TextStyle(color: AppColors.textSecondary),
         ),
       ),
       home: const LoginScreen(),

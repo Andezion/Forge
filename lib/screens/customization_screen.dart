@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../services/theme_service.dart';
 import '../services/profile_service.dart';
 import '../constants/app_text_styles.dart';
+import '../constants/app_colors.dart';
 
 class CustomizationScreen extends StatelessWidget {
   const CustomizationScreen({super.key});
@@ -33,10 +34,60 @@ class CustomizationScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Profile', style: AppTextStyles.h3),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Переключатель темы
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          appColor.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                          color: appColor.color,
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Dark Theme', style: AppTextStyles.h4),
+                            Text(
+                              appColor.isDarkMode ? 'Enabled' : 'Disabled',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Switch(
+                      value: appColor.isDarkMode,
+                      onChanged: (value) async {
+                        await appColor.setDarkMode(value);
+                      },
+                      activeColor: appColor.color,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text('Profile', style: AppTextStyles.h3),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -188,7 +239,7 @@ class CustomizationScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-                color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
+                color: Colors.black26, blurRadius: 4, offset: const Offset(0, 2))
           ],
         );
       case 1:

@@ -111,7 +111,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, color: AppColors.textSecondary),
+              Icon(Icons.info_outline, color: AppColors.textSecondary),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

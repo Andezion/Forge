@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline,
+          Icon(Icons.check_circle_outline,
               size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 8),
           Text(name, style: AppTextStyles.body2),

@@ -305,9 +305,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       ..sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -505,9 +505,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     final templates = ChallengeTemplate.getTemplates();
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(

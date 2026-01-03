@@ -57,7 +57,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('How do you feel?', style: AppTextStyles.h3),
+            Text('How do you feel?', style: AppTextStyles.h3),
             const SizedBox(height: 12),
             Expanded(
               child: ListView(
@@ -127,7 +127,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                     ),
                   ],
                   const SizedBox(height: 20),
-                  const Text('Recent entries', style: AppTextStyles.h4),
+                  Text('Recent entries', style: AppTextStyles.h4),
                   const SizedBox(height: 8),
                   for (var e in service.entries.take(7))
                     Card(

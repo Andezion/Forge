@@ -42,7 +42,7 @@ class _WeightScreenState extends State<WeightScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weight', style: AppTextStyles.h4),
+        title: Text('Weight', style: AppTextStyles.h4),
         backgroundColor: AppColors.primary,
       ),
       body: Column(
