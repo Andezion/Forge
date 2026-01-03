@@ -174,7 +174,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                     (e) => e.exercise.id == original.exercise.id,
                   );
                   return _buildComparisonRow(original, suggested);
-                }).toList(),
+                }),
               ],
             ),
           ],
@@ -259,7 +259,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
           final metrics = _exerciseMetrics![exercise.exercise.id];
           final reason = _reasons![exercise.exercise.id] ?? 'No data';
           return _buildExerciseCard(exercise, metrics!, reason);
-        }).toList(),
+        }),
       ],
     );
   }

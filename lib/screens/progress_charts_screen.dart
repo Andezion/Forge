@@ -723,7 +723,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

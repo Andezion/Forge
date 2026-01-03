@@ -188,7 +188,7 @@ class _OptimizationDialog extends StatelessWidget {
                 (e) => e.exercise.id == original.exercise.id,
               );
               return _buildExerciseComparison(original, optimized);
-            }).toList(),
+            }),
           ],
         ),
       ),

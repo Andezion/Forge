@@ -202,7 +202,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                     contentPadding: EdgeInsets.zero,
                     dense: true,
                   );
-                }).toList(),
+                }),
               ],
             ),
             const SizedBox(height: 16),
