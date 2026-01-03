@@ -4,15 +4,22 @@ import '../constants/app_colors.dart';
 
 class AppColor extends ChangeNotifier {
   static const _prefsKey = 'app_primary_color';
+  static const _darkModeKey = 'app_dark_mode';
 
   Color _color = AppColors.primary;
+  bool _isDarkMode = false;
 
   Color get color => _color;
+  bool get isDarkMode => _isDarkMode;
 
   AppColor();
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
+
+    _isDarkMode = prefs.getBool(_darkModeKey) ?? false;
+    AppColors.setDarkMode(_isDarkMode);
+
     final value = prefs.getInt(_prefsKey);
     if (value != null) {
       try {
@@ -46,5 +53,13 @@ class AppColor extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt(_prefsKey, newColor.value);
+  }
+
+  Future<void> setDarkMode(bool isDark) async {
+    _isDarkMode = isDark;
+    AppColors.setDarkMode(isDark);
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_darkModeKey, isDark);
   }
 }
