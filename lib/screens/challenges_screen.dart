@@ -110,8 +110,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   Widget _buildChallengeCard(Challenge challenge) {
     final auth = Provider.of<AuthService>(context, listen: false);
     final currentUserId = auth.firebaseUser?.uid ?? '';
-    final isParticipant = challenge.participantIds.contains(currentUserId);
-    final currentScore = challenge.scores[currentUserId] ?? 0;
 
     String leaderId = '';
     double leadScore = 0;
@@ -264,7 +262,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${score.toStringAsFixed(0)}',
+                          score.toStringAsFixed(0),
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,

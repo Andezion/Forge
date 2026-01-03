@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../models/user.dart' as app_user;
 import '../models/achievement.dart';
 
 class UserProfileScreen extends StatelessWidget {

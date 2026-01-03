@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
-import '../models/workout.dart';
 import '../services/data_manager.dart';
 import '../services/profile_service.dart';
 
@@ -913,7 +911,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   // Helper methods
   Map<String, PersonalRecord> _getPersonalRecords(DataManager dataManager) {
     final records = <String, PersonalRecord>{};
-    final completedWorkouts = dataManager.completedWorkouts;
+    final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
       for (final exercise in workout.exercises) {
@@ -947,7 +945,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     DataManager dataManager,
   ) {
     final history = <PersonalRecord>[];
-    final completedWorkouts = dataManager.completedWorkouts;
+    final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
       for (final ex in workout.exercises) {
@@ -976,12 +974,12 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   }
 
   List<Exercise> _getSystemExercises(DataManager dataManager) {
-    return dataManager.systemExercises;
+    return dataManager.exercises;
   }
 
   Exercise? _getExerciseById(String id, DataManager dataManager) {
     try {
-      return dataManager.systemExercises.firstWhere((ex) => ex.id == id);
+      return dataManager.exercises.firstWhere((ex) => ex.id == id);
     } catch (e) {
       return null;
     }
@@ -1084,7 +1082,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     DataManager dataManager,
   ) {
     final history = <PersonalRecord>[];
-    final completedWorkouts = dataManager.completedWorkouts;
+    final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
       for (final ex in workout.exercises) {

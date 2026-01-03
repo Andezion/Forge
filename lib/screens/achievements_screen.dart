@@ -291,7 +291,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
   List<Achievement> _calculateAchievements(DataManager dataManager) {
     final achievements = Achievements.getAll();
-    final completedWorkouts = dataManager.completedWorkouts;
+    final completedWorkouts = dataManager.workoutHistory;
     final totalWorkouts = completedWorkouts.length;
 
     double totalWeight = 0;
