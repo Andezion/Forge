@@ -132,13 +132,7 @@ class User {
 
 enum ExperienceLevel { beginner, intermediate, advanced }
 
-enum TrainingGoal {
-  strength,
-  hypertrophy,
-  endurance,
-  fat_loss,
-  general_fitness
-}
+enum TrainingGoal { strength, hypertrophy, endurance, fatLoss, generalFitness }
 
 enum TrainingIntensity { light, moderate, intense }
 
@@ -177,7 +171,7 @@ class UserProfile {
     return UserProfile(
       goals: (json['goals'] as List)
           .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
-              orElse: () => TrainingGoal.general_fitness))
+              orElse: () => TrainingGoal.generalFitness))
           .toList(),
       experienceLevel: ExperienceLevel.values.firstWhere(
           (e) => e.name == json['experienceLevel'],

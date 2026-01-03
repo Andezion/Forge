@@ -162,7 +162,7 @@ class CustomizationScreen extends StatelessWidget {
 
   Widget _buildColorTile(BuildContext context, Color color) {
     final appColor = Provider.of<AppColor>(context, listen: false);
-    final isSelected = appColor.color.value == color.value;
+    final isSelected = appColor.color == color;
 
     return GestureDetector(
       onTap: () async {
@@ -184,7 +184,7 @@ class CustomizationScreen extends StatelessWidget {
     switch (idx) {
       case 0:
         return BoxDecoration(
-          color: primary.withOpacity(0.85),
+          color: primary.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -205,7 +205,7 @@ class CustomizationScreen extends StatelessWidget {
         );
       default:
         return BoxDecoration(
-          color: primary.withOpacity(0.6),
+          color: primary.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(12),
         );
     }

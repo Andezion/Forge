@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Text(
                     firebaseUser?.email ?? '—',
                     style: AppTextStyles.body2.copyWith(
-                      color: AppColors.textOnPrimary.withOpacity(0.8),
+                      color: AppColors.textOnPrimary.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -375,7 +375,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       case 0:
         return BoxDecoration(
           shape: BoxShape.circle,
-          color: primary.withOpacity(0.85),
+          color: primary.withValues(alpha: 0.85),
         );
       case 2:
         return BoxDecoration(
@@ -386,13 +386,15 @@ class _ProfileScreenState extends State<ProfileScreen>
       case 3:
         return BoxDecoration(
           shape: BoxShape.circle,
-          color: primary.withOpacity(0.6),
+          color: primary.withValues(alpha: 0.6),
         );
       default:
         return BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(
-              colors: [primary.withOpacity(0.8), primary.withOpacity(0.4)]),
+          gradient: LinearGradient(colors: [
+            primary.withValues(alpha: 0.8),
+            primary.withValues(alpha: 0.4)
+          ]),
         );
     }
   }

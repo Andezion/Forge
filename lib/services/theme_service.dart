@@ -31,6 +31,11 @@ class AppColor extends ChangeNotifier {
         newColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_prefsKey, newColor.value);
+    // Store color as ARGB integer
+    final colorInt = (newColor.a.toInt() << 24) |
+        (newColor.r.toInt() << 16) |
+        (newColor.g.toInt() << 8) |
+        newColor.b.toInt();
+    await prefs.setInt(_prefsKey, colorInt);
   }
 }

@@ -365,7 +365,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: difficultyColor.withOpacity(0.1),
+                color: difficultyColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

@@ -321,7 +321,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withOpacity(0.1),
+          color: isSelected ? color : color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: color,
@@ -542,8 +542,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     final currentExercise = _exerciseQueue[_currentExerciseIndex];
     final progress = (_currentExerciseIndex + 1) / _exerciseQueue.length;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
         final shouldPop = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -562,7 +565,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
             ],
           ),
         );
-        return shouldPop ?? false;
+        if (shouldPop == true && context.mounted) {
+          Navigator.of(context).pop();
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -653,7 +658,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
@@ -704,7 +709,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                           child: ListTile(
                             leading: CircleAvatar(
                               backgroundColor:
-                                  AppColors.success.withOpacity(0.1),
+                                  AppColors.success.withValues(alpha: 0.1),
                               child: Text(
                                 '${setResult.setNumber}',
                                 style: AppTextStyles.body1.copyWith(

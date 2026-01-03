@@ -181,7 +181,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: difficultyColor.withOpacity(0.1),
+            color: difficultyColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -390,7 +390,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withOpacity(0.1),
+          color: isSelected ? color : color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: color,

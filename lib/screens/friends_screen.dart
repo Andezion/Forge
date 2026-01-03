@@ -60,7 +60,7 @@ class _FriendsScreenState extends State<FriendsScreen>
           controller: _tabController,
           indicatorColor: AppColors.textOnPrimary,
           labelColor: AppColors.textOnPrimary,
-          unselectedLabelColor: AppColors.textOnPrimary.withOpacity(0.7),
+          unselectedLabelColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
           tabs: const [
             Tab(text: 'Friends'),
             Tab(text: 'Requests'),
@@ -92,7 +92,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 Icon(
                   Icons.people_outline,
                   size: 80,
-                  color: AppColors.textSecondary.withOpacity(0.5),
+                  color: AppColors.textSecondary.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -149,7 +149,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 Icon(
                   Icons.mail_outline,
                   size: 80,
-                  color: AppColors.textSecondary.withOpacity(0.5),
+                  color: AppColors.textSecondary.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -212,7 +212,7 @@ class _FriendsScreenState extends State<FriendsScreen>
         contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           child: Text(
             friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?',
             style: AppTextStyles.h3.copyWith(
@@ -336,7 +336,7 @@ class _FriendsScreenState extends State<FriendsScreen>
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: Text(
                     request.fromUserName.isNotEmpty
                         ? request.fromUserName[0].toUpperCase()
@@ -440,7 +440,7 @@ class _FriendsScreenState extends State<FriendsScreen>
         contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: AppColors.textSecondary.withOpacity(0.1),
+          backgroundColor: AppColors.textSecondary.withValues(alpha: 0.1),
           child: const Icon(Icons.schedule, color: AppColors.textSecondary),
         ),
         title: Text(

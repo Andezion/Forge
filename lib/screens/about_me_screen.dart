@@ -154,7 +154,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                       label: Text(g.name.replaceAll('_', ' ')),
                       selected: selected,
                       onSelected: (v) => setState(() => _selectedGoals[g] = v),
-                      selectedColor: AppColors.primary.withOpacity(0.2),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
                       checkmarkColor: AppColors.primary,
                     );
                   }).toList(),
@@ -173,7 +173,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: AppColors.textSecondary.withOpacity(0.3)),
+                        color: AppColors.textSecondary.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<ExperienceLevel>(

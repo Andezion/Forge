@@ -230,7 +230,7 @@ class ProgressionService {
       await ps.load();
       final goals = ps.goals
           .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
-              orElse: () => TrainingGoal.general_fitness))
+              orElse: () => TrainingGoal.generalFitness))
           .toList();
       final experience = ps.experienceLevel != null
           ? ExperienceLevel.values.firstWhere(

@@ -161,7 +161,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
               children: [
                 TableRow(
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                   ),
                   children: [
                     _buildTableHeader('Exercise'),
