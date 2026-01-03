@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../services/friends_service.dart';
 import '../models/friend.dart';
+import 'community_leaderboard_screen.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -51,6 +52,17 @@ class _FriendsScreenState extends State<FriendsScreen>
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.leaderboard),
+            tooltip: 'Community Rankings',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CommunityLeaderboardScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person_add),
             onPressed: _showAddFriendDialog,
