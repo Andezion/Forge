@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -78,6 +79,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
 
   Widget _buildMyRecordsTab(DataManager dataManager) {
     final records = _getPersonalRecords(dataManager);
+    final profile = Provider.of<ProfileService>(context, listen: false);
+    final userWeight = profile.weightKg ?? 75.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -92,8 +95,15 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               _selectedExercise!,
             ),
             const SizedBox(height: 16),
+            _buildStrengthCoefficientCard(
+                records[_selectedExercise!.id], userWeight),
+            const SizedBox(height: 16),
+            _buildProgressChart(_selectedExercise!, dataManager),
+            const SizedBox(height: 16),
             _buildRecordHistory(_selectedExercise!, dataManager),
           ] else ...[
+            _buildTotalStrengthCard(records, userWeight),
+            const SizedBox(height: 24),
             _buildAllRecordsList(records, dataManager),
           ],
         ],
@@ -685,6 +695,48 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     if (reps == 1) return weight;
     // Epley formula
     return weight * (1 + reps / 30.0);
+  }
+
+  double _calculateWilksCoefficient(double bodyWeight, double totalLifted,
+      {bool isMale = true}) {
+    // Wilks formula coefficients for men
+    const a = -216.0475144;
+    const b = 16.2606339;
+    const c = -0.002388645;
+    const d = -0.00113732;
+    const e = 7.01863E-06;
+    const f = -1.291E-08;
+
+    final x = bodyWeight;
+    final denominator = a +
+        b * x +
+        c * x * x +
+        d * x * x * x +
+        e * x * x * x * x +
+        f * x * x * x * x * x;
+
+    return 500 / denominator * totalLifted;
+  }
+
+  double _calculateDotsCoefficient(double bodyWeight, double totalLifted,
+      {bool isMale = true}) {
+    // Dots formula (more modern than Wilks)
+    // Coefficients for men
+    const a = -0.0000010930;
+    const b = 0.0007391293;
+    const c = -0.1918759221;
+    const d = 24.0900756;
+    const e = -307.75076;
+
+    final bw = bodyWeight;
+    final denominator = a * bw * bw * bw * bw * bw +
+        b * bw * bw * bw * bw +
+        c * bw * bw * bw +
+        d * bw * bw +
+        e * bw +
+        1;
+
+    return 500 / denominator * totalLifted;
   }
 
   String _formatDate(DateTime date) {
