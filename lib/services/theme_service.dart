@@ -25,10 +25,8 @@ class AppColor extends ChangeNotifier {
       try {
         final loadedColor = Color(value);
 
-        if (loadedColor.alpha > 100 &&
-            (loadedColor.red > 0 ||
-                loadedColor.green > 0 ||
-                loadedColor.blue > 0)) {
+        if (loadedColor.a > 100 &&
+            (loadedColor.r > 0 || loadedColor.g > 0 || loadedColor.b > 0)) {
           _color = loadedColor;
           AppColors.primary = _color;
 
@@ -52,7 +50,11 @@ class AppColor extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt(_prefsKey, newColor.value);
+    final colorValue = (newColor.a.toInt() << 24) |
+        (newColor.r.toInt() << 16) |
+        (newColor.g.toInt() << 8) |
+        newColor.b.toInt();
+    await prefs.setInt(_prefsKey, colorValue);
   }
 
   Future<void> setDarkMode(bool isDark) async {
