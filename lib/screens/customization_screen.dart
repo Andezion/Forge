@@ -28,187 +28,191 @@ class CustomizationScreen extends StatelessWidget {
     final appColor = Provider.of<AppColor>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Customization', style: AppTextStyles.h4),
-        backgroundColor: appColor.color,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Переключатель темы
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          appColor.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                          color: appColor.color,
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Dark Theme', style: AppTextStyles.h4),
-                            Text(
-                              appColor.isDarkMode ? 'Enabled' : 'Disabled',
-                              style: AppTextStyles.caption.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Switch(
-                      value: appColor.isDarkMode,
-                      onChanged: (value) async {
-                        await appColor.setDarkMode(value);
-                      },
-                      activeColor: appColor.color,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text('Profile', style: AppTextStyles.h3),
-            const SizedBox(height: 12),
-            Row(
+        appBar: AppBar(
+          title: Text('Customization', style: AppTextStyles.h4),
+          backgroundColor: appColor.color,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () async {
-                    final picker = ImagePicker();
-                    final file = await picker.pickImage(
-                        source: ImageSource.gallery, maxWidth: 1200);
-                    if (file != null) {
-                      final profile =
-                          Provider.of<ProfileService>(context, listen: false);
-                      await profile.setImagePath(file.path);
-                    }
-                  },
-                  child: Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: appColor.color, width: 3),
-                    ),
-                    child: ClipOval(
-                      child: Consumer<ProfileService>(
-                        builder: (context, profile, _) {
-                          if (profile.imagePath != null) {
-                            return Image.file(File(profile.imagePath!),
-                                fit: BoxFit.cover);
-                          }
-                          return Icon(Icons.person,
-                              size: 56, color: appColor.color);
-                        },
+                // Переключатель темы
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Profile Image', style: AppTextStyles.body1),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final file = await picker.pickImage(
-                              source: ImageSource.gallery, maxWidth: 1200);
-                          if (file != null) {
-                            final profile = Provider.of<ProfileService>(context,
-                                listen: false);
-                            await profile.setImagePath(file.path);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: appColor.color,
-                          foregroundColor: Colors.black,
-                        ),
-                        child: const Text('Choose Photo'),
+                      Row(
+                        children: [
+                          Icon(
+                            appColor.isDarkMode
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
+                            color: appColor.color,
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Dark Theme', style: AppTextStyles.h4),
+                              Text(
+                                appColor.isDarkMode ? 'Enabled' : 'Disabled',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () async {
-                          final profile = Provider.of<ProfileService>(context,
-                              listen: false);
-                          await profile.setImagePath(null);
+                      Switch(
+                        value: appColor.isDarkMode,
+                        onChanged: (value) async {
+                          await appColor.setDarkMode(value);
                         },
-                        child: const Text('Delete Photo'),
+                        activeColor: appColor.color,
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text('Profile Frame', style: AppTextStyles.h3),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 88,
-              child: Consumer<ProfileService>(
-                builder: (context, profile, _) => ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 4,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, idx) {
-                    final selected = profile.frameIndex == idx;
-                    final decor = _frameDecoration(idx, appColor.color);
-                    return GestureDetector(
-                      onTap: () async => await profile.setFrameIndex(idx),
+                const SizedBox(height: 24),
+                Text('Profile', style: AppTextStyles.h3),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        final picker = ImagePicker();
+                        final file = await picker.pickImage(
+                            source: ImageSource.gallery, maxWidth: 1200);
+                        if (file != null) {
+                          final profile = Provider.of<ProfileService>(context,
+                              listen: false);
+                          await profile.setImagePath(file.path);
+                        }
+                      },
                       child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: decor.copyWith(
-                            border: selected
-                                ? Border.all(color: Colors.black, width: 3)
-                                : decor.border),
-                        child: Center(
-                          child: Text('F${idx + 1}',
-                              style: AppTextStyles.body1
-                                  .copyWith(color: Colors.white)),
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: appColor.color, width: 3),
+                        ),
+                        child: ClipOval(
+                          child: Consumer<ProfileService>(
+                            builder: (context, profile, _) {
+                              if (profile.imagePath != null) {
+                                return Image.file(File(profile.imagePath!),
+                                    fit: BoxFit.cover);
+                              }
+                              return Icon(Icons.person,
+                                  size: 56, color: appColor.color);
+                            },
+                          ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Profile Image', style: AppTextStyles.body1),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final picker = ImagePicker();
+                              final file = await picker.pickImage(
+                                  source: ImageSource.gallery, maxWidth: 1200);
+                              if (file != null) {
+                                final profile = Provider.of<ProfileService>(
+                                    context,
+                                    listen: false);
+                                await profile.setImagePath(file.path);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: appColor.color,
+                              foregroundColor: Colors.black,
+                            ),
+                            child: const Text('Choose Photo'),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: () async {
+                              final profile = Provider.of<ProfileService>(
+                                  context,
+                                  listen: false);
+                              await profile.setImagePath(null);
+                            },
+                            child: const Text('Delete Photo'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 16),
+                Text('Profile Frame', style: AppTextStyles.h3),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 88,
+                  child: Consumer<ProfileService>(
+                    builder: (context, profile, _) => ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 4,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, idx) {
+                        final selected = profile.frameIndex == idx;
+                        final decor = _frameDecoration(idx, appColor.color);
+                        return GestureDetector(
+                          onTap: () async => await profile.setFrameIndex(idx),
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: decor.copyWith(
+                                border: selected
+                                    ? Border.all(color: Colors.black, width: 3)
+                                    : decor.border),
+                            child: Center(
+                              child: Text('F${idx + 1}',
+                                  style: AppTextStyles.body1
+                                      .copyWith(color: Colors.white)),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text('Choose the primary app color', style: AppTextStyles.h3),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: _presetColors
+                      .map((c) => _buildColorTile(context, c))
+                      .toList(),
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-            Text('Choose the primary app color', style: AppTextStyles.h3),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: _presetColors
-                  .map((c) => _buildColorTile(context, c))
-                  .toList(),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildColorTile(BuildContext context, Color color) {
@@ -239,7 +243,9 @@ class CustomizationScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-                color: Colors.black26, blurRadius: 4, offset: const Offset(0, 2))
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: const Offset(0, 2))
           ],
         );
       case 1:
