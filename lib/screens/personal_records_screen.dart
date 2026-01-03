@@ -908,18 +908,17 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  // Helper methods
   Map<String, PersonalRecord> _getPersonalRecords(DataManager dataManager) {
     final records = <String, PersonalRecord>{};
     final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
-      for (final exercise in workout.exercises) {
-        for (final set in exercise.sets) {
-          if (set.actualWeight != null && set.actualReps != null) {
+      for (final exercise in workout.session.exerciseResults) {
+        for (final set in exercise.setResults) {
+          if (set.weight > 0 && set.actualReps > 0) {
             final exerciseId = exercise.exercise.id;
-            final weight = set.actualWeight!;
-            final reps = set.actualReps!;
+            final weight = set.weight;
+            final reps = set.actualReps;
             final estimated1RM = _calculate1RM(weight, reps);
 
             if (!records.containsKey(exerciseId) ||
@@ -927,7 +926,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               records[exerciseId] = PersonalRecord(
                 weight: weight,
                 reps: reps,
-                date: workout.completedAt!,
+                date: workout.date,
                 estimated1RM: estimated1RM,
                 isTheoretical: reps > 1,
               );
@@ -948,18 +947,18 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
-      for (final ex in workout.exercises) {
+      for (final ex in workout.session.exerciseResults) {
         if (ex.exercise.id == exercise.id) {
-          for (final set in ex.sets) {
-            if (set.actualWeight != null && set.actualReps != null) {
-              final weight = set.actualWeight!;
-              final reps = set.actualReps!;
+          for (final set in ex.setResults) {
+            if (set.weight > 0 && set.actualReps > 0) {
+              final weight = set.weight;
+              final reps = set.actualReps;
               final estimated1RM = _calculate1RM(weight, reps);
 
               history.add(PersonalRecord(
                 weight: weight,
                 reps: reps,
-                date: workout.completedAt!,
+                date: workout.date,
                 estimated1RM: estimated1RM,
                 isTheoretical: reps > 1,
               ));
@@ -987,13 +986,11 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
 
   double _calculate1RM(double weight, int reps) {
     if (reps == 1) return weight;
-    // Epley formula
     return weight * (1 + reps / 30.0);
   }
 
   double _calculateWilksCoefficient(double bodyWeight, double totalLifted,
       {bool isMale = true}) {
-    // Wilks formula coefficients
     final double a, b, c, d, e, f;
 
     if (isMale) {
@@ -1085,18 +1082,18 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final completedWorkouts = dataManager.workoutHistory;
 
     for (final workout in completedWorkouts) {
-      for (final ex in workout.exercises) {
+      for (final ex in workout.session.exerciseResults) {
         if (ex.exercise.id == exercise.id) {
-          for (final set in ex.sets) {
-            if (set.actualWeight != null && set.actualReps != null) {
-              final weight = set.actualWeight!;
-              final reps = set.actualReps!;
+          for (final set in ex.setResults) {
+            if (set.weight > 0 && set.actualReps > 0) {
+              final weight = set.weight;
+              final reps = set.actualReps;
               final estimated1RM = _calculate1RM(weight, reps);
 
               history.add(PersonalRecord(
                 weight: weight,
                 reps: reps,
-                date: workout.completedAt!,
+                date: workout.date,
                 estimated1RM: estimated1RM,
                 isTheoretical: reps > 1,
               ));

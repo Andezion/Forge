@@ -296,10 +296,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
     double totalWeight = 0;
     for (final workout in completedWorkouts) {
-      for (final exercise in workout.exercises) {
-        for (final set in exercise.sets) {
-          if (set.actualWeight != null && set.actualReps != null) {
-            totalWeight += set.actualWeight! * set.actualReps!;
+      for (final exercise in workout.session.exerciseResults) {
+        for (final set in exercise.setResults) {
+          if (set.weight > 0 && set.actualReps > 0) {
+            totalWeight += set.weight * set.actualReps;
           }
         }
       }
@@ -321,10 +321,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           progress = totalWorkouts;
           isUnlocked = totalWorkouts >= achievement.requiredValue;
           if (isUnlocked && completedWorkouts.isNotEmpty) {
-            unlockedAt = completedWorkouts
-                .take(achievement.requiredValue)
-                .last
-                .completedAt;
+            unlockedAt =
+                completedWorkouts.take(achievement.requiredValue).last.date;
           }
           break;
 
