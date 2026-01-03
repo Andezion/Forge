@@ -552,6 +552,302 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
+  Widget _buildStrengthCoefficientCard(
+      PersonalRecord? record, double bodyWeight) {
+    if (record == null) return const SizedBox.shrink();
+
+    final wilks = _calculateWilksCoefficient(bodyWeight, record.estimated1RM);
+    final dots = _calculateDotsCoefficient(bodyWeight, record.estimated1RM);
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Strength Coefficients', style: AppTextStyles.h3),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildCoefficientItem(
+                    'Wilks',
+                    wilks,
+                    _getWilksRating(wilks),
+                    AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildCoefficientItem(
+                    'Dots',
+                    dots,
+                    _getDotsRating(dots),
+                    AppColors.accent,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'These coefficients normalize your strength relative to body weight for fair comparison',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoefficientItem(
+      String label, double value, String rating, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Text(label, style: AppTextStyles.caption),
+          const SizedBox(height: 8),
+          Text(
+            value.toStringAsFixed(1),
+            style: AppTextStyles.h2.copyWith(color: color),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            rating,
+            style: AppTextStyles.caption.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTotalStrengthCard(
+      Map<String, PersonalRecord> records, double bodyWeight) {
+    // Calculate total for big 3 lifts
+    final bigThree = ['Squat', 'Bench Press', 'Deadlift'];
+    double total = 0;
+    int foundLifts = 0;
+
+    for (final entry in records.entries) {
+      final exercise = _getExerciseById(
+          entry.key, Provider.of<DataManager>(context, listen: false));
+      if (exercise != null && bigThree.contains(exercise.name)) {
+        total += entry.value.estimated1RM;
+        foundLifts++;
+      }
+    }
+
+    if (foundLifts == 0) return const SizedBox.shrink();
+
+    final wilks = _calculateWilksCoefficient(bodyWeight, total);
+    final dots = _calculateDotsCoefficient(bodyWeight, total);
+
+    return Card(
+      elevation: 2,
+      color: AppColors.primary.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.emoji_events, color: AppColors.primary, size: 32),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Total Strength', style: AppTextStyles.h3),
+                      Text(
+                        foundLifts == 3 ? 'Big 3 Total' : '$foundLifts/3 lifts',
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    Text('Total', style: AppTextStyles.caption),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${total.toStringAsFixed(1)} kg',
+                      style:
+                          AppTextStyles.h2.copyWith(color: AppColors.primary),
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: AppColors.divider,
+                ),
+                Column(
+                  children: [
+                    Text('Wilks', style: AppTextStyles.caption),
+                    const SizedBox(height: 4),
+                    Text(
+                      wilks.toStringAsFixed(1),
+                      style:
+                          AppTextStyles.h2.copyWith(color: AppColors.primary),
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: AppColors.divider,
+                ),
+                Column(
+                  children: [
+                    Text('Dots', style: AppTextStyles.caption),
+                    const SizedBox(height: 4),
+                    Text(
+                      dots.toStringAsFixed(1),
+                      style:
+                          AppTextStyles.h2.copyWith(color: AppColors.primary),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressChart(Exercise exercise, DataManager dataManager) {
+    final history = _getRecordHistoryChronological(exercise, dataManager);
+
+    if (history.length < 2) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Progress Over Time', style: AppTextStyles.h3),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 20,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: AppColors.divider,
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            '${value.toInt()}',
+                            style: AppTextStyles.caption,
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < history.length) {
+                            final date = history[value.toInt()].date;
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                '${date.day}/${date.month}',
+                                style: AppTextStyles.caption,
+                              ),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: history
+                          .asMap()
+                          .entries
+                          .map((entry) => FlSpot(
+                                entry.key.toDouble(),
+                                entry.value.estimated1RM,
+                              ))
+                          .toList(),
+                      isCurved: true,
+                      color: AppColors.primary,
+                      barWidth: 3,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, barData, index) {
+                          return FlDotCirclePainter(
+                            radius: 4,
+                            color: AppColors.primary,
+                            strokeWidth: 2,
+                            strokeColor: AppColors.surface,
+                          );
+                        },
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                      ),
+                    ),
+                  ],
+                  minY: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildWorldRecordsList(String weightClass) {
     final records = _getWorldRecords(weightClass, _selectedFederation);
 
@@ -741,6 +1037,68 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month}.${date.year}';
+  }
+
+  String _getWilksRating(double wilks) {
+    if (wilks < 250) return 'Beginner';
+    if (wilks < 350) return 'Intermediate';
+    if (wilks < 450) return 'Advanced';
+    if (wilks < 550) return 'Elite';
+    return 'World Class';
+  }
+
+  String _getDotsRating(double dots) {
+    if (dots < 300) return 'Beginner';
+    if (dots < 400) return 'Intermediate';
+    if (dots < 500) return 'Advanced';
+    if (dots < 600) return 'Elite';
+    return 'World Class';
+  }
+
+  List<PersonalRecord> _getRecordHistoryChronological(
+    Exercise exercise,
+    DataManager dataManager,
+  ) {
+    final history = <PersonalRecord>[];
+    final completedWorkouts = dataManager.completedWorkouts;
+
+    for (final workout in completedWorkouts) {
+      for (final ex in workout.exercises) {
+        if (ex.exercise.id == exercise.id) {
+          for (final set in ex.sets) {
+            if (set.actualWeight != null && set.actualReps != null) {
+              final weight = set.actualWeight!;
+              final reps = set.actualReps!;
+              final estimated1RM = _calculate1RM(weight, reps);
+
+              history.add(PersonalRecord(
+                weight: weight,
+                reps: reps,
+                date: workout.completedAt!,
+                estimated1RM: estimated1RM,
+                isTheoretical: reps > 1,
+              ));
+            }
+          }
+        }
+      }
+    }
+
+    history.sort((a, b) => a.date.compareTo(b.date));
+
+    // Keep only best record per month to avoid clutter
+    final monthlyBest = <String, PersonalRecord>{};
+    for (final record in history) {
+      final key = '${record.date.year}-${record.date.month}';
+      if (!monthlyBest.containsKey(key) ||
+          record.estimated1RM > monthlyBest[key]!.estimated1RM) {
+        monthlyBest[key] = record;
+      }
+    }
+
+    final result = monthlyBest.values.toList();
+    result.sort((a, b) => a.date.compareTo(b.date));
+    return result;
   }
 
   String _getWeightClass(double weight) {
