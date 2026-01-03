@@ -146,7 +146,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       );
     }
 
-    // Sort: unlocked first, then by progress
     achievements.sort((a, b) {
       if (a.isUnlocked && !b.isUnlocked) return -1;
       if (!a.isUnlocked && b.isUnlocked) return 1;
@@ -188,7 +187,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Icon
               Container(
                 width: 64,
                 height: 64,
@@ -207,7 +205,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 ),
               ),
               const SizedBox(width: 16),
-              // Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +240,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Progress bar for locked achievements
                     if (!achievement.isUnlocked) ...[
                       Row(
                         children: [
@@ -266,7 +262,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         ],
                       ),
                     ] else ...[
-                      // Unlocked date
                       Row(
                         children: [
                           Icon(
@@ -299,7 +294,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     final completedWorkouts = dataManager.completedWorkouts;
     final totalWorkouts = completedWorkouts.length;
 
-    // Calculate total weight
     double totalWeight = 0;
     for (final workout in completedWorkouts) {
       for (final exercise in workout.exercises) {
@@ -311,17 +305,14 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       }
     }
 
-    // Calculate streak (simplified - would need proper implementation)
     int currentStreak = 0; // TODO: Implement proper streak calculation
 
-    // Update progress for each achievement
     return achievements.map((achievement) {
       int progress = 0;
       bool isUnlocked = false;
       DateTime? unlockedAt;
 
       switch (achievement.id) {
-        // Workout achievements
         case 'first_workout':
         case 'workout_10':
         case 'workout_50':
@@ -337,7 +328,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           }
           break;
 
-        // Strength achievements
         case 'total_weight_1000':
         case 'total_weight_10000':
         case 'total_weight_100000':
@@ -345,7 +335,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           isUnlocked = totalWeight >= achievement.requiredValue;
           break;
 
-        // Consistency achievements
         case 'streak_7':
         case 'streak_30':
         case 'streak_100':
@@ -353,7 +342,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           isUnlocked = currentStreak >= achievement.requiredValue;
           break;
 
-        // Social achievements - would need friend data
         case 'first_friend':
         case 'friends_10':
           progress = 0; // TODO: Get from friends service
