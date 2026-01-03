@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 enum ChallengeType {
-  workouts, // Most workouts
-  totalWeight, // Most weight lifted
-  specificExercise, // Best performance in specific exercise
-  streak, // Longest streak
-  consistency, // Most consistent training
+  workouts,
+  totalWeight,
+  specificExercise,
+  streak,
+  consistency,
 }
 
 enum ChallengeStatus {
@@ -29,7 +29,7 @@ class Challenge {
   final ChallengeStatus status;
   final String? exerciseId;
   final String? exerciseName;
-  final Map<String, double> scores; // userId -> score
+  final Map<String, double> scores;
   final String? winnerId;
 
   Challenge({
