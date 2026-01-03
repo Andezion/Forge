@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/auth_service.dart';
+import 'user_profile_screen.dart';
 
 class CommunityLeaderboardScreen extends StatefulWidget {
   const CommunityLeaderboardScreen({super.key});
@@ -239,6 +240,18 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                 : BorderSide.none,
           ),
           child: ListTile(
+            onTap: isCurrentUser
+                ? null
+                : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => UserProfileScreen(
+                          userId: user.userId,
+                          userName: user.name,
+                        ),
+                      ),
+                    );
+                  },
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
