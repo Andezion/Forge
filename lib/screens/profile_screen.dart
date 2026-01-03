@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                     )
                   else if (_isLoadingUser)
-                    const SizedBox(
+                    SizedBox(
                       height: 24,
                       width: 24,
                       child: CircularProgressIndicator(
