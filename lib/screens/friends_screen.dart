@@ -6,6 +6,7 @@ import '../constants/app_strings.dart';
 import '../services/friends_service.dart';
 import '../models/friend.dart';
 import 'community_leaderboard_screen.dart';
+import 'challenges_screen.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -52,6 +53,17 @@ class _FriendsScreenState extends State<FriendsScreen>
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events),
+            tooltip: 'Challenges',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ChallengesScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.leaderboard),
             tooltip: 'Community Rankings',
