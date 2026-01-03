@@ -113,7 +113,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     final isParticipant = challenge.participantIds.contains(currentUserId);
     final currentScore = challenge.scores[currentUserId] ?? 0;
 
-    // Get leader
     String leaderId = '';
     double leadScore = 0;
     challenge.scores.forEach((id, score) {
@@ -193,7 +192,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ],
               ),
               const SizedBox(height: 16),
-              // Progress bar
               if (challenge.isActive) ...[
                 Row(
                   children: [
@@ -217,7 +215,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
                 const SizedBox(height: 16),
               ],
-              // Participants and scores
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -298,7 +295,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     final auth = Provider.of<AuthService>(context, listen: false);
     final currentUserId = auth.firebaseUser?.uid ?? '';
 
-    // Sort participants by score
     final sortedParticipants = challenge.participantIds
         .asMap()
         .entries
@@ -320,7 +316,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               Container(
@@ -354,7 +349,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             ],
           ),
           const SizedBox(height: 24),
-          // Dates
           _buildInfoRow(
             Icons.calendar_today,
             'Start',
@@ -375,7 +369,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             ),
           ],
           const SizedBox(height: 24),
-          // Leaderboard
           Text('Leaderboard', style: AppTextStyles.h3),
           const SizedBox(height: 12),
           ...sortedParticipants.asMap().entries.map((entry) {
@@ -436,7 +429,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             );
           }),
           const SizedBox(height: 24),
-          // Accept/Decline for pending challenges
           if (challenge.isPending &&
               challenge.participantIds.contains(currentUserId)) ...[
             Row(
@@ -648,7 +640,6 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     return '${date.day}.${date.month}.${date.year}';
   }
 
-  // Mock data - replace with actual data
   List<Challenge> _getActiveChallenges() {
     final now = DateTime.now();
     return [
