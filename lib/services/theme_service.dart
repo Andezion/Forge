@@ -15,12 +15,25 @@ class AppColor extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getInt(_prefsKey);
     if (value != null) {
-      _color = Color(value);
-      AppColors.primary = _color;
+      try {
+        final loadedColor = Color(value);
 
-      AppColors.textOnPrimary =
-          _color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
-      notifyListeners();
+        if (loadedColor.alpha > 100 &&
+            (loadedColor.red > 0 ||
+                loadedColor.green > 0 ||
+                loadedColor.blue > 0)) {
+          _color = loadedColor;
+          AppColors.primary = _color;
+
+          AppColors.textOnPrimary =
+              _color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+          notifyListeners();
+        } else {
+          await prefs.remove(_prefsKey);
+        }
+      } catch (e) {
+        await prefs.remove(_prefsKey);
+      }
     }
   }
 
@@ -32,10 +45,6 @@ class AppColor extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
 
-    final colorInt = (newColor.a.toInt() << 24) |
-        (newColor.r.toInt() << 16) |
-        (newColor.g.toInt() << 8) |
-        newColor.b.toInt();
-    await prefs.setInt(_prefsKey, colorInt);
+    await prefs.setInt(_prefsKey, newColor.value);
   }
 }
