@@ -16,6 +16,7 @@ import 'weight_screen.dart';
 import 'wellness_screen.dart';
 import 'about_me_screen.dart';
 import 'progress_charts_screen.dart';
+import 'personal_records_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -201,7 +202,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     AppStrings.oneRepMax,
                     Icons.fitness_center,
                     () {
-                      // TODO: Navigate to 1RM tracker
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const PersonalRecordsScreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildMenuItem(
