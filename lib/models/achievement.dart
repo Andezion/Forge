@@ -92,11 +92,9 @@ class Achievement {
   }
 }
 
-// Predefined achievements
 class Achievements {
   static List<Achievement> getAll() {
     return [
-      // Workout achievements
       Achievement(
         id: 'first_workout',
         title: 'First Steps',
@@ -142,8 +140,6 @@ class Achievements {
         category: AchievementCategory.workouts,
         requiredValue: 500,
       ),
-
-      // Strength achievements
       Achievement(
         id: 'total_weight_1000',
         title: 'Lightweight',
@@ -189,8 +185,6 @@ class Achievements {
         category: AchievementCategory.strength,
         requiredValue: 400,
       ),
-
-      // Consistency achievements
       Achievement(
         id: 'streak_7',
         title: 'Week Warrior',
@@ -236,8 +230,6 @@ class Achievements {
         category: AchievementCategory.consistency,
         requiredValue: 10,
       ),
-
-      // Social achievements
       Achievement(
         id: 'first_friend',
         title: 'Social',
@@ -274,8 +266,6 @@ class Achievements {
         category: AchievementCategory.social,
         requiredValue: 5,
       ),
-
-      // Special achievements
       Achievement(
         id: 'new_year',
         title: 'New Year, New Me',
