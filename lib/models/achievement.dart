@@ -50,8 +50,8 @@ class Achievement {
       id: json['id'],
       title: json['title'],
       description: json['description'],
-      icon: Icons.emoji_events, // Default icon
-      color: Colors.amber, // Default color
+      icon: Icons.emoji_events,
+      color: Colors.amber,
       category: AchievementCategory.values.firstWhere(
         (e) => e.name == json['category'],
         orElse: () => AchievementCategory.special,
