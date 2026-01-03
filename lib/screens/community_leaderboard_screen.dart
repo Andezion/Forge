@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../services/data_manager.dart';
 import '../services/auth_service.dart';
-import '../models/user.dart' as app_user;
 
 class CommunityLeaderboardScreen extends StatefulWidget {
   const CommunityLeaderboardScreen({super.key});
