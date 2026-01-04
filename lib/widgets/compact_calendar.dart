@@ -35,7 +35,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -137,10 +137,10 @@ class _CompactCalendarState extends State<CompactCalendar> {
             ),
             daysOfWeekStyle: DaysOfWeekStyle(
               weekdayStyle: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color,
               ),
               weekendStyle: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ),
             eventLoader: (day) {
