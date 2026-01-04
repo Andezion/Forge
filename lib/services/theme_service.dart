@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_theme.dart';
 
 class AppColor extends ChangeNotifier {
   static const _prefsKey = 'app_primary_color';
@@ -14,11 +15,16 @@ class AppColor extends ChangeNotifier {
 
   AppColor();
 
+  ThemeData getTheme() {
+    return _isDarkMode
+        ? AppTheme.darkTheme(_color)
+        : AppTheme.lightTheme(_color);
+  }
+
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
 
     _isDarkMode = prefs.getBool(_darkModeKey) ?? false;
-    AppColors.setDarkMode(_isDarkMode);
 
     final value = prefs.getInt(_prefsKey);
     if (value != null) {
@@ -29,9 +35,6 @@ class AppColor extends ChangeNotifier {
             (loadedColor.r > 0 || loadedColor.g > 0 || loadedColor.b > 0)) {
           _color = loadedColor;
           AppColors.primary = _color;
-
-          AppColors.textOnPrimary =
-              _color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
           notifyListeners();
         } else {
           await prefs.remove(_prefsKey);
@@ -45,8 +48,6 @@ class AppColor extends ChangeNotifier {
   Future<void> setColor(Color newColor) async {
     _color = newColor;
     AppColors.primary = newColor;
-    AppColors.textOnPrimary =
-        newColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
 
@@ -59,7 +60,6 @@ class AppColor extends ChangeNotifier {
 
   Future<void> setDarkMode(bool isDark) async {
     _isDarkMode = isDark;
-    AppColors.setDarkMode(isDark);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_darkModeKey, isDark);
