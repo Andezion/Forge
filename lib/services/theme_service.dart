@@ -25,6 +25,7 @@ class AppColor extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     _isDarkMode = prefs.getBool(_darkModeKey) ?? false;
+    AppColors.setDarkMode(_isDarkMode);
 
     final value = prefs.getInt(_prefsKey);
     if (value != null) {
@@ -60,6 +61,8 @@ class AppColor extends ChangeNotifier {
 
   Future<void> setDarkMode(bool isDark) async {
     _isDarkMode = isDark;
+    // Обновляем статические цвета для обратной совместимости
+    AppColors.setDarkMode(isDark);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_darkModeKey, isDark);
