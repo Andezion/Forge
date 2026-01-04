@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'services/auth_service.dart';
-import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'screens/login_screen.dart';
 import 'services/data_manager.dart';
@@ -60,43 +59,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: appColor.color,
-          primary: appColor.color,
-          brightness: appColor.isDarkMode ? Brightness.dark : Brightness.light,
-        ),
-        useMaterial3: true,
-        brightness: appColor.isDarkMode ? Brightness.dark : Brightness.light,
-        scaffoldBackgroundColor: AppColors.background,
-        appBarTheme: AppBarTheme(
-          backgroundColor: appColor.color,
-          foregroundColor: AppColors.textOnPrimary,
-          elevation: 0,
-        ),
-        cardTheme: CardTheme(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: AppColors.surface,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          filled: true,
-          fillColor: AppColors.surface,
-        ),
-        iconTheme: IconThemeData(
-          color: AppColors.textPrimary,
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: AppColors.textPrimary),
-          bodyMedium: TextStyle(color: AppColors.textPrimary),
-          bodySmall: TextStyle(color: AppColors.textSecondary),
-        ),
-      ),
+      theme: appColor.getTheme(),
       home: const LoginScreen(),
     );
   }
