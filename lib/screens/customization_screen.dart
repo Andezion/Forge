@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import '../services/theme_service.dart';
 import '../services/profile_service.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_colors.dart';
 
 class CustomizationScreen extends StatelessWidget {
   const CustomizationScreen({super.key});
@@ -38,11 +37,10 @@ class CustomizationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Переключатель темы
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -71,7 +69,10 @@ class CustomizationScreen extends StatelessWidget {
                               Text(
                                 appColor.isDarkMode ? 'Enabled' : 'Disabled',
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textSecondary,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                 ),
                               ),
                             ],
