@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Consumer<AppColor>(
       builder: (context, appColor, _) => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: appColor.color,
           foregroundColor: AppColors.textOnPrimary,
@@ -351,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     } else {
       content = CircleAvatar(
         radius: 50,
-        backgroundColor: AppColors.surface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: Icon(
           Icons.person,
           size: 50,

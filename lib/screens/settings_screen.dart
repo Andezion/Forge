@@ -39,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Consumer2<SettingsService, AppColor>(
       builder: (context, settings, appColor, _) => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: appColor.color,
           foregroundColor: AppColors.textOnPrimary,
@@ -347,7 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Text(
           subtitle,
           style: AppTextStyles.caption.copyWith(
-            color: AppColors.textSecondary,
+            color: Theme.of(context).textTheme.bodySmall?.color,
           ),
         ),
       ),

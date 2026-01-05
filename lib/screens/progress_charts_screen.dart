@@ -153,7 +153,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Progress Charts'),
         backgroundColor: AppColors.primary,
@@ -184,7 +184,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   Text(
                     'Loading data...',
                     style: AppTextStyles.body1.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   ),
                 ],
@@ -200,7 +200,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                         Icon(
                           Icons.show_chart,
                           size: 80,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -212,7 +212,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                         Text(
                           'Complete at least one workout to see progress charts',
                           style: AppTextStyles.body1.copyWith(
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -231,7 +231,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   Widget _buildTabBar() {
     return Container(
-      color: AppColors.surface,
+      color: Theme.of(context).colorScheme.surface,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -266,14 +266,18 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected
+                  ? AppColors.primary
+                  : Theme.of(context).textTheme.bodySmall?.color,
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: AppTextStyles.body1.copyWith(
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected
+                    ? AppColors.primary
+                    : Theme.of(context).textTheme.bodySmall?.color,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -507,7 +511,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surface,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -543,12 +547,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.fitness_center,
-                          size: 64, color: AppColors.textSecondary),
+                          size: 64,
+                          color: Theme.of(context).textTheme.bodySmall?.color),
                       const SizedBox(height: 16),
                       Text(
                         'Select an exercise to view progress',
                         style: AppTextStyles.body1.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
                       ),
                     ],

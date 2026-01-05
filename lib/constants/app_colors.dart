@@ -18,6 +18,17 @@ class AppColors {
   static const Color armwrestling = Color(0xFF004E89);
   static const Color powerlifting = Color(0xFF8B0000);
 
+  // Dynamic colors based on theme
+  static Color background = const Color(0xFFF5F5F5);
+  static Color surface = const Color(0xFFFFFFFF);
+  static Color surfaceDark = const Color(0xFF1E1E1E);
+  static Color textPrimary = const Color(0xFF000000);
+  static Color textSecondary = const Color(0xFF5F6368);
+  static Color textHint = const Color(0xFF9E9E9E);
+  static Color textOnPrimary = const Color(0xFFFFFFFF);
+  static Color divider = const Color(0xFFE0E0E0);
+
+  // Helper methods to get colors based on context (preferred)
   static Color getTextPrimary(BuildContext context) {
     return Theme.of(context).colorScheme.onSurface;
   }
@@ -50,14 +61,7 @@ class AppColors {
     return Theme.of(context).colorScheme.onPrimary;
   }
 
-  static Color background = const Color(0xFFF5F5F5);
-  static Color surface = const Color(0xFFFFFFFF);
-  static Color surfaceDark = const Color(0xFF1E1E1E);
-  static Color textPrimary = const Color(0xFF000000);
-  static Color textSecondary = const Color(0xFF5F6368);
-  static Color textHint = const Color(0xFF9E9E9E);
-  static Color textOnPrimary = const Color(0xFFFFFFFF);
-  static Color divider = const Color(0xFFE0E0E0);
+  // Update static colors based on dark mode
   static void setDarkMode(bool isDark) {
     if (isDark) {
       background = const Color(0xFF121212);
@@ -65,6 +69,7 @@ class AppColors {
       textPrimary = const Color(0xFFFFFFFF);
       textSecondary = const Color(0xFFB0B0B0);
       textHint = const Color(0xFF757575);
+      textOnPrimary = const Color(0xFF000000);
       divider = const Color(0xFF303030);
     } else {
       background = const Color(0xFFF5F5F5);
@@ -72,6 +77,7 @@ class AppColors {
       textPrimary = const Color(0xFF000000);
       textSecondary = const Color(0xFF5F6368);
       textHint = const Color(0xFF9E9E9E);
+      textOnPrimary = const Color(0xFFFFFFFF);
       divider = const Color(0xFFE0E0E0);
     }
   }
