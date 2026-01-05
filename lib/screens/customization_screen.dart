@@ -24,12 +24,12 @@ class CustomizationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appColor = Provider.of<AppColor>(context);
-
-    return Scaffold(
+    return Consumer<AppColor>(
+      builder: (context, appColor, _) => Scaffold(
         appBar: AppBar(
           title: Text('Customization', style: AppTextStyles.h4),
           backgroundColor: appColor.color,
+          foregroundColor: Colors.white,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -83,6 +83,17 @@ class CustomizationScreen extends StatelessWidget {
                         value: appColor.isDarkMode,
                         onChanged: (value) async {
                           await appColor.setDarkMode(value);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(value
+                                    ? 'Dark theme enabled'
+                                    : 'Light theme enabled'),
+                                duration: const Duration(seconds: 1),
+                                backgroundColor: appColor.color,
+                              ),
+                            );
+                          }
                         },
                         activeColor: appColor.color,
                       ),
@@ -213,7 +224,9 @@ class CustomizationScreen extends StatelessWidget {
               ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildColorTile(BuildContext context, Color color) {
@@ -223,6 +236,15 @@ class CustomizationScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         await appColor.setColor(color);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Theme color updated!'),
+              duration: const Duration(seconds: 1),
+              backgroundColor: color,
+            ),
+          );
+        }
       },
       child: Container(
         width: 56,
