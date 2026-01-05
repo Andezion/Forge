@@ -34,6 +34,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer2<SettingsService, AppColor>(
       builder: (context, settings, appColor, _) => Scaffold(
         backgroundColor: AppColors.background,
@@ -41,7 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: appColor.color,
           foregroundColor: AppColors.textOnPrimary,
           title: Text(
-            'Settings',
+            l10n.settings,
             style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
           ),
         ),
@@ -50,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Profile Information'),
+              _buildSectionTitle(l10n.profileInformation),
               const SizedBox(height: 12),
               _buildCard(
                 child: Column(
@@ -58,8 +60,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     TextField(
                       controller: _nicknameController,
                       decoration: InputDecoration(
-                        labelText: 'Nickname',
-                        hintText: 'Enter your nickname',
+                        labelText: l10n.nickname,
+                        hintText: l10n.enterNickname,
                         prefixIcon: Icon(Icons.person, color: appColor.color),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -73,8 +75,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     TextField(
                       controller: _regionController,
                       decoration: InputDecoration(
-                        labelText: 'Region',
-                        hintText: 'e.g., USA, Europe, Asia',
+                        labelText: l10n.region,
+                        hintText: l10n.enterRegion,
                         prefixIcon:
                             Icon(Icons.location_on, color: appColor.color),
                         border: OutlineInputBorder(
@@ -96,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             : _regionController.text);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('Profile information saved!'),
+                            content: Text(l10n.profileInfoSaved),
                             backgroundColor: appColor.color,
                             duration: const Duration(seconds: 1),
                           ),
@@ -110,19 +112,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Save Profile Info'),
+                      child: Text(l10n.saveProfileInfo),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle('Language'),
+              _buildSectionTitle(l10n.language),
               const SizedBox(height: 12),
               _buildCard(
                 child: Column(
                   children: [
                     _buildRadioTile<AppLanguage>(
-                      title: 'English',
+                      title: l10n.english,
                       value: AppLanguage.english,
                       groupValue: settings.language,
                       icon: Icons.language,
@@ -133,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildRadioTile<AppLanguage>(
-                      title: 'Русский',
+                      title: l10n.russian,
                       value: AppLanguage.russian,
                       groupValue: settings.language,
                       icon: Icons.language,
@@ -146,21 +148,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle('Units of Measurement'),
+              _buildSectionTitle(l10n.unitsOfMeasurement),
               const SizedBox(height: 12),
               _buildCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Weight',
+                      l10n.weight,
                       style: AppTextStyles.body1.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     _buildRadioTile<WeightUnit>(
-                      title: 'Kilograms (kg)',
+                      title: l10n.kilograms,
                       value: WeightUnit.kg,
                       groupValue: settings.weightUnit,
                       icon: Icons.monitor_weight,
@@ -171,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildRadioTile<WeightUnit>(
-                      title: 'Pounds (lb)',
+                      title: l10n.pounds,
                       value: WeightUnit.lb,
                       groupValue: settings.weightUnit,
                       icon: Icons.monitor_weight,
@@ -182,14 +184,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Distance',
+                      l10n.distance,
                       style: AppTextStyles.body1.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     _buildRadioTile<DistanceUnit>(
-                      title: 'Meters (m)',
+                      title: l10n.meters,
                       value: DistanceUnit.meters,
                       groupValue: settings.distanceUnit,
                       icon: Icons.straighten,
@@ -200,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildRadioTile<DistanceUnit>(
-                      title: 'Feet (ft)',
+                      title: l10n.feet,
                       value: DistanceUnit.feet,
                       groupValue: settings.distanceUnit,
                       icon: Icons.straighten,
@@ -213,14 +215,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle('Privacy Settings'),
+              _buildSectionTitle(l10n.privacySettings),
               const SizedBox(height: 12),
               _buildCard(
                 child: Column(
                   children: [
                     _buildSwitchTile(
-                      title: 'Public Profile',
-                      subtitle: 'Allow others to see your profile information',
+                      title: l10n.publicProfile,
+                      subtitle: l10n.publicProfileDesc,
                       value: settings.isProfilePublic,
                       icon: Icons.public,
                       iconColor: appColor.color,
@@ -231,8 +233,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
-                      title: 'Show Workout History',
-                      subtitle: 'Display your workout history to friends',
+                      title: l10n.showWorkoutHistory,
+                      subtitle: l10n.showWorkoutHistoryDesc,
                       value: settings.showWorkoutHistory,
                       icon: Icons.history,
                       iconColor: appColor.color,
@@ -243,8 +245,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
-                      title: 'Show Personal Records',
-                      subtitle: 'Let others see your personal records',
+                      title: l10n.showPersonalRecords,
+                      subtitle: l10n.showPersonalRecordsDesc,
                       value: settings.showPersonalRecords,
                       icon: Icons.emoji_events,
                       iconColor: appColor.color,
@@ -255,8 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
-                      title: 'Allow Friend Requests',
-                      subtitle: 'Enable others to send you friend requests',
+                      title: l10n.allowFriendRequests,
+                      subtitle: l10n.allowFriendRequestsDesc,
                       value: settings.allowFriendRequests,
                       icon: Icons.person_add,
                       iconColor: appColor.color,

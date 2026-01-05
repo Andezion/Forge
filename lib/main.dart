@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 
 import 'services/auth_service.dart';
@@ -12,6 +13,8 @@ import 'services/profile_service.dart';
 import 'services/wellness_service.dart';
 import 'services/friends_service.dart';
 import 'services/settings_service.dart';
+import 'models/app_settings.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,11 +63,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColor = Provider.of<AppColor>(context);
+    final settings = Provider.of<SettingsService>(context);
 
     return MaterialApp(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: appColor.getTheme(),
+      locale: settings.language == AppLanguage.russian
+          ? const Locale('ru')
+          : const Locale('en'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+      ],
       home: const LoginScreen(),
     );
   }

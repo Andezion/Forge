@@ -1,0 +1,235 @@
+{
+  "@@locale": "en",
+  "appName": "Forge",
+  "@appName": {
+    "description": "Application name"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile screen title"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "workout": "Workout",
+  "@workout": {
+    "description": "Workout screen title"
+  },
+  "friends": "Friends",
+  "@friends": {
+    "description": "Friends screen title"
+  },
+  "calendar": "Calendar",
+  "@calendar": {
+    "description": "Calendar screen title"
+  },
+  "progress": "Progress",
+  "@progress": {
+    "description": "Progress section title"
+  },
+  "workouts": "Workouts",
+  "@workouts": {
+    "description": "Workouts label"
+  },
+  "bodyWeight": "Body Weight",
+  "@bodyWeight": {
+    "description": "Body weight label"
+  },
+  "wellness": "Wellness",
+  "@wellness": {
+    "description": "Wellness screen title"
+  },
+  "oneRepMax": "1RM Calculator",
+  "@oneRepMax": {
+    "description": "One rep max calculator"
+  },
+  "logout": "Log Out",
+  "@logout": {
+    "description": "Logout button"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add button"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "customization": "Customization",
+  "@customization": {
+    "description": "Customization screen title"
+  },
+  "achievements": "Achievements",
+  "@achievements": {
+    "description": "Achievements screen title"
+  },
+  "progressCharts": "Progress Charts",
+  "@progressCharts": {
+    "description": "Progress charts screen title"
+  },
+  "aboutMe": "About Me",
+  "@aboutMe": {
+    "description": "About me screen title"
+  },
+  "easy": "Easy",
+  "@easy": {
+    "description": "Easy difficulty"
+  },
+  "medium": "Medium",
+  "@medium": {
+    "description": "Medium difficulty"
+  },
+  "hard": "Hard",
+  "@hard": {
+    "description": "Hard difficulty"
+  },
+  "profileInformation": "Profile Information",
+  "@profileInformation": {
+    "description": "Profile information section"
+  },
+  "nickname": "Nickname",
+  "@nickname": {
+    "description": "Nickname field"
+  },
+  "region": "Region",
+  "@region": {
+    "description": "Region field"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+  "unitsOfMeasurement": "Units of Measurement",
+  "@unitsOfMeasurement": {
+    "description": "Units section title"
+  },
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight label"
+  },
+  "distance": "Distance",
+  "@distance": {
+    "description": "Distance label"
+  },
+  "privacySettings": "Privacy Settings",
+  "@privacySettings": {
+    "description": "Privacy settings section"
+  },
+  "publicProfile": "Public Profile",
+  "@publicProfile": {
+    "description": "Public profile setting"
+  },
+  "publicProfileDesc": "Allow others to see your profile information",
+  "@publicProfileDesc": {
+    "description": "Public profile description"
+  },
+  "showWorkoutHistory": "Show Workout History",
+  "@showWorkoutHistory": {
+    "description": "Show workout history setting"
+  },
+  "showWorkoutHistoryDesc": "Display your workout history to friends",
+  "@showWorkoutHistoryDesc": {
+    "description": "Show workout history description"
+  },
+  "showPersonalRecords": "Show Personal Records",
+  "@showPersonalRecords": {
+    "description": "Show personal records setting"
+  },
+  "showPersonalRecordsDesc": "Let others see your personal records",
+  "@showPersonalRecordsDesc": {
+    "description": "Show personal records description"
+  },
+  "allowFriendRequests": "Allow Friend Requests",
+  "@allowFriendRequests": {
+    "description": "Allow friend requests setting"
+  },
+  "allowFriendRequestsDesc": "Enable others to send you friend requests",
+  "@allowFriendRequestsDesc": {
+    "description": "Allow friend requests description"
+  },
+  "saveProfileInfo": "Save Profile Info",
+  "@saveProfileInfo": {
+    "description": "Save profile info button"
+  },
+  "profileInfoSaved": "Profile information saved!",
+  "@profileInfoSaved": {
+    "description": "Profile info saved message"
+  },
+  "themeColorUpdated": "Theme color updated!",
+  "@themeColorUpdated": {
+    "description": "Theme color updated message"
+  },
+  "darkThemeEnabled": "Dark theme enabled",
+  "@darkThemeEnabled": {
+    "description": "Dark theme enabled message"
+  },
+  "lightThemeEnabled": "Light theme enabled",
+  "@lightThemeEnabled": {
+    "description": "Light theme enabled message"
+  },
+  "enterNickname": "Enter your nickname",
+  "@enterNickname": {
+    "description": "Nickname hint"
+  },
+  "enterRegion": "e.g., USA, Europe, Asia",
+  "@enterRegion": {
+    "description": "Region hint"
+  },
+  "kilograms": "Kilograms (kg)",
+  "@kilograms": {
+    "description": "Kilograms unit"
+  },
+  "pounds": "Pounds (lb)",
+  "@pounds": {
+    "description": "Pounds unit"
+  },
+  "meters": "Meters (m)",
+  "@meters": {
+    "description": "Meters unit"
+  },
+  "feet": "Feet (ft)",
+  "@feet": {
+    "description": "Feet unit"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language"
+  },
+  "russian": "Русский",
+  "@russian": {
+    "description": "Russian language"
+  }
+}

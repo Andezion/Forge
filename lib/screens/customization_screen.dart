@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/theme_service.dart';
 import '../services/profile_service.dart';
@@ -24,6 +25,8 @@ class CustomizationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<AppColor>(
       builder: (context, appColor, _) => Scaffold(
         appBar: AppBar(
@@ -87,8 +90,8 @@ class CustomizationScreen extends StatelessWidget {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(value
-                                    ? 'Dark theme enabled'
-                                    : 'Light theme enabled'),
+                                    ? l10n.darkThemeEnabled
+                                    : l10n.lightThemeEnabled),
                                 duration: const Duration(seconds: 1),
                                 backgroundColor: appColor.color,
                               ),
@@ -231,6 +234,7 @@ class CustomizationScreen extends StatelessWidget {
 
   Widget _buildColorTile(BuildContext context, Color color) {
     final appColor = Provider.of<AppColor>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
     final isSelected = appColor.color == color;
 
     return GestureDetector(
@@ -239,7 +243,7 @@ class CustomizationScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Theme color updated!'),
+              content: Text(l10n.themeColorUpdated),
               duration: const Duration(seconds: 1),
               backgroundColor: color,
             ),
