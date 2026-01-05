@@ -77,7 +77,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Progression Recommendations'),
         backgroundColor: AppColors.primary,
@@ -336,7 +336,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
             child: Text(
               label,
               style: AppTextStyles.body2.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ),
           ),
