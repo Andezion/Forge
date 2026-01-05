@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
+import '../services/theme_service.dart';
 import '../models/user.dart' as app_user;
 import '../services/auth_service.dart';
 import '../services/data_manager.dart';
@@ -79,223 +80,227 @@ class _ProfileScreenState extends State<ProfileScreen>
     final auth = Provider.of<AuthService>(context);
     final firebaseUser = auth.firebaseUser;
     final dataManager = Provider.of<DataManager>(context);
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        title: Text(
-          AppStrings.profile,
-          style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // TODO: Navigate to settings
-            },
+
+    return Consumer<AppColor>(
+      builder: (context, appColor, _) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: appColor.color,
+          foregroundColor: AppColors.textOnPrimary,
+          title: Text(
+            AppStrings.profile,
+            style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              color: AppColors.primary,
-              padding: const EdgeInsets.only(bottom: 32, top: 16),
-              child: Column(
-                children: [
-                  _buildFramedAvatar(profile),
-                  const SizedBox(height: 16),
-                  if (firebaseUser?.displayName != null &&
-                      (firebaseUser!.displayName ?? '').trim().isNotEmpty)
-                    Text(
-                      firebaseUser.displayName!,
-                      style: AppTextStyles.h3.copyWith(
-                        color: AppColors.textOnPrimary,
-                      ),
-                    )
-                  else if (_isLoadingUser)
-                    SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.textOnPrimary,
-                      ),
-                    )
-                  else
-                    Text(
-                      _cachedUser?.name ?? 'User Name',
-                      style: AppTextStyles.h3.copyWith(
-                        color: AppColors.textOnPrimary,
-                      ),
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    firebaseUser?.email ?? '—',
-                    style: AppTextStyles.body2.copyWith(
-                      color: AppColors.textOnPrimary.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                // TODO: Navigate to settings
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.progress,
-                    style: AppTextStyles.h3,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'Body Weight',
-                          profile.weightKg != null
-                              ? '${profile.weightKg!.toStringAsFixed(1)} kg'
-                              : '—',
-                          Icons.monitor_weight,
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                color: AppColors.primary,
+                padding: const EdgeInsets.only(bottom: 32, top: 16),
+                child: Column(
+                  children: [
+                    _buildFramedAvatar(profile),
+                    const SizedBox(height: 16),
+                    if (firebaseUser?.displayName != null &&
+                        (firebaseUser!.displayName ?? '').trim().isNotEmpty)
+                      Text(
+                        firebaseUser.displayName!,
+                        style: AppTextStyles.h3.copyWith(
+                          color: AppColors.textOnPrimary,
+                        ),
+                      )
+                    else if (_isLoadingUser)
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.textOnPrimary,
+                        ),
+                      )
+                    else
+                      Text(
+                        _cachedUser?.name ?? 'User Name',
+                        style: AppTextStyles.h3.copyWith(
+                          color: AppColors.textOnPrimary,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Workouts',
-                          dataManager.totalWorkouts().toString(),
-                          Icons.fitness_center,
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      firebaseUser?.email ?? '—',
+                      style: AppTextStyles.body2.copyWith(
+                        color: AppColors.textOnPrimary.withValues(alpha: 0.8),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  _buildMenuItem(
-                    context,
-                    'Progress Charts',
-                    Icons.show_chart,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const ProgressChartsScreen(),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppStrings.progress,
+                      style: AppTextStyles.h3,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            'Body Weight',
+                            profile.weightKg != null
+                                ? '${profile.weightKg!.toStringAsFixed(1)} kg'
+                                : '—',
+                            Icons.monitor_weight,
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    'About Me',
-                    Icons.fitness_center,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AboutMeScreen(),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            'Workouts',
+                            dataManager.totalWorkouts().toString(),
+                            Icons.fitness_center,
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    AppStrings.oneRepMax,
-                    Icons.fitness_center,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const PersonalRecordsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    AppStrings.wellness,
-                    Icons.favorite,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const WellnessScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    'Customisation',
-                    Icons.color_lens,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const CustomizationScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    'Achievements',
-                    Icons.emoji_events,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AchievementsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
-                    AppStrings.bodyWeight,
-                    Icons.monitor_weight,
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const WeightScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final authService =
-                            Provider.of<AuthService>(context, listen: false);
-                        await authService.signOut();
-                        Navigator.of(context).pushReplacement(
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildMenuItem(
+                      context,
+                      'Progress Charts',
+                      Icons.show_chart,
+                      () {
+                        Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                            builder: (context) => const ProgressChartsScreen(),
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.error,
-                        foregroundColor: AppColors.textOnPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'About Me',
+                      Icons.fitness_center,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AboutMeScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      AppStrings.oneRepMax,
+                      Icons.fitness_center,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const PersonalRecordsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      AppStrings.wellness,
+                      Icons.favorite,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const WellnessScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'Customisation',
+                      Icons.color_lens,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const CustomizationScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'Achievements',
+                      Icons.emoji_events,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AchievementsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      AppStrings.bodyWeight,
+                      Icons.monitor_weight,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const WeightScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final authService =
+                              Provider.of<AuthService>(context, listen: false);
+                          await authService.signOut();
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const LoginScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                          foregroundColor: AppColors.textOnPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          AppStrings.logout,
+                          style: AppTextStyles.button,
                         ),
                       ),
-                      child: Text(
-                        AppStrings.logout,
-                        style: AppTextStyles.button,
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildStatCard(String label, String value, IconData icon) {
+    final appColor = Provider.of<AppColor>(context, listen: false);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -305,11 +310,11 @@ class _ProfileScreenState extends State<ProfileScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.primary, size: 32),
+            Icon(icon, color: appColor.color, size: 32),
             const SizedBox(height: 8),
             Text(
               value,
-              style: AppTextStyles.h3.copyWith(color: AppColors.primary),
+              style: AppTextStyles.h3.copyWith(color: appColor.color),
             ),
             const SizedBox(height: 4),
             Text(
@@ -324,6 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildFramedAvatar(ProfileService profile) {
+    final appColor = Provider.of<AppColor>(context, listen: false);
     final imagePath = profile.imagePath;
     final idx = profile.frameIndex;
 
@@ -344,7 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: Icon(
           Icons.person,
           size: 50,
-          color: AppColors.primary,
+          color: appColor.color,
         ),
       );
     }
@@ -361,7 +367,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: SweepGradient(
-                colors: [AppColors.primary, Colors.pink, AppColors.primary],
+                colors: [appColor.color, Colors.pink, appColor.color],
                 transform: GradientRotation(rotation),
               ),
             ),
@@ -378,7 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     }
 
-    final decor = _avatarFrameDecoration(idx, AppColors.primary);
+    final decor = _avatarFrameDecoration(idx, appColor.color);
     return Container(
       width: 110,
       height: 110,
@@ -423,6 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     IconData icon,
     VoidCallback onTap,
   ) {
+    final appColor = Provider.of<AppColor>(context, listen: false);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 1,
@@ -430,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.primary),
+        leading: Icon(icon, color: appColor.color),
         title: Text(title, style: AppTextStyles.body1),
         trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,
