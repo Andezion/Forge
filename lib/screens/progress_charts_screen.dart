@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../models/chart_data.dart';
@@ -53,11 +54,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       if (histories.isEmpty) {
         setState(() => _isLoading = false);
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'No data available for analysis. Complete at least one workout!'),
-              duration: Duration(seconds: 3),
+            SnackBar(
+              content: Text(l10n.noDataAvailable),
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -113,8 +114,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       print('Stack trace: $stackTrace');
       setState(() => _isLoading = false);
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
+          SnackBar(content: Text(l10n.errorLoadingData(e.toString()))),
         );
       }
     }
@@ -143,8 +145,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading exercise data: $e')),
+          SnackBar(content: Text(l10n.errorLoadingData(e.toString()))),
         );
       }
     }
@@ -152,10 +155,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Progress Charts'),
+        title: Text(l10n.progressCharts),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         actions: [
@@ -166,10 +170,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               _loadData();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 30, child: Text('30 days')),
-              const PopupMenuItem(value: 90, child: Text('90 days')),
-              const PopupMenuItem(value: 180, child: Text('180 days')),
-              const PopupMenuItem(value: 365, child: Text('1 year')),
+              PopupMenuItem(value: 30, child: Text(l10n.thirtyDays)),
+              PopupMenuItem(value: 90, child: Text(l10n.ninetyDays)),
+              PopupMenuItem(value: 180, child: Text(l10n.oneHundredEightyDays)),
+              PopupMenuItem(value: 365, child: Text(l10n.oneYear)),
             ],
           ),
         ],
@@ -182,7 +186,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
                   Text(
-                    'Loading data...',
+                    l10n.loadingData,
                     style: AppTextStyles.body1.copyWith(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
@@ -204,13 +208,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'No data available for display',
-                          style: AppTextStyles.h2,
+                          l10n.noDataAvailable,
+                          style: AppTextStyles.h2.copyWith(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Complete at least one workout to see progress charts',
+                          l10n.completeOneWorkout,
                           style: AppTextStyles.body1.copyWith(
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
@@ -230,18 +236,20 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildTabBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       color: Theme.of(context).colorScheme.surface,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildTabButton('overall', 'Overall Strength', Icons.trending_up),
-            _buildTabButton('body', 'Body Weight', Icons.monitor_weight),
-            _buildTabButton('volume', 'Volume', Icons.fitness_center),
-            _buildTabButton('frequency', 'Frequency', Icons.calendar_month),
-            _buildTabButton('consistency', 'Consistency', Icons.check_circle),
-            _buildTabButton('exercise', 'Exercises', Icons.list),
+            _buildTabButton('overall', l10n.overallStrength, Icons.trending_up),
+            _buildTabButton('body', l10n.bodyWeightTab, Icons.monitor_weight),
+            _buildTabButton('volume', l10n.volume, Icons.fitness_center),
+            _buildTabButton('frequency', l10n.frequency, Icons.calendar_month),
+            _buildTabButton(
+                'consistency', l10n.consistency, Icons.check_circle),
+            _buildTabButton('exercise', l10n.exerciseProgress, Icons.list),
           ],
         ),
       ),
@@ -302,13 +310,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       case 'exercise':
         return _buildExerciseView();
       default:
-        return const Center(child: Text('Select a tab'));
+        final l10n = AppLocalizations.of(context)!;
+        return Center(child: Text(l10n.selectATab));
     }
   }
 
   Widget _buildOverallStrengthView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_overallStrengthData == null) {
-      return const Center(child: Text('No data'));
+      return Center(child: Text(l10n.noData));
     }
 
     return ListView(
@@ -342,8 +352,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildBodyWeightView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_bodyWeightData == null) {
-      return const Center(child: Text('No data'));
+      return Center(child: Text(l10n.noData));
     }
 
     return ListView(
@@ -361,7 +372,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Information', style: AppTextStyles.h2),
+                Text(l10n.information,
+                    style: AppTextStyles.h2.copyWith(
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    )),
                 const SizedBox(height: 12),
                 _buildInfoRow('Starting Weight',
                     '${_bodyWeightData!.startWeight.toStringAsFixed(1)} kg'),
@@ -386,8 +400,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildVolumeView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_volumeData == null) {
-      return const Center(child: Text('No data'));
+      return Center(child: Text(l10n.noData));
     }
 
     return ListView(
@@ -421,8 +436,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildFrequencyView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_frequencyData == null) {
-      return const Center(child: Text('No data'));
+      return Center(child: Text(l10n.noData));
     }
 
     return ListView(
@@ -463,8 +479,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildConsistencyView() {
+    final l10n = AppLocalizations.of(context)!;
     if (_consistencyData == null) {
-      return const Center(child: Text('No data'));
+      return Center(child: Text(l10n.noData));
     }
 
     return ListView(
@@ -482,7 +499,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Statistics', style: AppTextStyles.h2),
+                Text(l10n.statistics,
+                    style: AppTextStyles.h2.copyWith(
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    )),
                 const SizedBox(height: 12),
                 _buildInfoRow('Sets Completed',
                     '${_consistencyData!.totalSetsCompleted}'),
@@ -507,6 +527,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildExerciseView() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Container(
@@ -515,7 +536,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Select Exercise', style: AppTextStyles.h2),
+              Text(l10n.selectExercise,
+                  style: AppTextStyles.h2.copyWith(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  )),
               const SizedBox(height: 12),
               DropdownButtonFormField<Exercise>(
                 value: _selectedExercise,
@@ -524,7 +548,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-                hint: const Text('Select Exercise'),
+                hint: Text(l10n.selectExercise),
                 items: _availableExercises.map((exercise) {
                   return DropdownMenuItem(
                     value: exercise,
@@ -551,7 +575,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                           color: Theme.of(context).textTheme.bodySmall?.color),
                       const SizedBox(height: 16),
                       Text(
-                        'Select an exercise to view progress',
+                        l10n.selectAnExercise,
                         style: AppTextStyles.body1.copyWith(
                           color: Theme.of(context).textTheme.bodySmall?.color,
                         ),
@@ -696,6 +720,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildContributionsCard() {
+    final l10n = AppLocalizations.of(context)!;
     if (_overallStrengthData == null ||
         _overallStrengthData!.exerciseContributions.isEmpty) {
       return const SizedBox.shrink();
@@ -710,7 +735,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Exercise Contributions', style: AppTextStyles.h2),
+            Text(l10n.exerciseContributions,
+                style: AppTextStyles.h2.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                )),
             const SizedBox(height: 12),
             ...sorted.take(5).map((entry) {
               return Padding(
@@ -757,8 +785,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     double? minY,
     double? maxY,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
-      return const Center(child: Text('No data to display'));
+      return Center(child: Text(l10n.noDataToDisplay));
     }
 
     final spots = data
@@ -846,8 +875,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Widget _buildBarChart(List<ChartDataPoint> data) {
+    final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
-      return const Center(child: Text('No data to display'));
+      return Center(child: Text(l10n.noDataToDisplay));
     }
 
     final barGroups = data

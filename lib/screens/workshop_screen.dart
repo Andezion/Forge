@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -36,9 +37,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       });
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Workout saved: ${result.name}'),
+            content: Text(l10n.workoutSaved(result.name)),
             backgroundColor: AppColors.success,
           ),
         );
@@ -70,12 +72,13 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   void _deleteWorkout(int index) {
     print(
         '[WORKSHOP_SCREEN] Request to delete workout at index $index: ${_dataManager.workouts[index].name}');
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Workout'),
-        content: Text(
-            'Are you sure you want to delete "${_dataManager.workouts[index].name}"?'),
+        title: Text(l10n.deleteWorkout),
+        content:
+            Text(l10n.deleteWorkoutConfirm(_dataManager.workouts[index].name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -92,8 +95,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               });
               Navigator.of(context).pop();
             },
-            child:
-                const Text('Delete', style: TextStyle(color: AppColors.error)),
+            child: Text(l10n.delete,
+                style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -109,9 +112,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
 
     if (result != null) {
       // TODO: Handle completed workout session
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Workout completed!'),
+        SnackBar(
+          content: Text(l10n.workoutCompleted),
           backgroundColor: AppColors.success,
         ),
       );
@@ -120,8 +124,9 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
@@ -134,13 +139,17 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Create Your Workout',
-            style: AppTextStyles.h3,
+            l10n.createYourWorkout,
+            style: AppTextStyles.h3.copyWith(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Customize your training program',
-            style: AppTextStyles.body2,
+            l10n.customizeTrainingProgram,
+            style: AppTextStyles.body2.copyWith(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
           ),
           const SizedBox(height: 24),
           Card(
@@ -169,7 +178,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Create New Workout',
+                      l10n.createNewWorkout,
                       style: AppTextStyles.h4.copyWith(
                         color: AppColors.primary,
                       ),
@@ -182,8 +191,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'My Workouts',
-            style: AppTextStyles.h4,
+            l10n.myWorkouts,
+            style: AppTextStyles.h4.copyWith(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
           ),
           const SizedBox(height: 12),
           if (_dataManager.workouts.isEmpty)
@@ -191,9 +202,9 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'No workouts yet. Create your first workout!',
+                  l10n.noWorkoutsYet,
                   style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -236,8 +247,11 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           children: [
             const SizedBox(height: 4),
             Text(
-              '${workout.exercises.length} exercises',
-              style: AppTextStyles.caption,
+              AppLocalizations.of(context)!
+                  .exercisesCount(workout.exercises.length),
+              style: AppTextStyles.caption.copyWith(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
             ),
           ],
         ),

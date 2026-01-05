@@ -231,5 +231,567 @@
   "russian": "Русский",
   "@russian": {
     "description": "Russian language"
+  },
+  "workoutSaved": "Workout saved: {name}",
+  "@workoutSaved": {
+    "description": "Workout saved message",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWorkout": "Delete Workout",
+  "@deleteWorkout": {
+    "description": "Delete workout dialog title"
+  },
+  "deleteWorkoutConfirm": "Are you sure you want to delete \"{name}\"?",
+  "@deleteWorkoutConfirm": {
+    "description": "Delete workout confirmation",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCompleted": "Workout completed!",
+  "@workoutCompleted": {
+    "description": "Workout completed message"
+  },
+  "createYourWorkout": "Create Your Workout",
+  "@createYourWorkout": {
+    "description": "Create workout title"
+  },
+  "customizeTrainingProgram": "Customize your training program",
+  "@customizeTrainingProgram": {
+    "description": "Create workout subtitle"
+  },
+  "createNewWorkout": "Create New Workout",
+  "@createNewWorkout": {
+    "description": "Create new workout button"
+  },
+  "myWorkouts": "My Workouts",
+  "@myWorkouts": {
+    "description": "My workouts section title"
+  },
+  "noWorkoutsYet": "No workouts yet. Create your first workout!",
+  "@noWorkoutsYet": {
+    "description": "No workouts message"
+  },
+  "exitWorkout": "Exit Workout?",
+  "@exitWorkout": {
+    "description": "Exit workout dialog title"
+  },
+  "progressWillBeLost": "Your progress will be lost.",
+  "@progressWillBeLost": {
+    "description": "Progress lost warning"
+  },
+  "exit": "Exit",
+  "@exit": {
+    "description": "Exit button"
+  },
+  "setComplete": "Set {number} Complete",
+  "@setComplete": {
+    "description": "Set complete notification",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "targetReps": "Target: {reps} reps",
+  "@targetReps": {
+    "description": "Target reps label",
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "howWasExercise": "How was this exercise?",
+  "@howWasExercise": {
+    "description": "Exercise feedback question"
+  },
+  "workoutComplete": "Workout Complete!",
+  "@workoutComplete": {
+    "description": "Workout complete title"
+  },
+  "duration": "Duration: {time}",
+  "@duration": {
+    "description": "Duration label",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "completedExercises": "Completed: {count}",
+  "@completedExercises": {
+    "description": "Completed exercises count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "skippedExercises": "Skipped Exercises:",
+  "@skippedExercises": {
+    "description": "Skipped exercises label"
+  },
+  "noRemainingExercises": "No remaining exercises",
+  "@noRemainingExercises": {
+    "description": "No remaining exercises message"
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Total label"
+  },
+  "exerciseNum": "Exercise {current} of {total}",
+  "@exerciseNum": {
+    "description": "Exercise number label",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "setNum": "Set {current} of {total}",
+  "@setNum": {
+    "description": "Set number label",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "weightKg": "Weight: {weight} kg",
+  "@weightKg": {
+    "description": "Weight label in kg",
+    "placeholders": {
+      "weight": {
+        "type": "double"
+      }
+    }
+  },
+  "completedSets": "Completed Sets",
+  "@completedSets": {
+    "description": "Completed sets section title"
+  },
+  "repsCount": "{reps} reps",
+  "@repsCount": {
+    "description": "Reps count",
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "kgCount": "{kg} kg",
+  "@kgCount": {
+    "description": "Kg count",
+    "placeholders": {
+      "kg": {
+        "type": "double"
+      }
+    }
+  },
+  "completeSet": "Complete Set",
+  "@completeSet": {
+    "description": "Complete set button"
+  },
+  "startSet": "Start Set",
+  "@startSet": {
+    "description": "Start set button"
+  },
+  "howDoYouFeel": "How do you feel?",
+  "@howDoYouFeel": {
+    "description": "Wellness question"
+  },
+  "energy": "Energy",
+  "@energy": {
+    "description": "Energy wellness metric"
+  },
+  "mood": "Mood",
+  "@mood": {
+    "description": "Mood wellness metric"
+  },
+  "tiredness": "Tiredness",
+  "@tiredness": {
+    "description": "Tiredness wellness metric"
+  },
+  "stress": "Stress",
+  "@stress": {
+    "description": "Stress wellness metric"
+  },
+  "muscleSoreness": "Muscle soreness",
+  "@muscleSoreness": {
+    "description": "Muscle soreness wellness metric"
+  },
+  "saved": "Saved",
+  "@saved": {
+    "description": "Saved message"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Submit button"
+  },
+  "submitLocked": "Submit (locked)",
+  "@submitLocked": {
+    "description": "Submit locked button"
+  },
+  "nextEntryIn": "Next entry in {time}",
+  "@nextEntryIn": {
+    "description": "Next entry countdown",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recentEntries": "Recent entries",
+  "@recentEntries": {
+    "description": "Recent entries label"
+  },
+  "specifyWeight": "Specify your current weight",
+  "@specifyWeight": {
+    "description": "Weight input instruction"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button"
+  },
+  "challengeFeatureComingSoon": "Challenge feature coming soon",
+  "@challengeFeatureComingSoon": {
+    "description": "Challenge coming soon message"
+  },
+  "challenge": "Challenge",
+  "@challenge": {
+    "description": "Challenge button"
+  },
+  "compareFeatureComingSoon": "Compare feature coming soon",
+  "@compareFeatureComingSoon": {
+    "description": "Compare coming soon message"
+  },
+  "compare": "Compare",
+  "@compare": {
+    "description": "Compare button"
+  },
+  "messageFeatureComingSoon": "Message feature coming soon",
+  "@messageFeatureComingSoon": {
+    "description": "Message coming soon message"
+  },
+  "message": "Message",
+  "@message": {
+    "description": "Message button"
+  },
+  "rememberMe": "Remember me",
+  "@rememberMe": {
+    "description": "Remember me checkbox"
+  },
+  "errorLoadingData": "Error loading data: {error}",
+  "@errorLoadingData": {
+    "description": "Error loading data message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "thirtyDays": "30 days",
+  "@thirtyDays": {
+    "description": "30 days option"
+  },
+  "ninetyDays": "90 days",
+  "@ninetyDays": {
+    "description": "90 days option"
+  },
+  "oneHundredEightyDays": "180 days",
+  "@oneHundredEightyDays": {
+    "description": "180 days option"
+  },
+  "oneYear": "1 year",
+  "@oneYear": {
+    "description": "1 year option"
+  },
+  "selectATab": "Select a tab",
+  "@selectATab": {
+    "description": "Select tab message"
+  },
+  "noData": "No data",
+  "@noData": {
+    "description": "No data message"
+  },
+  "information": "Information",
+  "@information": {
+    "description": "Information section title"
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics section title"
+  },
+  "selectExercise": "Select Exercise",
+  "@selectExercise": {
+    "description": "Select exercise label"
+  },
+  "exerciseContributions": "Exercise Contributions",
+  "@exerciseContributions": {
+    "description": "Exercise contributions title"
+  },
+  "noDataToDisplay": "No data to display",
+  "@noDataToDisplay": {
+    "description": "No data to display message"
+  },
+  "loadingData": "Loading data...",
+  "@loadingData": {
+    "description": "Loading data message"
+  },
+  "noDataAvailable": "No data available for display",
+  "@noDataAvailable": {
+    "description": "No data available message"
+  },
+  "completeOneWorkout": "Complete at least one workout to see progress charts",
+  "@completeOneWorkout": {
+    "description": "Complete workout instruction"
+  },
+  "overallStrength": "Overall Strength",
+  "@overallStrength": {
+    "description": "Overall strength tab"
+  },
+  "bodyWeightTab": "Body Weight",
+  "@bodyWeightTab": {
+    "description": "Body weight tab"
+  },
+  "volume": "Volume",
+  "@volume": {
+    "description": "Volume tab"
+  },
+  "frequency": "Frequency",
+  "@frequency": {
+    "description": "Frequency tab"
+  },
+  "consistency": "Consistency",
+  "@consistency": {
+    "description": "Consistency tab"
+  },
+  "exerciseProgress": "Exercise Progress",
+  "@exerciseProgress": {
+    "description": "Exercise progress tab"
+  },
+  "progressionRecommendations": "Progression Recommendations",
+  "@progressionRecommendations": {
+    "description": "Progression recommendations title"
+  },
+  "notEnoughData": "Not enough data for recommendations",
+  "@notEnoughData": {
+    "description": "Not enough data message"
+  },
+  "workoutComparison": "Workout Comparison",
+  "@workoutComparison": {
+    "description": "Workout comparison title"
+  },
+  "detailedAnalysis": "Detailed analysis",
+  "@detailedAnalysis": {
+    "description": "Detailed analysis section"
+  },
+  "worldRecords": "World Records",
+  "@worldRecords": {
+    "description": "World records title"
+  },
+  "allExercises": "All Exercises",
+  "@allExercises": {
+    "description": "All exercises option"
+  },
+  "weightLabel": "Weight",
+  "@weightLabel": {
+    "description": "Weight column label"
+  },
+  "reps": "Reps",
+  "@reps": {
+    "description": "Reps column label"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Date column label"
+  },
+  "oneRmEstimated": "1RM (estimated)",
+  "@oneRmEstimated": {
+    "description": "1RM estimated label"
+  },
+  "recordHistory": "Record History",
+  "@recordHistory": {
+    "description": "Record history title"
+  },
+  "allPersonalRecords": "All Personal Records",
+  "@allPersonalRecords": {
+    "description": "All personal records title"
+  },
+  "federation": "Federation",
+  "@federation": {
+    "description": "Federation section title"
+  },
+  "strengthCoefficients": "Strength Coefficients",
+  "@strengthCoefficients": {
+    "description": "Strength coefficients title"
+  },
+  "totalStrength": "Total Strength",
+  "@totalStrength": {
+    "description": "Total strength label"
+  },
+  "wilks": "Wilks",
+  "@wilks": {
+    "description": "Wilks coefficient label"
+  },
+  "dots": "Dots",
+  "@dots": {
+    "description": "Dots coefficient label"
+  },
+  "progressOverTime": "Progress Over Time",
+  "@progressOverTime": {
+    "description": "Progress over time title"
+  },
+  "passwordResetEmailSent": "Password reset email sent.",
+  "@passwordResetEmailSent": {
+    "description": "Password reset email sent message"
+  },
+  "noWorkoutsAvailable": "No workouts available. Create one in Workshop!",
+  "@noWorkoutsAvailable": {
+    "description": "No workouts available message"
+  },
+  "exercisesCount": "{count} exercises",
+  "@exercisesCount": {
+    "description": "Exercises count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutCalendar": "Workout Calendar",
+  "@workoutCalendar": {
+    "description": "Workout calendar title"
+  },
+  "addFriend": "Add Friend",
+  "@addFriend": {
+    "description": "Add friend button"
+  },
+  "friendRemoved": "{name} removed from friends",
+  "@friendRemoved": {
+    "description": "Friend removed message",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFriend": "Remove Friend",
+  "@removeFriend": {
+    "description": "Remove friend button"
+  },
+  "requestDeclined": "Request declined",
+  "@requestDeclined": {
+    "description": "Request declined message"
+  },
+  "decline": "Decline",
+  "@decline": {
+    "description": "Decline button"
+  },
+  "accept": "Accept",
+  "@accept": {
+    "description": "Accept button"
+  },
+  "requestCancelled": "Request cancelled",
+  "@requestCancelled": {
+    "description": "Request cancelled message"
+  },
+  "pleaseEnterEmail": "Please enter an email address",
+  "@pleaseEnterEmail": {
+    "description": "Enter email prompt"
+  },
+  "friendRequestSent": "Friend request sent!",
+  "@friendRequestSent": {
+    "description": "Friend request sent message"
+  },
+  "sendRequest": "Send Request",
+  "@sendRequest": {
+    "description": "Send request button"
+  },
+  "darkTheme": "Dark Theme",
+  "@darkTheme": {
+    "description": "Dark theme label"
+  },
+  "profileSection": "Profile",
+  "@profileSection": {
+    "description": "Profile section title"
+  },
+  "profileImage": "Profile Image",
+  "@profileImage": {
+    "description": "Profile image label"
+  },
+  "choosePhoto": "Choose Photo",
+  "@choosePhoto": {
+    "description": "Choose photo button"
+  },
+  "deletePhoto": "Delete Photo",
+  "@deletePhoto": {
+    "description": "Delete photo button"
+  },
+  "profileFrame": "Profile Frame",
+  "@profileFrame": {
+    "description": "Profile frame label"
+  },
+  "programs": "Programs",
+  "@programs": {
+    "description": "Programs screen title"
+  },
+  "openProgram": "Open program: {program}",
+  "@openProgram": {
+    "description": "Open program message",
+    "placeholders": {
+      "program": {
+        "type": "String"
+      }
+    }
+  },
+  "recentAchievements": "Recent Achievements",
+  "@recentAchievements": {
+    "description": "Recent achievements section"
+  },
+  "personalRecords": "Personal Records",
+  "@personalRecords": {
+    "description": "Personal records section"
+  },
+  "activity": "Activity",
+  "@activity": {
+    "description": "Activity section"
+  },
+  "streak": "Streak",
+  "@streak": {
+    "description": "Streak label"
+  },
+  "days": "days",
+  "@days": {
+    "description": "Days label"
+  },
+  "totalWeightLifted": "Total Weight Lifted",
+  "@totalWeightLifted": {
+    "description": "Total weight lifted label"
+  },
+  "wilksScore": "Wilks Score",
+  "@wilksScore": {
+    "description": "Wilks score label"
+  },
+  "memberSince": "Member Since",
+  "@memberSince": {
+    "description": "Member since label"
+  },
+  "selectAnExercise": "Select an exercise to view progress",
+  "@selectAnExercise": {
+    "description": "Select exercise instruction"
   }
 }
