@@ -19,6 +19,7 @@ import 'about_me_screen.dart';
 import 'progress_charts_screen.dart';
 import 'personal_records_screen.dart';
 import 'achievements_screen.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -95,7 +96,11 @@ class _ProfileScreenState extends State<ProfileScreen>
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                // TODO: Navigate to settings
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
               },
             ),
           ],
