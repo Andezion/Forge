@@ -153,7 +153,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     });
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       itemCount: achievements.length,
       itemBuilder: (context, index) {
         final achievement = achievements[index];
@@ -271,7 +271,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Unlocked ${_formatDate(achievement.unlockedAt!)}',
+                            achievement.unlockedAt != null
+                                ? 'Unlocked ${_formatDate(achievement.unlockedAt!)}'
+                                : 'Unlocked',
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.textSecondary,
                             ),
@@ -331,6 +333,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         case 'total_weight_100000':
           progress = totalWeight.toInt();
           isUnlocked = totalWeight >= achievement.requiredValue;
+          if (isUnlocked && completedWorkouts.isNotEmpty) {
+            unlockedAt = completedWorkouts.last.date;
+          }
           break;
 
         case 'streak_7':
