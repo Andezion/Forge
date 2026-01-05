@@ -26,6 +26,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   int _currentExerciseIndex = 0;
   late List<WorkoutExercise> _exerciseQueue;
   final Map<String, int> _skipCounts = {};
+  final List<Exercise> _skippedExercises = [];
   int _currentSetNumber = 1;
   Timer? _timer;
   int _setDurationSeconds = 0;
@@ -388,6 +389,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     setState(() {
       if (count >= 2) {
         _exerciseQueue.removeAt(_currentExerciseIndex);
+        _skippedExercises.add(current.exercise);
         print('[WORKOUT_EXEC] Removed ${current.exercise.name} after 2 skips');
       } else {
         final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
@@ -466,10 +468,54 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Exercises: ${_exerciseResults.length}',
+                'Completed: ${_exerciseResults.length}',
                 style: AppTextStyles.body2,
                 textAlign: TextAlign.center,
               ),
+              if (_skippedExercises.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.warning,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: AppColors.warning,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Skipped Exercises:',
+                            style: AppTextStyles.body1.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ..._skippedExercises.map((exercise) => Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 28),
+                            child: Text(
+                              '• ${exercise.name}',
+                              style: AppTextStyles.body2,
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
