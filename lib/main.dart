@@ -11,6 +11,7 @@ import 'services/theme_service.dart';
 import 'services/profile_service.dart';
 import 'services/wellness_service.dart';
 import 'services/friends_service.dart';
+import 'services/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,9 @@ void main() async {
 
   final friendsService = FriendsService();
 
+  final settingsService = SettingsService();
+  await settingsService.load();
+
   runApp(
     MultiProvider(
       providers: [
@@ -43,6 +47,7 @@ void main() async {
         ChangeNotifierProvider.value(value: wellnessService),
         ChangeNotifierProvider.value(value: authService),
         ChangeNotifierProvider.value(value: friendsService),
+        ChangeNotifierProvider.value(value: settingsService),
       ],
       child: const MyApp(),
     ),
