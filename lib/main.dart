@@ -13,6 +13,7 @@ import 'services/profile_service.dart';
 import 'services/wellness_service.dart';
 import 'services/friends_service.dart';
 import 'services/settings_service.dart';
+import 'services/workout_recommendation_service.dart';
 import 'models/app_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -41,6 +42,12 @@ void main() async {
   final settingsService = SettingsService();
   await settingsService.load();
 
+  final workoutRecommendationService = WorkoutRecommendationService(
+    wellnessService: wellnessService,
+    dataManager: dataManager,
+    profileService: profileService,
+  );
+
   runApp(
     MultiProvider(
       providers: [
@@ -51,6 +58,7 @@ void main() async {
         ChangeNotifierProvider.value(value: authService),
         ChangeNotifierProvider.value(value: friendsService),
         ChangeNotifierProvider.value(value: settingsService),
+        ChangeNotifierProvider.value(value: workoutRecommendationService),
       ],
       child: const MyApp(),
     ),
