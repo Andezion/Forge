@@ -90,7 +90,6 @@ class _WellnessScreenState extends State<WellnessScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Today's Recommendation Section
             if (_isLoadingRecommendation)
               Card(
                 color: AppColors.primary.withOpacity(0.1),
@@ -176,10 +175,9 @@ class _WellnessScreenState extends State<WellnessScreen> {
                               answers: Map.from(_values),
                             );
                             await service.addEntry(entry);
-                            
-                            // Regenerate recommendation after submitting wellness
+
                             await _loadRecommendation();
-                            
+
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(l10n.saved)),
@@ -431,3 +429,4 @@ class _WellnessScreenState extends State<WellnessScreen> {
       ),
     );
   }
+}
