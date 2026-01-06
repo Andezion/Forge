@@ -92,7 +92,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
           children: [
             if (_isLoadingRecommendation)
               Card(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 child: const Padding(
                   padding: EdgeInsets.all(16),
                   child: Center(
@@ -104,7 +104,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
               _buildRecommendationCard(_recommendation!, l10n)
             else
               Card(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -257,7 +257,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
     }
 
     return Card(
-      color: levelColor.withOpacity(0.1),
+      color: levelColor.withValues(alpha: 0.1),
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -313,10 +313,10 @@ class _WellnessScreenState extends State<WellnessScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Column(
@@ -338,7 +338,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.2),
+                                color: AppColors.primary.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -378,7 +378,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -411,7 +411,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -46,7 +46,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
     }
 
     final histories = _dataManager.workoutHistory;
-    final recentWellness = _wellnessService.recentEntries;
+    final recentWellness = _wellnessService.entries;
 
     await _profileService.load();
     final goals = _profileService.goals
@@ -213,11 +213,8 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return workouts.first;
     }
 
-    final lastWorkoutIds = histories.reversed
-        .take(3)
-        .map((h) => h.session.workout?.id)
-        .where((id) => id != null)
-        .toList();
+    final lastWorkoutIds =
+        histories.reversed.take(3).map((h) => h.session.workoutId).toList();
 
     final freshWorkouts =
         workouts.where((w) => !lastWorkoutIds.contains(w.id)).toList();
@@ -334,8 +331,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
       }
 
       if (daysSince >= 3) {
-        reasons
-            .add('${daysSince} days since last workout - good recovery time');
+        reasons.add('$daysSince days since last workout - good recovery time');
       } else if (daysSince >= 2) {
         reasons.add('Well-recovered from last session');
       } else if (daysSince == 1) {
@@ -355,7 +351,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
       reasons.add('Good energy levels detected');
     }
 
-    return reasons.join('. ') + '.';
+    return '${reasons.join('. ')}.';
   }
 
   bool shouldRestToday(Map<String, dynamic> factors) {
