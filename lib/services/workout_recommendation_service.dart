@@ -28,12 +28,10 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
   WorkoutRecommendation? get todaysRecommendation => _todaysRecommendation;
 
-  /// Generate today's workout recommendation
   Future<WorkoutRecommendation?> generateTodaysRecommendation() async {
     final today = DateTime.now();
     final todayDate = DateTime(today.year, today.month, today.day);
 
-    // Check if we already have a recommendation for today
     if (_lastRecommendationDate != null &&
         _lastRecommendationDate!.year == todayDate.year &&
         _lastRecommendationDate!.month == todayDate.month &&
@@ -42,7 +40,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return _todaysRecommendation;
     }
 
-    // Get all necessary data
     final workouts = _dataManager.workouts;
     if (workouts.isEmpty) {
       return null;
@@ -51,7 +48,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final histories = _dataManager.workoutHistory;
     final recentWellness = _wellnessService.recentEntries;
 
-    // Load profile
     await _profileService.load();
     final goals = _profileService.goals
         .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
@@ -78,13 +74,10 @@ class WorkoutRecommendationService extends ChangeNotifier {
       yearsTraining: _profileService.yearsTraining,
     );
 
-    // Analyze factors
     final factors = _analyzeFactors(histories, recentWellness, profile);
 
-    // Select best workout
     final selectedWorkout = _selectBestWorkout(workouts, histories, factors);
 
-    // Generate adjusted workout with progression
     final adjustedResult = await _progressionService.suggestNextWorkout(
       selectedWorkout,
       histories,
@@ -96,10 +89,8 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final reasons = adjustedResult['reasons'] as Map<String, String>;
     final needsDeload = adjustedResult['needsDeload'] as bool;
 
-    // Determine recommendation level
     final level = _determineLevel(factors, needsDeload);
 
-    // Build exercise recommendations
     final exerciseRecommendations = <ExerciseRecommendation>[];
     for (var exercise in adjustedWorkout.exercises) {
       final reason = reasons[exercise.exercise.id] ?? 'Standard progression';
@@ -116,10 +107,8 @@ class WorkoutRecommendationService extends ChangeNotifier {
       ));
     }
 
-    // Build overall reason
     final overallReason = _buildOverallReason(factors, level, needsDeload);
 
-    // Calculate overall confidence
     final overallConfidence = exerciseRecommendations.isEmpty
         ? 0.5
         : exerciseRecommendations
@@ -144,7 +133,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return _todaysRecommendation;
   }
 
-  /// Analyze all factors influencing today's recommendation
   Map<String, dynamic> _analyzeFactors(
     List<WorkoutHistory> histories,
     List<WellnessEntry> wellness,
@@ -152,14 +140,12 @@ class WorkoutRecommendationService extends ChangeNotifier {
   ) {
     final factors = <String, dynamic>{};
 
-    // Recovery analysis
     final lastWorkout = histories.isNotEmpty ? histories.last.date : null;
     final daysSinceLastWorkout = lastWorkout != null
         ? DateTime.now().difference(lastWorkout).inDays
         : 999;
     factors['daysSinceLastWorkout'] = daysSinceLastWorkout;
 
-    // Wellness analysis
     if (wellness.isNotEmpty) {
       final latest = wellness.last;
       final avgScore = latest.averageScore;
@@ -177,7 +163,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       factors['stress'] = stress;
       factors['muscleSoreness'] = muscleSoreness;
 
-      // Calculate readiness score (0-1)
       final readiness = ((energy +
                   mood +
                   (5 - tiredness) +
@@ -191,7 +176,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       factors['readiness'] = 0.6;
     }
 
-    // Training frequency analysis
     if (histories.isNotEmpty) {
       final last30Days = histories.where((h) {
         final diff = DateTime.now().difference(h.date).inDays;
@@ -206,11 +190,9 @@ class WorkoutRecommendationService extends ChangeNotifier {
       factors['avgWorkoutsPerWeek'] = '0.0';
     }
 
-    // Check for overtraining
     final needsDeload = _progressionService.shouldDeload(histories);
     factors['needsDeload'] = needsDeload;
 
-    // Profile factors
     factors['experienceLevel'] = profile.experienceLevel.name;
     factors['preferredIntensity'] = profile.preferredIntensity.name;
     factors['age'] = profile.age ?? 30;
@@ -218,7 +200,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return factors;
   }
 
-  /// Select the best workout based on rotation and history
   Workout _selectBestWorkout(
     List<Workout> workouts,
     List<WorkoutHistory> histories,
@@ -232,38 +213,30 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return workouts.first;
     }
 
-    // Get last few workouts to avoid repetition
     final lastWorkoutIds = histories.reversed
         .take(3)
         .map((h) => h.session.workout?.id)
         .where((id) => id != null)
         .toList();
 
-    // Try to find a workout that wasn't done recently
     final freshWorkouts =
         workouts.where((w) => !lastWorkoutIds.contains(w.id)).toList();
 
     if (freshWorkouts.isNotEmpty) {
-      // Select based on readiness
       final readiness = factors['readiness'] as double;
 
       if (readiness > 0.7) {
-        // High readiness - return the first workout
         return freshWorkouts.first;
       } else if (readiness > 0.5) {
-        // Medium readiness - rotate
         return freshWorkouts[freshWorkouts.length > 1 ? 1 : 0];
       } else {
-        // Low readiness - prefer lighter workout (first or last)
         return freshWorkouts.first;
       }
     }
 
-    // All workouts were done recently, just rotate
     return workouts.first;
   }
 
-  /// Determine recommendation level based on factors
   RecommendationLevel _determineLevel(
     Map<String, dynamic> factors,
     bool needsDeload,
@@ -275,7 +248,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final readiness = factors['readiness'] as double;
     final daysSince = factors['daysSinceLastWorkout'] as int;
 
-    // Rest day criteria
     if (daysSince < 1) {
       return RecommendationLevel.rest;
     }
@@ -291,7 +263,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return RecommendationLevel.rest;
     }
 
-    // Intensity levels
     if (readiness >= 0.75 && daysSince >= 2) {
       return RecommendationLevel.intense;
     } else if (readiness >= 0.6) {
@@ -301,13 +272,11 @@ class WorkoutRecommendationService extends ChangeNotifier {
     }
   }
 
-  /// Calculate confidence score for individual exercise
   double _calculateExerciseConfidence(
     String exerciseId,
     List<WorkoutHistory> histories,
     Map<String, dynamic> factors,
   ) {
-    // Start with base confidence
     double confidence = 0.5;
 
     // Check exercise history
