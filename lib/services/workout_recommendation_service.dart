@@ -279,7 +279,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
   ) {
     double confidence = 0.5;
 
-    // Check exercise history
     int timesPerformed = 0;
     for (var h in histories) {
       for (var er in h.session.exerciseResults) {
@@ -289,7 +288,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       }
     }
 
-    // More history = higher confidence
     if (timesPerformed >= 10) {
       confidence += 0.3;
     } else if (timesPerformed >= 5) {
@@ -298,14 +296,12 @@ class WorkoutRecommendationService extends ChangeNotifier {
       confidence += 0.1;
     }
 
-    // Wellness factors
     final readiness = factors['readiness'] as double;
     confidence += (readiness - 0.5) * 0.4;
 
     return confidence.clamp(0.0, 1.0);
   }
 
-  /// Build human-readable overall reason
   String _buildOverallReason(
     Map<String, dynamic> factors,
     RecommendationLevel level,
@@ -362,7 +358,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return reasons.join('. ') + '.';
   }
 
-  /// Check if we should recommend rest instead of training
   bool shouldRestToday(Map<String, dynamic> factors) {
     final readiness = factors['readiness'] as double;
     final daysSince = factors['daysSinceLastWorkout'] as int;
@@ -378,14 +373,12 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return false;
   }
 
-  /// Clear today's recommendation (e.g., after completing workout)
   void clearTodaysRecommendation() {
     _todaysRecommendation = null;
     _lastRecommendationDate = null;
     notifyListeners();
   }
 
-  /// Force regenerate recommendation
   Future<WorkoutRecommendation?> regenerateRecommendation() async {
     _lastRecommendationDate = null;
     return await generateTodaysRecommendation();
