@@ -31,10 +31,23 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
   @override
   void initState() {
     super.initState();
+    _dataManager.addListener(_onDataChanged);
+    _loadSuggestions();
+  }
+
+  @override
+  void dispose() {
+    _dataManager.removeListener(_onDataChanged);
+    super.dispose();
+  }
+
+  void _onDataChanged() {
+    print('[PROGRESSION_INSIGHTS] Data changed, reloading suggestions...');
     _loadSuggestions();
   }
 
   Future<void> _loadSuggestions() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -57,15 +70,18 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
         );
       }
 
-      setState(() {
-        _suggestedWorkout = result['workout'] as Workout;
-        _reasons = result['reasons'] as Map<String, String>;
-        _needsDeload = result['needsDeload'] as bool;
-        _exerciseMetrics = metrics;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _suggestedWorkout = result['workout'] as Workout;
+          _reasons = result['reasons'] as Map<String, String>;
+          _needsDeload = result['needsDeload'] as bool;
+          _exerciseMetrics = metrics;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading data: $e')),

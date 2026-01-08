@@ -40,10 +40,23 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   @override
   void initState() {
     super.initState();
+    _dataManager.addListener(_onDataChanged);
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _dataManager.removeListener(_onDataChanged);
+    super.dispose();
+  }
+
+  void _onDataChanged() {
+    print('[PROGRESS_CHARTS] Data changed, reloading charts...');
     _loadData();
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -52,8 +65,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       final histories = _dataManager.workoutHistory;
 
       if (histories.isEmpty) {
-        setState(() => _isLoading = false);
         if (mounted) {
+          setState(() => _isLoading = false);
           final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -108,12 +121,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         lookbackDays: _lookbackDays,
       );
 
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     } catch (e, stackTrace) {
       print('Error loading progress data: $e');
       print('Stack trace: $stackTrace');
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() => _isLoading = false);
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.errorLoadingData(e.toString()))),
@@ -123,6 +138,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   Future<void> _loadExerciseData(Exercise exercise) async {
+    if (!mounted) return;
     setState(() {
       _selectedExercise = exercise;
       _isLoading = true;
@@ -138,13 +154,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         lookbackDays: _lookbackDays,
       );
 
-      setState(() {
-        _isLoading = false;
-        _selectedTab = 'exercise';
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _selectedTab = 'exercise';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.errorLoadingData(e.toString()))),

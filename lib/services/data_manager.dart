@@ -248,7 +248,10 @@ class DataManager extends ChangeNotifier {
     print('[DATA_MANAGER] Adding workout history for ${history.date}');
     _workoutHistory.add(history);
     _saveData();
+    print('[DATA_MANAGER] Notifying listeners about new workout...');
     notifyListeners();
+    print(
+        '[DATA_MANAGER] Listeners notified. Total workout history: ${_workoutHistory.length}');
   }
 
   List<WorkoutHistory> getWorkoutHistoryForDate(DateTime date) {
