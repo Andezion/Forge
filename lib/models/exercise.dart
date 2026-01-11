@@ -5,7 +5,7 @@ enum ExerciseDifficulty {
 }
 
 enum MuscleGroup {
-  chest, // Грудь
+  chest,
   back, // Спина
   legs, // Ноги
   shoulders, // Плечи
@@ -20,9 +20,9 @@ enum MuscleGroup {
 }
 
 enum MuscleGroupIntensity {
-  primary, // Основная нагрузка (3 балла)
-  secondary, // Вторичная нагрузка (2 балла)
-  stabilizer, // Стабилизация (1 балл)
+  primary,
+  secondary,
+  stabilizer,
 }
 
 class MuscleGroupTag {
@@ -71,7 +71,6 @@ class Exercise {
   final ExerciseDifficulty difficulty;
   final DateTime createdAt;
 
-  /// Тэги мышечных групп, которые работают в этом упражнении
   final List<MuscleGroupTag> muscleGroups;
 
   Exercise({
