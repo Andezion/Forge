@@ -383,17 +383,14 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     final id = current.exercise.id;
     _skipCounts[id] = (_skipCounts[id] ?? 0) + 1;
     final count = _skipCounts[id]!;
-    print('[WORKOUT_EXEC] Skipping ${current.exercise.name} (skip #$count)');
 
     setState(() {
       if (count >= 2) {
         _exerciseQueue.removeAt(_currentExerciseIndex);
         _skippedExercises.add(current.exercise);
-        print('[WORKOUT_EXEC] Removed ${current.exercise.name} after 2 skips');
       } else {
         final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
         _exerciseQueue.add(moved);
-        print('[WORKOUT_EXEC] Moved ${current.exercise.name} to end');
       }
 
       if (_exerciseQueue.isEmpty) {
@@ -433,7 +430,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       session: completedSession,
     );
     DataManager().addWorkoutHistory(history);
-    print('[WORKOUT_EXEC] Workout history saved for ${history.dateOnly}');
 
     showDialog(
       context: context,
