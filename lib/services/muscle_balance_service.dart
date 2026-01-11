@@ -2,18 +2,12 @@ import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 
-/// Результат анализа мышечного баланса
 class MuscleBalanceAnalysis {
-  /// Счет нагрузки на каждую группу мышц
   final Map<MuscleGroup, double> muscleLoadScores;
 
-  /// Группы мышц, которые перетренированы (нужен отдых)
   final Set<MuscleGroup> overtrainedGroups;
-
-  /// Группы мышц, которые недотренированы (нужна нагрузка)
   final Set<MuscleGroup> undertrainedGroups;
 
-  /// Общий баланс тренировки (0.0 - 1.0, где 1.0 - идеальный баланс)
   final double overallBalance;
 
   MuscleBalanceAnalysis({
@@ -24,9 +18,7 @@ class MuscleBalanceAnalysis {
   });
 }
 
-/// Сервис для анализа нагрузки на мышечные группы и баланса тренировок
 class MuscleBalanceService {
-  /// Анализирует тренировку и возвращает счет нагрузки на каждую группу мышц
   Map<MuscleGroup, double> calculateWorkoutMuscleLoad(Workout workout) {
     final muscleLoad = <MuscleGroup, double>{};
 
@@ -34,7 +26,6 @@ class MuscleBalanceService {
       for (var tag in workoutExercise.exercise.muscleGroups) {
         final currentLoad = muscleLoad[tag.group] ?? 0.0;
 
-        // Учитываем количество сетов и интенсивность воздействия
         final loadScore = tag.score * workoutExercise.sets.toDouble();
         muscleLoad[tag.group] = currentLoad + loadScore;
       }
@@ -43,8 +34,6 @@ class MuscleBalanceService {
     return muscleLoad;
   }
 
-  /// Анализирует историю тренировок за последние N дней
-  /// и возвращает накопленную нагрузку на каждую группу мышц
   Map<MuscleGroup, double> calculateRecentMuscleLoad(
     List<WorkoutHistory> histories, {
     int daysToAnalyze = 7,
@@ -55,7 +44,6 @@ class MuscleBalanceService {
     for (var history in histories) {
       if (history.date.isBefore(cutoffDate)) continue;
 
-      // Вес нагрузки уменьшается со временем (свежие тренировки весят больше)
       final daysSince = DateTime.now().difference(history.date).inDays;
       final timeDecay = 1.0 - (daysSince / daysToAnalyze) * 0.5;
 
@@ -63,7 +51,6 @@ class MuscleBalanceService {
         for (var tag in exerciseResult.exercise.muscleGroups) {
           final currentLoad = muscleLoad[tag.group] ?? 0.0;
 
-          // Учитываем фактически выполненные сеты
           final completedSets = exerciseResult.setResults.length;
           final loadScore = tag.score * completedSets * timeDecay;
 
@@ -75,7 +62,6 @@ class MuscleBalanceService {
     return muscleLoad;
   }
 
-  /// Полный анализ мышечного баланса на основе истории
   MuscleBalanceAnalysis analyzeMuscleBalance(
     List<WorkoutHistory> histories, {
     int daysToAnalyze = 7,
@@ -94,17 +80,14 @@ class MuscleBalanceService {
       );
     }
 
-    // Находим среднюю нагрузку
     final avgLoad =
         muscleLoad.values.fold(0.0, (a, b) => a + b) / muscleLoad.values.length;
 
-    // Определяем перетренированные группы (> 150% от средней нагрузки)
     final overtrained = muscleLoad.entries
         .where((e) => e.value > avgLoad * 1.5)
         .map((e) => e.key)
         .toSet();
 
-    // Определяем недотренированные группы (< 50% от средней нагрузки)
     final undertrained = muscleLoad.entries
         .where((e) => e.value < avgLoad * 0.5 && e.value > 0)
         .map((e) => e.key)
