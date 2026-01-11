@@ -8,11 +8,9 @@ import 'progression_service.dart';
 import 'wellness_service.dart';
 import 'data_manager.dart';
 import 'profile_service.dart';
-import 'muscle_balance_service.dart';
 
 class WorkoutRecommendationService extends ChangeNotifier {
   final ProgressionService _progressionService = ProgressionService();
-  final MuscleBalanceService _muscleBalanceService = MuscleBalanceService();
   final WellnessService _wellnessService;
   final DataManager _dataManager;
   final ProfileService _profileService;
@@ -80,16 +78,11 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
     final selectedWorkout = _selectBestWorkout(workouts, histories, factors);
 
-    // Получаем последний wellness entry для учета в прогрессии
-    final latestWellness =
-        recentWellness.isNotEmpty ? recentWellness.last : null;
-
     final adjustedResult = await _progressionService.suggestNextWorkout(
       selectedWorkout,
       histories,
       lookback: 5,
       profile: profile,
-      todayWellness: latestWellness,
     );
 
     final adjustedWorkout = adjustedResult['workout'] as Workout;
@@ -203,7 +196,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     factors['experienceLevel'] = profile.experienceLevel.name;
     factors['preferredIntensity'] = profile.preferredIntensity.name;
     factors['age'] = profile.age ?? 30;
-    factors['trainingFocus'] = profile.trainingFocus;
 
     return factors;
   }
@@ -221,72 +213,25 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return workouts.first;
     }
 
-    // Анализируем мышечный баланс из истории
-    final muscleBalance = _muscleBalanceService.analyzeMuscleBalance(
-      histories,
-      daysToAnalyze: 7,
-    );
-
-    final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
-
-    // Получаем ID последних тренировок
     final lastWorkoutIds =
         histories.reversed.take(3).map((h) => h.session.workoutId).toList();
 
-    // Фильтруем тренировки, которые не повторялись недавно
     final freshWorkouts =
         workouts.where((w) => !lastWorkoutIds.contains(w.id)).toList();
 
-    final workoutsToEvaluate =
-        freshWorkouts.isNotEmpty ? freshWorkouts : workouts;
-
-    // Оцениваем каждую тренировку
-    final workoutScores = <Workout, double>{};
-
-    for (var workout in workoutsToEvaluate) {
-      double score = 1.0;
-
-      // 1. Совместимость с мышечным балансом (не перегружать уже уставшие мышцы)
-      final compatibilityScore =
-          _muscleBalanceService.evaluateWorkoutCompatibility(
-        workout,
-        muscleBalance,
-      );
-      score *= compatibilityScore;
-
-      // 2. Соответствие целям пользователя (армрестлинг, пауэрлифтинг и т.д.)
-      if (trainingFocus.isNotEmpty) {
-        final goalScore = _muscleBalanceService.evaluateWorkoutForGoals(
-          workout,
-          trainingFocus,
-        );
-        score *= (0.5 +
-            goalScore); // 0.5 - базовая оценка, +0.5 за соответствие целям
-      }
-
-      // 3. Учитываем готовность пользователя (wellness)
+    if (freshWorkouts.isNotEmpty) {
       final readiness = factors['readiness'] as double;
 
-      // Если низкая готовность, предпочитаем более легкие тренировки
-      if (readiness < 0.6) {
-        final exerciseCount = workout.exercises.length;
-        // Меньше упражнений = лучше при низкой готовности
-        score *= (1.0 - (exerciseCount / 20.0).clamp(0.0, 0.3));
+      if (readiness > 0.7) {
+        return freshWorkouts.first;
+      } else if (readiness > 0.5) {
+        return freshWorkouts[freshWorkouts.length > 1 ? 1 : 0];
+      } else {
+        return freshWorkouts.first;
       }
-
-      // 4. Бонус за разнообразие (не повторялась недавно)
-      if (!lastWorkoutIds.contains(workout.id)) {
-        score *= 1.2;
-      }
-
-      workoutScores[workout] = score;
     }
 
-    // Выбираем тренировку с наивысшей оценкой
-    final sortedWorkouts = workoutScores.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return sortedWorkouts.first.key;
+    return workouts.first;
   }
 
   RecommendationLevel _determineLevel(
