@@ -282,7 +282,7 @@ class ProgressionService {
       double newWeight = we.weight;
       int newReps = we.targetReps;
       int newSets = we.sets;
-      String reason = 'Нет истории — используем текущие параметры';
+      String reason = 'No history — using current parameters';
 
       if (metrics.sessionsCount == 0) {
         newReps = _goalService.calculateTargetReps(
@@ -293,7 +293,7 @@ class ProgressionService {
           params: trainingParams,
           wellnessModifiers: wellnessModifiers,
         );
-        reason = 'Новое упражнение - параметры подобраны под ваши цели';
+        reason = 'New exercise - parameters tailored to your goals';
       } else {
         final c = metrics.completionRate;
         final perceived = metrics.lastPerceivedDifficulty;
