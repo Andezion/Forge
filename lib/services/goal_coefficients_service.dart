@@ -1,22 +1,12 @@
 import '../models/user.dart';
 import '../models/wellness_entry.dart';
 
-/// Параметры для расчета весов и повторений
 class TrainingParameters {
-  /// Целевой диапазон повторений
   final int minReps;
   final int maxReps;
-
-  /// Целевое количество сетов
   final int targetSets;
-
-  /// Коэффициент увеличения веса при успехе
   final double weightIncreaseCoefficient;
-
-  /// Коэффициент уменьшения веса при неудаче
   final double weightDecreaseCoefficient;
-
-  /// Время отдыха между сетами (секунды)
   final int restSeconds;
 
   const TrainingParameters({
