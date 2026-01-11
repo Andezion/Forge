@@ -1,0 +1,341 @@
+import '../models/user.dart';
+import '../models/wellness_entry.dart';
+
+/// Параметры для расчета весов и повторений
+class TrainingParameters {
+  /// Целевой диапазон повторений
+  final int minReps;
+  final int maxReps;
+
+  /// Целевое количество сетов
+  final int targetSets;
+
+  /// Коэффициент увеличения веса при успехе
+  final double weightIncreaseCoefficient;
+
+  /// Коэффициент уменьшения веса при неудаче
+  final double weightDecreaseCoefficient;
+
+  /// Время отдыха между сетами (секунды)
+  final int restSeconds;
+
+  const TrainingParameters({
+    required this.minReps,
+    required this.maxReps,
+    required this.targetSets,
+    required this.weightIncreaseCoefficient,
+    required this.weightDecreaseCoefficient,
+    required this.restSeconds,
+  });
+}
+
+/// Модификаторы на основе wellness состояния
+class WellnessModifiers {
+  final double weightMultiplier; // Множитель для веса (0.7 - 1.1)
+  final double
+      volumeMultiplier; // Множитель для объема (сеты/повторения) (0.7 - 1.1)
+  final double recoveryMultiplier; // Множитель восстановления (0.8 - 1.2)
+
+  const WellnessModifiers({
+    required this.weightMultiplier,
+    required this.volumeMultiplier,
+    required this.recoveryMultiplier,
+  });
+}
+
+/// Сервис для расчета коэффициентов на основе целей тренировок
+class GoalCoefficientsService {
+  /// Возвращает параметры тренировки на основе основной цели
+  TrainingParameters getParametersForGoal(TrainingGoal goal) {
+    switch (goal) {
+      case TrainingGoal.strength:
+        // Сила: тяжелые веса, малое количество повторений
+        return const TrainingParameters(
+          minReps: 1,
+          maxReps: 5,
+          targetSets: 5,
+          weightIncreaseCoefficient: 0.025, // 2.5% прибавка
+          weightDecreaseCoefficient: 0.10, // 10% снижение
+          restSeconds: 180, // 3 минуты отдыха
+        );
+
+      case TrainingGoal.hypertrophy:
+        // Гипертрофия: средние веса, среднее количество повторений
+        return const TrainingParameters(
+          minReps: 8,
+          maxReps: 12,
+          targetSets: 4,
+          weightIncreaseCoefficient: 0.05, // 5% прибавка
+          weightDecreaseCoefficient: 0.10,
+          restSeconds: 90, // 90 секунд отдыха
+        );
+
+      case TrainingGoal.endurance:
+        // Выносливость: легкие веса, много повторений
+        return const TrainingParameters(
+          minReps: 15,
+          maxReps: 25,
+          targetSets: 3,
+          weightIncreaseCoefficient: 0.05,
+          weightDecreaseCoefficient: 0.075,
+          restSeconds: 60, // 60 секунд отдыха
+        );
+
+      case TrainingGoal.fatLoss:
+        // Жиросжигание: среднее количество повторений, высокая интенсивность
+        return const TrainingParameters(
+          minReps: 12,
+          maxReps: 20,
+          targetSets: 3,
+          weightIncreaseCoefficient: 0.05,
+          weightDecreaseCoefficient: 0.075,
+          restSeconds: 45, // Короткий отдых
+        );
+
+      case TrainingGoal.generalFitness:
+        // Общий фитнес: баланс всего
+        return const TrainingParameters(
+          minReps: 8,
+          maxReps: 15,
+          targetSets: 3,
+          weightIncreaseCoefficient: 0.05,
+          weightDecreaseCoefficient: 0.075,
+          restSeconds: 75,
+        );
+    }
+  }
+
+  /// Возвращает усредненные параметры на основе нескольких целей
+  TrainingParameters getAverageParameters(List<TrainingGoal> goals) {
+    if (goals.isEmpty) {
+      return getParametersForGoal(TrainingGoal.generalFitness);
+    }
+
+    if (goals.length == 1) {
+      return getParametersForGoal(goals.first);
+    }
+
+    // Усредняем параметры всех целей
+    int totalMinReps = 0;
+    int totalMaxReps = 0;
+    int totalSets = 0;
+    double totalIncrease = 0.0;
+    double totalDecrease = 0.0;
+    int totalRest = 0;
+
+    for (var goal in goals) {
+      final params = getParametersForGoal(goal);
+      totalMinReps += params.minReps;
+      totalMaxReps += params.maxReps;
+      totalSets += params.targetSets;
+      totalIncrease += params.weightIncreaseCoefficient;
+      totalDecrease += params.weightDecreaseCoefficient;
+      totalRest += params.restSeconds;
+    }
+
+    final count = goals.length;
+
+    return TrainingParameters(
+      minReps: (totalMinReps / count).round(),
+      maxReps: (totalMaxReps / count).round(),
+      targetSets: (totalSets / count).round().clamp(3, 5),
+      weightIncreaseCoefficient: totalIncrease / count,
+      weightDecreaseCoefficient: totalDecrease / count,
+      restSeconds: (totalRest / count).round(),
+    );
+  }
+
+  /// Модифицирует параметры на основе уровня опыта
+  TrainingParameters applyExperienceModifiers(
+    TrainingParameters params,
+    ExperienceLevel experience,
+  ) {
+    switch (experience) {
+      case ExperienceLevel.beginner:
+        // Новички: больше прогресс, меньше сетов
+        return TrainingParameters(
+          minReps: params.minReps,
+          maxReps: params.maxReps,
+          targetSets: (params.targetSets * 0.75).round().clamp(2, 5),
+          weightIncreaseCoefficient: params.weightIncreaseCoefficient * 1.5,
+          weightDecreaseCoefficient: params.weightDecreaseCoefficient,
+          restSeconds: (params.restSeconds * 1.2).round(),
+        );
+
+      case ExperienceLevel.intermediate:
+        // Средний уровень: стандартные параметры
+        return params;
+
+      case ExperienceLevel.advanced:
+        // Продвинутые: медленный прогресс, больше объема
+        return TrainingParameters(
+          minReps: params.minReps,
+          maxReps: params.maxReps,
+          targetSets: (params.targetSets * 1.2).round().clamp(3, 6),
+          weightIncreaseCoefficient: params.weightIncreaseCoefficient * 0.6,
+          weightDecreaseCoefficient: params.weightDecreaseCoefficient * 0.8,
+          restSeconds: params.restSeconds,
+        );
+    }
+  }
+
+  /// Рассчитывает модификаторы на основе wellness данных
+  WellnessModifiers calculateWellnessModifiers(WellnessEntry? wellness) {
+    if (wellness == null) {
+      return const WellnessModifiers(
+        weightMultiplier: 1.0,
+        volumeMultiplier: 1.0,
+        recoveryMultiplier: 1.0,
+      );
+    }
+
+    final energy = wellness.answers['Energy'] ?? 3;
+    final mood = wellness.answers['Mood'] ?? 3;
+    final tiredness = wellness.answers['Tiredness'] ?? 3;
+    final stress = wellness.answers['Stress'] ?? 3;
+    final muscleSoreness = wellness.answers['Muscle soreness'] ?? 3;
+
+    // Рассчитываем общую готовность (0.0 - 1.0)
+    final readiness = ((energy +
+                mood +
+                (5 - tiredness) +
+                (5 - stress) +
+                (5 - muscleSoreness)) /
+            25.0)
+        .clamp(0.0, 1.0);
+
+    // Множитель для веса (0.7 - 1.1)
+    double weightMult = 0.7 + (readiness * 0.4);
+
+    // Множитель для объема (0.7 - 1.1)
+    double volumeMult = 0.75 + (readiness * 0.35);
+
+    // Множитель восстановления
+    // Высокая усталость = нужно больше времени на восстановление
+    double recoveryMult = 0.8 + ((5 - tiredness) / 5.0) * 0.4;
+
+    // Сильная боль в мышцах = замедление прогресса
+    if (muscleSoreness >= 4) {
+      weightMult *= 0.85;
+      volumeMult *= 0.85;
+      recoveryMult *= 1.3;
+    }
+
+    // Низкая энергия = снижение интенсивности
+    if (energy <= 2) {
+      weightMult *= 0.85;
+      volumeMult *= 0.90;
+    }
+
+    return WellnessModifiers(
+      weightMultiplier: weightMult.clamp(0.7, 1.1),
+      volumeMultiplier: volumeMult.clamp(0.7, 1.1),
+      recoveryMultiplier: recoveryMult.clamp(0.8, 1.3),
+    );
+  }
+
+  /// Модифицирует параметры на основе интенсивности тренировок
+  TrainingParameters applyIntensityModifiers(
+    TrainingParameters params,
+    TrainingIntensity intensity,
+  ) {
+    switch (intensity) {
+      case TrainingIntensity.light:
+        return TrainingParameters(
+          minReps: params.minReps,
+          maxReps: params.maxReps,
+          targetSets: (params.targetSets * 0.8).round().clamp(2, 5),
+          weightIncreaseCoefficient: params.weightIncreaseCoefficient * 0.7,
+          weightDecreaseCoefficient: params.weightDecreaseCoefficient * 0.8,
+          restSeconds: (params.restSeconds * 1.2).round(),
+        );
+
+      case TrainingIntensity.moderate:
+        return params;
+
+      case TrainingIntensity.intense:
+        return TrainingParameters(
+          minReps: params.minReps,
+          maxReps: params.maxReps,
+          targetSets: (params.targetSets * 1.2).round().clamp(3, 6),
+          weightIncreaseCoefficient: params.weightIncreaseCoefficient * 1.3,
+          weightDecreaseCoefficient: params.weightDecreaseCoefficient * 1.2,
+          restSeconds: (params.restSeconds * 1.1).round(),
+        );
+    }
+  }
+
+  /// Полный расчет финальных параметров тренировки
+  TrainingParameters calculateFinalParameters({
+    required UserProfile profile,
+    WellnessEntry? wellness,
+  }) {
+    // 1. Получаем базовые параметры на основе целей
+    var params = getAverageParameters(profile.goals);
+
+    // 2. Модифицируем на основе опыта
+    params = applyExperienceModifiers(params, profile.experienceLevel);
+
+    // 3. Модифицируем на основе предпочитаемой интенсивности
+    params = applyIntensityModifiers(params, profile.preferredIntensity);
+
+    return params;
+  }
+
+  /// Рассчитывает рекомендуемое количество повторений для упражнения
+  int calculateTargetReps({
+    required TrainingParameters params,
+    required WellnessModifiers wellnessModifiers,
+    int? previousReps,
+  }) {
+    // Берем среднее из диапазона
+    int targetReps = ((params.minReps + params.maxReps) / 2).round();
+
+    // Применяем wellness модификатор (объем)
+    targetReps = (targetReps * wellnessModifiers.volumeMultiplier).round();
+
+    // Ограничиваем диапазоном
+    return targetReps.clamp(params.minReps, params.maxReps);
+  }
+
+  /// Рассчитывает рекомендуемое количество сетов
+  int calculateTargetSets({
+    required TrainingParameters params,
+    required WellnessModifiers wellnessModifiers,
+  }) {
+    int targetSets = params.targetSets;
+
+    // Применяем wellness модификатор (объем)
+    targetSets = (targetSets * wellnessModifiers.volumeMultiplier).round();
+
+    return targetSets.clamp(2, 6);
+  }
+
+  /// Рассчитывает новый вес на основе предыдущей производительности
+  double calculateNextWeight({
+    required double currentWeight,
+    required double completionRate,
+    required TrainingParameters params,
+    required WellnessModifiers wellnessModifiers,
+    bool wasHard = false,
+  }) {
+    double newWeight = currentWeight;
+
+    if (completionRate >= 0.95 && !wasHard) {
+      // Отличное выполнение - увеличиваем вес
+      newWeight *= (1.0 + params.weightIncreaseCoefficient);
+    } else if (completionRate >= 0.85 && completionRate < 0.95) {
+      // Хорошее выполнение - небольшое увеличение
+      newWeight *= (1.0 + params.weightIncreaseCoefficient / 2);
+    } else if (completionRate < 0.75 || wasHard) {
+      // Плохое выполнение или слишком тяжело - уменьшаем вес
+      newWeight *= (1.0 - params.weightDecreaseCoefficient);
+    }
+
+    // Применяем wellness модификатор
+    newWeight *= wellnessModifiers.weightMultiplier;
+
+    // Округляем до 0.5 кг
+    return (newWeight * 2).round() / 2.0;
+  }
+}
