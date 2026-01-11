@@ -352,15 +352,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         perceivedDifficulty: perceivedDifficulty,
       );
       _exerciseResults.add(_currentExerciseResult!);
-      print(
-          '[WORKOUT_EXEC] Exercise result saved. Total completed: ${_exerciseResults.length}');
 
       _exerciseQueue.removeAt(_currentExerciseIndex);
-      print(
-          '[WORKOUT_EXEC] Removed completed exercise from queue. Remaining: ${_exerciseQueue.length}');
 
       if (_exerciseQueue.isEmpty) {
-        print('[WORKOUT_EXEC] No more exercises. Finishing workout...');
         _finishWorkout();
         return;
       }
@@ -371,8 +366,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
       _currentSetNumber = 1;
       _setDurationSeconds = 0;
-      print(
-          '[WORKOUT_EXEC] Moving to next exercise (index $_currentExerciseIndex): ${_exerciseQueue[_currentExerciseIndex].exercise.name}');
 
       _currentExerciseResult = ExerciseResult(
         exercise: _exerciseQueue[_currentExerciseIndex].exercise,
@@ -381,8 +374,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
         setResults: [],
       );
-      print(
-          '[WORKOUT_EXEC] Next exercise initialized: ${_currentExerciseResult!.exercise.name}');
     });
   }
 
