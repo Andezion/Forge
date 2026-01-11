@@ -312,8 +312,7 @@ class ProgressionService {
               .round()
               .clamp(1, we.sets);
           newReps = (we.targetReps * 0.9).round().clamp(1, we.targetReps);
-          reason =
-              'Неделя разгрузки - снижение интенсивности для восстановления';
+          reason = 'Week deload - reducing intensity for recovery';
         } else if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
             newReps = _goalService.calculateTargetReps(
@@ -322,19 +321,19 @@ class ProgressionService {
               previousReps: we.targetReps,
             );
             newReps = (newReps * 1.1).round().clamp(we.targetReps + 1, 50);
-            reason = 'Отличное выполнение - увеличиваем повторения';
+            reason = 'Excellent performance - increasing repetitions';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = _goalService.calculateTargetSets(
               params: trainingParams,
               wellnessModifiers: wellnessModifiers,
             );
             newSets = (newSets + 1).clamp(we.sets, 10);
-            reason = 'Хороший прогресс - добавляем сет';
+            reason = 'Good progress - adding a set';
           } else if (c < 0.70 || wasHard) {
             newReps = (we.targetReps * 0.85).round().clamp(1, we.targetReps);
-            reason = 'Сложное выполнение - снижаем повторения';
+            reason = 'Difficult performance - reducing repetitions';
           } else {
-            reason = 'Упражнение с весом тела - поддерживаем уровень';
+            reason = 'Bodyweight exercise - maintaining level';
           }
         } else {
           newWeight = _goalService.calculateNextWeight(
@@ -358,22 +357,22 @@ class ProgressionService {
 
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
-            reason = 'Недостаточное восстановление - скорректирован вес';
+            reason = 'Insufficient recovery - weight adjusted down';
           } else if (c >= 0.95 && !wasHard && metrics.performanceTrend >= 0) {
             reason =
-                'Отличная производительность - прогрессия веса на ${((newWeight - we.weight) / we.weight * 100).toStringAsFixed(1)}%';
+                'Excellent performance - weight progression by ${((newWeight - we.weight) / we.weight * 100).toStringAsFixed(1)}%';
           } else if (c >= 0.85) {
-            reason = 'Стабильный прогресс - умеренное увеличение нагрузки';
+            reason = 'Stable progress - moderate load increase';
           } else if (c < 0.75 || wasHard) {
-            reason = 'Сложная тренировка - снижение интенсивности';
+            reason = 'Difficult workout - reducing intensity';
           } else if (metrics.performanceTrend < -5.0) {
-            reason = 'Негативный тренд - корректировка нагрузки';
+            reason = 'Negative trend - adjusting load for recovery';
           } else {
-            reason = 'Поддержание текущего уровня с учетом ваших целей';
+            reason = 'Maintaining current level considering your goals';
           }
 
           if (wellnessModifiers.weightMultiplier < 0.9) {
-            reason += ' (с учетом самочувствия)';
+            reason += ' (Considering wellness)';
           }
         }
       }
