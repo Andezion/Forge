@@ -95,4 +95,28 @@ class AppStrings {
       'Password must be at least 6 characters';
   static const String errorPasswordsDontMatch = 'Passwords do not match';
   static const String errorFieldRequired = 'This field is required';
+
+  static const String muscleGroupChest = 'Chest';
+  static const String muscleGroupBack = 'Back';
+  static const String muscleGroupLegs = 'Legs';
+  static const String muscleGroupShoulders = 'Shoulders';
+  static const String muscleGroupBiceps = 'Biceps';
+  static const String muscleGroupTriceps = 'Triceps';
+  static const String muscleGroupForearms = 'Forearms';
+  static const String muscleGroupWrists = 'Wrists';
+  static const String muscleGroupCore = 'Core';
+  static const String muscleGroupGlutes = 'Glutes';
+  static const String muscleGroupCalves = 'Calves';
+  static const String muscleGroupCardio = 'Cardio';
+
+  static const String intensityPrimary = 'Primary';
+  static const String intensitySecondary = 'Secondary';
+  static const String intensityStabilizer = 'Stabilizer';
+
+  static const String muscleGroups = 'Muscle Groups';
+  static const String addMuscleGroup = 'Add Muscle Group';
+  static const String pickMuscleGroup = 'Pick muscle group';
+  static const String intensityFor = 'Intensity for';
+  static const String pressToAddMuscleGroups =
+      'Press the button below to add muscle groups';
 }
