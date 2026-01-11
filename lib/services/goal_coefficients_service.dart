@@ -71,11 +71,10 @@ class GoalCoefficientsService {
           targetSets: 3,
           weightIncreaseCoefficient: 0.05,
           weightDecreaseCoefficient: 0.075,
-          restSeconds: 45, // Короткий отдых
+          restSeconds: 45,
         );
 
       case TrainingGoal.generalFitness:
-        // Общий фитнес: баланс всего
         return const TrainingParameters(
           minReps: 8,
           maxReps: 15,
@@ -87,7 +86,6 @@ class GoalCoefficientsService {
     }
   }
 
-  /// Возвращает усредненные параметры на основе нескольких целей
   TrainingParameters getAverageParameters(List<TrainingGoal> goals) {
     if (goals.isEmpty) {
       return getParametersForGoal(TrainingGoal.generalFitness);
@@ -97,7 +95,6 @@ class GoalCoefficientsService {
       return getParametersForGoal(goals.first);
     }
 
-    // Усредняем параметры всех целей
     int totalMinReps = 0;
     int totalMaxReps = 0;
     int totalSets = 0;
@@ -127,14 +124,12 @@ class GoalCoefficientsService {
     );
   }
 
-  /// Модифицирует параметры на основе уровня опыта
   TrainingParameters applyExperienceModifiers(
     TrainingParameters params,
     ExperienceLevel experience,
   ) {
     switch (experience) {
       case ExperienceLevel.beginner:
-        // Новички: больше прогресс, меньше сетов
         return TrainingParameters(
           minReps: params.minReps,
           maxReps: params.maxReps,
@@ -145,11 +140,9 @@ class GoalCoefficientsService {
         );
 
       case ExperienceLevel.intermediate:
-        // Средний уровень: стандартные параметры
         return params;
 
       case ExperienceLevel.advanced:
-        // Продвинутые: медленный прогресс, больше объема
         return TrainingParameters(
           minReps: params.minReps,
           maxReps: params.maxReps,
@@ -161,7 +154,6 @@ class GoalCoefficientsService {
     }
   }
 
-  /// Рассчитывает модификаторы на основе wellness данных
   WellnessModifiers calculateWellnessModifiers(WellnessEntry? wellness) {
     if (wellness == null) {
       return const WellnessModifiers(
@@ -177,7 +169,6 @@ class GoalCoefficientsService {
     final stress = wellness.answers['Stress'] ?? 3;
     final muscleSoreness = wellness.answers['Muscle soreness'] ?? 3;
 
-    // Рассчитываем общую готовность (0.0 - 1.0)
     final readiness = ((energy +
                 mood +
                 (5 - tiredness) +
@@ -186,24 +177,16 @@ class GoalCoefficientsService {
             25.0)
         .clamp(0.0, 1.0);
 
-    // Множитель для веса (0.7 - 1.1)
     double weightMult = 0.7 + (readiness * 0.4);
-
-    // Множитель для объема (0.7 - 1.1)
     double volumeMult = 0.75 + (readiness * 0.35);
-
-    // Множитель восстановления
-    // Высокая усталость = нужно больше времени на восстановление
     double recoveryMult = 0.8 + ((5 - tiredness) / 5.0) * 0.4;
 
-    // Сильная боль в мышцах = замедление прогресса
     if (muscleSoreness >= 4) {
       weightMult *= 0.85;
       volumeMult *= 0.85;
       recoveryMult *= 1.3;
     }
 
-    // Низкая энергия = снижение интенсивности
     if (energy <= 2) {
       weightMult *= 0.85;
       volumeMult *= 0.90;
@@ -216,7 +199,6 @@ class GoalCoefficientsService {
     );
   }
 
-  /// Модифицирует параметры на основе интенсивности тренировок
   TrainingParameters applyIntensityModifiers(
     TrainingParameters params,
     TrainingIntensity intensity,
@@ -247,18 +229,13 @@ class GoalCoefficientsService {
     }
   }
 
-  /// Полный расчет финальных параметров тренировки
   TrainingParameters calculateFinalParameters({
     required UserProfile profile,
     WellnessEntry? wellness,
   }) {
-    // 1. Получаем базовые параметры на основе целей
     var params = getAverageParameters(profile.goals);
 
-    // 2. Модифицируем на основе опыта
     params = applyExperienceModifiers(params, profile.experienceLevel);
-
-    // 3. Модифицируем на основе предпочитаемой интенсивности
     params = applyIntensityModifiers(params, profile.preferredIntensity);
 
     return params;
