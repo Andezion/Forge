@@ -10,13 +10,13 @@ enum MuscleGroup {
   legs, // Ноги
   shoulders, // Плечи
   biceps, // Бицепс
-  triceps, // Трицепс
-  forearms, // Предплечья
-  wrists, // Кисти (для армрестлинга)
-  core, // Кор/Пресс
-  glutes, // Ягодицы
-  calves, // Икры
-  cardio, // Кардио
+  triceps,
+  forearms,
+  wrists,
+  core,
+  glutes,
+  calves,
+  cardio,
 }
 
 enum MuscleGroupIntensity {
