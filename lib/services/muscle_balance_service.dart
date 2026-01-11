@@ -223,7 +223,6 @@ class MuscleBalanceService {
         : 0.5;
   }
 
-  /// Предлагает какие группы мышц стоит тренировать следующими
   List<MuscleGroup> suggestNextMuscleGroups(
     List<WorkoutHistory> histories,
     List<String> trainingFocus, {
@@ -232,23 +231,19 @@ class MuscleBalanceService {
     final balance = analyzeMuscleBalance(histories);
     final priorities = getMuscleGroupPriorities(trainingFocus);
 
-    // Создаем список групп с оценкой приоритета
     final scores = <MuscleGroup, double>{};
 
     for (var group in MuscleGroup.values) {
       double score = priorities[group] ?? 1.0;
 
-      // Бонус для недотренированных групп
       if (balance.undertrainedGroups.contains(group)) {
         score *= 1.5;
       }
 
-      // Штраф для перетренированных групп
       if (balance.overtrainedGroups.contains(group)) {
         score *= 0.3;
       }
 
-      // Учитываем текущую нагрузку (меньше нагрузка = выше приоритет)
       final currentLoad = balance.muscleLoadScores[group] ?? 0.0;
       final avgLoad = balance.muscleLoadScores.values.isEmpty
           ? 1.0
@@ -263,7 +258,6 @@ class MuscleBalanceService {
       scores[group] = score;
     }
 
-    // Сортируем по убыванию оценки
     final sortedGroups = scores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
