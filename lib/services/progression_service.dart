@@ -305,7 +305,6 @@ class ProgressionService {
         );
 
         if (needsDeload) {
-          // Неделя разгрузки
           if (we.weight > 0) {
             newWeight = we.weight * 0.70 * wellnessModifiers.weightMultiplier;
           }
@@ -316,7 +315,6 @@ class ProgressionService {
           reason =
               'Неделя разгрузки - снижение интенсивности для восстановления';
         } else if (we.weight <= 0.0) {
-          // Упражнения с собственным весом
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
             newReps = _goalService.calculateTargetReps(
               params: trainingParams,
@@ -339,7 +337,6 @@ class ProgressionService {
             reason = 'Упражнение с весом тела - поддерживаем уровень';
           }
         } else {
-          // Упражнения с весом
           newWeight = _goalService.calculateNextWeight(
             currentWeight: we.weight,
             completionRate: c,
@@ -348,7 +345,6 @@ class ProgressionService {
             wasHard: wasHard,
           );
 
-          // Корректируем повторения и сеты на основе целей
           newReps = _goalService.calculateTargetReps(
             params: trainingParams,
             wellnessModifiers: wellnessModifiers,
@@ -360,7 +356,6 @@ class ProgressionService {
             wellnessModifiers: wellnessModifiers,
           );
 
-          // Применяем восстановление
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
             reason = 'Недостаточное восстановление - скорректирован вес';
@@ -377,17 +372,14 @@ class ProgressionService {
             reason = 'Поддержание текущего уровня с учетом ваших целей';
           }
 
-          // Дополнительные корректировки на основе wellness
           if (wellnessModifiers.weightMultiplier < 0.9) {
             reason += ' (с учетом самочувствия)';
           }
         }
       }
 
-      // Округляем вес
       newWeight = (newWeight * 2).round() / 2.0;
 
-      // Ограничиваем значения
       newReps = newReps.clamp(1, 50);
       newSets = newSets.clamp(1, 10);
 
