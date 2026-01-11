@@ -45,29 +45,26 @@ class GoalCoefficientsService {
         );
 
       case TrainingGoal.hypertrophy:
-        // Гипертрофия: средние веса, среднее количество повторений
         return const TrainingParameters(
           minReps: 8,
           maxReps: 12,
           targetSets: 4,
-          weightIncreaseCoefficient: 0.05, // 5% прибавка
+          weightIncreaseCoefficient: 0.05,
           weightDecreaseCoefficient: 0.10,
-          restSeconds: 90, // 90 секунд отдыха
+          restSeconds: 90,
         );
 
       case TrainingGoal.endurance:
-        // Выносливость: легкие веса, много повторений
         return const TrainingParameters(
           minReps: 15,
           maxReps: 25,
           targetSets: 3,
           weightIncreaseCoefficient: 0.05,
           weightDecreaseCoefficient: 0.075,
-          restSeconds: 60, // 60 секунд отдыха
+          restSeconds: 60,
         );
 
       case TrainingGoal.fatLoss:
-        // Жиросжигание: среднее количество повторений, высокая интенсивность
         return const TrainingParameters(
           minReps: 12,
           maxReps: 20,
