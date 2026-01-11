@@ -20,54 +20,37 @@ class DataManager extends ChangeNotifier {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    print('[DATA_MANAGER] Initializing...');
     _prefs = await SharedPreferences.getInstance();
     await _loadData();
     _isInitialized = true;
-    print('[DATA_MANAGER] Initialization complete');
   }
 
   Future<void> _loadData() async {
-    print('[DATA_MANAGER] Loading data from storage...');
-
     final exercisesJson = _prefs?.getStringList('exercises') ?? [];
     if (exercisesJson.isEmpty) {
-      print('[DATA_MANAGER] No saved exercises, loading defaults...');
       _loadDefaultExercises();
     } else {
       _exercises = exercisesJson
           .map((json) => Exercise.fromJson(jsonDecode(json)))
           .toList();
-      print(
-          '[DATA_MANAGER] Loaded ${_exercises.length} exercises: ${_exercises.map((e) => e.name).toList()}');
     }
 
     final workoutsJson = _prefs?.getStringList('workouts') ?? [];
     if (workoutsJson.isEmpty) {
-      print('[DATA_MANAGER] No saved workouts, creating demo...');
       _initializeDemoWorkout();
     } else {
       _workouts = workoutsJson
           .map((json) => Workout.fromJson(jsonDecode(json)))
           .toList();
-      print(
-          '[DATA_MANAGER] Loaded ${_workouts.length} workouts: ${_workouts.map((w) => w.name).toList()}');
     }
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
     _workoutHistory = historyJson
         .map((json) => WorkoutHistory.fromJson(jsonDecode(json)))
         .toList();
-    print('[DATA_MANAGER] Loaded ${_workoutHistory.length} history entries');
   }
 
   Future<void> _saveData() async {
-    print('[DATA_MANAGER] Saving data to storage...');
-    print(
-        '[DATA_MANAGER] Exercises to save: ${_exercises.map((e) => e.name).toList()}');
-    print(
-        '[DATA_MANAGER] Workouts to save: ${_workouts.map((w) => w.name).toList()}');
-
     final exercisesJson =
         _exercises.map((e) => jsonEncode(e.toJson())).toList();
     await _prefs?.setStringList('exercises', exercisesJson);
@@ -78,8 +61,6 @@ class DataManager extends ChangeNotifier {
     final historyJson =
         _workoutHistory.map((h) => jsonEncode(h.toJson())).toList();
     await _prefs?.setStringList('workout_history', historyJson);
-
-    print('[DATA_MANAGER] Data saved successfully');
   }
 
   List<Exercise> get exercises => List.unmodifiable(_exercises);
