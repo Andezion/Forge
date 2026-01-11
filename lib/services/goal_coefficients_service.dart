@@ -241,36 +241,29 @@ class GoalCoefficientsService {
     return params;
   }
 
-  /// Рассчитывает рекомендуемое количество повторений для упражнения
   int calculateTargetReps({
     required TrainingParameters params,
     required WellnessModifiers wellnessModifiers,
     int? previousReps,
   }) {
-    // Берем среднее из диапазона
     int targetReps = ((params.minReps + params.maxReps) / 2).round();
 
-    // Применяем wellness модификатор (объем)
     targetReps = (targetReps * wellnessModifiers.volumeMultiplier).round();
 
-    // Ограничиваем диапазоном
     return targetReps.clamp(params.minReps, params.maxReps);
   }
 
-  /// Рассчитывает рекомендуемое количество сетов
   int calculateTargetSets({
     required TrainingParameters params,
     required WellnessModifiers wellnessModifiers,
   }) {
     int targetSets = params.targetSets;
 
-    // Применяем wellness модификатор (объем)
     targetSets = (targetSets * wellnessModifiers.volumeMultiplier).round();
 
     return targetSets.clamp(2, 6);
   }
 
-  /// Рассчитывает новый вес на основе предыдущей производительности
   double calculateNextWeight({
     required double currentWeight,
     required double completionRate,
@@ -281,20 +274,15 @@ class GoalCoefficientsService {
     double newWeight = currentWeight;
 
     if (completionRate >= 0.95 && !wasHard) {
-      // Отличное выполнение - увеличиваем вес
       newWeight *= (1.0 + params.weightIncreaseCoefficient);
     } else if (completionRate >= 0.85 && completionRate < 0.95) {
-      // Хорошее выполнение - небольшое увеличение
       newWeight *= (1.0 + params.weightIncreaseCoefficient / 2);
     } else if (completionRate < 0.75 || wasHard) {
-      // Плохое выполнение или слишком тяжело - уменьшаем вес
       newWeight *= (1.0 - params.weightDecreaseCoefficient);
     }
 
-    // Применяем wellness модификатор
     newWeight *= wellnessModifiers.weightMultiplier;
 
-    // Округляем до 0.5 кг
     return (newWeight * 2).round() / 2.0;
   }
 }
