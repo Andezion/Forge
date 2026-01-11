@@ -261,13 +261,11 @@ class ProgressionService {
 
     final prof = profile;
 
-    // Получаем параметры тренировки на основе целей и опыта
     final trainingParams = _goalService.calculateFinalParameters(
       profile: prof,
       wellness: todayWellness,
     );
 
-    // Получаем модификаторы wellness
     final wellnessModifiers =
         _goalService.calculateWellnessModifiers(todayWellness);
 
@@ -287,7 +285,6 @@ class ProgressionService {
       String reason = 'Нет истории — используем текущие параметры';
 
       if (metrics.sessionsCount == 0) {
-        // Нет истории - используем параметры на основе целей
         newReps = _goalService.calculateTargetReps(
           params: trainingParams,
           wellnessModifiers: wellnessModifiers,
@@ -302,7 +299,6 @@ class ProgressionService {
         final perceived = metrics.lastPerceivedDifficulty;
         final wasHard = perceived == ExerciseDifficulty.hard;
 
-        // Учитываем восстановление
         final recoveryModifier = getRecoveryModifier(
           metrics.daysSinceLastSession,
           userAge,
