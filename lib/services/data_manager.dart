@@ -672,7 +672,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'armwrestling_grip_1',
         name: 'Armwrestling Grip Focus - Day 1',
@@ -703,7 +702,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'armwrestling_comp_1',
         name: 'Armwrestling Competition - Day 1',
@@ -719,7 +717,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'streetlifting_beginner_1',
         name: 'Streetlifting Beginner - Day 1',
@@ -750,7 +747,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'streetlifting_advanced_1',
         name: 'Streetlifting Advanced - Day 1',
@@ -781,7 +777,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'streetlifting_exit_1',
         name: 'Streetlifting Strength Exit - Day 1',
@@ -812,7 +807,6 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'powerlifting_5x5_a',
         name: 'Powerlifting 5x5 - Day A',
@@ -839,26 +833,16 @@ class DataManager extends ChangeNotifier {
         ],
         createdAt: DateTime.now(),
       ),
-
       Workout(
         id: 'powerlifting_inter_1',
         name: 'Powerlifting Intermediate - Day 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[2],
-              sets: 5,
-              targetReps: 3,
-              weight: 80.0), // Squats
+              exercise: _exercises[2], sets: 5, targetReps: 3, weight: 80.0),
           WorkoutExercise(
-              exercise: _exercises[24],
-              sets: 4,
-              targetReps: 8,
-              weight: 60.0), // Front Squat
+              exercise: _exercises[24], sets: 4, targetReps: 8, weight: 60.0),
           WorkoutExercise(
-              exercise: _exercises[23],
-              sets: 3,
-              targetReps: 12,
-              weight: 40.0), // Romanian Deadlift
+              exercise: _exercises[23], sets: 3, targetReps: 12, weight: 40.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -867,20 +851,11 @@ class DataManager extends ChangeNotifier {
         name: 'Powerlifting Intermediate - Day 2',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[3],
-              sets: 5,
-              targetReps: 3,
-              weight: 70.0), // Bench Press
+              exercise: _exercises[3], sets: 5, targetReps: 3, weight: 70.0),
           WorkoutExercise(
-              exercise: _exercises[25],
-              sets: 4,
-              targetReps: 8,
-              weight: 50.0), // Close-Grip Bench
+              exercise: _exercises[25], sets: 4, targetReps: 8, weight: 50.0),
           WorkoutExercise(
-              exercise: _exercises[5],
-              sets: 4,
-              targetReps: 6,
-              weight: 40.0), // Overhead Press
+              exercise: _exercises[5], sets: 4, targetReps: 6, weight: 40.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -889,44 +864,24 @@ class DataManager extends ChangeNotifier {
         name: 'Powerlifting Intermediate - Day 3',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[4],
-              sets: 5,
-              targetReps: 2,
-              weight: 100.0), // Deadlift
+              exercise: _exercises[4], sets: 5, targetReps: 2, weight: 100.0),
           WorkoutExercise(
-              exercise: _exercises[23],
-              sets: 4,
-              targetReps: 8,
-              weight: 70.0), // Romanian Deadlift
+              exercise: _exercises[23], sets: 4, targetReps: 8, weight: 70.0),
           WorkoutExercise(
-              exercise: _exercises[6],
-              sets: 4,
-              targetReps: 10,
-              weight: 50.0), // Barbell Row
+              exercise: _exercises[6], sets: 4, targetReps: 10, weight: 50.0),
         ],
         createdAt: DateTime.now(),
       ),
-
-      // Powerlifting: Pre-Competition Peaking
       Workout(
         id: 'powerlifting_peak_1',
         name: 'Powerlifting Competition Prep - Week 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[26],
-              sets: 5,
-              targetReps: 3,
-              weight: 85.0), // Paused Squats
+              exercise: _exercises[26], sets: 5, targetReps: 3, weight: 85.0),
           WorkoutExercise(
-              exercise: _exercises[3],
-              sets: 5,
-              targetReps: 2,
-              weight: 80.0), // Bench Press
+              exercise: _exercises[3], sets: 5, targetReps: 2, weight: 80.0),
           WorkoutExercise(
-              exercise: _exercises[25],
-              sets: 3,
-              targetReps: 5,
-              weight: 55.0), // Close-Grip Bench
+              exercise: _exercises[25], sets: 3, targetReps: 5, weight: 55.0),
         ],
         createdAt: DateTime.now(),
       ),
