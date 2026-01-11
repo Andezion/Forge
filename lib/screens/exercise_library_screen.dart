@@ -225,6 +225,9 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
   final _descriptionController = TextEditingController();
   ExerciseDifficulty _selectedDifficulty = ExerciseDifficulty.medium;
 
+  // Храним выбранные группы мышц с их интенсивностью
+  final Map<MuscleGroup, MuscleGroupIntensity> _selectedMuscleGroups = {};
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -234,17 +237,170 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
 
   void _createExercise() {
     if (_formKey.currentState!.validate()) {
+      // Конвертируем Map в List<MuscleGroupTag>
+      final muscleTags = _selectedMuscleGroups.entries
+          .map((entry) => MuscleGroupTag(
+                group: entry.key,
+                intensity: entry.value,
+              ))
+          .toList();
+
       final exercise = Exercise(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
         description: _descriptionController.text,
         difficulty: _selectedDifficulty,
         createdAt: DateTime.now(),
+        muscleGroups: muscleTags,
       );
 
       widget.onExerciseCreated(exercise);
       Navigator.of(context).pop();
     }
+  }
+
+  String _getMuscleGroupLabel(MuscleGroup group) {
+    switch (group) {
+      case MuscleGroup.chest:
+        return 'Грудь';
+      case MuscleGroup.back:
+        return 'Спина';
+      case MuscleGroup.legs:
+        return 'Ноги';
+      case MuscleGroup.shoulders:
+        return 'Плечи';
+      case MuscleGroup.biceps:
+        return 'Бицепс';
+      case MuscleGroup.triceps:
+        return 'Трицепс';
+      case MuscleGroup.forearms:
+        return 'Предплечья';
+      case MuscleGroup.wrists:
+        return 'Кисти';
+      case MuscleGroup.core:
+        return 'Кор';
+      case MuscleGroup.glutes:
+        return 'Ягодицы';
+      case MuscleGroup.calves:
+        return 'Икры';
+      case MuscleGroup.cardio:
+        return 'Кардио';
+    }
+  }
+
+  String _getIntensityLabel(MuscleGroupIntensity intensity) {
+    switch (intensity) {
+      case MuscleGroupIntensity.primary:
+        return 'Основная';
+      case MuscleGroupIntensity.secondary:
+        return 'Вторичная';
+      case MuscleGroupIntensity.stabilizer:
+        return 'Стабилизация';
+    }
+  }
+
+  Color _getIntensityColor(MuscleGroupIntensity intensity) {
+    switch (intensity) {
+      case MuscleGroupIntensity.primary:
+        return AppColors.primary;
+      case MuscleGroupIntensity.secondary:
+        return AppColors.warning;
+      case MuscleGroupIntensity.stabilizer:
+        return AppColors.textSecondary;
+    }
+  }
+
+  void _showMuscleGroupSelector() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Выберите группу мышц',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: MuscleGroup.values.map((group) {
+                    return ListTile(
+                      title: Text(_getMuscleGroupLabel(group)),
+                      trailing: _selectedMuscleGroups.containsKey(group)
+                          ? Icon(Icons.check, color: AppColors.success)
+                          : null,
+                      onTap: () {
+                        Navigator.pop(context, group);
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((selectedGroup) {
+      if (selectedGroup != null) {
+        _showIntensitySelector(selectedGroup);
+      }
+    });
+  }
+
+  void _showIntensitySelector(MuscleGroup group) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Интенсивность для\n${_getMuscleGroupLabel(group)}',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ...MuscleGroupIntensity.values.map((intensity) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMuscleGroups[group] = intensity;
+                      });
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: _getIntensityColor(intensity)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      _getIntensityLabel(intensity),
+                      style: TextStyle(color: _getIntensityColor(intensity)),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -334,6 +490,57 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Группы мышц',
+                  style: AppTextStyles.body1.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (_selectedMuscleGroups.isEmpty)
+                  Text(
+                    'Нажмите кнопку ниже чтобы добавить группы мышц',
+                    style: AppTextStyles.caption,
+                  )
+                else
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _selectedMuscleGroups.entries.map((entry) {
+                      return Chip(
+                        label: Text(
+                          '${_getMuscleGroupLabel(entry.key)} (${_getIntensityLabel(entry.value)})',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textOnPrimary,
+                          ),
+                        ),
+                        backgroundColor: _getIntensityColor(entry.value),
+                        deleteIcon: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: AppColors.textOnPrimary,
+                        ),
+                        onDeleted: () {
+                          setState(() {
+                            _selectedMuscleGroups.remove(entry.key);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _showMuscleGroupSelector,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Добавить группу мышц'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(
