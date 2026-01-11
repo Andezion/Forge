@@ -818,20 +818,11 @@ class DataManager extends ChangeNotifier {
         name: 'Powerlifting 5x5 - Day A',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[2],
-              sets: 5,
-              targetReps: 5,
-              weight: 60.0), // Squats
+              exercise: _exercises[2], sets: 5, targetReps: 5, weight: 60.0),
           WorkoutExercise(
-              exercise: _exercises[3],
-              sets: 5,
-              targetReps: 5,
-              weight: 50.0), // Bench Press
+              exercise: _exercises[3], sets: 5, targetReps: 5, weight: 50.0),
           WorkoutExercise(
-              exercise: _exercises[6],
-              sets: 5,
-              targetReps: 5,
-              weight: 40.0), // Barbell Row
+              exercise: _exercises[6], sets: 5, targetReps: 5, weight: 40.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -840,25 +831,15 @@ class DataManager extends ChangeNotifier {
         name: 'Powerlifting 5x5 - Day B',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[2],
-              sets: 5,
-              targetReps: 5,
-              weight: 60.0), // Squats
+              exercise: _exercises[2], sets: 5, targetReps: 5, weight: 60.0),
           WorkoutExercise(
-              exercise: _exercises[5],
-              sets: 5,
-              targetReps: 5,
-              weight: 35.0), // Overhead Press
+              exercise: _exercises[5], sets: 5, targetReps: 5, weight: 35.0),
           WorkoutExercise(
-              exercise: _exercises[4],
-              sets: 5,
-              targetReps: 5,
-              weight: 80.0), // Deadlift
+              exercise: _exercises[4], sets: 5, targetReps: 5, weight: 80.0),
         ],
         createdAt: DateTime.now(),
       ),
 
-      // Powerlifting: Intermediate Program
       Workout(
         id: 'powerlifting_inter_1',
         name: 'Powerlifting Intermediate - Day 1',
@@ -954,20 +935,11 @@ class DataManager extends ChangeNotifier {
         name: 'Powerlifting Competition Prep - Week 2',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[4],
-              sets: 3,
-              targetReps: 1,
-              weight: 110.0), // Deadlift
+              exercise: _exercises[4], sets: 3, targetReps: 1, weight: 110.0),
           WorkoutExercise(
-              exercise: _exercises[2],
-              sets: 3,
-              targetReps: 2,
-              weight: 90.0), // Squats
+              exercise: _exercises[2], sets: 3, targetReps: 2, weight: 90.0),
           WorkoutExercise(
-              exercise: _exercises[6],
-              sets: 3,
-              targetReps: 8,
-              weight: 55.0), // Barbell Row
+              exercise: _exercises[6], sets: 3, targetReps: 8, weight: 55.0),
         ],
         createdAt: DateTime.now(),
       ),
