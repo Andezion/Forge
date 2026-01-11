@@ -6,10 +6,10 @@ enum ExerciseDifficulty {
 
 enum MuscleGroup {
   chest,
-  back, // Спина
-  legs, // Ноги
-  shoulders, // Плечи
-  biceps, // Бицепс
+  back,
+  legs,
+  shoulders,
+  biceps,
   triceps,
   forearms,
   wrists,
