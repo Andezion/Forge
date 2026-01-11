@@ -42,6 +42,17 @@ class DataManager extends ChangeNotifier {
       _workouts = workoutsJson
           .map((json) => Workout.fromJson(jsonDecode(json)))
           .toList();
+
+      final hasArmwrestling =
+          _workouts.any((w) => w.id.startsWith('armwrestling_'));
+      final hasStreetlifting =
+          _workouts.any((w) => w.id.startsWith('streetlifting_'));
+      final hasPowerlifting =
+          _workouts.any((w) => w.id.startsWith('powerlifting_'));
+
+      if (!hasArmwrestling || !hasStreetlifting || !hasPowerlifting) {
+        _initializeDemoWorkout();
+      }
     }
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
@@ -640,6 +651,19 @@ class DataManager extends ChangeNotifier {
     ];
   }
 
+  // Public method to force reinitialize demo programs
+  Future<void> reinitializeDemoPrograms() async {
+    // Remove existing demo programs
+    _workouts.removeWhere((w) =>
+        w.id.startsWith('armwrestling_') ||
+        w.id.startsWith('streetlifting_') ||
+        w.id.startsWith('powerlifting_'));
+
+    // Add them again
+    _initializeDemoWorkout();
+    notifyListeners();
+  }
+
   void _initializeDemoWorkout() {
     _workouts.addAll([
       Workout(
@@ -899,6 +923,7 @@ class DataManager extends ChangeNotifier {
         createdAt: DateTime.now(),
       ),
     ]);
+    _saveData();
   }
 
   void addExercise(Exercise exercise) {
