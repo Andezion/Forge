@@ -3,7 +3,9 @@ import '../models/workout_history.dart';
 import '../models/workout_session.dart';
 import '../models/user.dart';
 import '../models/exercise.dart';
+import '../models/wellness_entry.dart';
 import 'profile_service.dart';
+import 'goal_coefficients_service.dart';
 
 class ProgressMetrics {
   final double completionRate;
@@ -46,6 +48,7 @@ class SuggestedExerciseAdjustment {
 }
 
 class ProgressionService {
+  final GoalCoefficientsService _goalService = GoalCoefficientsService();
   double calculate1RM(double weight, int reps) {
     if (weight <= 0 || reps <= 0) return 0.0;
     if (reps == 1) return weight;
@@ -224,6 +227,7 @@ class ProgressionService {
     List<WorkoutHistory> histories, {
     int lookback = 5,
     UserProfile? profile,
+    WellnessEntry? todayWellness,
   }) async {
     if (profile == null) {
       final ps = ProfileService();
@@ -254,144 +258,140 @@ class ProgressionService {
         yearsTraining: ps.yearsTraining,
       );
     }
+
     final prof = profile;
+
+    // Получаем параметры тренировки на основе целей и опыта
+    final trainingParams = _goalService.calculateFinalParameters(
+      profile: prof,
+      wellness: todayWellness,
+    );
+
+    // Получаем модификаторы wellness
+    final wellnessModifiers =
+        _goalService.calculateWellnessModifiers(todayWellness);
+
     final adjustedExercises = <WorkoutExercise>[];
     final reasons = <String, String>{};
 
     final needsDeload = shouldDeload(histories);
-
     final userAge = prof.age ?? 30;
 
     for (var we in workout.exercises) {
       final metrics =
           analyzeExerciseHistory(we.exercise.id, histories, lookback: lookback);
+
       double newWeight = we.weight;
       int newReps = we.targetReps;
       int newSets = we.sets;
-      String reason = 'No history — keep prescription';
+      String reason = 'Нет истории — используем текущие параметры';
 
       if (metrics.sessionsCount == 0) {
-        reason = 'No recent data — keep as is';
+        // Нет истории - используем параметры на основе целей
+        newReps = _goalService.calculateTargetReps(
+          params: trainingParams,
+          wellnessModifiers: wellnessModifiers,
+        );
+        newSets = _goalService.calculateTargetSets(
+          params: trainingParams,
+          wellnessModifiers: wellnessModifiers,
+        );
+        reason = 'Новое упражнение - параметры подобраны под ваши цели';
       } else {
-        double baseIncreasePct;
-        double baseDecreasePct;
-        switch (prof.experienceLevel) {
-          case ExperienceLevel.beginner:
-            baseIncreasePct = 0.05;
-            baseDecreasePct = 0.05;
-            break;
-          case ExperienceLevel.intermediate:
-            baseIncreasePct = 0.025;
-            baseDecreasePct = 0.05;
-            break;
-          case ExperienceLevel.advanced:
-            baseIncreasePct = 0.0125;
-            baseDecreasePct = 0.0375;
-            break;
-        }
+        final c = metrics.completionRate;
+        final perceived = metrics.lastPerceivedDifficulty;
+        final wasHard = perceived == ExerciseDifficulty.hard;
 
-        final intensity = prof.preferredIntensity;
-        double intensityMultiplier;
-        switch (intensity) {
-          case TrainingIntensity.light:
-            intensityMultiplier = 0.7;
-            break;
-          case TrainingIntensity.moderate:
-            intensityMultiplier = 1.0;
-            break;
-          case TrainingIntensity.intense:
-            intensityMultiplier = 1.3;
-            break;
-        }
-
+        // Учитываем восстановление
         final recoveryModifier = getRecoveryModifier(
           metrics.daysSinceLastSession,
           userAge,
         );
 
-        final increaseFactor =
-            1.0 + (baseIncreasePct * intensityMultiplier * recoveryModifier);
-        final decreaseFactor = 1.0 - (baseDecreasePct * intensityMultiplier);
-
-        final c = metrics.completionRate;
-        final perceived = metrics.lastPerceivedDifficulty;
-
         if (needsDeload) {
+          // Неделя разгрузки
           if (we.weight > 0) {
-            newWeight = we.weight * 0.70;
+            newWeight = we.weight * 0.70 * wellnessModifiers.weightMultiplier;
           }
-          newSets = (we.sets * 0.75).round().clamp(1, we.sets);
-          reason = 'Deload week — reduce intensity for recovery';
+          newSets = (we.sets * 0.75 * wellnessModifiers.volumeMultiplier)
+              .round()
+              .clamp(1, we.sets);
+          newReps = (we.targetReps * 0.9).round().clamp(1, we.targetReps);
+          reason =
+              'Неделя разгрузки - снижение интенсивности для восстановления';
         } else if (we.weight <= 0.0) {
+          // Упражнения с собственным весом
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
-            final add =
-                prof.experienceLevel == ExperienceLevel.advanced ? 2 : 1;
-            newReps = we.targetReps + add;
-            reason = 'Bodyweight: excellent completion — +$add rep(s)';
-          } else if (c >= 0.90 && metrics.performanceTrend > 0) {
-            newSets = we.sets + 1;
-            reason = 'Bodyweight: good progress — +1 set';
-          } else if (c < 0.70 || perceived == ExerciseDifficulty.hard) {
-            final sub =
-                prof.experienceLevel == ExperienceLevel.beginner ? 1 : 2;
-            newReps = (we.targetReps - sub).clamp(1, we.targetReps);
-            reason = 'Bodyweight: struggling — -$sub rep(s)';
+            newReps = _goalService.calculateTargetReps(
+              params: trainingParams,
+              wellnessModifiers: wellnessModifiers,
+              previousReps: we.targetReps,
+            );
+            newReps = (newReps * 1.1).round().clamp(we.targetReps + 1, 50);
+            reason = 'Отличное выполнение - увеличиваем повторения';
+          } else if (c >= 0.85 && metrics.performanceTrend > 0) {
+            newSets = _goalService.calculateTargetSets(
+              params: trainingParams,
+              wellnessModifiers: wellnessModifiers,
+            );
+            newSets = (newSets + 1).clamp(we.sets, 10);
+            reason = 'Хороший прогресс - добавляем сет';
+          } else if (c < 0.70 || wasHard) {
+            newReps = (we.targetReps * 0.85).round().clamp(1, we.targetReps);
+            reason = 'Сложное выполнение - снижаем повторения';
           } else {
-            reason = 'Bodyweight: maintain current level';
+            reason = 'Упражнение с весом тела - поддерживаем уровень';
           }
         } else {
-          if (c >= 0.95 &&
-              metrics.avgRepsPerSet >= we.targetReps &&
-              perceived != ExerciseDifficulty.hard &&
-              metrics.performanceTrend >= 0) {
-            newWeight = we.weight * increaseFactor;
+          // Упражнения с весом
+          newWeight = _goalService.calculateNextWeight(
+            currentWeight: we.weight,
+            completionRate: c,
+            params: trainingParams,
+            wellnessModifiers: wellnessModifiers,
+            wasHard: wasHard,
+          );
 
-            if (metrics.performanceTrend > 5.0 && c >= 0.98) {
-              newReps = we.targetReps + 1;
-              reason = 'Excellent progress — increase weight & reps';
-            } else {
-              reason =
-                  'Strong performance — increase weight by ${((increaseFactor - 1) * 100).toStringAsFixed(1)}%';
-            }
-          } else if (c >= 0.85 &&
-              c < 0.95 &&
-              perceived != ExerciseDifficulty.hard) {
-            if (metrics.estimated1RM > 0) {
-              final new1RM = metrics.estimated1RM * (1.0 + baseIncreasePct / 2);
-              newWeight = calculateWeightForReps(new1RM, we.targetReps);
-              reason = 'Good progress — calculated weight from estimated 1RM';
-            } else {
-              newWeight = we.weight * (1.0 + baseIncreasePct / 2);
-              reason = 'Steady progress — small weight increase';
-            }
-          } else if (c < 0.75 || perceived == ExerciseDifficulty.hard) {
-            newWeight = we.weight * decreaseFactor;
+          // Корректируем повторения и сеты на основе целей
+          newReps = _goalService.calculateTargetReps(
+            params: trainingParams,
+            wellnessModifiers: wellnessModifiers,
+            previousReps: we.targetReps,
+          );
 
-            if (c < 0.60) {
-              newReps = (we.targetReps - 2).clamp(1, we.targetReps);
-              reason = 'Struggling significantly — reduce weight & reps';
-            } else {
-              newReps = (we.targetReps - 1).clamp(1, we.targetReps);
-              reason = 'Hard workout — reduce weight & reps slightly';
-            }
-          } else if (metrics.performanceTrend < -5.0 &&
-              metrics.weightTrend < 0) {
-            newWeight = we.weight * 0.90;
-            reason = 'Negative trend detected — reduce intensity';
-          } else if (metrics.avgDurationSeconds > 120) {
-            newWeight = we.weight * 0.95;
-            reason = 'Sets taking too long — reduce weight for better form';
-          } else if (recoveryModifier < 0.95) {
-            newWeight = we.weight * recoveryModifier;
-            reason = 'Insufficient recovery time — adjusted for fatigue';
+          newSets = _goalService.calculateTargetSets(
+            params: trainingParams,
+            wellnessModifiers: wellnessModifiers,
+          );
+
+          // Применяем восстановление
+          if (recoveryModifier < 0.95) {
+            newWeight *= recoveryModifier;
+            reason = 'Недостаточное восстановление - скорректирован вес';
+          } else if (c >= 0.95 && !wasHard && metrics.performanceTrend >= 0) {
+            reason =
+                'Отличная производительность - прогрессия веса на ${((newWeight - we.weight) / we.weight * 100).toStringAsFixed(1)}%';
+          } else if (c >= 0.85) {
+            reason = 'Стабильный прогресс - умеренное увеличение нагрузки';
+          } else if (c < 0.75 || wasHard) {
+            reason = 'Сложная тренировка - снижение интенсивности';
+          } else if (metrics.performanceTrend < -5.0) {
+            reason = 'Негативный тренд - корректировка нагрузки';
           } else {
-            reason = 'Performance stable — maintain current prescription';
+            reason = 'Поддержание текущего уровня с учетом ваших целей';
+          }
+
+          // Дополнительные корректировки на основе wellness
+          if (wellnessModifiers.weightMultiplier < 0.9) {
+            reason += ' (с учетом самочувствия)';
           }
         }
       }
 
+      // Округляем вес
       newWeight = (newWeight * 2).round() / 2.0;
 
+      // Ограничиваем значения
       newReps = newReps.clamp(1, 50);
       newSets = newSets.clamp(1, 10);
 
