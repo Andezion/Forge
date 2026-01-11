@@ -4,6 +4,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../services/data_manager.dart';
+import '../utils/muscle_group_utils.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   final Function(Exercise) onExerciseSelected;
@@ -258,43 +259,11 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
   }
 
   String _getMuscleGroupLabel(MuscleGroup group) {
-    switch (group) {
-      case MuscleGroup.chest:
-        return 'Грудь';
-      case MuscleGroup.back:
-        return 'Спина';
-      case MuscleGroup.legs:
-        return 'Ноги';
-      case MuscleGroup.shoulders:
-        return 'Плечи';
-      case MuscleGroup.biceps:
-        return 'Бицепс';
-      case MuscleGroup.triceps:
-        return 'Трицепс';
-      case MuscleGroup.forearms:
-        return 'Предплечья';
-      case MuscleGroup.wrists:
-        return 'Кисти';
-      case MuscleGroup.core:
-        return 'Кор';
-      case MuscleGroup.glutes:
-        return 'Ягодицы';
-      case MuscleGroup.calves:
-        return 'Икры';
-      case MuscleGroup.cardio:
-        return 'Кардио';
-    }
+    return MuscleGroupUtils.getLabel(group);
   }
 
   String _getIntensityLabel(MuscleGroupIntensity intensity) {
-    switch (intensity) {
-      case MuscleGroupIntensity.primary:
-        return 'Основная';
-      case MuscleGroupIntensity.secondary:
-        return 'Вторичная';
-      case MuscleGroupIntensity.stabilizer:
-        return 'Стабилизация';
-    }
+    return MuscleGroupUtils.getIntensityLabel(intensity);
   }
 
   Color _getIntensityColor(MuscleGroupIntensity intensity) {
@@ -322,7 +291,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Pick muscle group',
+                AppStrings.pickMuscleGroup,
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -368,7 +337,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Intensity for\n${_getMuscleGroupLabel(group)}',
+                '${AppStrings.intensityFor}\n${_getMuscleGroupLabel(group)}',
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -491,7 +460,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Muscle Groups',
+                  AppStrings.muscleGroups,
                   style: AppTextStyles.body1.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -499,7 +468,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 const SizedBox(height: 8),
                 if (_selectedMuscleGroups.isEmpty)
                   Text(
-                    'Press the button below to add muscle groups',
+                    AppStrings.pressToAddMuscleGroups,
                     style: AppTextStyles.caption,
                   )
                 else
@@ -532,7 +501,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 OutlinedButton.icon(
                   onPressed: _showMuscleGroupSelector,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Muscle Group'),
+                  label: Text(AppStrings.addMuscleGroup),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
