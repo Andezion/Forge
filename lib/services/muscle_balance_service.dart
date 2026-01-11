@@ -93,7 +93,6 @@ class MuscleBalanceService {
         .map((e) => e.key)
         .toSet();
 
-    // Рассчитываем общий баланс (насколько равномерно распределена нагрузка)
     double balance = 1.0;
     if (muscleLoad.isNotEmpty) {
       final maxLoad = muscleLoad.values.reduce((a, b) => a > b ? a : b);
@@ -112,8 +111,6 @@ class MuscleBalanceService {
     );
   }
 
-  /// Проверяет, совместима ли тренировка с текущим мышечным балансом
-  /// Возвращает оценку совместимости (0.0 - 1.0, где 1.0 - идеально)
   double evaluateWorkoutCompatibility(
     Workout workout,
     MuscleBalanceAnalysis recentBalance,
@@ -122,7 +119,6 @@ class MuscleBalanceService {
 
     double compatibilityScore = 1.0;
 
-    // Штрафуем, если тренировка нагружает перетренированные группы
     for (var group in recentBalance.overtrainedGroups) {
       if (workoutLoad.containsKey(group)) {
         final loadRatio = workoutLoad[group]! /
@@ -131,7 +127,6 @@ class MuscleBalanceService {
       }
     }
 
-    // Бонус, если тренировка нагружает недотренированные группы
     for (var group in recentBalance.undertrainedGroups) {
       if (workoutLoad.containsKey(group)) {
         compatibilityScore += 0.2;
@@ -141,7 +136,6 @@ class MuscleBalanceService {
     return compatibilityScore.clamp(0.0, 1.0);
   }
 
-  /// Возвращает приоритетные группы мышц на основе целей тренировок
   Map<MuscleGroup, double> getMuscleGroupPriorities(
     List<String> trainingFocus,
   ) {
@@ -193,7 +187,6 @@ class MuscleBalanceService {
       }
     }
 
-    // Если нет специфичных приоритетов, все группы равны
     if (priorities.isEmpty) {
       for (var group in MuscleGroup.values) {
         priorities[group] = 1.0;
@@ -203,7 +196,6 @@ class MuscleBalanceService {
     return priorities;
   }
 
-  /// Оценивает, насколько тренировка соответствует целям пользователя
   double evaluateWorkoutForGoals(
     Workout workout,
     List<String> trainingFocus,
@@ -212,7 +204,7 @@ class MuscleBalanceService {
     final workoutLoad = calculateWorkoutMuscleLoad(workout);
 
     if (priorities.isEmpty || workoutLoad.isEmpty) {
-      return 0.5; // Нейтральная оценка
+      return 0.5;
     }
 
     double totalScore = 0.0;
@@ -222,7 +214,7 @@ class MuscleBalanceService {
       final priority = entry.value;
       final load = workoutLoad[entry.key] ?? 0.0;
 
-      maxPossibleScore += priority * 10; // Максимальная нагрузка = 10
+      maxPossibleScore += priority * 10;
       totalScore += priority * load.clamp(0.0, 10.0);
     }
 
