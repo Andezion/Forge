@@ -4,7 +4,9 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import 'package:provider/provider.dart';
 import '../services/data_manager.dart';
+import '../services/workout_recommendation_service.dart';
 import '../models/workout.dart';
+import '../models/workout_recommendation.dart';
 import '../widgets/compact_calendar.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
@@ -18,9 +20,45 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDate = DateTime.now();
+  WorkoutRecommendation? _todayRecommendation;
+  bool _isLoadingRecommendation = false;
 
   DataManager get _dataManager =>
       Provider.of<DataManager>(context, listen: false);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayRecommendation();
+  }
+
+  Future<void> _loadTodayRecommendation() async {
+    setState(() {
+      _isLoadingRecommendation = true;
+    });
+
+    try {
+      final recommendationService = Provider.of<WorkoutRecommendationService>(
+        context,
+        listen: false,
+      );
+      final recommendation =
+          await recommendationService.generateTodaysRecommendation();
+
+      if (mounted) {
+        setState(() {
+          _todayRecommendation = recommendation;
+          _isLoadingRecommendation = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingRecommendation = false;
+        });
+      }
+    }
+  }
 
   void _showWorkoutSelectionDialog() {
     if (_dataManager.workouts.isEmpty) {
@@ -31,6 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
       return;
+    }
+
+    // Получаем рекомендованную тренировку
+    Workout? recommendedWorkout;
+    if (_todayRecommendation != null) {
+      recommendedWorkout = _dataManager.workouts.firstWhere(
+        (w) => w.id == _todayRecommendation!.workoutId,
+        orElse: () => _dataManager.workouts.first,
+      );
     }
 
     showDialog(
@@ -56,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  if (_dataManager.getTodayWorkout() != null) ...[
+                  if (recommendedWorkout != null) ...[
                     Text(
                       'Recommended for Today',
                       style: AppTextStyles.body1.copyWith(
@@ -64,9 +111,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    if (_todayRecommendation!.overallReason.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          _todayRecommendation!.overallReason,
+                          style: AppTextStyles.caption.copyWith(
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
                     _buildWorkoutTile(
-                      _dataManager.getTodayWorkout()!,
+                      recommendedWorkout,
                       isRecommended: true,
                     ),
                     const SizedBox(height: 24),
@@ -79,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 12),
                   ..._dataManager.workouts
+                      .where((w) => w.id != recommendedWorkout?.id)
                       .map((workout) => _buildWorkoutTile(workout)),
                 ],
               ),
@@ -246,6 +304,89 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWorkoutCard() {
+    if (_isLoadingRecommendation) {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.all(48),
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
+    if (_todayRecommendation == null) {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'No recommendation available',
+                style: AppTextStyles.body1.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Create workouts in Workshop to get personalized recommendations',
+                style: AppTextStyles.caption,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Находим тренировку по ID из рекомендации
+    final workout = _dataManager.workouts.firstWhere(
+      (w) => w.id == _todayRecommendation!.workoutId,
+      orElse: () => _dataManager.workouts.first,
+    );
+
+    // Определяем цвет и иконку уровня
+    IconData levelIcon;
+    Color levelColor;
+    String levelText;
+
+    switch (_todayRecommendation!.level) {
+      case RecommendationLevel.rest:
+        levelIcon = Icons.hotel;
+        levelColor = AppColors.textSecondary;
+        levelText = 'Rest Day';
+        break;
+      case RecommendationLevel.light:
+        levelIcon = Icons.wb_sunny_outlined;
+        levelColor = AppColors.success;
+        levelText = 'Light';
+        break;
+      case RecommendationLevel.moderate:
+        levelIcon = Icons.fitness_center;
+        levelColor = AppColors.warning;
+        levelText = 'Moderate';
+        break;
+      case RecommendationLevel.intense:
+        levelIcon = Icons.local_fire_department;
+        levelColor = AppColors.error;
+        levelText = 'Intense';
+        break;
+    }
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -275,18 +416,67 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Strength Training A',
+                        workout.name,
                         style: AppTextStyles.h4,
                       ),
-                      Text(
-                        'Powerlifting',
-                        style: AppTextStyles.caption,
+                      Row(
+                        children: [
+                          Icon(
+                            levelIcon,
+                            size: 14,
+                            color: levelColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            levelText,
+                            style: AppTextStyles.caption.copyWith(
+                              color: levelColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${(_todayRecommendation!.overallConfidence * 100).toInt()}% confidence',
+                            style: AppTextStyles.caption,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ],
             ),
+            if (_todayRecommendation!.overallReason.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _todayRecommendation!.overallReason,
+                        style: AppTextStyles.caption.copyWith(
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Text(
               'Exercises:',
@@ -295,16 +485,32 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            _buildExerciseItem('Squats', '4x8'),
-            _buildExerciseItem('Bench Press', '4x8'),
-            _buildExerciseItem('Deadlift', '3x5'),
+            ..._todayRecommendation!.exercises.take(4).map((exerciseRec) {
+              return _buildExerciseItem(
+                exerciseRec.exercise.exercise.name,
+                '${exerciseRec.exercise.sets}x${exerciseRec.exercise.targetReps}',
+                exerciseRec.exercise.weight > 0
+                    ? ' @ ${exerciseRec.exercise.weight}kg'
+                    : '',
+              );
+            }),
+            if (_todayRecommendation!.exercises.length > 4)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '+ ${_todayRecommendation!.exercises.length - 4} more exercises',
+                  style: AppTextStyles.caption.copyWith(
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildExerciseItem(String name, String sets) {
+  Widget _buildExerciseItem(String name, String sets, [String weight = '']) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -312,9 +518,18 @@ class _HomeScreenState extends State<HomeScreen> {
           Icon(Icons.check_circle_outline,
               size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 8),
-          Text(name, style: AppTextStyles.body2),
-          const Spacer(),
-          Text(sets, style: AppTextStyles.caption),
+          Expanded(
+            child: Text(
+              name,
+              style: AppTextStyles.body2,
+            ),
+          ),
+          Text(
+            '$sets$weight',
+            style: AppTextStyles.caption.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
