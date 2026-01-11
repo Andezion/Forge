@@ -71,7 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    // Получаем рекомендованную тренировку
     Workout? recommendedWorkout;
     if (_todayRecommendation != null) {
       recommendedWorkout = _dataManager.workouts.firstWhere(
@@ -353,13 +352,11 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Находим тренировку по ID из рекомендации
     final workout = _dataManager.workouts.firstWhere(
       (w) => w.id == _todayRecommendation!.workoutId,
       orElse: () => _dataManager.workouts.first,
     );
 
-    // Определяем цвет и иконку уровня
     IconData levelIcon;
     Color levelColor;
     String levelText;

@@ -225,7 +225,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
   final _descriptionController = TextEditingController();
   ExerciseDifficulty _selectedDifficulty = ExerciseDifficulty.medium;
 
-  // Храним выбранные группы мышц с их интенсивностью
   final Map<MuscleGroup, MuscleGroupIntensity> _selectedMuscleGroups = {};
 
   @override
@@ -237,7 +236,6 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
 
   void _createExercise() {
     if (_formKey.currentState!.validate()) {
-      // Конвертируем Map в List<MuscleGroupTag>
       final muscleTags = _selectedMuscleGroups.entries
           .map((entry) => MuscleGroupTag(
                 group: entry.key,
@@ -324,7 +322,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Выберите группу мышц',
+                'Pick muscle group',
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -370,7 +368,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Интенсивность для\n${_getMuscleGroupLabel(group)}',
+                'Intensity for\n${_getMuscleGroupLabel(group)}',
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -493,7 +491,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Группы мышц',
+                  'Muscle Groups',
                   style: AppTextStyles.body1.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -501,7 +499,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 const SizedBox(height: 8),
                 if (_selectedMuscleGroups.isEmpty)
                   Text(
-                    'Нажмите кнопку ниже чтобы добавить группы мышц',
+                    'Press the button below to add muscle groups',
                     style: AppTextStyles.caption,
                   )
                 else
@@ -534,7 +532,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                 OutlinedButton.icon(
                   onPressed: _showMuscleGroupSelector,
                   icon: const Icon(Icons.add),
-                  label: const Text('Добавить группу мышц'),
+                  label: const Text('Add Muscle Group'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
