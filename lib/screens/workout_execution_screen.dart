@@ -355,26 +355,34 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       print(
           '[WORKOUT_EXEC] Exercise result saved. Total completed: ${_exerciseResults.length}');
 
-      if (_currentExerciseIndex < _exerciseQueue.length - 1) {
-        _currentExerciseIndex++;
-        _currentSetNumber = 1;
-        _setDurationSeconds = 0;
-        print(
-            '[WORKOUT_EXEC] Moving to next exercise (index $_currentExerciseIndex): ${_exerciseQueue[_currentExerciseIndex].exercise.name}');
+      _exerciseQueue.removeAt(_currentExerciseIndex);
+      print(
+          '[WORKOUT_EXEC] Removed completed exercise from queue. Remaining: ${_exerciseQueue.length}');
 
-        _currentExerciseResult = ExerciseResult(
-          exercise: _exerciseQueue[_currentExerciseIndex].exercise,
-          targetSets: _exerciseQueue[_currentExerciseIndex].sets,
-          targetReps: _exerciseQueue[_currentExerciseIndex].targetReps,
-          targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
-          setResults: [],
-        );
-        print(
-            '[WORKOUT_EXEC] Next exercise initialized: ${_currentExerciseResult!.exercise.name}');
-      } else {
+      if (_exerciseQueue.isEmpty) {
         print('[WORKOUT_EXEC] No more exercises. Finishing workout...');
         _finishWorkout();
+        return;
       }
+
+      if (_currentExerciseIndex >= _exerciseQueue.length) {
+        _currentExerciseIndex = 0;
+      }
+
+      _currentSetNumber = 1;
+      _setDurationSeconds = 0;
+      print(
+          '[WORKOUT_EXEC] Moving to next exercise (index $_currentExerciseIndex): ${_exerciseQueue[_currentExerciseIndex].exercise.name}');
+
+      _currentExerciseResult = ExerciseResult(
+        exercise: _exerciseQueue[_currentExerciseIndex].exercise,
+        targetSets: _exerciseQueue[_currentExerciseIndex].sets,
+        targetReps: _exerciseQueue[_currentExerciseIndex].targetReps,
+        targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
+        setResults: [],
+      );
+      print(
+          '[WORKOUT_EXEC] Next exercise initialized: ${_currentExerciseResult!.exercise.name}');
     });
   }
 
