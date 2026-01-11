@@ -94,6 +94,24 @@ class DataManager extends ChangeNotifier {
         description: 'Upper body exercise focusing on back and biceps',
         difficulty: ExerciseDifficulty.medium,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.back,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.biceps,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.forearms,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.stabilizer,
+          ),
+        ],
       ),
       Exercise(
         id: '2',
@@ -101,6 +119,24 @@ class DataManager extends ChangeNotifier {
         description: 'Bodyweight exercise for chest, shoulders and triceps',
         difficulty: ExerciseDifficulty.easy,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.chest,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.triceps,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.shoulders,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.stabilizer,
+          ),
+        ],
       ),
       Exercise(
         id: '3',
@@ -108,6 +144,20 @@ class DataManager extends ChangeNotifier {
         description: 'Lower body compound exercise',
         difficulty: ExerciseDifficulty.medium,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.legs,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.glutes,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+        ],
       ),
       Exercise(
         id: '4',
@@ -115,6 +165,20 @@ class DataManager extends ChangeNotifier {
         description: 'Chest and triceps compound exercise',
         difficulty: ExerciseDifficulty.hard,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.chest,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.triceps,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.shoulders,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+        ],
       ),
       Exercise(
         id: '5',
@@ -122,6 +186,28 @@ class DataManager extends ChangeNotifier {
         description: 'Full body compound exercise',
         difficulty: ExerciseDifficulty.hard,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.back,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.legs,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.glutes,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.forearms,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.stabilizer,
+          ),
+        ],
       ),
       Exercise(
         id: '6',
@@ -129,6 +215,20 @@ class DataManager extends ChangeNotifier {
         description: 'Shoulder compound exercise',
         difficulty: ExerciseDifficulty.medium,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.shoulders,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.triceps,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.stabilizer,
+          ),
+        ],
       ),
       Exercise(
         id: '7',
@@ -136,6 +236,24 @@ class DataManager extends ChangeNotifier {
         description: 'Back compound exercise',
         difficulty: ExerciseDifficulty.medium,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.back,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.biceps,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.forearms,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.core,
+            intensity: MuscleGroupIntensity.stabilizer,
+          ),
+        ],
       ),
       Exercise(
         id: '8',
@@ -143,6 +261,20 @@ class DataManager extends ChangeNotifier {
         description: 'Chest and triceps bodyweight exercise',
         difficulty: ExerciseDifficulty.hard,
         createdAt: DateTime.now(),
+        muscleGroups: [
+          MuscleGroupTag(
+            group: MuscleGroup.chest,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.triceps,
+            intensity: MuscleGroupIntensity.primary,
+          ),
+          MuscleGroupTag(
+            group: MuscleGroup.shoulders,
+            intensity: MuscleGroupIntensity.secondary,
+          ),
+        ],
       ),
     ];
   }
