@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
+import '../services/data_manager.dart';
+import '../models/workout.dart';
 
 class ProgramsScreen extends StatelessWidget {
   const ProgramsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final dataManager = Provider.of<DataManager>(context);
+
+    final armwrestlingWorkouts = dataManager.workouts
+        .where((w) => w.id.startsWith('armwrestling_'))
+        .toList();
+    final streetliftingWorkouts = dataManager.workouts
+        .where((w) => w.id.startsWith('streetlifting_'))
+        .toList();
+    final powerliftingWorkouts = dataManager.workouts
+        .where((w) => w.id.startsWith('powerlifting_'))
+        .toList();
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -32,11 +46,7 @@ class ProgramsScreen extends StatelessWidget {
             'Bodyweight training',
             Icons.sports_gymnastics,
             AppColors.streetlifting,
-            [
-              'Beginner basic program',
-              'Advanced program',
-              'Program for strength exit',
-            ],
+            streetliftingWorkouts,
           ),
           const SizedBox(height: 16),
           _buildProgramCategory(
@@ -45,11 +55,7 @@ class ProgramsScreen extends StatelessWidget {
             'Specialized training',
             Icons.back_hand,
             AppColors.armwrestling,
-            [
-              'Basic armwrestling program',
-              'Grip and forearm training',
-              'Competition program',
-            ],
+            armwrestlingWorkouts,
           ),
           const SizedBox(height: 16),
           _buildProgramCategory(
@@ -58,11 +64,7 @@ class ProgramsScreen extends StatelessWidget {
             'Programs for maximum strength',
             Icons.fitness_center,
             AppColors.powerlifting,
-            [
-              'Beginner 5x5 program',
-              'Intermediate program',
-              'Pre-competition preparation program',
-            ],
+            powerliftingWorkouts,
           ),
         ],
       ),
@@ -75,8 +77,12 @@ class ProgramsScreen extends StatelessWidget {
     String description,
     IconData icon,
     Color color,
-    List<String> programs,
+    List<Workout> workouts,
   ) {
+    if (workouts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -103,29 +109,23 @@ class ProgramsScreen extends StatelessWidget {
           ),
           children: [
             SizedBox(
-              height: 180,
-              child: PageView.builder(
-                itemCount: programs.length,
-                controller: PageController(viewportFraction: 0.85),
+              height: 200,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                itemCount: workouts.length,
                 itemBuilder: (context, index) {
-                  final program = programs[index];
+                  final workout = workouts[index];
                   return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: GestureDetector(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Open program: $program'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                        _showWorkoutDetails(context, workout, color);
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 3,
+                        elevation: 2,
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -139,7 +139,7 @@ class ProgramsScreen extends StatelessWidget {
                                   color: color.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(Icons.play_arrow, color: color),
+                                child: Icon(Icons.fitness_center, color: color),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -147,9 +147,17 @@ class ProgramsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(program, style: AppTextStyles.body1),
-                                    const SizedBox(height: 6),
-                                    Text(title, style: AppTextStyles.caption),
+                                    Text(
+                                      workout.name,
+                                      style: AppTextStyles.body1.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${workout.exercises.length} exercises',
+                                      style: AppTextStyles.caption,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -165,6 +173,87 @@ class ProgramsScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showWorkoutDetails(BuildContext context, Workout workout, Color color) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(workout.name),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Exercises:',
+                style: AppTextStyles.body1.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...workout.exercises.map((we) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(Icons.check, color: color, size: 16),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              we.exercise.name,
+                              style: AppTextStyles.body2.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${we.sets} sets × ${we.targetReps} reps${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Program "${workout.name}" selected'),
+                  backgroundColor: color,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+            ),
+            child: const Text('Select Program'),
+          ),
+        ],
       ),
     );
   }
