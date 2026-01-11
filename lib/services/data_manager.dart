@@ -292,7 +292,6 @@ class DataManager extends ChangeNotifier {
   void addExercise(Exercise exercise) {
     _exercises.add(exercise);
     _saveData();
-    print('[DATA_MANAGER] Exercise added: ${exercise.name}');
   }
 
   void removeExercise(String id) {
@@ -309,22 +308,13 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkout(Workout workout) {
-    print('[DATA_MANAGER] Adding workout: ${workout.name} (ID: ${workout.id})');
-    print('[DATA_MANAGER] Workout has ${workout.exercises.length} exercises');
     _workouts.add(workout);
-    print(
-        '[DATA_MANAGER] Workouts after add: ${_workouts.map((w) => w.name).toList()}');
-    _saveData();
-    print('[DATA_MANAGER] Total workouts now: ${_workouts.length}');
+
     notifyListeners();
   }
 
   void updateWorkout(int index, Workout workout) {
     if (index >= 0 && index < _workouts.length) {
-      print('[DATA_MANAGER] Updating workout at index $index: ${workout.name}');
-      _workouts[index] = workout;
-      print(
-          '[DATA_MANAGER] Workouts after update: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
       notifyListeners();
     }
@@ -332,11 +322,6 @@ class DataManager extends ChangeNotifier {
 
   void removeWorkout(int index) {
     if (index >= 0 && index < _workouts.length) {
-      print(
-          '[DATA_MANAGER] Removing workout at index $index: ${_workouts[index].name}');
-      _workouts.removeAt(index);
-      print(
-          '[DATA_MANAGER] Workouts after remove: ${_workouts.map((w) => w.name).toList()}');
       _saveData();
       notifyListeners();
     }
@@ -358,13 +343,10 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkoutHistory(WorkoutHistory history) {
-    print('[DATA_MANAGER] Adding workout history for ${history.date}');
     _workoutHistory.add(history);
     _saveData();
-    print('[DATA_MANAGER] Notifying listeners about new workout...');
+
     notifyListeners();
-    print(
-        '[DATA_MANAGER] Listeners notified. Total workout history: ${_workoutHistory.length}');
   }
 
   List<WorkoutHistory> getWorkoutHistoryForDate(DateTime date) {
