@@ -19,12 +19,10 @@ class TrainingParameters {
   });
 }
 
-/// Модификаторы на основе wellness состояния
 class WellnessModifiers {
-  final double weightMultiplier; // Множитель для веса (0.7 - 1.1)
-  final double
-      volumeMultiplier; // Множитель для объема (сеты/повторения) (0.7 - 1.1)
-  final double recoveryMultiplier; // Множитель восстановления (0.8 - 1.2)
+  final double weightMultiplier;
+  final double volumeMultiplier;
+  final double recoveryMultiplier;
 
   const WellnessModifiers({
     required this.weightMultiplier,
@@ -33,20 +31,17 @@ class WellnessModifiers {
   });
 }
 
-/// Сервис для расчета коэффициентов на основе целей тренировок
 class GoalCoefficientsService {
-  /// Возвращает параметры тренировки на основе основной цели
   TrainingParameters getParametersForGoal(TrainingGoal goal) {
     switch (goal) {
       case TrainingGoal.strength:
-        // Сила: тяжелые веса, малое количество повторений
         return const TrainingParameters(
           minReps: 1,
           maxReps: 5,
           targetSets: 5,
-          weightIncreaseCoefficient: 0.025, // 2.5% прибавка
-          weightDecreaseCoefficient: 0.10, // 10% снижение
-          restSeconds: 180, // 3 минуты отдыха
+          weightIncreaseCoefficient: 0.025,
+          weightDecreaseCoefficient: 0.10,
+          restSeconds: 180,
         );
 
       case TrainingGoal.hypertrophy:
