@@ -709,55 +709,29 @@ class DataManager extends ChangeNotifier {
         name: 'Armwrestling Competition - Day 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[10],
-              sets: 5,
-              targetReps: 6,
-              weight: 25.0), // Hammer Curls
+              exercise: _exercises[10], sets: 5, targetReps: 6, weight: 25.0),
           WorkoutExercise(
-              exercise: _exercises[13],
-              sets: 4,
-              targetReps: 5,
-              weight: 30.0), // Cable Side Pressure
+              exercise: _exercises[13], sets: 4, targetReps: 5, weight: 30.0),
           WorkoutExercise(
-              exercise: _exercises[12],
-              sets: 3,
-              targetReps: 15,
-              weight: 0.0), // Heavy Grip
+              exercise: _exercises[12], sets: 3, targetReps: 15, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[11],
-              sets: 3,
-              targetReps: 10,
-              weight: 12.0), // Pronation
+              exercise: _exercises[11], sets: 3, targetReps: 10, weight: 12.0),
         ],
         createdAt: DateTime.now(),
       ),
 
-      // Streetlifting Programs
-      // Streetlifting: Beginner Basic
       Workout(
         id: 'streetlifting_beginner_1',
         name: 'Streetlifting Beginner - Day 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[0],
-              sets: 5,
-              targetReps: 5,
-              weight: 0.0), // Pull-ups
+              exercise: _exercises[0], sets: 5, targetReps: 5, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[1],
-              sets: 5,
-              targetReps: 10,
-              weight: 0.0), // Push-ups
+              exercise: _exercises[1], sets: 5, targetReps: 10, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[2],
-              sets: 4,
-              targetReps: 12,
-              weight: 0.0), // Squats
+              exercise: _exercises[2], sets: 4, targetReps: 12, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[7],
-              sets: 3,
-              targetReps: 8,
-              weight: 0.0), // Dips
+              exercise: _exercises[7], sets: 3, targetReps: 8, weight: 0.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -766,54 +740,29 @@ class DataManager extends ChangeNotifier {
         name: 'Streetlifting Beginner - Day 2',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[17],
-              sets: 3,
-              targetReps: 3,
-              weight: 0.0), // Muscle-ups
+              exercise: _exercises[17], sets: 3, targetReps: 3, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[22],
-              sets: 4,
-              targetReps: 10,
-              weight: 0.0), // Pistol Squats
+              exercise: _exercises[22], sets: 4, targetReps: 10, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[0],
-              sets: 3,
-              targetReps: 10,
-              weight: 0.0), // Pull-ups
+              exercise: _exercises[0], sets: 3, targetReps: 10, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[7],
-              sets: 4,
-              targetReps: 12,
-              weight: 0.0), // Dips
+              exercise: _exercises[7], sets: 4, targetReps: 12, weight: 0.0),
         ],
         createdAt: DateTime.now(),
       ),
 
-      // Streetlifting: Advanced Program
       Workout(
         id: 'streetlifting_advanced_1',
         name: 'Streetlifting Advanced - Day 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[15],
-              sets: 5,
-              targetReps: 3,
-              weight: 20.0), // Weighted Pull-ups
+              exercise: _exercises[15], sets: 5, targetReps: 3, weight: 20.0),
           WorkoutExercise(
-              exercise: _exercises[16],
-              sets: 5,
-              targetReps: 3,
-              weight: 20.0), // Weighted Dips
+              exercise: _exercises[16], sets: 5, targetReps: 3, weight: 20.0),
           WorkoutExercise(
-              exercise: _exercises[17],
-              sets: 4,
-              targetReps: 5,
-              weight: 0.0), // Muscle-ups
+              exercise: _exercises[17], sets: 4, targetReps: 5, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[18],
-              sets: 3,
-              targetReps: 10,
-              weight: 0.0), // Front Lever
+              exercise: _exercises[18], sets: 3, targetReps: 10, weight: 0.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -822,54 +771,29 @@ class DataManager extends ChangeNotifier {
         name: 'Streetlifting Advanced - Day 2',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[19],
-              sets: 3,
-              targetReps: 15,
-              weight: 0.0), // Back Lever
+              exercise: _exercises[19], sets: 3, targetReps: 15, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[20],
-              sets: 3,
-              targetReps: 20,
-              weight: 0.0), // Planche Progression
+              exercise: _exercises[20], sets: 3, targetReps: 20, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[21],
-              sets: 3,
-              targetReps: 10,
-              weight: 0.0), // Human Flag
+              exercise: _exercises[21], sets: 3, targetReps: 10, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[22],
-              sets: 3,
-              targetReps: 10,
-              weight: 20.0), // Pistol Squats
+              exercise: _exercises[22], sets: 3, targetReps: 10, weight: 20.0),
         ],
         createdAt: DateTime.now(),
       ),
 
-      // Streetlifting: Strength Exit Training
       Workout(
         id: 'streetlifting_exit_1',
         name: 'Streetlifting Strength Exit - Day 1',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[15],
-              sets: 6,
-              targetReps: 1,
-              weight: 40.0), // Weighted Pull-ups
+              exercise: _exercises[15], sets: 6, targetReps: 1, weight: 40.0),
           WorkoutExercise(
-              exercise: _exercises[0],
-              sets: 3,
-              targetReps: 15,
-              weight: 0.0), // Pull-ups
+              exercise: _exercises[0], sets: 3, targetReps: 15, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[18],
-              sets: 4,
-              targetReps: 12,
-              weight: 0.0), // Front Lever Hold
+              exercise: _exercises[18], sets: 4, targetReps: 12, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[6],
-              sets: 4,
-              targetReps: 8,
-              weight: 40.0), // Barbell Row
+              exercise: _exercises[6], sets: 4, targetReps: 8, weight: 40.0),
         ],
         createdAt: DateTime.now(),
       ),
@@ -878,31 +802,17 @@ class DataManager extends ChangeNotifier {
         name: 'Streetlifting Strength Exit - Day 2',
         exercises: [
           WorkoutExercise(
-              exercise: _exercises[16],
-              sets: 6,
-              targetReps: 1,
-              weight: 40.0), // Weighted Dips
+              exercise: _exercises[16], sets: 6, targetReps: 1, weight: 40.0),
           WorkoutExercise(
-              exercise: _exercises[7],
-              sets: 3,
-              targetReps: 15,
-              weight: 0.0), // Dips
+              exercise: _exercises[7], sets: 3, targetReps: 15, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[17],
-              sets: 3,
-              targetReps: 5,
-              weight: 0.0), // Muscle-ups
+              exercise: _exercises[17], sets: 3, targetReps: 5, weight: 0.0),
           WorkoutExercise(
-              exercise: _exercises[3],
-              sets: 4,
-              targetReps: 8,
-              weight: 50.0), // Bench Press
+              exercise: _exercises[3], sets: 4, targetReps: 8, weight: 50.0),
         ],
         createdAt: DateTime.now(),
       ),
 
-      // Powerlifting Programs
-      // Powerlifting: Beginner 5x5
       Workout(
         id: 'powerlifting_5x5_a',
         name: 'Powerlifting 5x5 - Day A',
