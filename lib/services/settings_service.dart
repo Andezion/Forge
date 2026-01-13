@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'dart:convert';
 import '../models/app_settings.dart';
 
@@ -31,6 +33,33 @@ class SettingsService extends ChangeNotifier {
         notifyListeners();
       } catch (e) {}
     }
+
+    await _loadNicknameFromFirebase();
+  }
+
+  Future<void> _loadNicknameFromFirebase() async {
+    try {
+      final fb_auth.FirebaseAuth auth = fb_auth.FirebaseAuth.instance;
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+
+      final userId = auth.currentUser?.uid;
+      if (userId != null) {
+        final doc = await db.collection('users').doc(userId).get();
+        if (doc.exists) {
+          final data = doc.data();
+          final firebaseNickname = data?['nickname'] as String?;
+          if (firebaseNickname != null && firebaseNickname.trim().isNotEmpty) {
+            if (_settings.nickname != firebaseNickname) {
+              _settings = _settings.copyWith(nickname: firebaseNickname);
+              notifyListeners();
+              await _save();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading nickname from Firebase: $e');
+    }
   }
 
   Future<void> _save() async {
@@ -49,6 +78,25 @@ class SettingsService extends ChangeNotifier {
     _settings = _settings.copyWith(nickname: nickname);
     notifyListeners();
     await _save();
+
+    await _saveNicknameToFirebase(nickname);
+  }
+
+  Future<void> _saveNicknameToFirebase(String? nickname) async {
+    try {
+      final fb_auth.FirebaseAuth auth = fb_auth.FirebaseAuth.instance;
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+
+      final userId = auth.currentUser?.uid;
+      if (userId != null && nickname != null && nickname.trim().isNotEmpty) {
+        await db.collection('users').doc(userId).update({
+          'nickname': nickname,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      debugPrint('Error saving nickname to Firebase: $e');
+    }
   }
 
   Future<void> setRegion(String? region) async {
