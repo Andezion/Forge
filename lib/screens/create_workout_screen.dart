@@ -44,22 +44,17 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
   }
 
   void _addExercise() async {
-    print('[CREATE_WORKOUT] Opening exercise library as dialog...');
-
     final selectedExercise = await showDialog<Exercise>(
       context: context,
       builder: (dialogContext) => Dialog.fullscreen(
         child: ExerciseLibraryScreen(
           onExerciseSelected: (exercise) {
-            print('[CREATE_WORKOUT] Exercise selected: ${exercise.name}');
             Navigator.of(dialogContext).pop(exercise);
           },
         ),
       ),
     );
 
-    print(
-        '[CREATE_WORKOUT] Returned from library dialog. Selected: ${selectedExercise?.name ?? "null"}, mounted: $mounted');
     if (selectedExercise != null && mounted) {
       _showExerciseConfigDialog(selectedExercise);
     }
@@ -78,115 +73,124 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
 
     final result = await showDialog<WorkoutExercise>(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Configure ${exercise.name}',
-                  style: AppTextStyles.h4,
-                  textAlign: TextAlign.center,
+        context: context,
+        builder: (dialogContext) => Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.75,
                 ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: setsController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: AppStrings.sets,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: repsController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: AppStrings.targetReps,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: weightController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: '${AppStrings.weight} (kg)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(dialogContext).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Configure ${exercise.name}',
+                          style: AppTextStyles.h4,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: setsController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            labelText: AppStrings.sets,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                        child: Text(AppStrings.cancel),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          print('[CREATE_WORKOUT] Save button pressed');
-                          final workoutExercise = WorkoutExercise(
-                            exercise: exercise,
-                            sets: int.parse(setsController.text),
-                            targetReps: int.parse(repsController.text),
-                            weight: double.parse(weightController.text),
-                          );
-                          print(
-                              '[CREATE_WORKOUT] Created WorkoutExercise: ${exercise.name}, sets: ${workoutExercise.sets}');
-
-                          print(
-                              '[CREATE_WORKOUT] Returning workout exercise and closing dialog...');
-
-                          Navigator.of(dialogContext).pop(workoutExercise);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.textOnPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: repsController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            labelText: AppStrings.targetReps,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                        child: Text(AppStrings.save),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: weightController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          decoration: InputDecoration(
+                            labelText: '${AppStrings.weight} (kg)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(AppStrings.cancel),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  print('[CREATE_WORKOUT] Save button pressed');
+                                  final workoutExercise = WorkoutExercise(
+                                    exercise: exercise,
+                                    sets: int.parse(setsController.text),
+                                    targetReps: int.parse(repsController.text),
+                                    weight: double.parse(weightController.text),
+                                  );
+                                  print(
+                                      '[CREATE_WORKOUT] Created WorkoutExercise: ${exercise.name}, sets: ${workoutExercise.sets}');
 
-    print(
-        '[CREATE_WORKOUT] Dialog closed. Result: ${result != null ? result.exercise.name : "null"}, Mounted: $mounted');
+                                  print(
+                                      '[CREATE_WORKOUT] Returning workout exercise and closing dialog...');
+
+                                  Navigator.of(dialogContext)
+                                      .pop(workoutExercise);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: AppColors.textOnPrimary,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(AppStrings.save),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ));
 
     if (result != null && mounted) {
       print('[CREATE_WORKOUT] Processing result...');
