@@ -53,6 +53,7 @@ class ExerciseMax {
 class User {
   final String id;
   final String name;
+  final String? nickname;
   final String email;
   final double height;
   final double weight;
@@ -64,6 +65,7 @@ class User {
   User({
     required this.id,
     required this.name,
+    this.nickname,
     required this.email,
     required this.height,
     required this.weight,
@@ -77,6 +79,7 @@ class User {
     return {
       'id': id,
       'name': name,
+      'nickname': nickname,
       'email': email,
       'height': height,
       'weight': weight,
@@ -91,6 +94,7 @@ class User {
     return User(
       id: json['id'],
       name: json['name'],
+      nickname: json['nickname'],
       email: json['email'],
       height: (json['height'] as num).toDouble(),
       weight: (json['weight'] as num).toDouble(),
@@ -108,6 +112,7 @@ class User {
   User copyWith({
     String? id,
     String? name,
+    String? nickname,
     String? email,
     double? height,
     double? weight,
@@ -119,6 +124,7 @@ class User {
     return User(
       id: id ?? this.id,
       name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
       email: email ?? this.email,
       height: height ?? this.height,
       weight: weight ?? this.weight,
