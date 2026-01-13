@@ -89,22 +89,52 @@ class ProgressAnalyticsService {
     double currentWeight, {
     int lookbackDays = 90,
   }) {
+    final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
+
     final weightPoints = <ChartDataPoint>[];
+    final weightByDate = <DateTime, double>{};
+
+    for (var history in histories) {
+      if (history.date.isAfter(cutoffDate)) {
+        final dateOnly = DateTime(
+          history.date.year,
+          history.date.month,
+          history.date.day,
+        );
+        weightByDate[dateOnly] = currentWeight;
+      }
+    }
+
+    if (weightByDate.isNotEmpty) {
+      final sortedDates = weightByDate.keys.toList()..sort();
+      for (var date in sortedDates) {
+        weightPoints.add(ChartDataPoint(
+          date: date,
+          value: weightByDate[date]!,
+        ));
+      }
+    }
 
     weightPoints.add(ChartDataPoint(
       date: DateTime.now(),
       value: currentWeight,
     ));
 
-    final startWeight = currentWeight;
-    final weightChange = 0.0;
+    final startWeight =
+        weightPoints.isNotEmpty ? weightPoints.first.value : currentWeight;
+    final weightChange = currentWeight - startWeight;
+
+    final averageWeight = weightPoints.isNotEmpty
+        ? weightPoints.map((p) => p.value).reduce((a, b) => a + b) /
+            weightPoints.length
+        : currentWeight;
 
     return BodyWeightData(
       weightData: weightPoints,
       currentWeight: currentWeight,
       startWeight: startWeight,
       weightChange: weightChange,
-      averageWeight: currentWeight,
+      averageWeight: averageWeight,
     );
   }
 
@@ -147,18 +177,19 @@ class ProgressAnalyticsService {
         }
       }
 
-      if (sessionTotalStrength > 0) {
+      // Use average instead of total to make it less volatile
+      if (sessionTotalStrength > 0 && exerciseCount > 0) {
+        final averageSessionStrength = sessionTotalStrength / exerciseCount;
+
         totalStrengthPoints.add(ChartDataPoint(
           date: history.date,
-          value: sessionTotalStrength,
+          value: averageSessionStrength,
         ));
 
-        if (exerciseCount > 0) {
-          averageStrengthPoints.add(ChartDataPoint(
-            date: history.date,
-            value: sessionTotalStrength / exerciseCount.toDouble(),
-          ));
-        }
+        averageStrengthPoints.add(ChartDataPoint(
+          date: history.date,
+          value: averageSessionStrength,
+        ));
       }
     }
 
