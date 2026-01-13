@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
 import '../services/theme_service.dart';
+import '../services/settings_service.dart';
 import '../models/user.dart' as app_user;
 import '../services/auth_service.dart';
 import '../services/data_manager.dart';
@@ -116,30 +117,24 @@ class _ProfileScreenState extends State<ProfileScreen>
                   children: [
                     _buildFramedAvatar(profile),
                     const SizedBox(height: 16),
-                    if (firebaseUser?.displayName != null &&
-                        (firebaseUser!.displayName ?? '').trim().isNotEmpty)
-                      Text(
-                        firebaseUser.displayName!,
-                        style: AppTextStyles.h3.copyWith(
-                          color: AppColors.textOnPrimary,
-                        ),
-                      )
-                    else if (_isLoadingUser)
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.textOnPrimary,
-                        ),
-                      )
-                    else
-                      Text(
-                        _cachedUser?.name ?? 'User Name',
-                        style: AppTextStyles.h3.copyWith(
-                          color: AppColors.textOnPrimary,
-                        ),
-                      ),
+                    Consumer<SettingsService>(
+                      builder: (context, settingsService, _) {
+                        final nickname = settingsService.nickname;
+                        final displayText =
+                            (nickname != null && nickname.isNotEmpty)
+                                ? nickname
+                                : (firebaseUser?.displayName?.isNotEmpty == true
+                                    ? firebaseUser!.displayName!
+                                    : (_cachedUser?.name ?? 'User Name'));
+
+                        return Text(
+                          displayText,
+                          style: AppTextStyles.h3.copyWith(
+                            color: AppColors.textOnPrimary,
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       firebaseUser?.email ?? '—',
