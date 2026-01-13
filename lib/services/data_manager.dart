@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
+import 'challenge_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 class DataManager extends ChangeNotifier {
   static final DataManager _instance = DataManager._internal();
@@ -983,7 +985,21 @@ class DataManager extends ChangeNotifier {
     _workoutHistory.add(history);
     _saveData();
 
+    _updateChallengeScoresAfterWorkout();
+
     notifyListeners();
+  }
+
+  Future<void> _updateChallengeScoresAfterWorkout() async {
+    try {
+      final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid;
+      if (userId != null) {
+        final challengeService = ChallengeService();
+        await challengeService.recalculateChallengeScores(userId);
+      }
+    } catch (e) {
+      debugPrint('Error updating challenge scores: $e');
+    }
   }
 
   List<WorkoutHistory> getWorkoutHistoryForDate(DateTime date) {
