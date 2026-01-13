@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../models/challenge.dart';
 import '../services/auth_service.dart';
 import '../services/friends_service.dart';
+import '../services/challenge_service.dart';
 import '../models/friend.dart';
 
 class ChallengesScreen extends StatefulWidget {
@@ -32,6 +33,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final challengeService = Provider.of<ChallengeService>(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -62,11 +65,38 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildChallengesList(_getActiveChallenges()),
-          _buildChallengesList(_getCompletedChallenges()),
-          _buildChallengesList(_getPendingChallenges()),
+          _buildChallengesStreamList(
+              challengeService.getActiveChallengesStream()),
+          _buildChallengesStreamList(
+              challengeService.getCompletedChallengesStream()),
+          _buildChallengesStreamList(
+              challengeService.getPendingChallengesStream()),
         ],
       ),
+    );
+  }
+
+  Widget _buildChallengesStreamList(Stream<List<Challenge>> stream) {
+    return StreamBuilder<List<Challenge>>(
+      stream: stream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Error loading challenges',
+              style:
+                  AppTextStyles.body1.copyWith(color: AppColors.textSecondary),
+            ),
+          );
+        }
+
+        final challenges = snapshot.data ?? [];
+        return _buildChallengesList(challenges);
+      },
     );
   }
 
@@ -546,27 +576,142 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   void _showSelectFriendsDialog(
       ChallengeTemplate template, List<Friend> friends) {
-    // TODO: Implement friend selection and challenge creation
+    final selectedFriends = <Friend>{};
+    int durationDays = template.defaultDurationDays;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Select Friends'),
-        content: Text('Friend selection coming soon...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Select Friends'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  template.title,
+                  style: AppTextStyles.h4,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select friends to challenge',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 16),
+                ...friends.map((friend) {
+                  final isSelected = selectedFriends.contains(friend);
+                  return CheckboxListTile(
+                    title: Text(friend.name),
+                    subtitle: Text(friend.email),
+                    value: isSelected,
+                    onChanged: (value) {
+                      setDialogState(() {
+                        if (value == true) {
+                          selectedFriends.add(friend);
+                        } else {
+                          selectedFriends.remove(friend);
+                        }
+                      });
+                    },
+                  );
+                }),
+                const SizedBox(height: 16),
+                Text(
+                  'Duration (days)',
+                  style: AppTextStyles.body1,
+                ),
+                Slider(
+                  value: durationDays.toDouble(),
+                  min: 1,
+                  max: 30,
+                  divisions: 29,
+                  label: '$durationDays days',
+                  onChanged: (value) {
+                    setDialogState(() {
+                      durationDays = value.toInt();
+                    });
+                  },
+                ),
+                Text(
+                  '$durationDays days',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Create challenge
-            },
-            child: const Text('Create'),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: selectedFriends.isEmpty
+                  ? null
+                  : () async {
+                      Navigator.pop(context);
+                      await _createChallenge(
+                          template, selectedFriends.toList(), durationDays);
+                    },
+              child: const Text('Create'),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _createChallenge(ChallengeTemplate template,
+      List<Friend> selectedFriends, int durationDays) async {
+    final challengeService =
+        Provider.of<ChallengeService>(context, listen: false);
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final currentUserId = auth.firebaseUser?.uid;
+    final currentUserName =
+        auth.firebaseUser?.displayName ?? auth.firebaseUser?.email ?? 'You';
+
+    if (currentUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in')),
+      );
+      return;
+    }
+
+    final participantIds = [
+      currentUserId,
+      ...selectedFriends.map((f) => f.userId)
+    ];
+    final participantNames = [
+      currentUserName,
+      ...selectedFriends.map((f) => f.name)
+    ];
+
+    final now = DateTime.now();
+    final endDate = now.add(Duration(days: durationDays));
+
+    final result = await challengeService.createChallenge(
+      type: template.type,
+      title: template.title,
+      description: template.description,
+      participantIds: participantIds,
+      participantNames: participantNames,
+      startDate: now,
+      endDate: endDate,
+    );
+
+    if (mounted) {
+      if (result == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Challenge created successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result)),
+        );
+      }
+    }
   }
 
   IconData _getChallengeIcon(ChallengeType type) {
@@ -636,81 +781,5 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month}.${date.year}';
-  }
-
-  List<Challenge> _getActiveChallenges() {
-    final now = DateTime.now();
-    return [
-      Challenge(
-        id: '1',
-        creatorId: 'user1',
-        creatorName: 'John',
-        participantIds: ['user1', 'current', 'user3'],
-        participantNames: ['John', 'You', 'Mike'],
-        type: ChallengeType.workouts,
-        title: 'Weekly Workout Challenge',
-        description: 'Most workouts in 7 days',
-        startDate: now.subtract(const Duration(days: 3)),
-        endDate: now.add(const Duration(days: 4)),
-        status: ChallengeStatus.active,
-        scores: {'user1': 5, 'current': 7, 'user3': 4},
-      ),
-      Challenge(
-        id: '2',
-        creatorId: 'current',
-        creatorName: 'You',
-        participantIds: ['current', 'user2'],
-        participantNames: ['You', 'Sarah'],
-        type: ChallengeType.totalWeight,
-        title: 'Weight Lifting Challenge',
-        description: 'Lift the most total weight',
-        startDate: now.subtract(const Duration(days: 2)),
-        endDate: now.add(const Duration(days: 5)),
-        status: ChallengeStatus.active,
-        scores: {'current': 5500, 'user2': 4800},
-      ),
-    ];
-  }
-
-  List<Challenge> _getCompletedChallenges() {
-    final now = DateTime.now();
-    return [
-      Challenge(
-        id: '3',
-        creatorId: 'user1',
-        creatorName: 'John',
-        participantIds: ['user1', 'current'],
-        participantNames: ['John', 'You'],
-        type: ChallengeType.streak,
-        title: 'Streak Challenge',
-        description: 'Longest training streak',
-        startDate: now.subtract(const Duration(days: 14)),
-        endDate: now.subtract(const Duration(days: 1)),
-        status: ChallengeStatus.completed,
-        scores: {'user1': 12, 'current': 14},
-        winnerId: 'current',
-      ),
-    ];
-  }
-
-  List<Challenge> _getPendingChallenges() {
-    final now = DateTime.now();
-    return [
-      Challenge(
-        id: '4',
-        creatorId: 'user2',
-        creatorName: 'Sarah',
-        participantIds: ['user2', 'current'],
-        participantNames: ['Sarah', 'You'],
-        type: ChallengeType.specificExercise,
-        title: 'Bench Press Challenge',
-        description: 'Best bench press 1RM',
-        startDate: now.add(const Duration(days: 1)),
-        endDate: now.add(const Duration(days: 8)),
-        status: ChallengeStatus.pending,
-        exerciseId: 'bench_press',
-        exerciseName: 'Bench Press',
-      ),
-    ];
   }
 }
