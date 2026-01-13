@@ -195,7 +195,7 @@ class FriendsService extends ChangeNotifier {
 
       final friendForCurrentUser = Friend(
         userId: request.fromUserId,
-        name: fromUserData['name'] ?? 'Unknown',
+        name: fromUserData['nickname'] ?? fromUserData['name'] ?? 'Unknown',
         email: fromUserData['email'] ?? '',
         weight: fromUserData['weight'] != null
             ? (fromUserData['weight'] as num).toDouble()
@@ -211,7 +211,7 @@ class FriendsService extends ChangeNotifier {
 
       final friendForRequestSender = Friend(
         userId: request.toUserId,
-        name: toUserData['name'] ?? 'Unknown',
+        name: toUserData['nickname'] ?? toUserData['name'] ?? 'Unknown',
         email: toUserData['email'] ?? '',
         weight: toUserData['weight'] != null
             ? (toUserData['weight'] as num).toDouble()
@@ -315,31 +315,46 @@ class FriendsService extends ChangeNotifier {
     try {
       final normalizedQuery = query.trim().toLowerCase();
 
-      final snapshot = await _db
+      final nicknameSnapshot = await _db
+          .collection('users')
+          .where('nickname', isGreaterThanOrEqualTo: normalizedQuery)
+          .where('nickname', isLessThanOrEqualTo: '$normalizedQuery\uf8ff')
+          .limit(5)
+          .get();
+
+      final emailSnapshot = await _db
           .collection('users')
           .where('email', isGreaterThanOrEqualTo: normalizedQuery)
           .where('email', isLessThanOrEqualTo: '$normalizedQuery\uf8ff')
-          .limit(10)
+          .limit(5)
           .get();
 
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Friend(
-          userId: doc.id,
-          name: data['name'] ?? 'Unknown',
-          email: data['email'] ?? '',
-          weight: data['weight'] != null
-              ? (data['weight'] as num).toDouble()
-              : null,
-          overallRating: data['overallRating'] != null
-              ? (data['overallRating'] as num).toDouble()
-              : null,
-          lastWorkoutDate: data['lastWorkoutDate'] != null
-              ? DateTime.parse(data['lastWorkoutDate'])
-              : null,
-          friendsSince: DateTime.now(),
-        );
-      }).toList();
+      final userIds = <String>{};
+      final results = <Friend>[];
+
+      for (var doc in [...nicknameSnapshot.docs, ...emailSnapshot.docs]) {
+        if (!userIds.contains(doc.id) && doc.id != _currentUserId) {
+          userIds.add(doc.id);
+          final data = doc.data();
+          results.add(Friend(
+            userId: doc.id,
+            name: data['nickname'] ?? data['name'] ?? 'Unknown',
+            email: data['email'] ?? '',
+            weight: data['weight'] != null
+                ? (data['weight'] as num).toDouble()
+                : null,
+            overallRating: data['overallRating'] != null
+                ? (data['overallRating'] as num).toDouble()
+                : null,
+            lastWorkoutDate: data['lastWorkoutDate'] != null
+                ? DateTime.parse(data['lastWorkoutDate'])
+                : null,
+            friendsSince: DateTime.now(),
+          ));
+        }
+      }
+
+      return results.take(10).toList();
     } catch (e) {
       debugPrint('Error searching users: $e');
       return [];
