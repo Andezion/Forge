@@ -384,6 +384,10 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           (_bodyWeightData!.weightChange / _bodyWeightData!.startWeight) * 100,
         ),
         const SizedBox(height: 16),
+        if (_bodyWeightData!.weightData.length > 1) ...[
+          _buildWeightChart(),
+          const SizedBox(height: 16)
+        ],
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -399,17 +403,42 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                     '${_bodyWeightData!.startWeight.toStringAsFixed(1)} kg'),
                 _buildInfoRow('Change',
                     '${_bodyWeightData!.weightChange >= 0 ? '+' : ''}${_bodyWeightData!.weightChange.toStringAsFixed(1)} kg'),
+                _buildInfoRow('Average Weight',
+                    '${_bodyWeightData!.averageWeight.toStringAsFixed(1)} kg'),
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
-        const Card(
+        Card(
           child: Padding(
             padding: EdgeInsets.all(16),
-            child: Text(
-              'Tip: For complete weight tracking, use the "Weight" feature in the main menu',
-              style: TextStyle(fontStyle: FontStyle.italic),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline,
+                        size: 20, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Weight Tracking Tip',
+                        style: AppTextStyles.body1.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'For detailed weight history tracking, use the "Weight" feature in the main menu to update your current weight regularly.',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -450,6 +479,38 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildWeightChart() {
+    if (_bodyWeightData == null || _bodyWeightData!.weightData.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Weight History',
+              style: AppTextStyles.h2.copyWith(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: _buildLineChart(
+                _bodyWeightData!.weightData,
+                'kg',
+                AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
