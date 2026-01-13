@@ -49,6 +49,7 @@ class AuthService extends ChangeNotifier {
         final profile = {
           'id': _firebaseUser!.uid,
           'name': name,
+          'nickname': name,
           'email': email,
           'height': 0.0,
           'weight': 0.0,
