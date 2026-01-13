@@ -12,6 +12,7 @@ import 'services/theme_service.dart';
 import 'services/profile_service.dart';
 import 'services/wellness_service.dart';
 import 'services/friends_service.dart';
+import 'services/challenge_service.dart';
 import 'services/settings_service.dart';
 import 'services/workout_recommendation_service.dart';
 import 'models/app_settings.dart';
@@ -39,6 +40,8 @@ void main() async {
 
   final friendsService = FriendsService();
 
+  final challengeService = ChallengeService();
+
   final settingsService = SettingsService();
   await settingsService.load();
 
@@ -57,6 +60,7 @@ void main() async {
         ChangeNotifierProvider.value(value: wellnessService),
         ChangeNotifierProvider.value(value: authService),
         ChangeNotifierProvider.value(value: friendsService),
+        ChangeNotifierProvider.value(value: challengeService),
         ChangeNotifierProvider.value(value: settingsService),
         ChangeNotifierProvider.value(value: workoutRecommendationService),
       ],
