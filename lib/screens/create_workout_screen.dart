@@ -155,18 +155,12 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  print('[CREATE_WORKOUT] Save button pressed');
                                   final workoutExercise = WorkoutExercise(
                                     exercise: exercise,
                                     sets: int.parse(setsController.text),
                                     targetReps: int.parse(repsController.text),
                                     weight: double.parse(weightController.text),
                                   );
-                                  print(
-                                      '[CREATE_WORKOUT] Created WorkoutExercise: ${exercise.name}, sets: ${workoutExercise.sets}');
-
-                                  print(
-                                      '[CREATE_WORKOUT] Returning workout exercise and closing dialog...');
 
                                   Navigator.of(dialogContext)
                                       .pop(workoutExercise);
@@ -193,20 +187,15 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
             ));
 
     if (result != null && mounted) {
-      print('[CREATE_WORKOUT] Processing result...');
       setState(() {
         if (existing != null) {
           final index = _workoutExercises.indexOf(existing);
           _workoutExercises[index] = result;
-          print('[CREATE_WORKOUT] Updated exercise at index $index');
         } else {
           _workoutExercises.add(result);
-          print(
-              '[CREATE_WORKOUT] Added new exercise. Total exercises: ${_workoutExercises.length}');
         }
       });
 
-      print('[CREATE_WORKOUT] Showing SnackBar...');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
