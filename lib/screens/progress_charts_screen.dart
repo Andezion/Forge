@@ -504,8 +504,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               height: 200,
               child: _buildLineChart(
                 _bodyWeightData!.weightData,
-                'kg',
-                AppColors.primary,
+                color: AppColors.primary,
               ),
             ),
           ],
