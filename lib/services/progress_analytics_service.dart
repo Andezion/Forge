@@ -151,11 +151,54 @@ class ProgressAnalyticsService {
 
     final totalStrengthPoints = <ChartDataPoint>[];
     final averageStrengthPoints = <ChartDataPoint>[];
+
     final exerciseMaxes = <String, double>{};
+    final exerciseFirstWeights = <String, double>{};
+    final exerciseDates = <String, DateTime>{};
 
     for (var history in relevantHistories) {
-      double sessionTotalStrength = 0;
-      int exerciseCount = 0;
+      for (var exerciseResult in history.session.exerciseResults) {
+        double maxWeight = 0;
+        for (var set in exerciseResult.setResults) {
+          if (set.weight > maxWeight) {
+            maxWeight = set.weight;
+          }
+        }
+
+        if (maxWeight > 0) {
+          final exerciseId = exerciseResult.exercise.id;
+
+          if (!exerciseFirstWeights.containsKey(exerciseId)) {
+            exerciseFirstWeights[exerciseId] = maxWeight;
+          }
+
+          if (!exerciseMaxes.containsKey(exerciseId) ||
+              exerciseMaxes[exerciseId]! < maxWeight) {
+            exerciseMaxes[exerciseId] = maxWeight;
+            exerciseDates[exerciseId] = history.date;
+          }
+        }
+      }
+    }
+
+    double totalProgressRatio = 0;
+    int exerciseCount = exerciseMaxes.length;
+
+    for (var exerciseId in exerciseMaxes.keys) {
+      final maxWeight = exerciseMaxes[exerciseId]!;
+      final firstWeight = exerciseFirstWeights[exerciseId]!;
+
+      final progressRatio = maxWeight / firstWeight;
+      totalProgressRatio += progressRatio;
+    }
+
+    final strengthCoefficient =
+        exerciseCount > 0 ? (totalProgressRatio / exerciseCount) * 100 : 100.0;
+
+    final exerciseCurrentMaxes = <String, double>{};
+    for (var history in relevantHistories) {
+      double sessionProgressSum = 0;
+      int sessionExerciseCount = 0;
 
       for (var exerciseResult in history.session.exerciseResults) {
         double maxWeight = 0;
@@ -166,37 +209,36 @@ class ProgressAnalyticsService {
         }
 
         if (maxWeight > 0) {
-          sessionTotalStrength += maxWeight;
-          exerciseCount++;
-
           final exerciseId = exerciseResult.exercise.id;
-          if (!exerciseMaxes.containsKey(exerciseId) ||
-              exerciseMaxes[exerciseId]! < maxWeight) {
-            exerciseMaxes[exerciseId] = maxWeight;
+
+          if (!exerciseCurrentMaxes.containsKey(exerciseId) ||
+              exerciseCurrentMaxes[exerciseId]! < maxWeight) {
+            exerciseCurrentMaxes[exerciseId] = maxWeight;
           }
+
+          final firstWeight = exerciseFirstWeights[exerciseId]!;
+          final currentMax = exerciseCurrentMaxes[exerciseId]!;
+          final ratio = currentMax / firstWeight;
+
+          sessionProgressSum += ratio;
+          sessionExerciseCount++;
         }
       }
 
-      // Use average instead of total to make it less volatile
-      if (sessionTotalStrength > 0 && exerciseCount > 0) {
-        final averageSessionStrength = sessionTotalStrength / exerciseCount;
+      if (sessionExerciseCount > 0) {
+        final sessionCoefficient =
+            (sessionProgressSum / sessionExerciseCount) * 100;
 
         totalStrengthPoints.add(ChartDataPoint(
           date: history.date,
-          value: averageSessionStrength,
-        ));
-
-        averageStrengthPoints.add(ChartDataPoint(
-          date: history.date,
-          value: averageSessionStrength,
+          value: sessionCoefficient,
         ));
       }
     }
 
-    final currentTotal =
-        totalStrengthPoints.isNotEmpty ? totalStrengthPoints.last.value : 0.0;
+    final currentTotal = strengthCoefficient;
 
-    double previousTotal = 0;
+    double previousTotal = 100.0;
     if (totalStrengthPoints.length > 1) {
       previousTotal = totalStrengthPoints[totalStrengthPoints.length - 2].value;
     }
