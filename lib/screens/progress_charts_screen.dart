@@ -343,24 +343,51 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Current Overall Strength',
-          '${_overallStrengthData!.currentTotalStrength.toStringAsFixed(1)} kg',
+          'Strength Coefficient',
+          '${_overallStrengthData!.currentTotalStrength.toStringAsFixed(1)}',
           _overallStrengthData!.progressPercentage,
         ),
         const SizedBox(height: 16),
-        _buildChartCard(
-          'Overall Strength Progress',
-          _buildLineChart(
-            _overallStrengthData!.totalStrengthData,
-            color: AppColors.primary,
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline,
+                        size: 20, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'About Strength Coefficient',
+                        style: AppTextStyles.body1.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'This coefficient is calculated based on your progress across ALL exercises. '
+                  '100 = baseline (your starting weights), 150 = 50% stronger overall, 200 = 2x stronger. '
+                  'It tracks your long-term strength development, not just recent workouts.',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Average Strength per Exercise',
+          'Strength Coefficient Progress',
           _buildLineChart(
-            _overallStrengthData!.averageStrengthData,
-            color: Colors.orange,
+            _overallStrengthData!.totalStrengthData,
+            color: AppColors.primary,
           ),
         ),
         const SizedBox(height: 16),
