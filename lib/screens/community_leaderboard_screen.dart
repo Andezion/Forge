@@ -329,25 +329,28 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
   }
 
   Widget _buildProgressLeaderboard() {
-    // TODO: Implement progress calculation based on historical data
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.construction,
-            size: 64,
-            color: AppColors.textSecondary,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Progress tracking coming soon',
-            style: AppTextStyles.body1.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
+    final leaderboardService = Provider.of<LeaderboardService>(context);
+
+    return StreamBuilder<List<UserStats>>(
+      stream: leaderboardService.getProgressLeaderboard(
+        scope: _selectedScope,
       ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final users = snapshot.data ?? [];
+        return _buildLeaderboardList(
+          users,
+          (user) => '+${user.weeklyProgressPercentage.toStringAsFixed(1)}%',
+          Icons.trending_up,
+        );
+      },
     );
   }
 
