@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/achievement.dart';
+import '../models/user_stats.dart';
+import '../services/leaderboard_service.dart';
+import '../services/challenge_service.dart';
+import '../services/auth_service.dart';
+import '../models/challenge.dart';
 
-class UserProfileScreen extends StatelessWidget {
+class UserProfileScreen extends StatefulWidget {
   final String userId;
   final String userName;
 
@@ -14,9 +20,65 @@ class UserProfileScreen extends StatelessWidget {
   });
 
   @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  UserStats? _userStats;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final leaderboardService =
+        Provider.of<LeaderboardService>(context, listen: false);
+
+    try {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      if (widget.userId == auth.firebaseUser?.uid) {
+        final stats = await leaderboardService.getCurrentUserStats();
+        if (mounted) {
+          setState(() {
+            _userStats = stats;
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // TODO: Load actual user data
-    final mockUser = _getMockUserData();
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textOnPrimary,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final userData =
+        _userStats != null ? _getUserDataFromStats() : _getMockUserData();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -29,7 +91,7 @@ class UserProfileScreen extends StatelessWidget {
             foregroundColor: AppColors.textOnPrimary,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                userName,
+                widget.userName,
                 style: AppTextStyles.h4.copyWith(
                   color: AppColors.textOnPrimary,
                 ),
@@ -69,19 +131,19 @@ class UserProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatsGrid(mockUser),
+                  _buildStatsGrid(userData),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Recent Achievements'),
                   const SizedBox(height: 12),
-                  _buildAchievementsList(mockUser['achievements']),
+                  _buildAchievementsList(userData['achievements']),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Personal Records'),
                   const SizedBox(height: 12),
-                  _buildPersonalRecords(mockUser['records']),
+                  _buildPersonalRecords(userData['records']),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Activity'),
                   const SizedBox(height: 12),
-                  _buildActivitySection(mockUser),
+                  _buildActivitySection(userData),
                   const SizedBox(height: 24),
                   _buildActionButtons(context),
                 ],
@@ -300,12 +362,7 @@ class UserProfileScreen extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Challenge user
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Challenge feature coming soon')),
-              );
-            },
+            onPressed: () => _showChallengeDialog(context),
             icon: const Icon(Icons.emoji_events),
             label: const Text('Challenge'),
             style: ElevatedButton.styleFrom(
@@ -319,51 +376,158 @@ class UserProfileScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Compare stats
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Compare feature coming soon')),
-                  );
-                },
-                icon: const Icon(Icons.compare_arrows),
-                label: const Text('Compare'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              // TODO: Compare stats
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Compare feature coming soon')),
+              );
+            },
+            icon: const Icon(Icons.compare_arrows),
+            label: const Text('Compare Stats'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Send message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Message feature coming soon')),
-                  );
-                },
-                icon: const Icon(Icons.message),
-                label: const Text('Message'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );
+  }
+
+  Map<String, dynamic> _getUserDataFromStats() {
+    if (_userStats == null) return _getMockUserData();
+
+    return {
+      'workoutCount': _userStats!.workoutCount,
+      'streak': _userStats!.currentStreak,
+      'totalWeight': _userStats!.totalWeightLifted.toInt(),
+      'wilks': 0.0,
+      'memberSince': _formatMemberSince(_userStats!.lastWorkoutDate),
+      'achievements': <Achievement>[],
+      'records': _userStats!.exerciseRecords.entries
+          .take(3)
+          .map((e) => {
+                'exercise': e.key,
+                'weight': e.value,
+              })
+          .toList(),
+    };
+  }
+
+  String _formatMemberSince(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.year}';
+  }
+
+  void _showChallengeDialog(BuildContext context) {
+    final templates = ChallengeTemplate.getTemplates();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Challenge ${widget.userName}', style: AppTextStyles.h3),
+            const SizedBox(height: 16),
+            Text(
+              'Choose a challenge type',
+              style:
+                  AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            ...templates.map((template) {
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: template.color.withValues(alpha: 0.2),
+                    child: Icon(template.icon, color: template.color),
+                  ),
+                  title: Text(template.title),
+                  subtitle: Text(template.description),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _createChallenge(context, template);
+                  },
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createChallenge(
+      BuildContext context, ChallengeTemplate template) async {
+    final challengeService =
+        Provider.of<ChallengeService>(context, listen: false);
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final currentUserId = auth.firebaseUser?.uid;
+    final currentUserName =
+        auth.firebaseUser?.displayName ?? auth.firebaseUser?.email ?? 'You';
+
+    if (currentUserId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You must be logged in')),
+        );
+      }
+      return;
+    }
+
+    final now = DateTime.now();
+    final endDate = now.add(Duration(days: template.defaultDurationDays));
+
+    final result = await challengeService.createChallenge(
+      type: template.type,
+      title: template.title,
+      description: template.description,
+      participantIds: [currentUserId, widget.userId],
+      participantNames: [currentUserName, widget.userName],
+      startDate: now,
+      endDate: endDate,
+    );
+
+    if (mounted) {
+      if (result == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Challenge sent to ${widget.userName}!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result)),
+        );
+      }
+    }
   }
 
   Map<String, dynamic> _getMockUserData() {
