@@ -4,6 +4,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/achievement.dart';
 import '../services/data_manager.dart';
+import '../services/friends_service.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
@@ -307,7 +308,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       }
     }
 
-    int currentStreak = 0; // TODO: Implement proper streak calculation
+    int currentStreak = _calculateStreak(completedWorkouts);
 
     return achievements.map((achievement) {
       int progress = 0;
@@ -347,7 +348,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
         case 'first_friend':
         case 'friends_10':
-          progress = 0; // TODO: Get from friends service
+          final friendsService =
+              Provider.of<FriendsService>(context, listen: false);
+          progress = friendsService.friends.length;
+          isUnlocked = progress >= achievement.requiredValue;
           break;
 
         default:
@@ -364,5 +368,40 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month}.${date.year}';
+  }
+
+  int _calculateStreak(List<dynamic> workoutHistory) {
+    if (workoutHistory.isEmpty) return 0;
+
+    final sortedDates = workoutHistory
+        .map((h) => DateTime(h.date.year, h.date.month, h.date.day))
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    int streak = 0;
+    DateTime? lastDate;
+
+    for (var date in sortedDates) {
+      if (lastDate == null) {
+        final daysDiff = DateTime.now().difference(date).inDays;
+        if (daysDiff <= 1) {
+          lastDate = date;
+          streak = 1;
+        } else {
+          break;
+        }
+      } else {
+        final difference = lastDate.difference(date).inDays;
+        if (difference <= 2) {
+          streak++;
+          lastDate = date;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return streak;
   }
 }
