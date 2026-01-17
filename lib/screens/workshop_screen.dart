@@ -111,7 +111,6 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     );
 
     if (result != null) {
-      // TODO: Handle completed workout session
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
