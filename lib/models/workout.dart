@@ -5,12 +5,14 @@ class WorkoutExercise {
   final int sets;
   final int targetReps;
   final double weight;
+  final Exercise? alternativeExercise;
 
   WorkoutExercise({
     required this.exercise,
     required this.sets,
     required this.targetReps,
     required this.weight,
+    this.alternativeExercise,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,6 +21,7 @@ class WorkoutExercise {
       'sets': sets,
       'targetReps': targetReps,
       'weight': weight,
+      'alternativeExercise': alternativeExercise?.toJson(),
     };
   }
 
@@ -28,6 +31,9 @@ class WorkoutExercise {
       sets: json['sets'],
       targetReps: json['targetReps'],
       weight: (json['weight'] as num).toDouble(),
+      alternativeExercise: json['alternativeExercise'] != null
+          ? Exercise.fromJson(json['alternativeExercise'])
+          : null,
     );
   }
 
@@ -36,12 +42,17 @@ class WorkoutExercise {
     int? sets,
     int? targetReps,
     double? weight,
+    Exercise? alternativeExercise,
+    bool clearAlternative = false,
   }) {
     return WorkoutExercise(
       exercise: exercise ?? this.exercise,
       sets: sets ?? this.sets,
       targetReps: targetReps ?? this.targetReps,
       weight: weight ?? this.weight,
+      alternativeExercise: clearAlternative
+          ? null
+          : alternativeExercise ?? this.alternativeExercise,
     );
   }
 }
