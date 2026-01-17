@@ -15,6 +15,7 @@ import 'services/friends_service.dart';
 import 'services/challenge_service.dart';
 import 'services/settings_service.dart';
 import 'services/workout_recommendation_service.dart';
+import 'services/leaderboard_service.dart';
 import 'models/app_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -51,6 +52,8 @@ void main() async {
     profileService: profileService,
   );
 
+  final leaderboardService = LeaderboardService();
+
   runApp(
     MultiProvider(
       providers: [
@@ -63,6 +66,7 @@ void main() async {
         ChangeNotifierProvider.value(value: challengeService),
         ChangeNotifierProvider.value(value: settingsService),
         ChangeNotifierProvider.value(value: workoutRecommendationService),
+        ChangeNotifierProvider.value(value: leaderboardService),
       ],
       child: const MyApp(),
     ),
