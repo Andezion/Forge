@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/auth_service.dart';
+import '../services/leaderboard_service.dart';
+import '../services/data_manager.dart';
+import '../models/user_stats.dart';
+import '../models/exercise.dart';
 import 'user_profile_screen.dart';
 
 class CommunityLeaderboardScreen extends StatefulWidget {
@@ -18,6 +22,7 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
   late TabController _tabController;
   String _selectedScope = 'Global';
   String _selectedPeriod = 'All Time';
+  Exercise? _selectedExercise;
 
   final List<String> _scopes = ['Global', 'Friends', 'Country', 'City'];
   final List<String> _periods = ['All Time', 'This Month', 'This Week'];
@@ -123,13 +128,13 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
           borderSide: BorderSide(color: AppColors.textOnPrimary),
         ),
       ),
-      style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary),
+      style: AppTextStyles.body2.copyWith(color: Colors.black),
       items: options.map((option) {
         return DropdownMenuItem<String>(
           value: option,
           child: Text(
             option,
-            style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary),
+            style: AppTextStyles.body2.copyWith(color: Colors.black),
           ),
         );
       }).toList(),
@@ -140,53 +145,215 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
   }
 
   Widget _buildWorkoutsLeaderboard() {
-    final leaderboard = _getWorkoutsLeaderboard();
-    return _buildLeaderboardList(
-      leaderboard,
-      (user) => '${user.workoutCount} workouts',
-      Icons.fitness_center,
+    final leaderboardService = Provider.of<LeaderboardService>(context);
+
+    return StreamBuilder<List<UserStats>>(
+      stream: leaderboardService.getWorkoutCountLeaderboard(
+        scope: _selectedScope,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final users = snapshot.data ?? [];
+        return _buildLeaderboardList(
+          users,
+          (user) => '${user.workoutCount} workouts',
+          Icons.fitness_center,
+        );
+      },
     );
   }
 
   Widget _buildTotalWeightLeaderboard() {
-    final leaderboard = _getTotalWeightLeaderboard();
-    return _buildLeaderboardList(
-      leaderboard,
-      (user) => '${user.totalWeight.toStringAsFixed(0)} kg',
-      Icons.bar_chart,
+    final leaderboardService = Provider.of<LeaderboardService>(context);
+
+    return StreamBuilder<List<UserStats>>(
+      stream: leaderboardService.getTotalWeightLeaderboard(
+        scope: _selectedScope,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final users = snapshot.data ?? [];
+        return _buildLeaderboardList(
+          users,
+          (user) => '${user.totalWeightLifted.toStringAsFixed(0)} kg',
+          Icons.bar_chart,
+        );
+      },
     );
   }
 
   Widget _buildRecordsLeaderboard() {
-    final leaderboard = _getRecordsLeaderboard();
-    return _buildLeaderboardList(
-      leaderboard,
-      (user) => user.exerciseDetails,
-      Icons.emoji_events,
+    final dataManager = Provider.of<DataManager>(context);
+    final leaderboardService = Provider.of<LeaderboardService>(context);
+    final exercises = dataManager.exercises;
+
+    if (_selectedExercise == null && exercises.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _selectedExercise = exercises.first;
+        });
+      });
+    }
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: AppColors.surface,
+          child: Row(
+            children: [
+              Text(
+                'Exercise:',
+                style: AppTextStyles.body1.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<Exercise>(
+                  value: _selectedExercise,
+                  dropdownColor: AppColors.surface,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: AppColors.primary),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: AppColors.primary),
+                    ),
+                  ),
+                  style: AppTextStyles.body2.copyWith(color: Colors.black),
+                  items: exercises.map((exercise) {
+                    return DropdownMenuItem<Exercise>(
+                      value: exercise,
+                      child: Text(
+                        exercise.name,
+                        style:
+                            AppTextStyles.body2.copyWith(color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (exercise) {
+                    if (exercise != null) {
+                      setState(() {
+                        _selectedExercise = exercise;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _selectedExercise == null
+              ? const Center(child: Text('Select an exercise'))
+              : StreamBuilder<List<UserStats>>(
+                  stream: leaderboardService.getExerciseRecordLeaderboard(
+                    exerciseId: _selectedExercise!.id,
+                    scope: _selectedScope,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final users = snapshot.data ?? [];
+                    return _buildLeaderboardList(
+                      users,
+                      (user) {
+                        final record =
+                            user.exerciseRecords[_selectedExercise!.id];
+                        return record != null
+                            ? '${record.toStringAsFixed(1)} kg'
+                            : 'No record';
+                      },
+                      Icons.emoji_events,
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 
   Widget _buildStreakLeaderboard() {
-    final leaderboard = _getStreakLeaderboard();
-    return _buildLeaderboardList(
-      leaderboard,
-      (user) => '${user.streak} days',
-      Icons.local_fire_department,
+    final leaderboardService = Provider.of<LeaderboardService>(context);
+
+    return StreamBuilder<List<UserStats>>(
+      stream: leaderboardService.getStreakLeaderboard(
+        scope: _selectedScope,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final users = snapshot.data ?? [];
+        return _buildLeaderboardList(
+          users,
+          (user) => '${user.currentStreak} days',
+          Icons.local_fire_department,
+        );
+      },
     );
   }
 
   Widget _buildProgressLeaderboard() {
-    final leaderboard = _getProgressLeaderboard();
-    return _buildLeaderboardList(
-      leaderboard,
-      (user) => '+${user.improvement.toStringAsFixed(1)}%',
-      Icons.trending_up,
+    // TODO: Implement progress calculation based on historical data
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.construction,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Progress tracking coming soon',
+            style: AppTextStyles.body1.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildLeaderboardList(
-    List<LeaderboardUser> users,
-    String Function(LeaderboardUser) getSubtitle,
+    List<UserStats> users,
+    String Function(UserStats) getSubtitle,
     IconData icon,
   ) {
     final auth = Provider.of<AuthService>(context);
@@ -247,7 +414,7 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                       MaterialPageRoute(
                         builder: (context) => UserProfileScreen(
                           userId: user.userId,
-                          userName: user.name,
+                          userName: user.displayName,
                         ),
                       ),
                     );
@@ -275,7 +442,7 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
               children: [
                 Expanded(
                   child: Text(
-                    user.name,
+                    user.displayName,
                     style: AppTextStyles.body1.copyWith(
                       fontWeight:
                           isCurrentUser ? FontWeight.bold : FontWeight.normal,
@@ -357,203 +524,4 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
         return AppColors.primary;
     }
   }
-
-  List<LeaderboardUser> _getWorkoutsLeaderboard() {
-    // TODO: Fetch from Firebase/backend
-    return [
-      LeaderboardUser(
-        userId: 'user1',
-        name: 'Alex Johnson',
-        workoutCount: 145,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user2',
-        name: 'Maria Garcia',
-        workoutCount: 132,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user3',
-        name: 'James Smith',
-        workoutCount: 128,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'current',
-        name: 'You',
-        workoutCount: 87,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user5',
-        name: 'Sarah Williams',
-        workoutCount: 76,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-    ];
-  }
-
-  List<LeaderboardUser> _getTotalWeightLeaderboard() {
-    return [
-      LeaderboardUser(
-        userId: 'user1',
-        name: 'Marcus Thompson',
-        workoutCount: 0,
-        totalWeight: 245000,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user2',
-        name: 'David Chen',
-        workoutCount: 0,
-        totalWeight: 232000,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user3',
-        name: 'John Davis',
-        workoutCount: 0,
-        totalWeight: 218000,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-    ];
-  }
-
-  List<LeaderboardUser> _getRecordsLeaderboard() {
-    return [
-      LeaderboardUser(
-        userId: 'user1',
-        name: 'Robert Brown',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: 'Squat: 220kg',
-      ),
-      LeaderboardUser(
-        userId: 'user2',
-        name: 'Michael Wilson',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: 'Bench: 180kg',
-      ),
-      LeaderboardUser(
-        userId: 'user3',
-        name: 'Chris Anderson',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 0,
-        exerciseDetails: 'Deadlift: 280kg',
-      ),
-    ];
-  }
-
-  List<LeaderboardUser> _getStreakLeaderboard() {
-    return [
-      LeaderboardUser(
-        userId: 'user1',
-        name: 'Emma Taylor',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 127,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user2',
-        name: 'Olivia Martinez',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 98,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user3',
-        name: 'Sophia Lee',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 85,
-        improvement: 0,
-        exerciseDetails: '',
-      ),
-    ];
-  }
-
-  List<LeaderboardUser> _getProgressLeaderboard() {
-    return [
-      LeaderboardUser(
-        userId: 'user1',
-        name: 'Lucas White',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 45.3,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user2',
-        name: 'Ethan Harris',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 38.7,
-        exerciseDetails: '',
-      ),
-      LeaderboardUser(
-        userId: 'user3',
-        name: 'Noah Clark',
-        workoutCount: 0,
-        totalWeight: 0,
-        streak: 0,
-        improvement: 32.1,
-        exerciseDetails: '',
-      ),
-    ];
-  }
-}
-
-class LeaderboardUser {
-  final String userId;
-  final String name;
-  final int workoutCount;
-  final double totalWeight;
-  final int streak;
-  final double improvement;
-  final String exerciseDetails;
-
-  LeaderboardUser({
-    required this.userId,
-    required this.name,
-    required this.workoutCount,
-    required this.totalWeight,
-    required this.streak,
-    required this.improvement,
-    required this.exerciseDetails,
-  });
 }
