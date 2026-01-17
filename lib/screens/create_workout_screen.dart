@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -20,10 +22,12 @@ class CreateWorkoutScreen extends StatefulWidget {
 }
 
 class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   List<WorkoutExercise> _workoutExercises = [];
+  static const String _draftKey = 'workout_draft';
+  bool _isDraft = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -31,16 +35,86 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.existingWorkout != null) {
       _nameController.text = widget.existingWorkout!.name;
       _workoutExercises = List.from(widget.existingWorkout!.exercises);
+    } else {
+      _loadDraft();
     }
+    _nameController.addListener(_saveDraft);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _nameController.removeListener(_saveDraft);
     _nameController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _saveDraft();
+    }
+  }
+
+  Future<void> _loadDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final draftJson = prefs.getString(_draftKey);
+
+      if (draftJson != null && draftJson.isNotEmpty) {
+        final draft = jsonDecode(draftJson);
+        setState(() {
+          _isDraft = true;
+          _nameController.text = draft['name'] ?? '';
+          _workoutExercises = (draft['exercises'] as List?)
+                  ?.map((e) => WorkoutExercise.fromJson(e))
+                  .toList() ??
+              [];
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Draft restored'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error loading draft: $e');
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    if (widget.existingWorkout != null) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final draft = {
+        'name': _nameController.text,
+        'exercises': _workoutExercises.map((e) => e.toJson()).toList(),
+      };
+      await prefs.setString(_draftKey, jsonEncode(draft));
+    } catch (e) {
+      print('Error saving draft: $e');
+    }
+  }
+
+  Future<void> _clearDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_draftKey);
+      _isDraft = false;
+    } catch (e) {
+      print('Error clearing draft: $e');
+    }
   }
 
   void _addExercise() async {
@@ -196,6 +270,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         }
       });
 
+      _saveDraft();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -210,7 +286,41 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     }
   }
 
-  void _saveWorkout() {
+  void _setAlternativeExercise(
+      WorkoutExercise workoutExercise, int index) async {
+    final selectedExercise = await showDialog<Exercise>(
+      context: context,
+      builder: (dialogContext) => Dialog.fullscreen(
+        child: ExerciseLibraryScreen(
+          onExerciseSelected: (exercise) {
+            Navigator.of(dialogContext).pop(exercise);
+          },
+        ),
+      ),
+    );
+
+    if (selectedExercise != null && mounted) {
+      setState(() {
+        _workoutExercises[index] = workoutExercise.copyWith(
+          alternativeExercise: selectedExercise,
+        );
+      });
+
+      _saveDraft();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Alternative set: ${selectedExercise.name}',
+          ),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _saveWorkout() async {
     if (_formKey.currentState!.validate() && _workoutExercises.isNotEmpty) {
       final workout = Workout(
         id: widget.existingWorkout?.id ??
@@ -220,7 +330,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         createdAt: widget.existingWorkout?.createdAt ?? DateTime.now(),
       );
 
-      Navigator.of(context).pop(workout);
+      await _clearDraft();
+      if (mounted) {
+        Navigator.of(context).pop(workout);
+      }
     } else if (_workoutExercises.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -313,6 +426,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                           final item = _workoutExercises.removeAt(oldIndex);
                           _workoutExercises.insert(newIndex, item);
                         });
+                        _saveDraft();
                       },
                       itemBuilder: (context, index) {
                         final workoutExercise = _workoutExercises[index];
@@ -348,44 +462,130 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.drag_handle, color: AppColors.textSecondary),
-            const SizedBox(width: 8),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.drag_handle, color: AppColors.textSecondary),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: difficultyColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.fitness_center,
+                    color: difficultyColor,
+                  ),
+                ),
+              ],
+            ),
+            title: Text(
+              workoutExercise.exercise.name,
+              style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              '${workoutExercise.sets} sets x ${workoutExercise.targetReps} reps, ${workoutExercise.weight} kg',
+              style: AppTextStyles.body2,
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Edit exercise',
+                  onPressed: () => _showExerciseConfigDialog(
+                      workoutExercise.exercise, workoutExercise),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: 'Delete exercise',
+                  onPressed: () {
+                    setState(() {
+                      _workoutExercises.removeAt(index);
+                    });
+                    _saveDraft();
+                  },
+                ),
+              ],
+            ),
+          ),
+          if (workoutExercise.alternativeExercise != null)
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: difficultyColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: AppColors.primary.withValues(alpha: 0.1),
+                border: Border(
+                  top: BorderSide(
+                    color: AppColors.textSecondary.withValues(alpha: 0.2),
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.fitness_center,
-                color: difficultyColor,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.swap_horiz,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Alternative: ${workoutExercise.alternativeExercise!.name}',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 18),
+                    onPressed: () {
+                      setState(() {
+                        _workoutExercises[index] = workoutExercise.copyWith(
+                          clearAlternative: true,
+                        );
+                      });
+                      _saveDraft();
+                    },
+                    tooltip: 'Remove alternative',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        title: Text(
-          workoutExercise.exercise.name,
-          style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          '${workoutExercise.sets} sets x ${workoutExercise.targetReps} reps, ${workoutExercise.weight} kg',
-          style: AppTextStyles.body2,
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () {
-            setState(() {
-              _workoutExercises.removeAt(index);
-            });
-          },
-        ),
-        onTap: () => _showExerciseConfigDialog(
-            workoutExercise.exercise, workoutExercise),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    _setAlternativeExercise(workoutExercise, index),
+                icon: const Icon(Icons.swap_horiz, size: 18),
+                label: Text(
+                  workoutExercise.alternativeExercise != null
+                      ? 'Change Alternative'
+                      : 'Add Alternative',
+                  style: AppTextStyles.caption,
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(
+                      color: AppColors.primary.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
