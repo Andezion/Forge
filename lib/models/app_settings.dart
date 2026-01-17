@@ -14,6 +14,7 @@ class AppSettings {
   final bool showWorkoutHistory;
   final bool showPersonalRecords;
   final bool allowFriendRequests;
+  final bool isProfileHidden;
 
   const AppSettings({
     this.nickname,
@@ -25,6 +26,7 @@ class AppSettings {
     this.showWorkoutHistory = true,
     this.showPersonalRecords = true,
     this.allowFriendRequests = true,
+    this.isProfileHidden = false,
   });
 
   AppSettings copyWith({
@@ -37,6 +39,7 @@ class AppSettings {
     bool? showWorkoutHistory,
     bool? showPersonalRecords,
     bool? allowFriendRequests,
+    bool? isProfileHidden,
   }) {
     return AppSettings(
       nickname: nickname ?? this.nickname,
@@ -48,6 +51,7 @@ class AppSettings {
       showWorkoutHistory: showWorkoutHistory ?? this.showWorkoutHistory,
       showPersonalRecords: showPersonalRecords ?? this.showPersonalRecords,
       allowFriendRequests: allowFriendRequests ?? this.allowFriendRequests,
+      isProfileHidden: isProfileHidden ?? this.isProfileHidden,
     );
   }
 
@@ -62,6 +66,7 @@ class AppSettings {
       'showWorkoutHistory': showWorkoutHistory,
       'showPersonalRecords': showPersonalRecords,
       'allowFriendRequests': allowFriendRequests,
+      'isProfileHidden': isProfileHidden,
     };
   }
 
@@ -85,6 +90,7 @@ class AppSettings {
       showWorkoutHistory: json['showWorkoutHistory'] ?? true,
       showPersonalRecords: json['showPersonalRecords'] ?? true,
       allowFriendRequests: json['allowFriendRequests'] ?? true,
+      isProfileHidden: json['isProfileHidden'] ?? false,
     );
   }
 }
