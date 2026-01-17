@@ -653,15 +653,12 @@ class DataManager extends ChangeNotifier {
     ];
   }
 
-  // Public method to force reinitialize demo programs
   Future<void> reinitializeDemoPrograms() async {
-    // Remove existing demo programs
     _workouts.removeWhere((w) =>
         w.id.startsWith('armwrestling_') ||
         w.id.startsWith('streetlifting_') ||
         w.id.startsWith('powerlifting_'));
 
-    // Add them again
     _initializeDemoWorkout();
     notifyListeners();
   }

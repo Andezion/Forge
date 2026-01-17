@@ -61,7 +61,6 @@ class AppColor extends ChangeNotifier {
 
   Future<void> setDarkMode(bool isDark) async {
     _isDarkMode = isDark;
-    // Обновляем статические цвета для обратной совместимости
     AppColors.setDarkMode(isDark);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
