@@ -39,22 +39,38 @@ class MuscleBalanceService {
     int daysToAnalyze = 7,
   }) {
     final muscleLoad = <MuscleGroup, double>{};
+    final muscleLastWorked = <MuscleGroup, DateTime>{};
     final cutoffDate = DateTime.now().subtract(Duration(days: daysToAnalyze));
 
-    for (var history in histories) {
-      if (history.date.isBefore(cutoffDate)) continue;
+    final sortedHistories = List<WorkoutHistory>.from(histories)
+      ..sort((a, b) => a.date.compareTo(b.date));
 
-      final daysSince = DateTime.now().difference(history.date).inDays;
-      final timeDecay = 1.0 - (daysSince / daysToAnalyze) * 0.5;
+    for (var history in sortedHistories) {
+      if (history.date.isBefore(cutoffDate)) continue;
 
       for (var exerciseResult in history.session.exerciseResults) {
         for (var tag in exerciseResult.exercise.muscleGroups) {
+          final lastWorked = muscleLastWorked[tag.group];
+          final daysSince = DateTime.now().difference(history.date).inDays;
+
+          double recoveryFactor = 1.0;
+          if (lastWorked != null) {
+            final daysSinceLastWork =
+                history.date.difference(lastWorked).inDays;
+
+            recoveryFactor = (daysSinceLastWork / 3.0).clamp(0.0, 1.0);
+          }
+
+          final timeDecay = 1.0 - (daysSince / daysToAnalyze) * 0.6;
+
           final currentLoad = muscleLoad[tag.group] ?? 0.0;
-
           final completedSets = exerciseResult.setResults.length;
-          final loadScore = tag.score * completedSets * timeDecay;
 
-          muscleLoad[tag.group] = currentLoad + loadScore;
+          final recoveredLoad = currentLoad * (1.0 - recoveryFactor * 0.4);
+          final newLoad = tag.score * completedSets * timeDecay;
+
+          muscleLoad[tag.group] = recoveredLoad + newLoad;
+          muscleLastWorked[tag.group] = history.date;
         }
       }
     }
