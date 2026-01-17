@@ -103,6 +103,8 @@ class ProgressionService {
 
     if (daysSinceLastWorkout < optimalWithAge) {
       return 0.90 + (daysSinceLastWorkout / optimalWithAge) * 0.10;
+    } else if (daysSinceLastWorkout <= optimalWithAge * 1.6) {
+      return 1.0;
     } else if (daysSinceLastWorkout > optimalWithAge * 2.5) {
       final daysOver = daysSinceLastWorkout - (optimalWithAge * 2.5);
       final reduction = (daysOver / 7.0) * 0.05;
