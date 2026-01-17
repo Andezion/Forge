@@ -463,9 +463,23 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Accept challenge
+                    onPressed: () async {
                       Navigator.pop(context);
+                      final challengeService =
+                          Provider.of<ChallengeService>(context, listen: false);
+                      final result =
+                          await challengeService.acceptChallenge(challenge.id);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result == 'success'
+                                ? 'Challenge accepted!'
+                                : result),
+                            backgroundColor:
+                                result == 'success' ? AppColors.success : null,
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.success,
@@ -478,9 +492,21 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                      // TODO: Decline challenge
+                    onPressed: () async {
                       Navigator.pop(context);
+                      final challengeService =
+                          Provider.of<ChallengeService>(context, listen: false);
+                      final result =
+                          await challengeService.declineChallenge(challenge.id);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result == 'success'
+                                ? 'Challenge declined'
+                                : result),
+                          ),
+                        );
+                      }
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
