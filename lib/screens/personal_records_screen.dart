@@ -632,7 +632,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
 
   Widget _buildTotalStrengthCard(
       Map<String, PersonalRecord> records, double bodyWeight) {
-    // Calculate total for big 3 lifts
     final bigThree = ['Squat', 'Bench Press', 'Deadlift'];
     double total = 0;
     int foundLifts = 0;
