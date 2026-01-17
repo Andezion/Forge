@@ -8,6 +8,7 @@ class UserStats {
   final Map<String, double> exerciseRecords;
   final bool isProfileHidden;
   final DateTime updatedAt;
+  final double weeklyProgressPercentage;
 
   UserStats({
     required this.userId,
@@ -19,6 +20,7 @@ class UserStats {
     required this.exerciseRecords,
     this.isProfileHidden = false,
     required this.updatedAt,
+    this.weeklyProgressPercentage = 0.0,
   });
 
   Map<String, dynamic> toJson() {
@@ -32,6 +34,7 @@ class UserStats {
       'exerciseRecords': exerciseRecords,
       'isProfileHidden': isProfileHidden,
       'updatedAt': updatedAt.toIso8601String(),
+      'weeklyProgressPercentage': weeklyProgressPercentage,
     };
   }
 
@@ -50,6 +53,8 @@ class UserStats {
       ),
       isProfileHidden: json['isProfileHidden'] as bool? ?? false,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      weeklyProgressPercentage:
+          (json['weeklyProgressPercentage'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -63,6 +68,7 @@ class UserStats {
     Map<String, double>? exerciseRecords,
     bool? isProfileHidden,
     DateTime? updatedAt,
+    double? weeklyProgressPercentage,
   }) {
     return UserStats(
       userId: userId ?? this.userId,
@@ -74,6 +80,8 @@ class UserStats {
       exerciseRecords: exerciseRecords ?? this.exerciseRecords,
       isProfileHidden: isProfileHidden ?? this.isProfileHidden,
       updatedAt: updatedAt ?? this.updatedAt,
+      weeklyProgressPercentage:
+          weeklyProgressPercentage ?? this.weeklyProgressPercentage,
     );
   }
 }
