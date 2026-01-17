@@ -268,6 +268,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         settings.setAllowFriendRequests(value);
                       },
                     ),
+                    const Divider(height: 1),
+                    _buildSwitchTile(
+                      title: 'Hide from Leaderboards',
+                      subtitle: 'Your stats will not appear in public rankings',
+                      value: settings.isProfileHidden,
+                      icon: Icons.visibility_off,
+                      iconColor: appColor.color,
+                      activeColor: appColor.color,
+                      onChanged: (value) {
+                        settings.setProfileHidden(value);
+                      },
+                    ),
                   ],
                 ),
               ),
