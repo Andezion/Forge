@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -8,6 +9,8 @@ import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/workout_history.dart';
 import '../services/data_manager.dart';
+import '../services/leaderboard_service.dart';
+import '../services/settings_service.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
   final Workout workout;
@@ -534,7 +537,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     });
   }
 
-  void _finishWorkout() {
+  void _finishWorkout() async {
     _timer?.cancel();
 
     final completedSession = _session.copyWith(
@@ -550,6 +553,21 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       session: completedSession,
     );
     DataManager().addWorkoutHistory(history);
+
+    try {
+      final leaderboardService =
+          Provider.of<LeaderboardService>(context, listen: false);
+      final settingsService =
+          Provider.of<SettingsService>(context, listen: false);
+      final workoutHistory = DataManager().workoutHistory;
+
+      await leaderboardService.syncUserStats(
+        workoutHistory: workoutHistory,
+        isProfileHidden: settingsService.isProfileHidden,
+      );
+    } catch (e) {
+      debugPrint('[WORKOUT] Error syncing stats to Firebase: $e');
+    }
 
     showDialog(
       context: context,
