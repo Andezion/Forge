@@ -34,6 +34,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   bool _isSetInProgress = false;
   final List<ExerciseResult> _exerciseResults = [];
   ExerciseResult? _currentExerciseResult;
+  final DataManager _dataManager = DataManager();
+  ExerciseResult? _previousExercisePerformance;
 
   @override
   void initState() {
@@ -68,6 +70,29 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       targetWeight: _exerciseQueue[0].weight,
       setResults: [],
     );
+
+    _loadPreviousPerformance();
+  }
+
+  void _loadPreviousPerformance() {
+    final histories = _dataManager.workoutHistory;
+    final exerciseId = _currentExerciseResult!.exercise.id;
+
+    for (var history in histories.reversed) {
+      for (var exerciseResult in history.session.exerciseResults) {
+        if (exerciseResult.exercise.id == exerciseId &&
+            exerciseResult.setResults.isNotEmpty) {
+          setState(() {
+            _previousExercisePerformance = exerciseResult;
+          });
+          return;
+        }
+      }
+    }
+
+    setState(() {
+      _previousExercisePerformance = null;
+    });
   }
 
   void _startTotalTimer() {
@@ -173,6 +198,99 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _swapExercise(WorkoutExercise currentWorkoutExercise) {
+    if (currentWorkoutExercise.alternativeExercise == null) return;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Swap Exercise'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Current exercise:',
+              style: AppTextStyles.body2.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              currentWorkoutExercise.exercise.name,
+              style: AppTextStyles.body1.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Alternative exercise:',
+              style: AppTextStyles.body2.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              currentWorkoutExercise.alternativeExercise!.name,
+              style: AppTextStyles.body1.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              currentWorkoutExercise.alternativeExercise!.description,
+              style: AppTextStyles.caption,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                final alternative = currentWorkoutExercise.alternativeExercise!;
+                _exerciseQueue[_currentExerciseIndex] =
+                    currentWorkoutExercise.copyWith(
+                  exercise: alternative,
+                  alternativeExercise: currentWorkoutExercise.exercise,
+                );
+
+                _currentExerciseResult = ExerciseResult(
+                  exercise: alternative,
+                  targetSets: currentWorkoutExercise.sets,
+                  targetReps: currentWorkoutExercise.targetReps,
+                  targetWeight: currentWorkoutExercise.weight,
+                  setResults: _currentExerciseResult!.setResults,
+                );
+              });
+              Navigator.of(dialogContext).pop();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Switched to ${currentWorkoutExercise.alternativeExercise!.name}',
+                  ),
+                  backgroundColor: AppColors.success,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            icon: const Icon(Icons.swap_horiz),
+            label: const Text('Swap'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -374,6 +492,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
         setResults: [],
       );
+
+      _loadPreviousPerformance();
     });
   }
 
@@ -689,6 +809,32 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                                   ),
                               ],
                             ),
+                            if (currentExercise.alternativeExercise !=
+                                null) ...[
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: () => _swapExercise(currentExercise),
+                                icon: const Icon(Icons.swap_horiz, size: 18),
+                                label: Text(
+                                  'Swap',
+                                  style: AppTextStyles.caption,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                  side: BorderSide(
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             Text(
                               currentExercise.exercise.description,
@@ -711,6 +857,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
+                                  if (_previousExercisePerformance != null &&
+                                      _currentSetNumber <=
+                                          _previousExercisePerformance!
+                                              .setResults.length) ...[
+                                    Text(
+                                      'Last time: ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].actualReps} reps${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight > 0 ? " @ ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight} kg" : ""}',
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.textSecondary,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                  ],
                                   Text(
                                     'Target: ${currentExercise.targetReps} reps',
                                     style: AppTextStyles.body1,
