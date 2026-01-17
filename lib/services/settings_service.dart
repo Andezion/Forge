@@ -21,6 +21,7 @@ class SettingsService extends ChangeNotifier {
   bool get showWorkoutHistory => _settings.showWorkoutHistory;
   bool get showPersonalRecords => _settings.showPersonalRecords;
   bool get allowFriendRequests => _settings.allowFriendRequests;
+  bool get isProfileHidden => _settings.isProfileHidden;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -147,7 +148,31 @@ class SettingsService extends ChangeNotifier {
     await _save();
   }
 
-  // Helper methods for conversions
+  Future<void> setProfileHidden(bool hidden) async {
+    _settings = _settings.copyWith(isProfileHidden: hidden);
+    notifyListeners();
+    await _save();
+
+    await _updateProfileVisibilityInFirebase(hidden);
+  }
+
+  Future<void> _updateProfileVisibilityInFirebase(bool hidden) async {
+    try {
+      final fb_auth.FirebaseAuth auth = fb_auth.FirebaseAuth.instance;
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+
+      final userId = auth.currentUser?.uid;
+      if (userId != null) {
+        await db.collection('user_stats').doc(userId).update({
+          'isProfileHidden': hidden,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      debugPrint('Error updating profile visibility in Firebase: $e');
+    }
+  }
+
   double convertWeight(double kg) {
     if (_settings.weightUnit == WeightUnit.lb) {
       return kg * 2.20462;
