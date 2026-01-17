@@ -8,6 +8,7 @@ import '../services/leaderboard_service.dart';
 import '../services/challenge_service.dart';
 import '../services/auth_service.dart';
 import '../models/challenge.dart';
+import 'stats_comparison_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -380,9 +381,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: () {
-              // TODO: Compare stats
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Compare feature coming soon')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StatsComparisonScreen(
+                    otherUserId: widget.userId,
+                    otherUserName: widget.userName,
+                  ),
+                ),
               );
             },
             icon: const Icon(Icons.compare_arrows),
