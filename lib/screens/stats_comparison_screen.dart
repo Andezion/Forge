@@ -40,13 +40,13 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
       final currentUserId = auth.firebaseUser?.uid;
       if (currentUserId != null) {
         final currentStats = await leaderboardService.getCurrentUserStats();
-
-        // For now, we'll use mock data for other user since we don't have getUserStats method yet
-        // TODO: Implement getUserStats in LeaderboardService
+        final otherStats =
+            await leaderboardService.getUserStats(widget.otherUserId);
 
         if (mounted) {
           setState(() {
             _currentUserStats = currentStats;
+            _otherUserStats = otherStats;
             _isLoading = false;
           });
         }
@@ -89,7 +89,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   _buildComparisonCard(
                     'Workouts',
                     _currentUserStats?.workoutCount ?? 0,
-                    87,
+                    _otherUserStats?.workoutCount ?? 0,
                     Icons.fitness_center,
                     Colors.blue,
                   ),
@@ -97,7 +97,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   _buildComparisonCard(
                     'Current Streak',
                     _currentUserStats?.currentStreak ?? 0,
-                    14,
+                    _otherUserStats?.currentStreak ?? 0,
                     Icons.local_fire_department,
                     Colors.orange,
                   ),
@@ -105,7 +105,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   _buildComparisonCard(
                     'Total Weight',
                     (_currentUserStats?.totalWeightLifted ?? 0).toInt(),
-                    125000,
+                    (_otherUserStats?.totalWeightLifted ?? 0).toInt(),
                     Icons.fitness_center,
                     Colors.green,
                     suffix: ' kg',
@@ -280,11 +280,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
 
   Widget _buildRecordsComparison() {
     final currentRecords = _currentUserStats?.exerciseRecords ?? {};
-    final otherRecords = {
-      'Squat': 140.0,
-      'Bench Press': 100.0,
-      'Deadlift': 180.0,
-    };
+    final otherRecords = _otherUserStats?.exerciseRecords ?? {};
 
     final allExercises = {...currentRecords.keys, ...otherRecords.keys}.toList()
       ..sort();

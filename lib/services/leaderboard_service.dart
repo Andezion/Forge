@@ -255,6 +255,23 @@ class LeaderboardService extends ChangeNotifier {
     return null;
   }
 
+  Future<UserStats?> getUserStats(String userId) async {
+    try {
+      final doc = await _db.collection('user_stats').doc(userId).get();
+      if (doc.exists) {
+        final stats = UserStats.fromJson(doc.data()!);
+        if (stats.isProfileHidden) {
+          debugPrint('[LEADERBOARD] User profile is hidden: $userId');
+          return null;
+        }
+        return stats;
+      }
+    } catch (e) {
+      debugPrint('[LEADERBOARD] Error fetching user stats: $e');
+    }
+    return null;
+  }
+
   Stream<List<UserStats>> getProgressLeaderboard({
     int limit = 100,
     String? scope,
