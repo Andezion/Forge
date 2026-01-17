@@ -18,7 +18,6 @@ class AppColors {
   static const Color armwrestling = Color(0xFF004E89);
   static const Color powerlifting = Color(0xFF8B0000);
 
-  // Dynamic colors based on theme
   static Color background = const Color(0xFFF5F5F5);
   static Color surface = const Color(0xFFFFFFFF);
   static Color surfaceDark = const Color(0xFF1E1E1E);
@@ -28,7 +27,6 @@ class AppColors {
   static Color textOnPrimary = const Color(0xFFFFFFFF);
   static Color divider = const Color(0xFFE0E0E0);
 
-  // Helper methods to get colors based on context (preferred)
   static Color getTextPrimary(BuildContext context) {
     return Theme.of(context).colorScheme.onSurface;
   }
@@ -61,7 +59,6 @@ class AppColors {
     return Theme.of(context).colorScheme.onPrimary;
   }
 
-  // Update static colors based on dark mode
   static void setDarkMode(bool isDark) {
     if (isDark) {
       background = const Color(0xFF121212);
