@@ -352,11 +352,23 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
-        title: Text(
-          widget.existingWorkout != null
-              ? 'Edit Workout'
-              : AppStrings.createWorkout,
-          style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.existingWorkout != null
+                  ? 'Edit Workout'
+                  : AppStrings.createWorkout,
+              style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+            ),
+            if (_isDraft)
+              Text(
+                'Draft',
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textOnPrimary.withValues(alpha: 0.7),
+                ),
+              ),
+          ],
         ),
         actions: [
           IconButton(
