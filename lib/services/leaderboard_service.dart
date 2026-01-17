@@ -58,6 +58,8 @@ class LeaderboardService extends ChangeNotifier {
 
     final exerciseRecords = _calculateExerciseRecords(workoutHistory);
 
+    final weeklyProgress = _calculateWeeklyProgress(workoutHistory);
+
     return UserStats(
       userId: userId,
       displayName: displayName,
@@ -68,6 +70,7 @@ class LeaderboardService extends ChangeNotifier {
       exerciseRecords: exerciseRecords,
       isProfileHidden: isProfileHidden,
       updatedAt: DateTime.now(),
+      weeklyProgressPercentage: weeklyProgress,
     );
   }
 
@@ -250,5 +253,71 @@ class LeaderboardService extends ChangeNotifier {
       debugPrint('[LEADERBOARD] Error fetching current user stats: $e');
     }
     return null;
+  }
+
+  Stream<List<UserStats>> getProgressLeaderboard({
+    int limit = 100,
+    String? scope,
+  }) {
+    return _db
+        .collection('user_stats')
+        .where('isProfileHidden', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) {
+      final users = snapshot.docs
+          .map((doc) {
+            try {
+              return UserStats.fromJson(doc.data());
+            } catch (e) {
+              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
+              return null;
+            }
+          })
+          .whereType<UserStats>()
+          .where((user) => user.weeklyProgressPercentage > 0)
+          .toList();
+
+      users.sort((a, b) =>
+          b.weeklyProgressPercentage.compareTo(a.weeklyProgressPercentage));
+
+      return users.take(limit).toList();
+    });
+  }
+
+  double _calculateWeeklyProgress(List<WorkoutHistory> workoutHistory) {
+    if (workoutHistory.isEmpty) return 0.0;
+
+    final now = DateTime.now();
+    final oneWeekAgo = now.subtract(const Duration(days: 7));
+    final twoWeeksAgo = now.subtract(const Duration(days: 14));
+
+    double currentWeekWeight = 0;
+    for (var history in workoutHistory) {
+      if (history.date.isAfter(oneWeekAgo)) {
+        for (var exerciseResult in history.session.exerciseResults) {
+          for (var setResult in exerciseResult.setResults) {
+            currentWeekWeight += setResult.weight * setResult.actualReps;
+          }
+        }
+      }
+    }
+
+    double previousWeekWeight = 0;
+    for (var history in workoutHistory) {
+      if (history.date.isAfter(twoWeeksAgo) &&
+          history.date.isBefore(oneWeekAgo)) {
+        for (var exerciseResult in history.session.exerciseResults) {
+          for (var setResult in exerciseResult.setResults) {
+            previousWeekWeight += setResult.weight * setResult.actualReps;
+          }
+        }
+      }
+    }
+
+    if (previousWeekWeight == 0) return 0.0;
+
+    final progress =
+        ((currentWeekWeight - previousWeekWeight) / previousWeekWeight) * 100;
+    return progress.clamp(-100, 1000);
   }
 }
