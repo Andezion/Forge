@@ -31,7 +31,7 @@ class MuscleRecoveryCard extends StatelessWidget {
                     color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
                 Text(
-                  'Восстановление мышц',
+                  'Muscle Recovery',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ],
@@ -40,7 +40,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             if (musclesToTrain.isNotEmpty) ...[
               _buildSectionHeader(
                 context,
-                '✅ Готовы к тренировке',
+                'Ready to train',
                 Colors.green,
               ),
               const SizedBox(height: 8),
@@ -54,7 +54,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             ],
             _buildSectionHeader(
               context,
-              '⏳ В процессе восстановления',
+              'In recovery',
               Colors.orange,
             ),
             const SizedBox(height: 8),
@@ -68,7 +68,7 @@ class MuscleRecoveryCard extends StatelessWidget {
               const SizedBox(height: 16),
               _buildSectionHeader(
                 context,
-                '😴 Требуют отдыха',
+                'Require rest',
                 Colors.red,
               ),
               const SizedBox(height: 8),
@@ -148,7 +148,7 @@ class MuscleRecoveryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              days >= 999 ? 'Не тренировали' : '$days ${_getDaysWord(days)}',
+              days >= 999 ? 'Not trained' : '$days ${_getDaysWord(days)}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: color,
                     fontWeight: FontWeight.w600,
@@ -181,12 +181,12 @@ class MuscleRecoveryCard extends StatelessWidget {
 
   String _getDaysWord(int days) {
     if (days % 10 == 1 && days % 100 != 11) {
-      return 'день';
+      return 'day';
     } else if ([2, 3, 4].contains(days % 10) &&
         ![12, 13, 14].contains(days % 100)) {
-      return 'дня';
+      return 'days';
     } else {
-      return 'дней';
+      return 'days';
     }
   }
 
@@ -231,7 +231,7 @@ class MuscleRecoveryCompact extends StatelessWidget {
                 const Icon(Icons.flash_on, color: Colors.green, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Готовы к тренировке:',
+                  'Ready to train:',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -249,7 +249,7 @@ class MuscleRecoveryCompact extends StatelessWidget {
                 return Chip(
                   avatar: const Icon(Icons.check_circle,
                       size: 16, color: Colors.green),
-                  label: Text('$displayName ($days д.)'),
+                  label: Text('$displayName ($days days)'),
                   visualDensity: VisualDensity.compact,
                 );
               }).toList(),
