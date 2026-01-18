@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/exercise.dart';
 import '../services/muscle_recovery_tracker.dart';
 
-/// Виджет для отображения состояния восстановления групп мышц
 class MuscleRecoveryCard extends StatelessWidget {
   final Map<MuscleGroup, int> daysSinceTraining;
   final Map<MuscleGroup, double> recoveryPriorities;
@@ -38,8 +37,6 @@ class MuscleRecoveryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
-            // Мышцы, готовые к тренировке
             if (musclesToTrain.isNotEmpty) ...[
               _buildSectionHeader(
                 context,
@@ -55,8 +52,6 @@ class MuscleRecoveryCard extends StatelessWidget {
                   )),
               const SizedBox(height: 16),
             ],
-
-            // Мышцы в процессе восстановления
             _buildSectionHeader(
               context,
               '⏳ В процессе восстановления',
@@ -69,8 +64,6 @@ class MuscleRecoveryCard extends StatelessWidget {
                   daysSinceTraining[muscle] ?? 0,
                   recoveryPriorities[muscle] ?? 0.5,
                 )),
-
-            // Мышцы, требующие отдыха
             if (musclesToRest.isNotEmpty) ...[
               const SizedBox(height: 16),
               _buildSectionHeader(
@@ -128,7 +121,6 @@ class MuscleRecoveryCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          // Индикатор приоритета
           Container(
             width: 8,
             height: 8,
@@ -138,16 +130,12 @@ class MuscleRecoveryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-
-          // Название группы мышц
           Expanded(
             child: Text(
               displayName,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
-
-          // Количество дней
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
@@ -167,10 +155,7 @@ class MuscleRecoveryCard extends StatelessWidget {
                   ),
             ),
           ),
-
           const SizedBox(width: 8),
-
-          // Прогресс-бар
           SizedBox(
             width: 60,
             child: LinearProgressIndicator(
@@ -215,7 +200,6 @@ class MuscleRecoveryCard extends StatelessWidget {
   }
 }
 
-/// Компактная версия виджета для главного экрана
 class MuscleRecoveryCompact extends StatelessWidget {
   final Map<MuscleGroup, int> daysSinceTraining;
   final Map<MuscleGroup, double> recoveryPriorities;
