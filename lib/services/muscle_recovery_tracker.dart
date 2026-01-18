@@ -1,9 +1,7 @@
 import '../models/exercise.dart';
 import '../models/workout_history.dart';
 
-/// Отслеживает восстановление каждой группы мышц
 class MuscleRecoveryTracker {
-  /// Оптимальные периоды восстановления для каждой группы мышц (в днях)
   static const Map<MuscleGroup, int> _optimalRecoveryDays = {
     MuscleGroup.legs: 3, // Большие мышцы - дольше восстанавливаются
     MuscleGroup.back: 3, // Большие мышцы
