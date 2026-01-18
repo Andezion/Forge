@@ -8,6 +8,7 @@ import '../services/workout_recommendation_service.dart';
 import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../widgets/compact_calendar.dart';
+import '../widgets/muscle_recovery_card.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
 
@@ -239,6 +240,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildWorkoutCard(),
+                  const SizedBox(height: 8),
+                  _buildMuscleRecoveryCompact(),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -559,5 +562,26 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildMuscleRecoveryCompact() {
+    try {
+      final recommendationService = Provider.of<WorkoutRecommendationService>(
+        context,
+        listen: false,
+      );
+
+      final daysSinceTraining =
+          recommendationService.getDaysSinceLastTraining();
+      final recoveryPriorities =
+          recommendationService.getMuscleRecoveryPriorities();
+
+      return MuscleRecoveryCompact(
+        daysSinceTraining: daysSinceTraining,
+        recoveryPriorities: recoveryPriorities,
+      );
+    } catch (e) {
+      return const SizedBox.shrink();
+    }
   }
 }

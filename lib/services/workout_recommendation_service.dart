@@ -4,16 +4,19 @@ import '../models/workout_recommendation.dart';
 import '../models/workout_history.dart';
 import '../models/wellness_entry.dart';
 import '../models/user.dart';
+import '../models/exercise.dart';
 import 'progression_service.dart';
 import 'wellness_service.dart';
 import 'data_manager.dart';
 import 'profile_service.dart';
+import 'muscle_recovery_tracker.dart';
 
 class WorkoutRecommendationService extends ChangeNotifier {
   final ProgressionService _progressionService = ProgressionService();
   final WellnessService _wellnessService;
   final DataManager _dataManager;
   final ProfileService _profileService;
+  final MuscleRecoveryTracker _recoveryTracker = MuscleRecoveryTracker();
 
   WorkoutRecommendation? _todaysRecommendation;
   DateTime? _lastRecommendationDate;
@@ -146,6 +149,19 @@ class WorkoutRecommendationService extends ChangeNotifier {
         : 999;
     factors['daysSinceLastWorkout'] = daysSinceLastWorkout;
 
+    // ✨ НОВОЕ: Отслеживание восстановления групп мышц
+    final daysSinceTraining =
+        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+    final recoveryPriorities =
+        _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
+
+    factors['daysSinceTraining'] = daysSinceTraining;
+    factors['recoveryPriorities'] = recoveryPriorities;
+    factors['musclesToTrain'] =
+        _recoveryTracker.getMusclesToTrain(recoveryPriorities);
+    factors['musclesToRest'] =
+        _recoveryTracker.getMusclesToRest(recoveryPriorities);
+
     if (wellness.isNotEmpty) {
       final latest = wellness.last;
       final avgScore = latest.averageScore;
@@ -213,25 +229,85 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return workouts.first;
     }
 
+    // ✨ НОВОЕ: Используем приоритеты восстановления мышц
+    final recoveryPriorities =
+        factors['recoveryPriorities'] as Map<MuscleGroup, double>;
+    final musclesToTrain = factors['musclesToTrain'] as List<MuscleGroup>;
+    final musclesToRest = factors['musclesToRest'] as List<MuscleGroup>;
+
+    // Исключаем тренировки, которые недавно делали
     final lastWorkoutIds =
         histories.reversed.take(3).map((h) => h.session.workoutId).toList();
 
     final freshWorkouts =
         workouts.where((w) => !lastWorkoutIds.contains(w.id)).toList();
 
-    if (freshWorkouts.isNotEmpty) {
-      final readiness = factors['readiness'] as double;
+    final workoutsToConsider =
+        freshWorkouts.isNotEmpty ? freshWorkouts : workouts;
 
-      if (readiness > 0.7) {
-        return freshWorkouts.first;
-      } else if (readiness > 0.5) {
-        return freshWorkouts[freshWorkouts.length > 1 ? 1 : 0];
-      } else {
-        return freshWorkouts.first;
+    // Рассчитываем приоритет для каждой тренировки на основе восстановления мышц
+    final workoutScores = <Workout, double>{};
+
+    for (var workout in workoutsToConsider) {
+      double score = 0.0;
+
+      // Собираем все группы мышц из всех упражнений тренировки
+      final allMuscleGroups = <MuscleGroupTag>[];
+      for (var exercise in workout.exercises) {
+        allMuscleGroups.addAll(exercise.exercise.muscleGroups);
       }
+
+      // Рассчитываем базовый приоритет восстановления
+      final recoveryScore = _recoveryTracker.calculateWorkoutPriority(
+        allMuscleGroups,
+        recoveryPriorities,
+      );
+
+      score += recoveryScore * 100; // Основной вес
+
+      // Бонус, если тренировка включает мышцы, которые нужно тренировать
+      int trainableCount = 0;
+      int restingCount = 0;
+      for (var muscleTag in allMuscleGroups) {
+        if (musclesToTrain.contains(muscleTag.group)) {
+          trainableCount += muscleTag.score;
+        }
+        if (musclesToRest.contains(muscleTag.group)) {
+          restingCount += muscleTag.score;
+        }
+      }
+
+      score += trainableCount * 5.0; // Бонус за мышцы, готовые к тренировке
+      score -= restingCount * 10.0; // Штраф за мышцы, требующие отдыха
+
+      // Учитываем readiness через количество упражнений
+      final readiness = factors['readiness'] as double;
+      final exerciseCount = workout.exercises.length;
+
+      if (readiness < 0.5) {
+        // При низкой готовности предпочитаем короткие тренировки
+        if (exerciseCount <= 4) {
+          score += 20.0;
+        }
+      } else if (readiness > 0.7) {
+        // При высокой готовности можем делать длинные тренировки
+        if (exerciseCount >= 6) {
+          score += 15.0;
+        }
+      }
+
+      workoutScores[workout] = score;
     }
 
-    return workouts.first;
+    // Выбираем тренировку с максимальным приоритетом
+    final sortedWorkouts = workoutScores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    if (sortedWorkouts.isEmpty) {
+      return workouts.first;
+    }
+
+    return sortedWorkouts.first.key;
   }
 
   RecommendationLevel _determineLevel(
@@ -313,6 +389,12 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final readiness = factors['readiness'] as double;
     final daysSince = factors['daysSinceLastWorkout'] as int;
 
+    // ✨ НОВОЕ: Добавляем информацию о восстановлении мышц
+    final musclesToTrain = factors['musclesToTrain'] as List<MuscleGroup>;
+    final musclesToRest = factors['musclesToRest'] as List<MuscleGroup>;
+    final daysSinceTraining =
+        factors['daysSinceTraining'] as Map<MuscleGroup, int>;
+
     if (level == RecommendationLevel.rest) {
       if (daysSince < 1) {
         reasons.add('Rest day - you trained yesterday');
@@ -336,6 +418,23 @@ class WorkoutRecommendationService extends ChangeNotifier {
         reasons.add('Well-recovered from last session');
       } else if (daysSince == 1) {
         reasons.add('One day recovery - intensity adjusted accordingly');
+      }
+
+      // Добавляем информацию о готовых к тренировке мышцах
+      if (musclesToTrain.isNotEmpty) {
+        final topMuscles = musclesToTrain.take(2).map((m) {
+          final days = daysSinceTraining[m] ?? 0;
+          return '${MuscleRecoveryTracker.getMuscleGroupDisplayName(m)} ($days дней)';
+        }).join(', ');
+        reasons.add('Готовы к тренировке: $topMuscles');
+      }
+
+      // Предупреждаем о мышцах, требующих отдыха
+      if (musclesToRest.isNotEmpty) {
+        final restingMuscles = musclesToRest.take(2).map((m) {
+          return MuscleRecoveryTracker.getMuscleGroupDisplayName(m);
+        }).join(', ');
+        reasons.add('Требуют отдыха: $restingMuscles');
       }
     }
 
@@ -378,5 +477,27 @@ class WorkoutRecommendationService extends ChangeNotifier {
   Future<WorkoutRecommendation?> regenerateRecommendation() async {
     _lastRecommendationDate = null;
     return await generateTodaysRecommendation();
+  }
+
+  /// Получает детальную информацию о восстановлении мышц
+  Map<MuscleGroup, String> getMuscleRecoveryStatus() {
+    final histories = _dataManager.workoutHistory;
+    final daysSinceTraining =
+        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+    return _recoveryTracker.getRecoveryRecommendations(daysSinceTraining);
+  }
+
+  /// Получает приоритеты восстановления для всех групп мышц
+  Map<MuscleGroup, double> getMuscleRecoveryPriorities() {
+    final histories = _dataManager.workoutHistory;
+    final daysSinceTraining =
+        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+    return _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
+  }
+
+  /// Получает количество дней с последней тренировки для каждой группы мышц
+  Map<MuscleGroup, int> getDaysSinceLastTraining() {
+    final histories = _dataManager.workoutHistory;
+    return _recoveryTracker.calculateDaysSinceLastTraining(histories);
   }
 }
