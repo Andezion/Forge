@@ -3,21 +3,20 @@ import '../models/workout_history.dart';
 
 class MuscleRecoveryTracker {
   static const Map<MuscleGroup, int> _optimalRecoveryDays = {
-    MuscleGroup.legs: 3, // Большие мышцы - дольше восстанавливаются
-    MuscleGroup.back: 3, // Большие мышцы
-    MuscleGroup.chest: 2, // Средние мышцы
-    MuscleGroup.shoulders: 2, // Средние мышцы
-    MuscleGroup.glutes: 3, // Большие мышцы
-    MuscleGroup.biceps: 2, // Малые мышцы
-    MuscleGroup.triceps: 2, // Малые мышцы
-    MuscleGroup.forearms: 1, // Малые мышцы, быстрое восстановление
-    MuscleGroup.wrists: 1, // Малые мышцы
-    MuscleGroup.core: 1, // Можно тренировать часто
-    MuscleGroup.calves: 2, // Средние мышцы
-    MuscleGroup.cardio: 1, // Можно каждый день
+    MuscleGroup.legs: 3,
+    MuscleGroup.back: 3,
+    MuscleGroup.chest: 2,
+    MuscleGroup.shoulders: 2,
+    MuscleGroup.glutes: 3,
+    MuscleGroup.biceps: 2,
+    MuscleGroup.triceps: 2,
+    MuscleGroup.forearms: 1,
+    MuscleGroup.wrists: 1,
+    MuscleGroup.core: 1,
+    MuscleGroup.calves: 2,
+    MuscleGroup.cardio: 1,
   };
 
-  /// Рассчитывает количество дней отдыха для каждой группы мышц
   Map<MuscleGroup, int> calculateDaysSinceLastTraining(
       List<WorkoutHistory> histories) {
     final result = <MuscleGroup, int>{};
