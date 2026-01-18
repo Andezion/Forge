@@ -112,17 +112,17 @@ class MuscleRecoveryTracker {
       final optimalDays = _optimalRecoveryDays[group] ?? 2;
 
       if (daysSince >= 999) {
-        result[group] = 'Никогда не тренировали';
+        result[group] = 'Never trained';
       } else if (daysSince < 1) {
-        result[group] = 'Тренировали сегодня - отдых';
+        result[group] = 'Trained today - rest';
       } else if (daysSince < optimalDays) {
-        result[group] = 'Восстановление ($daysSince/$optimalDays дней)';
+        result[group] = 'Recovery ($daysSince/$optimalDays days)';
       } else if (daysSince == optimalDays) {
-        result[group] = '✅ Готово к тренировке';
+        result[group] = 'Ready to train';
       } else if (daysSince < optimalDays * 2) {
-        result[group] = '✅ Хорошее время для тренировки';
+        result[group] = 'Good time to train';
       } else {
-        result[group] = '⚠️ Давно не тренировали ($daysSince дней)';
+        result[group] = 'Long time no train ($daysSince days)';
       }
     }
 
@@ -157,29 +157,29 @@ class MuscleRecoveryTracker {
   static String getMuscleGroupDisplayName(MuscleGroup group) {
     switch (group) {
       case MuscleGroup.chest:
-        return 'Грудь';
+        return 'Chest';
       case MuscleGroup.back:
-        return 'Спина';
+        return 'Back';
       case MuscleGroup.legs:
-        return 'Ноги';
+        return 'Legs';
       case MuscleGroup.shoulders:
-        return 'Плечи';
+        return 'Shoulders';
       case MuscleGroup.biceps:
-        return 'Бицепс';
+        return 'Biceps';
       case MuscleGroup.triceps:
-        return 'Трицепс';
+        return 'Triceps';
       case MuscleGroup.forearms:
-        return 'Предплечья';
+        return 'Forearms';
       case MuscleGroup.wrists:
-        return 'Кисти';
+        return 'Wrists';
       case MuscleGroup.core:
-        return 'Пресс';
+        return 'Core';
       case MuscleGroup.glutes:
-        return 'Ягодицы';
+        return 'Glutes';
       case MuscleGroup.calves:
-        return 'Икры';
+        return 'Calves';
       case MuscleGroup.cardio:
-        return 'Кардио';
+        return 'Cardio';
     }
   }
 }
