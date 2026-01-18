@@ -22,31 +22,25 @@ class MuscleRecoveryTracker {
     final result = <MuscleGroup, int>{};
     final now = DateTime.now();
 
-    // Инициализируем все группы мышц большим значением
     for (var group in MuscleGroup.values) {
-      result[group] = 999; // Никогда не тренировали
+      result[group] = 999;
     }
 
     if (histories.isEmpty) {
       return result;
     }
 
-    // Создаем карту: группа мышц -> последняя дата тренировки
     final lastTrainingDates = <MuscleGroup, DateTime>{};
 
-    // Проходим по истории тренировок (от новых к старым)
     for (var history in histories.reversed) {
       final session = history.session;
 
-      // Проходим по всем упражнениям в тренировке
       for (var exerciseResult in session.exerciseResults) {
         final exercise = exerciseResult.exercise;
 
-        // Проходим по всем группам мышц в упражнении
         for (var muscleTag in exercise.muscleGroups) {
           final group = muscleTag.group;
 
-          // Если это первая встреча с этой группой мышц, сохраняем дату
           if (!lastTrainingDates.containsKey(group)) {
             lastTrainingDates[group] = history.date;
           }
@@ -54,7 +48,6 @@ class MuscleRecoveryTracker {
       }
     }
 
-    // Рассчитываем количество дней для каждой группы
     for (var entry in lastTrainingDates.entries) {
       final daysSince = now.difference(entry.value).inDays;
       result[entry.key] = daysSince;
@@ -63,9 +56,6 @@ class MuscleRecoveryTracker {
     return result;
   }
 
-  /// Рассчитывает приоритет восстановления для каждой группы мышц (0.0 - 1.0)
-  /// 1.0 = нужна срочная тренировка (давно не тренировали)
-  /// 0.0 = недавно тренировали, нужен отдых
   Map<MuscleGroup, double> calculateRecoveryPriority(
       Map<MuscleGroup, int> daysSinceTraining) {
     final result = <MuscleGroup, double>{};
@@ -75,23 +65,14 @@ class MuscleRecoveryTracker {
       final daysSince = entry.value;
       final optimalDays = _optimalRecoveryDays[group] ?? 2;
 
-      // Формула приоритета:
-      // - Если прошло меньше оптимального времени -> низкий приоритет (нужен отдых)
-      // - Если прошло больше оптимального -> высокий приоритет (пора тренировать)
-      // - Если прошло намного больше -> очень высокий приоритет
-
       if (daysSince < optimalDays) {
-        // Недостаточно отдыха: 0.0 - 0.3
         result[group] = (daysSince / optimalDays) * 0.3;
       } else if (daysSince == optimalDays) {
-        // Оптимальное время: 0.7
         result[group] = 0.7;
       } else if (daysSince < optimalDays * 2) {
-        // Хорошее время для тренировки: 0.7 - 1.0
         final excess = daysSince - optimalDays;
         result[group] = 0.7 + (excess / optimalDays) * 0.3;
       } else {
-        // Слишком долго не тренировали: 1.0+
         result[group] =
             1.0 + ((daysSince - optimalDays * 2) / 7.0).clamp(0, 0.5);
       }
@@ -100,7 +81,6 @@ class MuscleRecoveryTracker {
     return result;
   }
 
-  /// Рассчитывает общую оценку приоритета для тренировки на основе групп мышц
   double calculateWorkoutPriority(
     List<MuscleGroupTag> muscleGroups,
     Map<MuscleGroup, double> recoveryPriorities,
@@ -113,8 +93,7 @@ class MuscleRecoveryTracker {
     for (var muscleTag in muscleGroups) {
       final group = muscleTag.group;
       final priority = recoveryPriorities[group] ?? 0.5;
-      final weight =
-          muscleTag.score; // 3 для primary, 2 для secondary, 1 для stabilizer
+      final weight = muscleTag.score;
 
       totalPriority += priority * weight;
       totalWeight += weight;
@@ -123,7 +102,6 @@ class MuscleRecoveryTracker {
     return totalWeight > 0 ? totalPriority / totalWeight : 0.5;
   }
 
-  /// Возвращает рекомендации по тренировке групп мышц
   Map<MuscleGroup, String> getRecoveryRecommendations(
       Map<MuscleGroup, int> daysSinceTraining) {
     final result = <MuscleGroup, String>{};
