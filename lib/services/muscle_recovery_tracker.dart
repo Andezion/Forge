@@ -129,7 +129,6 @@ class MuscleRecoveryTracker {
     return result;
   }
 
-  /// Получает группы мышц, которые нуждаются в тренировке (priority > 0.7)
   List<MuscleGroup> getMusclesToTrain(
       Map<MuscleGroup, double> recoveryPriorities) {
     return recoveryPriorities.entries
@@ -140,7 +139,6 @@ class MuscleRecoveryTracker {
           (a, b) => recoveryPriorities[b]!.compareTo(recoveryPriorities[a]!));
   }
 
-  /// Получает группы мышц, которым нужен отдых (priority < 0.3)
   List<MuscleGroup> getMusclesToRest(
       Map<MuscleGroup, double> recoveryPriorities) {
     return recoveryPriorities.entries
@@ -151,13 +149,11 @@ class MuscleRecoveryTracker {
           (a, b) => recoveryPriorities[a]!.compareTo(recoveryPriorities[b]!));
   }
 
-  /// Проверяет, безопасно ли тренировать эту группу мышц сегодня
   bool isSafeToTrain(MuscleGroup group, int daysSinceTraining) {
     final optimalDays = _optimalRecoveryDays[group] ?? 2;
     return daysSinceTraining >= optimalDays;
   }
 
-  /// Получает человекочитаемое название группы мышц
   static String getMuscleGroupDisplayName(MuscleGroup group) {
     switch (group) {
       case MuscleGroup.chest:
