@@ -81,7 +81,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final userWeight = profile.weightKg ?? 75.0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,7 +114,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final weightClass = _getWeightClass(userWeight);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
