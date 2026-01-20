@@ -490,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 exerciseRec.exercise.exercise.name,
                 '${exerciseRec.exercise.sets}x${exerciseRec.exercise.targetReps}',
                 exerciseRec.exercise.weight > 0
-                    ? ' @ ${exerciseRec.exercise.weight}kg'
+                    ? ' with ${exerciseRec.exercise.weight} kg'
                     : '',
               );
             }),
