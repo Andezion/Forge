@@ -67,13 +67,20 @@ class _WellnessScreenState extends State<WellnessScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final questions = [
-      l10n.energy,
-      l10n.mood,
-      l10n.tiredness,
-      l10n.stress,
-      l10n.muscleSoreness,
+    final _questionKeys = [
+      'energy',
+      'mood',
+      'tiredness',
+      'stress',
+      'muscleSoreness',
     ];
+    final _questionLabels = {
+      'energy': l10n.energy,
+      'mood': l10n.mood,
+      'tiredness': l10n.tiredness,
+      'stress': l10n.stress,
+      'muscleSoreness': l10n.muscleSoreness,
+    };
     final service = Provider.of<WellnessService>(context);
     final canSubmit = service.canSubmit();
     final timeUntil = service.timeUntilNext();
@@ -129,8 +136,8 @@ class _WellnessScreenState extends State<WellnessScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  for (var q in questions) ...[
-                    Text(q,
+                  for (var key in _questionKeys) ...[
+                    Text(_questionLabels[key]!,
                         style: AppTextStyles.body1.copyWith(
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         )),
@@ -139,15 +146,15 @@ class _WellnessScreenState extends State<WellnessScreen> {
                       children: [
                         Expanded(
                           child: Slider(
-                            value: _values[q]!.toDouble(),
+                            value: _values[key]!.toDouble(),
                             min: 0,
                             max: 5,
                             divisions: 5,
-                            label: _values[q].toString(),
+                            label: _values[key].toString(),
                             activeColor: AppColors.primary,
                             onChanged: (v) {
                               setState(() {
-                                _values[q] = v.round();
+                                _values[key] = v.round();
                               });
                             },
                           ),
@@ -157,7 +164,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                           width: 36,
                           child: Center(
                             child: Text(
-                              _values[q]!.toString(),
+                              _values[key]!.toString(),
                               style: AppTextStyles.h4,
                             ),
                           ),
