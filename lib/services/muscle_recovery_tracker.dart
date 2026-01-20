@@ -23,7 +23,7 @@ class MuscleRecoveryTracker {
     final now = DateTime.now();
 
     for (var group in MuscleGroup.values) {
-      result[group] = 999;
+      result[group] = 14;
     }
 
     if (histories.isEmpty) {
@@ -111,8 +111,10 @@ class MuscleRecoveryTracker {
       final daysSince = entry.value;
       final optimalDays = _optimalRecoveryDays[group] ?? 2;
 
-      if (daysSince >= 999) {
-        result[group] = 'Never trained';
+      if (daysSince >= 10) {
+        result[group] = 'Really need to train!';
+      } else if (daysSince >= 7) {
+        result[group] = 'Definitely time to train';
       } else if (daysSince < 1) {
         result[group] = 'Trained today - rest';
       } else if (daysSince < optimalDays) {
