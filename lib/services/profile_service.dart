@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import '../models/chart_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileService extends ChangeNotifier {
@@ -12,10 +14,12 @@ class ProfileService extends ChangeNotifier {
   static const _keyAge = 'profile_age';
   static const _keyHeight = 'profile_height';
   static const _keyYearsTraining = 'profile_years_training';
+  static const _keyWeightHistory = 'profile_weight_history';
 
   String? _imagePath;
   int _frameIndex = 0;
   double? _weightKg;
+  final List<ChartDataPoint> _weightHistory = [];
   List<String> _goals = [];
   String? _experienceLevel;
   List<String> _trainingFocus = [];
@@ -27,6 +31,7 @@ class ProfileService extends ChangeNotifier {
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
   double? get weightKg => _weightKg;
+  List<ChartDataPoint> get weightHistory => List.unmodifiable(_weightHistory);
   List<String> get goals => _goals;
   String? get experienceLevel => _experienceLevel;
   List<String> get trainingFocus => _trainingFocus;
@@ -51,6 +56,18 @@ class ProfileService extends ChangeNotifier {
     _yearsTraining = prefs.containsKey(_keyYearsTraining)
         ? prefs.getDouble(_keyYearsTraining)
         : null;
+    try {
+      final hist = prefs.getStringList(_keyWeightHistory) ?? [];
+      _weightHistory.clear();
+      for (var s in hist) {
+        final m = jsonDecode(s) as Map<String, dynamic>;
+        final dt = DateTime.parse(m['t'] as String);
+        final w = (m['w'] as num).toDouble();
+        _weightHistory.add(ChartDataPoint(date: dt, value: w));
+      }
+    } catch (_) {
+      _weightHistory.clear();
+    }
     notifyListeners();
   }
 
@@ -74,13 +91,27 @@ class ProfileService extends ChangeNotifier {
 
   Future<void> setWeightKg(double? kg) async {
     _weightKg = kg;
-    notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     if (kg == null) {
       await prefs.remove(_keyWeight);
     } else {
       await prefs.setDouble(_keyWeight, kg);
+      try {
+        final entry = jsonEncode({
+          't': DateTime.now().toIso8601String(),
+          'w': kg,
+        });
+        final hist = prefs.getStringList(_keyWeightHistory) ?? [];
+        hist.insert(0, entry);
+        if (hist.length > 365) hist.removeRange(365, hist.length);
+        await prefs.setStringList(_keyWeightHistory, hist);
+        _weightHistory.insert(
+            0, ChartDataPoint(date: DateTime.now(), value: kg));
+        if (_weightHistory.length > 365)
+          _weightHistory.removeRange(365, _weightHistory.length);
+      } catch (_) {}
     }
+    notifyListeners();
   }
 
   Future<void> setGoals(List<String> goals) async {
