@@ -148,7 +148,9 @@ class MuscleRecoveryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              days >= 999 ? 'Not trained' : '$days ${_getDaysWord(days)}',
+              days >= 10
+                  ? '10+ ${_getDaysWord(10)}'
+                  : '$days ${_getDaysWord(days)}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: color,
                     fontWeight: FontWeight.w600,
@@ -220,9 +222,12 @@ class MuscleRecoveryCompact extends StatelessWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
