@@ -88,20 +88,30 @@ class ProgressAnalyticsService {
     List<WorkoutHistory> histories,
     double currentWeight, {
     int lookbackDays = 90,
+    List<ChartDataPoint>? weightHistory,
   }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
     final weightPoints = <ChartDataPoint>[];
     final weightByDate = <DateTime, double>{};
 
-    for (var history in histories) {
-      if (history.date.isAfter(cutoffDate)) {
-        final dateOnly = DateTime(
-          history.date.year,
-          history.date.month,
-          history.date.day,
-        );
-        weightByDate[dateOnly] = currentWeight;
+    if (weightHistory != null && weightHistory.isNotEmpty) {
+      for (var p in weightHistory) {
+        if (p.date.isAfter(cutoffDate)) {
+          final dateOnly = DateTime(p.date.year, p.date.month, p.date.day);
+          weightByDate[dateOnly] = p.value;
+        }
+      }
+    } else {
+      for (var history in histories) {
+        if (history.date.isAfter(cutoffDate)) {
+          final dateOnly = DateTime(
+            history.date.year,
+            history.date.month,
+            history.date.day,
+          );
+          weightByDate[dateOnly] = currentWeight;
+        }
       }
     }
 
