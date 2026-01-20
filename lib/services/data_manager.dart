@@ -945,12 +945,13 @@ class DataManager extends ChangeNotifier {
 
   void addWorkout(Workout workout) {
     _workouts.add(workout);
-
+    _saveData();
     notifyListeners();
   }
 
   void updateWorkout(int index, Workout workout) {
     if (index >= 0 && index < _workouts.length) {
+      _workouts[index] = workout;
       _saveData();
       notifyListeners();
     }
@@ -958,6 +959,7 @@ class DataManager extends ChangeNotifier {
 
   void removeWorkout(int index) {
     if (index >= 0 && index < _workouts.length) {
+      _workouts.removeAt(index);
       _saveData();
       notifyListeners();
     }
