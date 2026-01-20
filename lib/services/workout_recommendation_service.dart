@@ -146,7 +146,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final lastWorkout = histories.isNotEmpty ? histories.last.date : null;
     final daysSinceLastWorkout = lastWorkout != null
         ? DateTime.now().difference(lastWorkout).inDays
-        : 999;
+        : 14;
     factors['daysSinceLastWorkout'] = daysSinceLastWorkout;
 
     final daysSinceTraining =
