@@ -82,6 +82,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -90,7 +91,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         foregroundColor: AppColors.textOnPrimary,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0 + bottomInset),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
