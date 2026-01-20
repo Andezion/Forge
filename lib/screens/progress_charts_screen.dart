@@ -98,6 +98,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         histories,
         _profileService.weightKg ?? 70.0,
         lookbackDays: _lookbackDays,
+        weightHistory: _profileService.weightHistory,
       );
 
       await Future.delayed(const Duration(milliseconds: 10));
