@@ -880,7 +880,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                                           _previousExercisePerformance!
                                               .setResults.length) ...[
                                     Text(
-                                      'Last time: ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].actualReps} reps${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight > 0 ? " @ ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight} kg" : ""}',
+                                      'Last time: ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].actualReps} reps${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight > 0 ? " with ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight} kg" : ""}',
                                       style: AppTextStyles.caption.copyWith(
                                         color: AppColors.textSecondary,
                                         fontStyle: FontStyle.italic,
