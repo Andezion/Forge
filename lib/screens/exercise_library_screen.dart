@@ -158,6 +158,77 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     );
   }
 
+  void _deleteExercise(Exercise exercise) async {
+    final isUsed = _dataManager.isExerciseUsed(exercise.id);
+
+    if (isUsed) {
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exercise in Use'),
+          content: Text(
+            'The exercise "${exercise.name}" is currently used in one or more workout programs. Are you sure you want to delete it?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppStrings.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.error,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldDelete != true) return;
+    } else {
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Exercise'),
+          content: Text(
+            'Are you sure you want to delete "${exercise.name}"?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppStrings.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.error,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldDelete != true) return;
+    }
+
+    _dataManager.removeExercise(exercise.id);
+    setState(() {
+      _filteredExercises = List.from(_dataManager.exercises);
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${exercise.name} deleted'),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   Widget _buildExerciseCard(Exercise exercise) {
     Color difficultyColor;
     switch (exercise.difficulty) {
@@ -199,7 +270,18 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           exercise.description,
           style: AppTextStyles.body2,
         ),
-        trailing: const Icon(Icons.add_circle_outline),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              color: AppColors.error,
+              onPressed: () => _deleteExercise(exercise),
+              tooltip: 'Delete',
+            ),
+            const Icon(Icons.add_circle_outline),
+          ],
+        ),
         onTap: () {
           widget.onExerciseSelected(exercise);
         },

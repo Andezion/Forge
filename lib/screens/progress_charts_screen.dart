@@ -41,12 +41,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   void initState() {
     super.initState();
     _dataManager.addListener(_onDataChanged);
+    _profileService.addListener(_onProfileChanged);
     _loadData();
   }
 
   @override
   void dispose() {
     _dataManager.removeListener(_onDataChanged);
+    _profileService.removeListener(_onProfileChanged);
     super.dispose();
   }
 
@@ -55,13 +57,19 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     _loadData();
   }
 
+  void _onProfileChanged() {
+    print('[PROGRESS_CHARTS] Profile changed, reloading charts...');
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   Future<void> _loadData() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
       await _dataManager.initialize();
-      await _profileService.load();
       final histories = _dataManager.workoutHistory;
 
       if (histories.isEmpty) {
@@ -187,6 +195,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             onSelected: (days) {
               setState(() => _lookbackDays = days);
               _loadData();
+              if (_selectedExercise != null) {
+                _loadExerciseData(_selectedExercise!);
+              }
             },
             itemBuilder: (context) => [
               PopupMenuItem(value: 30, child: Text(l10n.thirtyDays)),

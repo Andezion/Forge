@@ -930,9 +930,24 @@ class DataManager extends ChangeNotifier {
     _saveData();
   }
 
+  bool isExerciseUsed(String exerciseId) {
+    for (var workout in _workouts) {
+      for (var workoutExercise in workout.exercises) {
+        if (workoutExercise.exercise.id == exerciseId) {
+          return true;
+        }
+        if (workoutExercise.alternativeExercise?.id == exerciseId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   void removeExercise(String id) {
     _exercises.removeWhere((exercise) => exercise.id == id);
     _saveData();
+    notifyListeners();
   }
 
   Exercise? getExerciseById(String id) {
@@ -981,8 +996,19 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkoutHistory(WorkoutHistory history) {
+    print('[DATA_MANAGER] Adding workout history: ${history.id}');
+    print('[DATA_MANAGER] Current history count: ${_workoutHistory.length}');
+
+    final exists = _workoutHistory.any((h) => h.id == history.id);
+    if (exists) {
+      print('[DATA_MANAGER] WARNING: Duplicate history detected, skipping add');
+      return;
+    }
+
     _workoutHistory.add(history);
+    print('[DATA_MANAGER] New history count: ${_workoutHistory.length}');
     _saveData();
+    notifyListeners();
 
     _updateChallengeScoresAfterWorkout();
 

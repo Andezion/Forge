@@ -39,6 +39,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   ExerciseResult? _currentExerciseResult;
   final DataManager _dataManager = DataManager();
   ExerciseResult? _previousExercisePerformance;
+  bool _workoutFinished = false;
 
   @override
   void initState() {
@@ -538,6 +539,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   }
 
   void _finishWorkout() async {
+    if (_workoutFinished) {
+      print('[WORKOUT_EXEC] Workout already finished, ignoring duplicate call');
+      return;
+    }
+
+    _workoutFinished = true;
     _timer?.cancel();
 
     final completedSession = _session.copyWith(

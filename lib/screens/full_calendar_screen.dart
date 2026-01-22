@@ -52,113 +52,9 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              ...workouts.map((workout) => _buildWorkoutCard(workout)),
+              ...workouts.map((workout) => _WorkoutCardWidget(workout: workout)),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWorkoutCard(WorkoutHistory workout) {
-    final session = workout.session;
-    final duration = session.totalDurationSeconds;
-    final hours = duration ~/ 3600;
-    final minutes = (duration % 3600) ~/ 60;
-    final durationText = hours > 0 ? '${hours}h ${minutes}m' : '${minutes}m';
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: AppColors.surface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.divider),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    session.workoutName,
-                    style: AppTextStyles.h4,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'Completed',
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.success,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.timer_outlined,
-                  size: 16,
-                  color: AppColors.textSecondary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  durationText,
-                  style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Icon(
-                  Icons.fitness_center,
-                  size: 16,
-                  color: AppColors.textSecondary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${session.exerciseResults.length} exercises',
-                  style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            if (session.exerciseResults.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              ...session.exerciseResults.take(3).map((result) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      '• ${result.exercise.name}: ${result.setResults.length} sets',
-                      style: AppTextStyles.body2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )),
-              if (session.exerciseResults.length > 3)
-                Text(
-                  '  +${session.exerciseResults.length - 3} more...',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-            ],
-          ],
         ),
       ),
     );
@@ -296,7 +192,208 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: workouts.length,
-      itemBuilder: (context, index) => _buildWorkoutCard(workouts[index]),
+      itemBuilder: (context, index) => _WorkoutCardWidget(workout: workouts[index]),
+    );
+  }
+}
+
+class _WorkoutCardWidget extends StatefulWidget {
+  final WorkoutHistory workout;
+
+  const _WorkoutCardWidget({required this.workout});
+
+  @override
+  State<_WorkoutCardWidget> createState() => _WorkoutCardWidgetState();
+}
+
+class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final session = widget.workout.session;
+    final duration = session.totalDurationSeconds;
+    final hours = duration ~/ 3600;
+    final minutes = (duration % 3600) ~/ 60;
+    final durationText = hours > 0 ? '${hours}h ${minutes}m' : '${minutes}m';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: AppColors.surface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.divider),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    session.workoutName,
+                    style: AppTextStyles.h4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Completed',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.timer_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  durationText,
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Icon(
+                  Icons.fitness_center,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${session.exerciseResults.length} exercises',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  tooltip: _isExpanded ? 'Collapse' : 'Expand',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            if (!_isExpanded && session.exerciseResults.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ...session.exerciseResults.take(3).map((result) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '• ${result.exercise.name}: ${result.setResults.length} sets',
+                      style: AppTextStyles.body2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )),
+              if (session.exerciseResults.length > 3)
+                Text(
+                  '  +${session.exerciseResults.length - 3} more...',
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+            ],
+            if (_isExpanded && session.exerciseResults.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 8),
+              ...session.exerciseResults.map((result) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.divider,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        result.exercise.name,
+                        style: AppTextStyles.body1.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...result.setResults.map((set) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: AppColors.success,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${set.setNumber}',
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: AppColors.textOnPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                '${set.actualReps} reps × ${set.weight.toStringAsFixed(1)} kg',
+                                style: AppTextStyles.body2,
+                              ),
+                              const Spacer(),
+                              Text(
+                                '${set.durationSeconds}s',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
