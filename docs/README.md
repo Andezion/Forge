@@ -152,7 +152,7 @@ To add Google Analytics:
 </script>
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Site not loading
 - Check GitHub Pages settings
