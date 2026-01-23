@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/chart_data.dart';
 import '../models/exercise.dart';
 import '../services/progress_analytics_service.dart';
@@ -20,7 +21,6 @@ class ProgressChartsScreen extends StatefulWidget {
 class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   final _analyticsService = ProgressAnalyticsService();
   final _dataManager = DataManager();
-  final _profileService = ProfileService();
 
   bool _isLoading = true;
   String _selectedTab = 'overall';
@@ -41,19 +41,20 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   void initState() {
     super.initState();
     _dataManager.addListener(_onDataChanged);
-    _profileService.addListener(_onProfileChanged);
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    await _profileService.load();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProfileService>(context, listen: false)
+          .addListener(_onDataChanged);
+    });
     _loadData();
   }
 
   @override
   void dispose() {
     _dataManager.removeListener(_onDataChanged);
-    _profileService.removeListener(_onProfileChanged);
+    try {
+      Provider.of<ProfileService>(context, listen: false)
+          .removeListener(_onDataChanged);
+    } catch (_) {}
     super.dispose();
   }
 
@@ -62,18 +63,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     _loadData();
   }
 
-  void _onProfileChanged() {
-    print('[PROGRESS_CHARTS] Profile changed, reloading charts...');
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   Future<void> _loadData() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
+      final profileService =
+          Provider.of<ProfileService>(context, listen: false);
+
       await _dataManager.initialize();
       final histories = _dataManager.workoutHistory;
 
@@ -109,9 +106,9 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
       _bodyWeightData = _analyticsService.analyzeBodyWeight(
         histories,
-        _profileService.weightKg ?? 70.0,
+        profileService.weightKg ?? 70.0,
         lookbackDays: _lookbackDays,
-        weightHistory: _profileService.weightHistory,
+        weightHistory: profileService.weightHistory,
       );
 
       await Future.delayed(const Duration(milliseconds: 10));
