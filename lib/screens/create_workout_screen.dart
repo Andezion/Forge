@@ -154,7 +154,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                  maxHeight: MediaQuery.of(context).size.height * 0.75,
                 ),
                 child: SingleChildScrollView(
                   child: Padding(
