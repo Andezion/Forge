@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Formulas - SYHA Forge</title>
+    <meta name="description" content="Detailed explanation of all analytics formulas used in SYHA Forge for tracking workout progress, strength gains, and performance metrics.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">⚒️ SYHA FORGE</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="formulas.html">Formulas</a></li>
+                <li><a href="technical.html">Technical Docs</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h1>📐 Analytics Formulas</h1>
+            <p>SYHA Forge uses scientifically-backed formulas to calculate your progress metrics. This page explains each formula in detail.</p>
+        </section>
+
+        <section id="strength-coefficient">
+            <h2>💪 Overall Strength Coefficient</h2>
+            <p>The Strength Coefficient is a comprehensive metric that tracks your overall strength development across <strong>all exercises</strong>.</p>
+
+            <div class="formula">
+                <div class="formula-title">Base Formula</div>
+                <div class="formula-content">
+                    Strength Coefficient = (Σ(max_weight / first_weight) / exercise_count) × 100
+                </div>
+                <div class="formula-explanation">
+                    <strong>Where:</strong>
+                    <ul>
+                        <li><strong>max_weight:</strong> The maximum weight lifted for each exercise across the lookback period</li>
+                        <li><strong>first_weight:</strong> The first recorded weight for that exercise</li>
+                        <li><strong>exercise_count:</strong> Total number of unique exercises performed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>How It Works</h3>
+            <p>The algorithm:</p>
+            <ol>
+                <li>Filters workout history to the specified lookback period (default 90 days)</li>
+                <li>For each exercise, tracks:
+                    <ul>
+                        <li>The first weight you ever used (baseline)</li>
+                        <li>The maximum weight you've lifted</li>
+                        <li>The date you achieved that max</li>
+                    </ul>
+                </li>
+                <li>Calculates the progress ratio for each exercise: <code>current_max / first_weight</code></li>
+                <li>Averages all ratios and multiplies by 100</li>
+            </ol>
+
+            <h3>Interpretation</h3>
+            <ul>
+                <li><strong>100:</strong> Baseline (no progress from starting weights)</li>
+                <li><strong>150:</strong> You're 50% stronger overall than when you started</li>
+                <li><strong>200:</strong> You've doubled your strength across all exercises</li>
+            </ul>
+
+            <div class="formula">
+                <div class="formula-title">Progress Percentage</div>
+                <div class="formula-content">
+                    Progress % = ((current_coefficient - previous_coefficient) / previous_coefficient) × 100
+                </div>
+                <div class="formula-explanation">
+                    Shows your improvement rate compared to the second-to-last data point.
+                </div>
+            </div>
+        </section>
+
+        <section id="exercise-progress">
+            <h2>🏋️ Exercise-Specific Progress</h2>
+            <p>Track detailed progress for individual exercises with three key metrics.</p>
+
+            <div class="formula">
+                <div class="formula-title">1. Maximum Weight Tracking</div>
+                <div class="formula-content">
+                    max_weight = max(set_1.weight, set_2.weight, ..., set_n.weight)
+                </div>
+                <div class="formula-explanation">
+                    For each workout session, we record the heaviest weight lifted across all sets.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">2. Volume Calculation</div>
+                <div class="formula-content">
+                    Volume = Σ(weight × actual_reps) for all sets
+                </div>
+                <div class="formula-explanation">
+                    Total volume quantifies the total work performed. Higher volume typically indicates greater training stimulus.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">3. Intensity Metric</div>
+                <div class="formula-content">
+                    Intensity (%) = (average_weight / max_weight) × 100
+                </div>
+                <div class="formula-explanation">
+                    <strong>Where:</strong>
+                    <ul>
+                        <li><strong>average_weight:</strong> Average weight across all sets in that session</li>
+                        <li><strong>max_weight:</strong> The heaviest weight lifted in that session</li>
+                    </ul>
+                    <p>Intensity shows how close your working sets are to your maximum effort. Higher intensity (closer to 100%) indicates training closer to your max capacity.</p>
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Progress Percentage</div>
+                <div class="formula-content">
+                    Progress % = ((current_max - previous_max) / previous_max) × 100
+                </div>
+                <div class="formula-explanation">
+                    Compares your latest max to your previous recorded max for this exercise.
+                </div>
+            </div>
+        </section>
+
+        <section id="body-weight">
+            <h2>⚖️ Body Weight Tracking</h2>
+            <p>Monitor your body composition changes over time.</p>
+
+            <div class="formula">
+                <div class="formula-title">Weight Change</div>
+                <div class="formula-content">
+                    Weight Change = current_weight - start_weight
+                </div>
+                <div class="formula-explanation">
+                    Tracks absolute change from your first recorded weight in the lookback period.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Average Weight</div>
+                <div class="formula-content">
+                    Average Weight = Σ(weight_points) / total_points
+                </div>
+                <div class="formula-explanation">
+                    Calculates your mean body weight across all recorded measurements.
+                </div>
+            </div>
+
+            <h3>Data Integration</h3>
+            <p>Body weight data is sourced from:</p>
+            <ol>
+                <li><strong>Profile Service:</strong> Direct weight entries from "Body Weight" screen</li>
+                <li><strong>Weight History:</strong> Historical weight logs stored with timestamps</li>
+                <li><strong>Workout Sessions:</strong> Fallback to current weight if no history exists</li>
+            </ol>
+        </section>
+
+        <section id="volume">
+            <h2>📦 Workout Volume Analysis</h2>
+            <p>Volume is the total amount of weight lifted, a key indicator of training stimulus.</p>
+
+            <div class="formula">
+                <div class="formula-title">Daily Volume</div>
+                <div class="formula-content">
+                    Daily Volume = Σ(weight × reps) for all exercises in session
+                </div>
+                <div class="formula-explanation">
+                    Aggregates the total volume for each workout day.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Weekly Volume</div>
+                <div class="formula-content">
+                    Weekly Volume = Σ(daily_volumes) for all days in week
+                </div>
+                <div class="formula-explanation">
+                    Sums up all daily volumes for each training week. Week starts on Monday.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Average Volume</div>
+                <div class="formula-content">
+                    Average Volume = Σ(weekly_volumes) / total_weeks
+                </div>
+                <div class="formula-explanation">
+                    Your typical weekly training volume across the entire lookback period.
+                </div>
+            </div>
+
+            <h3>Week Definition</h3>
+            <p>Weeks are calculated as Monday to Sunday periods using this helper function:</p>
+            <pre><code>week_start = date - Duration(days: date.weekday - 1)</code></pre>
+        </section>
+
+        <section id="frequency">
+            <h2>📅 Workout Frequency</h2>
+            <p>Track how often you train and maintain consistency streaks.</p>
+
+            <div class="formula">
+                <div class="formula-title">Weekly Frequency</div>
+                <div class="formula-content">
+                    Weekly Frequency = workouts_per_week
+                </div>
+                <div class="formula-explanation">
+                    Counts the number of workout sessions completed each week.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Average Frequency</div>
+                <div class="formula-content">
+                    Average Frequency = Σ(weekly_frequencies) / total_weeks
+                </div>
+                <div class="formula-explanation">
+                    Your typical weekly training frequency.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Streak Calculation</div>
+                <div class="formula-content">
+                    Streak += 1 if (previous_date - current_date) ≤ 2 days
+                </div>
+                <div class="formula-explanation">
+                    Counts consecutive training days with a 2-day grace period to account for rest days.
+                </div>
+            </div>
+
+            <h3>Streak Logic</h3>
+            <p>The streak algorithm:</p>
+            <ol>
+                <li>Sorts all workout dates in descending order (most recent first)</li>
+                <li>Starts from the most recent workout</li>
+                <li>Continues the streak if workouts are within 2 days of each other</li>
+                <li>Breaks the streak if the gap exceeds 2 days</li>
+            </ol>
+        </section>
+
+        <section id="consistency">
+            <h2>✅ Consistency & Completion Rate</h2>
+            <p>Measures how well you stick to your planned workouts.</p>
+
+            <div class="formula">
+                <div class="formula-title">Session Completion Rate</div>
+                <div class="formula-content">
+                    Session Completion % = (sets_completed / sets_planned) × 100
+                </div>
+                <div class="formula-explanation">
+                    Calculates what percentage of planned sets you actually completed in each session.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Overall Completion Rate</div>
+                <div class="formula-content">
+                    Overall Completion % = (total_sets_completed / total_sets_planned) × 100
+                </div>
+                <div class="formula-explanation">
+                    Your aggregated completion rate across all workouts in the lookback period.
+                </div>
+            </div>
+
+            <h3>What Counts</h3>
+            <ul>
+                <li><strong>Sets Planned:</strong> The target number of sets specified in your workout program</li>
+                <li><strong>Sets Completed:</strong> The actual number of sets you logged</li>
+            </ul>
+
+            <h3>Interpretation</h3>
+            <ul>
+                <li><strong>&gt;90%:</strong> Excellent adherence to your program</li>
+                <li><strong>75-90%:</strong> Good consistency with occasional incomplete workouts</li>
+                <li><strong>&lt;75%:</strong> May need to adjust program difficulty or time management</li>
+            </ul>
+        </section>
+
+        <section id="lookback">
+            <h2>⏰ Lookback Period</h2>
+            <p>All formulas use a configurable lookback period to filter relevant data.</p>
+
+            <div class="formula">
+                <div class="formula-title">Date Filtering</div>
+                <div class="formula-content">
+                    cutoff_date = current_date - Duration(days: lookback_days)
+                </div>
+                <div class="formula-explanation">
+                    Only workouts after this cutoff date are included in calculations.
+                </div>
+            </div>
+
+            <h3>Available Periods</h3>
+            <ul>
+                <li><strong>30 days:</strong> Recent short-term progress</li>
+                <li><strong>90 days (default):</strong> Medium-term training cycles</li>
+                <li><strong>180 days:</strong> Long-term trends and patterns</li>
+                <li><strong>365 days:</strong> Annual progress and year-over-year comparison</li>
+            </ul>
+        </section>
+
+        <section id="example">
+            <h2>📊 Example Calculation</h2>
+            <p>Let's walk through a real example of calculating the Strength Coefficient.</p>
+
+            <h3>Scenario</h3>
+            <p>A user has tracked 3 exercises over 90 days:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Exercise</th>
+                        <th>First Weight</th>
+                        <th>Max Weight</th>
+                        <th>Progress Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bench Press</td>
+                        <td>60 kg</td>
+                        <td>90 kg</td>
+                        <td>1.50</td>
+                    </tr>
+                    <tr>
+                        <td>Squat</td>
+                        <td>80 kg</td>
+                        <td>120 kg</td>
+                        <td>1.50</td>
+                    </tr>
+                    <tr>
+                        <td>Deadlift</td>
+                        <td>100 kg</td>
+                        <td>140 kg</td>
+                        <td>1.40</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Calculation</h3>
+            <pre><code>Total Progress Ratio = 1.50 + 1.50 + 1.40 = 4.40
+Exercise Count = 3
+Strength Coefficient = (4.40 / 3) × 100 = 146.67</code></pre>
+
+            <h3>Result</h3>
+            <p>This user has improved their overall strength by <strong>46.67%</strong> across all exercises!</p>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SYHA Forge. Built with 🔥 using Flutter & Firebase.</p>
+            <p>
+                <a href="https://github.com/vdoro/Dyplom">GitHub</a> |
+                <a href="index.html">Home</a> |
+                <a href="technical.html">Docs</a> |
+                <a href="contributing.html">Contribute</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

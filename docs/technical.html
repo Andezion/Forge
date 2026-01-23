@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Documentation - SYHA Forge</title>
+    <meta name="description" content="Technical documentation for SYHA Forge including architecture, data models, services, and implementation details.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">⚒️ SYHA FORGE</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="formulas.html">Formulas</a></li>
+                <li><a href="technical.html">Technical Docs</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h1>🔧 Technical Documentation</h1>
+            <p>Comprehensive technical guide for developers contributing to or learning from SYHA Forge.</p>
+        </section>
+
+        <section id="tech-stack">
+            <h2>🛠️ Technology Stack</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Framework</h3>
+                    <p><strong>Flutter 3.6.2+</strong> - Cross-platform mobile development framework using Dart</p>
+                </div>
+                <div class="card">
+                    <h3>Backend</h3>
+                    <p><strong>Firebase</strong> - Authentication, Cloud Firestore for data storage</p>
+                </div>
+                <div class="card">
+                    <h3>State Management</h3>
+                    <p><strong>Provider 6.0.5</strong> - Reactive state management and dependency injection</p>
+                </div>
+                <div class="card">
+                    <h3>Local Storage</h3>
+                    <p><strong>SharedPreferences 2.2.2</strong> - Persistent key-value storage for offline data</p>
+                </div>
+                <div class="card">
+                    <h3>Charts</h3>
+                    <p><strong>FL Chart 0.69.2</strong> - Beautiful, customizable charts for progress visualization</p>
+                </div>
+                <div class="card">
+                    <h3>Calendar</h3>
+                    <p><strong>Table Calendar 3.0.9</strong> - Highly customizable calendar widget</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>🏗️ Architecture</h2>
+            <p>SYHA Forge follows a clean architecture pattern with clear separation of concerns.</p>
+
+            <h3>Directory Structure</h3>
+            <pre><code>lib/
+├── constants/          # App-wide constants
+│   ├── app_colors.dart      # Color definitions
+│   ├── app_strings.dart     # Localized strings
+│   └── app_text_styles.dart # Text styling
+├── models/             # Data models
+│   ├── exercise.dart        # Exercise entity
+│   ├── workout.dart         # Workout program
+│   ├── workout_history.dart # Completed workout records
+│   ├── chart_data.dart      # Chart data structures
+│   └── user.dart            # User profile model
+├── screens/            # UI screens
+│   ├── home_screen.dart
+│   ├── profile_screen.dart
+│   ├── programs_screen.dart
+│   ├── full_calendar_screen.dart
+│   ├── progress_charts_screen.dart
+│   └── ...
+├── services/           # Business logic
+│   ├── data_manager.dart              # Central data management
+│   ├── progress_analytics_service.dart # Progress calculations
+│   ├── profile_service.dart           # User profile management
+│   ├── auth_service.dart              # Firebase authentication
+│   └── theme_service.dart             # Theme customization
+└── main.dart           # App entry point</code></pre>
+
+            <h3>Layer Responsibilities</h3>
+            <ul>
+                <li><strong>Models:</strong> Pure data classes with serialization logic</li>
+                <li><strong>Services:</strong> Business logic, data processing, external API calls</li>
+                <li><strong>Screens:</strong> UI components, user interaction, state consumption</li>
+                <li><strong>Constants:</strong> Immutable configuration and styling</li>
+            </ul>
+        </section>
+
+        <section id="data-flow">
+            <h2>🔄 Data Flow</h2>
+
+            <h3>State Management</h3>
+            <p>SYHA Forge uses Provider for reactive state management:</p>
+
+            <pre><code>// Service definition
+class DataManager extends ChangeNotifier {
+  List<Workout> _workouts = [];
+
+  void addWorkout(Workout workout) {
+    _workouts.add(workout);
+    notifyListeners(); // Triggers UI rebuild
+  }
+}
+
+// Provider setup in main.dart
+MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => DataManager()),
+    ChangeNotifierProvider(create: (_) => ProfileService()),
+    // ... other providers
+  ],
+  child: MyApp(),
+)
+
+// Consumption in screens
+final dataManager = Provider.of<DataManager>(context);
+// OR
+Consumer<DataManager>(
+  builder: (context, dataManager, child) => ...
+)</code></pre>
+
+            <h3>Data Persistence</h3>
+            <p>Data is persisted using a hybrid approach:</p>
+            <ul>
+                <li><strong>Local Storage (SharedPreferences):</strong> Exercises, workouts, workout history, profile data</li>
+                <li><strong>Cloud Storage (Firebase):</strong> User authentication, profile sync, leaderboards</li>
+            </ul>
+        </section>
+
+        <section id="key-services">
+            <h2>⚙️ Key Services</h2>
+
+            <h3>DataManager</h3>
+            <p>Central hub for all workout-related data. Implements the Singleton pattern.</p>
+            <pre><code>class DataManager extends ChangeNotifier {
+  static final DataManager _instance = DataManager._internal();
+  factory DataManager() => _instance;
+
+  List<Exercise> _exercises = [];
+  List<Workout> _workouts = [];
+  List<WorkoutHistory> _workoutHistory = [];
+
+  // CRUD operations with automatic persistence
+  void addWorkout(Workout workout) { ... }
+  void updateWorkout(int index, Workout workout) { ... }
+  void removeWorkout(int index) { ... }
+
+  // Query methods
+  List<WorkoutHistory> getWorkoutHistoryForDate(DateTime date) { ... }
+  bool hasWorkoutOnDate(DateTime date) { ... }
+  int workoutsThisMonth([DateTime? forDate]) { ... }
+}</code></pre>
+
+            <h3>ProgressAnalyticsService</h3>
+            <p>Stateless service that performs all analytics calculations. See <a href="formulas.html">Formulas page</a> for detailed explanations.</p>
+            <pre><code>class ProgressAnalyticsService {
+  // Analyzes overall strength across all exercises
+  OverallStrengthData analyzeOverallStrength(
+    List<WorkoutHistory> histories,
+    {int lookbackDays = 90}
+  ) { ... }
+
+  // Tracks individual exercise progress
+  ExerciseProgressData analyzeExerciseProgress(
+    String exerciseId,
+    String exerciseName,
+    List<WorkoutHistory> histories,
+    {int lookbackDays = 90}
+  ) { ... }
+
+  // Additional analytics methods...
+}</code></pre>
+
+            <h3>ProfileService</h3>
+            <p>Manages user profile data including body weight history.</p>
+            <pre><code>class ProfileService extends ChangeNotifier {
+  double? _weightKg;
+  List<ChartDataPoint> _weightHistory = [];
+
+  Future<void> setWeightKg(double? kg) async {
+    _weightKg = kg;
+    // Auto-save to weight history
+    final entry = ChartDataPoint(
+      date: DateTime.now(),
+      value: kg
+    );
+    _weightHistory.insert(0, entry);
+    // Persist to SharedPreferences
+    await _saveToStorage();
+    notifyListeners();
+  }
+}</code></pre>
+        </section>
+
+        <section id="models">
+            <h2>📦 Data Models</h2>
+
+            <h3>Exercise Model</h3>
+            <pre><code>class Exercise {
+  final String id;
+  final String name;
+  final String description;
+  final ExerciseDifficulty difficulty;
+  final List<MuscleGroupTag> muscleGroups;
+  final DateTime createdAt;
+
+  // JSON serialization
+  Map<String, dynamic> toJson() { ... }
+  factory Exercise.fromJson(Map<String, dynamic> json) { ... }
+}</code></pre>
+
+            <h3>Workout Model</h3>
+            <pre><code>class Workout {
+  final String id;
+  final String name;
+  final List<WorkoutExercise> exercises;
+  final DateTime createdAt;
+}
+
+class WorkoutExercise {
+  final Exercise exercise;
+  final int sets;
+  final int targetReps;
+  final double weight;
+  final Exercise? alternativeExercise;
+}</code></pre>
+
+            <h3>WorkoutHistory Model</h3>
+            <pre><code>class WorkoutHistory {
+  final String id;
+  final DateTime date;
+  final WorkoutSession session;
+
+  // Computed property for date-only comparisons
+  DateTime get dateOnly => DateTime(
+    date.year,
+    date.month,
+    date.day,
+  );
+}
+
+class WorkoutSession {
+  final String workoutId;
+  final String workoutName;
+  final List<ExerciseResult> exerciseResults;
+  final int totalDurationSeconds;
+}</code></pre>
+        </section>
+
+        <section id="ui-patterns">
+            <h2>🎨 UI Patterns</h2>
+
+            <h3>Theme System</h3>
+            <p>SYHA Forge uses a dynamic theme system with user-customizable colors:</p>
+            <pre><code>// AppColor provider for dynamic theming
+class AppColor extends ChangeNotifier {
+  Color _color = AppColors.primary;
+
+  Color get color => _color;
+
+  void setColor(Color color) {
+    _color = color;
+    notifyListeners();
+  }
+}
+
+// Usage in widgets
+Consumer<AppColor>(
+  builder: (context, appColor, _) => Container(
+    color: appColor.color,
+    child: ...
+  ),
+)</code></pre>
+
+            <h3>Responsive Design</h3>
+            <p>All screens adapt to different screen sizes using MediaQuery:</p>
+            <pre><code>// Example from calendar screen
+padding: EdgeInsets.fromLTRB(16, 16, 16, 100), // Extra bottom padding
+
+// Dialog constraints
+ConstrainedBox(
+  constraints: BoxConstraints(
+    maxHeight: MediaQuery.of(context).size.height * 0.7,
+  ),
+  child: ...
+)</code></pre>
+
+            <h3>Custom Widgets</h3>
+            <p>Reusable card components throughout the app:</p>
+            <pre><code>Widget _buildStatCard(String label, String value, IconData icon) {
+  return Card(
+    elevation: 2,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Icon(icon, color: AppColors.primary),
+          Text(value, style: AppTextStyles.h3),
+          Text(label, style: AppTextStyles.caption),
+        ],
+      ),
+    ),
+  );
+}</code></pre>
+        </section>
+
+        <section id="firebase">
+            <h2>🔥 Firebase Integration</h2>
+
+            <h3>Authentication</h3>
+            <pre><code>class AuthService extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<User?> signInWithEmail(String email, String password) async {
+    final credential = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return credential.user;
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    notifyListeners();
+  }
+}</code></pre>
+
+            <h3>Firestore Data Model</h3>
+            <pre><code>// User collection
+users/{userId}/
+  - name: string
+  - email: string
+  - createdAt: timestamp
+  - profile: {
+      weightKg: number
+      goals: array
+      experienceLevel: string
+    }
+
+// Leaderboards collection
+leaderboards/powerlifting/
+  - entries: array of {userId, totalKg, date}
+leaderboards/streetlifting/
+  - entries: array of {userId, score, date}</code></pre>
+        </section>
+
+        <section id="performance">
+            <h2>⚡ Performance Optimizations</h2>
+
+            <ul>
+                <li><strong>Lazy Loading:</strong> Charts and heavy computations use <code>FutureBuilder</code> and <code>StreamBuilder</code></li>
+                <li><strong>Memoization:</strong> Analytics data is cached until underlying data changes</li>
+                <li><strong>Singleton Services:</strong> DataManager uses singleton pattern to prevent multiple instances</li>
+                <li><strong>Debouncing:</strong> Profile updates and draft saves are debounced to reduce I/O</li>
+                <li><strong>Pagination:</strong> Large lists use <code>ListView.builder</code> for efficient rendering</li>
+            </ul>
+
+            <h3>Example: Deduplication Logic</h3>
+            <pre><code>// DataManager prevents duplicate workout history entries
+final seen = <String>{};
+_workoutHistory = [];
+for (var history in loadedHistory) {
+  final dateKey = history.dateOnly.toIso8601String();
+  final workoutKey = history.session.workoutName;
+  final uniqueKey = '$dateKey-$workoutKey-${history.session.exerciseResults.length}';
+
+  if (!seen.contains(uniqueKey)) {
+    seen.add(uniqueKey);
+    _workoutHistory.add(history);
+  }
+}</code></pre>
+        </section>
+
+        <section id="testing">
+            <h2>🧪 Testing</h2>
+
+            <h3>Unit Tests</h3>
+            <p>Service logic should be tested with unit tests:</p>
+            <pre><code>// Example test for ProgressAnalyticsService
+test('calculates strength coefficient correctly', () {
+  final histories = [
+    // Create test workout histories
+  ];
+  final service = ProgressAnalyticsService();
+  final result = service.analyzeOverallStrength(histories);
+
+  expect(result.currentTotalStrength, closeTo(150.0, 0.1));
+});</code></pre>
+
+            <h3>Widget Tests</h3>
+            <p>Screen components should have widget tests:</p>
+            <pre><code>testWidgets('displays workout cards', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(home: FullCalendarScreen()),
+  );
+
+  expect(find.text('Workout Calendar'), findsOneWidget);
+});</code></pre>
+        </section>
+
+        <section id="security">
+            <h2>🔒 Security Considerations</h2>
+
+            <ul>
+                <li><strong>Authentication:</strong> Firebase Auth handles all authentication securely</li>
+                <li><strong>Data Validation:</strong> All user inputs are validated before storage</li>
+                <li><strong>Firestore Rules:</strong> Database rules prevent unauthorized access:
+                    <pre><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                        && request.auth.uid == userId;
+    }
+  }
+}</code></pre>
+                </li>
+                <li><strong>Sensitive Data:</strong> No passwords or sensitive data stored locally</li>
+            </ul>
+        </section>
+
+        <section id="localization">
+            <h2>🌍 Localization</h2>
+
+            <p>SYHA Forge uses Flutter's built-in localization system:</p>
+
+            <pre><code>// l10n.yaml configuration
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+
+// Usage in code
+final l10n = AppLocalizations.of(context)!;
+Text(l10n.workoutName); // Automatically localized</code></pre>
+
+            <p>Currently supported languages: English (more coming soon!)</p>
+        </section>
+
+        <section id="build">
+            <h2>🏗️ Building & Deployment</h2>
+
+            <h3>Development Build</h3>
+            <pre><code># Run in debug mode
+flutter run
+
+# Run with specific device
+flutter run -d [device-id]</code></pre>
+
+            <h3>Production Build</h3>
+            <pre><code># Android APK
+flutter build apk --release
+
+# Android App Bundle (for Play Store)
+flutter build appbundle --release
+
+# iOS
+flutter build ios --release</code></pre>
+
+            <h3>Version Management</h3>
+            <p>Version is defined in <code>pubspec.yaml</code>:</p>
+            <pre><code>version: 1.0.0+1
+# Format: major.minor.patch+buildNumber</code></pre>
+        </section>
+
+        <section id="future">
+            <h2>🚀 Future Improvements</h2>
+
+            <ul>
+                <li>🔄 Cloud sync for workout data across devices</li>
+                <li>📸 Exercise form check using AI/ML</li>
+                <li>👥 Social features: friend system, shared workouts</li>
+                <li>🏆 Global leaderboards and challenges</li>
+                <li>📊 Advanced analytics: predicted 1RM, deload recommendations</li>
+                <li>⌚ Wear OS / Apple Watch support</li>
+                <li>🎧 Workout music integration</li>
+                <li>📹 Exercise video library</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SYHA Forge. Built with 🔥 using Flutter & Firebase.</p>
+            <p>
+                <a href="https://github.com/vdoro/Dyplom">GitHub</a> |
+                <a href="index.html">Home</a> |
+                <a href="formulas.html">Formulas</a> |
+                <a href="contributing.html">Contribute</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

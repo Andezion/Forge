@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributing Guide - SYHA Forge</title>
+    <meta name="description" content="Learn how to contribute to SYHA Forge - guidelines, code standards, and contribution workflow.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">⚒️ SYHA FORGE</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="formulas.html">Formulas</a></li>
+                <li><a href="technical.html">Technical Docs</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h1>🤝 Contributing to SYHA Forge</h1>
+            <p>Thank you for your interest in contributing! This guide will help you get started with contributing to SYHA Forge.</p>
+        </section>
+
+        <section id="ways-to-contribute">
+            <h2>🌟 Ways to Contribute</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>💻 Code Contributions</h3>
+                    <p>Add features, fix bugs, improve performance, or refactor code.</p>
+                </div>
+                <div class="card">
+                    <h3>📝 Documentation</h3>
+                    <p>Improve docs, write tutorials, translate content, or create guides.</p>
+                </div>
+                <div class="card">
+                    <h3>🐛 Bug Reports</h3>
+                    <p>Report bugs with detailed reproduction steps and logs.</p>
+                </div>
+                <div class="card">
+                    <h3>💡 Feature Requests</h3>
+                    <p>Suggest new features or improvements to existing functionality.</p>
+                </div>
+                <div class="card">
+                    <h3>🎨 Design</h3>
+                    <p>Create UI mockups, improve UX, or design new themes.</p>
+                </div>
+                <div class="card">
+                    <h3>🧪 Testing</h3>
+                    <p>Write tests, perform manual testing, or help with QA.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="getting-started">
+            <h2>🚀 Getting Started</h2>
+
+            <h3>1. Fork the Repository</h3>
+            <pre><code># On GitHub, click the "Fork" button
+# Then clone your fork
+git clone https://github.com/YOUR_USERNAME/Dyplom.git
+cd Dyplom</code></pre>
+
+            <h3>2. Set Up Development Environment</h3>
+            <pre><code># Install Flutter (if not already installed)
+# Follow: https://flutter.dev/docs/get-started/install
+
+# Install dependencies
+flutter pub get
+
+# Run the app
+flutter run</code></pre>
+
+            <h3>3. Configure Firebase (Optional)</h3>
+            <p>For testing Firebase features:</p>
+            <ol>
+                <li>Create a Firebase project at <a href="https://console.firebase.google.com">console.firebase.google.com</a></li>
+                <li>Add Android/iOS apps and download <code>google-services.json</code> / <code>GoogleService-Info.plist</code></li>
+                <li>Place configuration files in appropriate directories</li>
+                <li>Run <code>flutterfire configure</code> if available</li>
+            </ol>
+
+            <h3>4. Create a Branch</h3>
+            <pre><code># Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Or for bug fixes
+git checkout -b fix/bug-description</code></pre>
+        </section>
+
+        <section id="code-standards">
+            <h2>📏 Code Standards</h2>
+
+            <h3>Dart Style Guide</h3>
+            <p>We follow the official <a href="https://dart.dev/guides/language/effective-dart/style">Dart Style Guide</a>. Key points:</p>
+
+            <ul>
+                <li>Use <code>camelCase</code> for variable and function names</li>
+                <li>Use <code>PascalCase</code> for class names</li>
+                <li>Use <code>snake_case</code> for library and file names</li>
+                <li>Prefer <code>final</code> over <code>var</code> when possible</li>
+                <li>Use trailing commas for better formatting</li>
+            </ul>
+
+            <h3>Code Formatting</h3>
+            <pre><code># Format your code before committing
+flutter format .
+
+# Or format specific file
+flutter format lib/screens/your_screen.dart</code></pre>
+
+            <h3>Linting</h3>
+            <pre><code># Run the linter
+flutter analyze
+
+# Fix lint issues when possible
+dart fix --apply</code></pre>
+
+            <h3>Example: Good Code Style</h3>
+            <pre><code>// ✅ Good
+class WorkoutService extends ChangeNotifier {
+  final List<Workout> _workouts = [];
+
+  List<Workout> get workouts => List.unmodifiable(_workouts);
+
+  Future<void> addWorkout(Workout workout) async {
+    _workouts.add(workout);
+    await _saveToStorage();
+    notifyListeners();
+  }
+}
+
+// ❌ Bad
+class workout_service extends ChangeNotifier {
+  var workouts = [];
+
+  addWorkout(workout) {
+    workouts.add(workout);
+    notifyListeners();
+  }
+}</code></pre>
+        </section>
+
+        <section id="commit-guidelines">
+            <h2>📝 Commit Guidelines</h2>
+
+            <h3>Commit Message Format</h3>
+            <p>Use conventional commits format:</p>
+
+            <pre><code>type(scope): subject
+
+body (optional)
+
+footer (optional)</code></pre>
+
+            <h3>Types</h3>
+            <ul>
+                <li><strong>feat:</strong> New feature</li>
+                <li><strong>fix:</strong> Bug fix</li>
+                <li><strong>docs:</strong> Documentation changes</li>
+                <li><strong>style:</strong> Code style changes (formatting, no logic change)</li>
+                <li><strong>refactor:</strong> Code refactoring</li>
+                <li><strong>test:</strong> Adding or updating tests</li>
+                <li><strong>chore:</strong> Build process or auxiliary tool changes</li>
+                <li><strong>perf:</strong> Performance improvements</li>
+            </ul>
+
+            <h3>Examples</h3>
+            <pre><code>feat(analytics): add body weight tracking to progress charts
+
+fix(calendar): remove duplicate workout dialog on date click
+
+docs(formulas): add detailed explanation of strength coefficient
+
+refactor(services): extract data persistence logic to separate class
+
+test(analytics): add unit tests for volume calculations</code></pre>
+
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Keep commits atomic (one logical change per commit)</li>
+                <li>Write clear, descriptive commit messages</li>
+                <li>Reference issue numbers when applicable: <code>fix(calendar): resolve #123</code></li>
+                <li>Use present tense: "add feature" not "added feature"</li>
+            </ul>
+        </section>
+
+        <section id="pull-requests">
+            <h2>🔄 Pull Request Process</h2>
+
+            <h3>Before Submitting</h3>
+            <ol>
+                <li>Ensure your code follows the style guide</li>
+                <li>Run <code>flutter format .</code> and <code>flutter analyze</code></li>
+                <li>Test your changes thoroughly</li>
+                <li>Update documentation if needed</li>
+                <li>Add or update tests for new functionality</li>
+            </ol>
+
+            <h3>Submitting a Pull Request</h3>
+            <pre><code># Commit your changes
+git add .
+git commit -m "feat(scope): your change description"
+
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Open a pull request on GitHub</code></pre>
+
+            <h3>Pull Request Template</h3>
+            <pre><code>## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+How to test these changes
+
+## Screenshots (if applicable)
+Add screenshots for UI changes
+
+## Checklist
+- [ ] Code follows style guide
+- [ ] Self-review completed
+- [ ] Comments added for complex code
+- [ ] Documentation updated
+- [ ] Tests added/updated
+- [ ] No new warnings generated</code></pre>
+
+            <h3>Review Process</h3>
+            <ul>
+                <li>Maintainers will review your PR within 1-3 days</li>
+                <li>Address any requested changes</li>
+                <li>Once approved, your PR will be merged</li>
+                <li>Your contribution will be credited in the project</li>
+            </ul>
+        </section>
+
+        <section id="testing">
+            <h2>🧪 Testing Guidelines</h2>
+
+            <h3>Running Tests</h3>
+            <pre><code># Run all tests
+flutter test
+
+# Run specific test file
+flutter test test/services/progress_analytics_service_test.dart
+
+# Run with coverage
+flutter test --coverage</code></pre>
+
+            <h3>Writing Tests</h3>
+
+            <h4>Unit Tests (Services)</h4>
+            <pre><code>import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('ProgressAnalyticsService', () {
+    late ProgressAnalyticsService service;
+
+    setUp(() {
+      service = ProgressAnalyticsService();
+    });
+
+    test('calculates strength coefficient correctly', () {
+      // Arrange
+      final histories = createTestHistories();
+
+      // Act
+      final result = service.analyzeOverallStrength(histories);
+
+      // Assert
+      expect(result.currentTotalStrength, 150.0);
+    });
+  });
+}</code></pre>
+
+            <h4>Widget Tests (UI)</h4>
+            <pre><code>testWidgets('displays workout calendar', (tester) async {
+  // Build widget
+  await tester.pumpWidget(
+    MaterialApp(home: FullCalendarScreen()),
+  );
+
+  // Verify
+  expect(find.text('Workout Calendar'), findsOneWidget);
+  expect(find.byType(TableCalendar), findsOneWidget);
+});</code></pre>
+
+            <h3>Test Coverage</h3>
+            <p>Aim for:</p>
+            <ul>
+                <li>Services: 80%+ coverage</li>
+                <li>Models: 100% coverage (serialization)</li>
+                <li>Screens: Critical paths tested</li>
+            </ul>
+        </section>
+
+        <section id="issue-guidelines">
+            <h2>🐛 Issue Guidelines</h2>
+
+            <h3>Bug Reports</h3>
+            <p>Include the following information:</p>
+
+            <pre><code>**Describe the bug**
+A clear description of the bug
+
+**To Reproduce**
+Steps to reproduce:
+1. Go to '...'
+2. Click on '...'
+3. See error
+
+**Expected behavior**
+What should happen
+
+**Screenshots**
+If applicable
+
+**Environment:**
+- Device: [e.g. Pixel 6]
+- OS: [e.g. Android 13]
+- App Version: [e.g. 1.0.0]
+
+**Additional context**
+Any other relevant information</code></pre>
+
+            <h3>Feature Requests</h3>
+            <pre><code>**Feature Description**
+Clear description of the feature
+
+**Problem It Solves**
+What problem does this solve?
+
+**Proposed Solution**
+How would you implement this?
+
+**Alternatives Considered**
+Other ways to solve this
+
+**Additional Context**
+Mockups, examples, etc.</code></pre>
+        </section>
+
+        <section id="community">
+            <h2>👥 Community Guidelines</h2>
+
+            <h3>Code of Conduct</h3>
+            <ul>
+                <li>Be respectful and inclusive</li>
+                <li>Welcome newcomers and help them learn</li>
+                <li>Focus on constructive feedback</li>
+                <li>Respect different viewpoints and experiences</li>
+                <li>Accept responsibility for mistakes</li>
+            </ul>
+
+            <h3>Communication Channels</h3>
+            <ul>
+                <li><strong>GitHub Issues:</strong> Bug reports, feature requests</li>
+                <li><strong>GitHub Discussions:</strong> Questions, ideas, general discussion</li>
+                <li><strong>Pull Requests:</strong> Code review and technical discussion</li>
+            </ul>
+
+            <h3>Getting Help</h3>
+            <p>If you're stuck:</p>
+            <ol>
+                <li>Check the <a href="technical.html">technical documentation</a></li>
+                <li>Search existing GitHub issues</li>
+                <li>Ask in GitHub Discussions</li>
+                <li>Reach out to maintainers</li>
+            </ol>
+        </section>
+
+        <section id="recognition">
+            <h2>🏆 Recognition</h2>
+
+            <p>All contributors will be recognized in:</p>
+            <ul>
+                <li>Project README contributors section</li>
+                <li>Release notes for their contributions</li>
+                <li>GitHub's built-in contributors page</li>
+            </ul>
+
+            <h3>Types of Contributors</h3>
+            <ul>
+                <li><strong>Core Maintainers:</strong> Regular contributors with commit access</li>
+                <li><strong>Contributors:</strong> Anyone who has submitted merged PRs</li>
+                <li><strong>Community Members:</strong> Active in discussions, testing, etc.</li>
+            </ul>
+        </section>
+
+        <section id="resources">
+            <h2>📚 Resources</h2>
+
+            <h3>Learning Resources</h3>
+            <ul>
+                <li><a href="https://flutter.dev/docs">Flutter Documentation</a></li>
+                <li><a href="https://dart.dev/guides">Dart Language Tour</a></li>
+                <li><a href="https://firebase.google.com/docs/flutter/setup">Firebase for Flutter</a></li>
+                <li><a href="https://pub.dev/packages/provider">Provider Package</a></li>
+            </ul>
+
+            <h3>Project-Specific</h3>
+            <ul>
+                <li><a href="technical.html">Technical Documentation</a></li>
+                <li><a href="formulas.html">Analytics Formulas</a></li>
+                <li><a href="https://github.com/vdoro/Dyplom">GitHub Repository</a></li>
+            </ul>
+        </section>
+
+        <section id="license">
+            <h2>📄 License</h2>
+            <p>By contributing to SYHA Forge, you agree that your contributions will be licensed under the same license as the project.</p>
+            <p>All contributions must be your own work or properly attributed.</p>
+        </section>
+
+        <section id="thanks">
+            <h2>💖 Thank You!</h2>
+            <p>Thank you for taking the time to contribute to SYHA Forge! Your efforts help make this project better for everyone in the strength training community.</p>
+
+            <div style="text-align: center; margin: 3rem 0;">
+                <a href="https://github.com/vdoro/Dyplom" class="cta-button glow-effect">Start Contributing</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SYHA Forge. Built with 🔥 using Flutter & Firebase.</p>
+            <p>
+                <a href="https://github.com/vdoro/Dyplom">GitHub</a> |
+                <a href="index.html">Home</a> |
+                <a href="formulas.html">Formulas</a> |
+                <a href="technical.html">Docs</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
