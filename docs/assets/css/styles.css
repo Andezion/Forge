@@ -1,4 +1,3 @@
-/* SYHA Forge - Black & Gold Fire Theme */
 :root {
   --black: #0a0a0a;
   --dark-gray: #1a1a1a;
@@ -28,7 +27,6 @@ body {
   min-height: 100vh;
 }
 
-/* Navigation */
 nav {
   background: rgba(10, 10, 10, 0.95);
   padding: 1.5rem 2rem;
@@ -79,14 +77,12 @@ nav .container {
   box-shadow: var(--shadow-gold);
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-/* Hero Section */
 .hero {
   text-align: center;
   padding: 6rem 2rem;
@@ -144,7 +140,6 @@ nav .container {
   border-color: var(--gold-light);
 }
 
-/* Cards */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -177,7 +172,6 @@ nav .container {
   line-height: 1.8;
 }
 
-/* Sections */
 section {
   margin: 4rem 0;
   padding: 2rem 0;
@@ -203,7 +197,6 @@ section h4 {
   color: var(--fire-orange);
 }
 
-/* Code blocks */
 pre, code {
   background: rgba(10, 10, 10, 0.9);
   border: 1px solid var(--gold-dark);
@@ -219,7 +212,6 @@ code {
   font-size: 0.9rem;
 }
 
-/* Formula blocks */
 .formula {
   background: rgba(26, 26, 26, 0.9);
   border-left: 4px solid var(--fire-orange);
@@ -253,7 +245,6 @@ code {
   line-height: 1.6;
 }
 
-/* Lists */
 ul, ol {
   margin-left: 2rem;
   margin-bottom: 1rem;
@@ -268,7 +259,6 @@ li strong {
   color: var(--gold);
 }
 
-/* Links */
 a {
   color: var(--fire-orange);
   text-decoration: none;
@@ -280,7 +270,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Tables */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -306,7 +295,6 @@ tr:hover {
   background: rgba(212, 175, 55, 0.05);
 }
 
-/* Footer */
 footer {
   background: var(--black);
   padding: 3rem 2rem;
@@ -323,7 +311,6 @@ footer a {
   color: var(--gold);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .hero h1 {
     font-size: 2.5rem;
@@ -343,7 +330,6 @@ footer a {
   }
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -361,7 +347,6 @@ footer a {
   background: var(--gold-light);
 }
 
-/* Animations */
 @keyframes glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
