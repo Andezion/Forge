@@ -42,6 +42,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     super.initState();
     _dataManager.addListener(_onDataChanged);
     _profileService.addListener(_onProfileChanged);
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _profileService.load();
     _loadData();
   }
 
