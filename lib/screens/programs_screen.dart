@@ -180,80 +180,122 @@ class ProgramsScreen extends StatelessWidget {
   void _showWorkoutDetails(BuildContext context, Workout workout, Color color) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(workout.name),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Exercises:',
-                style: AppTextStyles.body1.copyWith(
-                  fontWeight: FontWeight.bold,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  workout.name,
+                  style: AppTextStyles.h4,
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 12),
-              ...workout.exercises.map((we) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Exercises:',
+                          style: AppTextStyles.body1.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        child: Icon(Icons.check, color: color, size: 16),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              we.exercise.name,
-                              style: AppTextStyles.body2.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                        const SizedBox(height: 12),
+                        ...workout.exercises.map((we) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(Icons.check, color: color, size: 16),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        we.exercise.name,
+                                        style: AppTextStyles.body2.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${we.sets} sets × ${we.targetReps} reps${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
+                                        style: AppTextStyles.caption,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${we.sets} sets × ${we.targetReps} reps${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
-                              style: AppTextStyles.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                          );
+                        }).toList(),
+                      ],
+                    ),
                   ),
-                );
-              }).toList(),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Close'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Program "${workout.name}" selected'),
+                              backgroundColor: color,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Select Program'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Program "${workout.name}" selected'),
-                  backgroundColor: color,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: color,
-            ),
-            child: const Text('Select Program'),
-          ),
-        ],
       ),
     );
   }
