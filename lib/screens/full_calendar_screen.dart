@@ -32,28 +32,40 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    DateFormat('MMMM d, yyyy').format(_selectedDay),
-                    style: AppTextStyles.h4,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('MMMM d, yyyy').format(_selectedDay),
+                      style: AppTextStyles.h4,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: workouts.map((workout) => _WorkoutCardWidget(workout: workout)).toList(),
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ...workouts.map((workout) => _WorkoutCardWidget(workout: workout)),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -281,13 +293,15 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                   color: AppColors.textSecondary,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  '${session.exerciseResults.length} exercises',
-                  style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    '${session.exerciseResults.length} exercises',
+                    style: AppTextStyles.body2.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
@@ -301,6 +315,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                   tooltip: _isExpanded ? 'Collapse' : 'Expand',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
+                  iconSize: 20,
                 ),
               ],
             ),
@@ -371,11 +386,14 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Text(
-                                '${set.actualReps} reps × ${set.weight.toStringAsFixed(1)} kg',
-                                style: AppTextStyles.body2,
+                              Flexible(
+                                child: Text(
+                                  '${set.actualReps} reps × ${set.weight.toStringAsFixed(1)} kg',
+                                  style: AppTextStyles.body2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              const Spacer(),
+                              const SizedBox(width: 8),
                               Text(
                                 '${set.durationSeconds}s',
                                 style: AppTextStyles.caption.copyWith(
