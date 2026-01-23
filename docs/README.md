@@ -2,11 +2,11 @@
 
 This directory contains the GitHub Pages documentation website for SYHA Forge.
 
-## 🌐 Live Site
+## Live Site
 
 Once deployed, the site will be available at: `https://[your-username].github.io/Dyplom/`
 
-## 📁 Structure
+## Structure
 
 ```
 docs/
@@ -20,7 +20,7 @@ docs/
         └── styles.css  # Black & gold fire theme
 ```
 
-## 🚀 Deploying to GitHub Pages
+## Deploying to GitHub Pages
 
 ### Method 1: GitHub Settings (Recommended)
 
@@ -57,7 +57,7 @@ jobs:
           publish_dir: ./docs
 ```
 
-## 🎨 Theme Customization
+## Theme Customization
 
 The site uses a black & gold fire theme. To customize colors, edit `assets/css/styles.css`:
 
@@ -71,7 +71,7 @@ The site uses a black & gold fire theme. To customize colors, edit `assets/css/s
 }
 ```
 
-## 📝 Updating Content
+## Updating Content
 
 ### Adding a New Page
 
@@ -104,7 +104,7 @@ npx http-server
 # Visit http://localhost:8080
 ```
 
-## 📚 Page Descriptions
+## Page Descriptions
 
 ### index.html
 - **Purpose**: User-facing landing page
@@ -126,7 +126,7 @@ npx http-server
 - **Content**: Guidelines, workflow, standards, community rules
 - **Audience**: Open source contributors
 
-## 🔗 Links to Update
+## Links to Update
 
 Before deploying, update these links in all pages:
 
@@ -134,7 +134,7 @@ Before deploying, update these links in all pages:
 2. Live site URL (after deployment)
 3. Your contact information (if adding)
 
-## 📊 Analytics (Optional)
+## Analytics (Optional)
 
 To add Google Analytics:
 
@@ -168,7 +168,7 @@ To add Google Analytics:
 - Use relative paths: `formulas.html` not `/formulas.html`
 - Test locally before deploying
 
-## 🎯 Future Enhancements
+## Future Enhancements
 
 - [ ] Add dark/light theme toggle
 - [ ] Implement search functionality
@@ -178,14 +178,14 @@ To add Google Analytics:
 - [ ] FAQ section
 - [ ] Blog/changelog section
 
-## 📄 License
+## License
 
 Same license as the main project.
 
-## 🙏 Credits
+## Credits
 
 Design inspired by modern minimalist design principles with a focus on readability and accessibility.
 
 ---
 
-Built with 🔥 for the SYHA Forge community
+Built with 🔥 for the Forge community
