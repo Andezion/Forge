@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/data_manager.dart';
@@ -25,52 +24,6 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     _focusedDay = DateTime.now();
   }
 
-  void _showWorkoutDetails(List<WorkoutHistory> workouts) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      DateFormat('MMMM d, yyyy').format(_selectedDay),
-                      style: AppTextStyles.h4,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: workouts.map((workout) => _WorkoutCardWidget(workout: workout)).toList(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,14 +100,6 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
-
-                final dataManager =
-                    Provider.of<DataManager>(context, listen: false);
-                final workouts =
-                    dataManager.getWorkoutHistoryForDate(selectedDay);
-                if (workouts.isNotEmpty) {
-                  _showWorkoutDetails(workouts);
-                }
               },
               onPageChanged: (focusedDay) {
                 setState(() {
@@ -202,7 +147,7 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       itemCount: workouts.length,
       itemBuilder: (context, index) => _WorkoutCardWidget(workout: workouts[index]),
     );
