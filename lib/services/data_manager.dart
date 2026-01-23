@@ -58,9 +58,32 @@ class DataManager extends ChangeNotifier {
     }
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
-    _workoutHistory = historyJson
+    final loadedHistory = historyJson
         .map((json) => WorkoutHistory.fromJson(jsonDecode(json)))
         .toList();
+
+    final seen = <String>{};
+    _workoutHistory = [];
+    for (var history in loadedHistory) {
+      final dateKey = history.dateOnly.toIso8601String();
+      final workoutKey = history.session.workoutName;
+      final exerciseCount = history.session.exerciseResults.length;
+      final uniqueKey = '$dateKey-$workoutKey-$exerciseCount';
+
+      if (!seen.contains(uniqueKey)) {
+        seen.add(uniqueKey);
+        _workoutHistory.add(history);
+      } else {
+        print(
+            '[DATA_MANAGER] Removed duplicate history: ${history.session.workoutName} on ${history.dateOnly}');
+      }
+    }
+
+    if (_workoutHistory.length != loadedHistory.length) {
+      print(
+          '[DATA_MANAGER] Cleaned ${loadedHistory.length - _workoutHistory.length} duplicate(s)');
+      await _saveData();
+    }
   }
 
   Future<void> _saveData() async {
