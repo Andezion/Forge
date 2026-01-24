@@ -17,12 +17,12 @@ Forge is a powerful mobile app built with Flutter for tracking workout progress,
 - **Advanced Analytics** - Track progress with strength coefficient, volume, frequency, and consistency metrics
 - **Specialized Programs** - Pre-built programs for Powerlifting, Street Lifting, and Armwrestling
 - **Smart Calendar** - Visual workout tracking with streaks and history
-- 🔥 **Body Weight Tracking** - Monitor weight changes over time with complete history
-- 🏆 **Personal Records** - Track 1RM and compare with world records
-- 🎨 **Customizable UI** - Personalize with custom avatars, themes, and colors
-- 📱 **Cross-Platform** - Works on Android and iOS
+- **Body Weight Tracking** - Monitor weight changes over time with complete history
+- **Personal Records** - Track 1RM and compare with world records
+- **Customizable UI** - Personalize with custom avatars, themes, and colors
+- **Cross-Platform** - Works on Android and iOS
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -35,8 +35,8 @@ Forge is a powerful mobile app built with Flutter for tracking workout progress,
 
 ```bash
 # Clone the repository
-git clone https://github.com/vdoro/Dyplom.git
-cd Dyplom
+git clone https://github.com/Andezion/Forge
+cd Forge
 
 # Install dependencies
 flutter pub get
@@ -45,7 +45,7 @@ flutter pub get
 flutter run
 ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: Flutter 3.6.2+
 - **Language**: Dart
@@ -55,9 +55,9 @@ flutter run
 - **Charts**: FL Chart 0.69.2
 - **Calendar**: Table Calendar 3.0.9
 
-## 📐 Analytics Formulas
+## Analytics Formulas
 
-SYHA Forge uses scientifically-backed formulas to calculate your progress:
+Forge uses scientifically-backed formulas to calculate your progress:
 
 ### Strength Coefficient
 ```
@@ -67,9 +67,9 @@ Coefficient = (Σ(max_weight / first_weight) / exercise_count) × 100
 - 150 = 50% stronger overall
 - 200 = Doubled your strength
 
-[📖 See all formulas →](https://vdoro.github.io/Dyplom/formulas.html)
+[See all formulas →](https://vdoro.github.io/Dyplom/formulas.html)
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 lib/
@@ -80,7 +80,7 @@ lib/
 └── main.dart        # App entry point
 ```
 
-[📖 Full technical docs →](https://vdoro.github.io/Dyplom/technical.html)
+[Full technical docs →](https://vdoro.github.io/Dyplom/technical.html)
 
 ## 🤝 Contributing
 
