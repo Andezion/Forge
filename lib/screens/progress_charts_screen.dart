@@ -497,18 +497,51 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       return Center(child: Text(l10n.noData));
     }
 
+    String periodLabel;
+    if (_lookbackDays <= 7) {
+      periodLabel = 'This Week';
+    } else if (_lookbackDays <= 30) {
+      periodLabel = 'Last 30 Days';
+    } else if (_lookbackDays <= 90) {
+      periodLabel = 'Last 90 Days';
+    } else if (_lookbackDays <= 180) {
+      periodLabel = 'Last 180 Days';
+    } else {
+      periodLabel = 'Last Year';
+    }
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Current Week Volume',
-          '${_volumeData!.currentWeekVolume.toStringAsFixed(0)} kg',
+          'Total Volume ($periodLabel)',
+          '${_formatWeight(_volumeData!.totalPeriodVolume)} kg',
           _volumeData!.previousWeekVolume > 0
               ? ((_volumeData!.currentWeekVolume -
                           _volumeData!.previousWeekVolume) /
                       _volumeData!.previousWeekVolume) *
                   100
               : 0,
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildMiniStatsCard(
+                'Avg/Week',
+                '${_formatWeight(_volumeData!.averageVolume)} kg',
+                Icons.show_chart,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildMiniStatsCard(
+                'This Week',
+                '${_formatWeight(_volumeData!.currentWeekVolume)} kg',
+                Icons.fitness_center,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         _buildChartCard(
@@ -525,6 +558,16 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
       ],
     );
+  }
+
+  String _formatWeight(double weight) {
+    if (weight >= 1000000) {
+      return '${(weight / 1000000).toStringAsFixed(1)}M';
+    } else if (weight >= 1000) {
+      return '${(weight / 1000).toStringAsFixed(1)}K';
+    } else {
+      return weight.toStringAsFixed(0);
+    }
   }
 
   Widget _buildWeightChart() {
