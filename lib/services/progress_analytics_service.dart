@@ -7,6 +7,7 @@ class ProgressAnalyticsService {
     String exerciseName,
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
+    double userBodyWeight = 70.0,
   }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
@@ -30,10 +31,12 @@ class ProgressAnalyticsService {
           double totalVolume = 0;
 
           for (var set in exerciseResult.setResults) {
-            if (set.weight > maxWeight) {
-              maxWeight = set.weight;
+            final effectiveWeight =
+                set.weight > 0 ? set.weight : userBodyWeight;
+            if (effectiveWeight > maxWeight) {
+              maxWeight = effectiveWeight;
             }
-            totalVolume += set.weight * set.actualReps;
+            totalVolume += effectiveWeight * set.actualReps;
           }
 
           if (!foundCurrent && maxWeight > 0) {
@@ -283,6 +286,7 @@ class ProgressAnalyticsService {
   WorkoutVolumeData analyzeWorkoutVolume(
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
+    double userBodyWeight = 70.0,
   }) {
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
@@ -299,7 +303,8 @@ class ProgressAnalyticsService {
 
       for (var exerciseResult in history.session.exerciseResults) {
         for (var set in exerciseResult.setResults) {
-          dailyVolume += set.weight * set.actualReps.toDouble();
+          final effectiveWeight = set.weight > 0 ? set.weight : userBodyWeight;
+          dailyVolume += effectiveWeight * set.actualReps.toDouble();
         }
       }
 
