@@ -67,7 +67,7 @@ Coefficient = (Σ(max_weight / first_weight) / exercise_count) × 100
 - 150 = 50% stronger overall
 - 200 = Doubled your strength
 
-[See all formulas →](https://vdoro.github.io/Dyplom/formulas.html)
+[See all formulas →](https://andezion.github.io/Forge/formulas.html)
 
 ## Architecture
 
@@ -82,9 +82,9 @@ lib/
 
 [Full technical docs →](https://vdoro.github.io/Dyplom/technical.html)
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Please read our [Contributing Guide](https://vdoro.github.io/Dyplom/contributing.html) to get started.
+We welcome contributions! Please read our [Contributing Guide](https://andezion.github.io/Forge/contributing.html) to get started.
 
 ### Quick Contribution Guide
 
