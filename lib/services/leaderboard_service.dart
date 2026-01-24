@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import '../models/user_stats.dart';
 import '../models/workout_history.dart';
+import 'profile_service.dart';
 
 class LeaderboardService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -18,7 +19,12 @@ class LeaderboardService extends ChangeNotifier {
     if (userId == null) return;
 
     try {
-      final stats = _calculateStats(workoutHistory, userId, isProfileHidden);
+      final profileService = ProfileService();
+      await profileService.load();
+      final userBodyWeight = profileService.weightKg ?? 70.0;
+
+      final stats = _calculateStats(
+          workoutHistory, userId, isProfileHidden, userBodyWeight);
 
       await _db.collection('user_stats').doc(userId).set(
             stats.toJson(),
@@ -35,6 +41,7 @@ class LeaderboardService extends ChangeNotifier {
     List<WorkoutHistory> workoutHistory,
     String userId,
     bool isProfileHidden,
+    double userBodyWeight,
   ) {
     final displayName = _auth.currentUser?.displayName ??
         _auth.currentUser?.email?.split('@').first ??
@@ -46,7 +53,9 @@ class LeaderboardService extends ChangeNotifier {
     for (var history in workoutHistory) {
       for (var exerciseResult in history.session.exerciseResults) {
         for (var setResult in exerciseResult.setResults) {
-          totalWeight += setResult.weight * setResult.actualReps;
+          final effectiveWeight =
+              setResult.weight > 0 ? setResult.weight : userBodyWeight;
+          totalWeight += effectiveWeight * setResult.actualReps;
         }
       }
     }
@@ -58,7 +67,8 @@ class LeaderboardService extends ChangeNotifier {
 
     final exerciseRecords = _calculateExerciseRecords(workoutHistory);
 
-    final weeklyProgress = _calculateWeeklyProgress(workoutHistory);
+    final weeklyProgress =
+        _calculateWeeklyProgress(workoutHistory, userBodyWeight);
 
     return UserStats(
       userId: userId,
@@ -301,7 +311,8 @@ class LeaderboardService extends ChangeNotifier {
     });
   }
 
-  double _calculateWeeklyProgress(List<WorkoutHistory> workoutHistory) {
+  double _calculateWeeklyProgress(
+      List<WorkoutHistory> workoutHistory, double userBodyWeight) {
     if (workoutHistory.isEmpty) return 0.0;
 
     final now = DateTime.now();
@@ -313,7 +324,9 @@ class LeaderboardService extends ChangeNotifier {
       if (history.date.isAfter(oneWeekAgo)) {
         for (var exerciseResult in history.session.exerciseResults) {
           for (var setResult in exerciseResult.setResults) {
-            currentWeekWeight += setResult.weight * setResult.actualReps;
+            final effectiveWeight =
+                setResult.weight > 0 ? setResult.weight : userBodyWeight;
+            currentWeekWeight += effectiveWeight * setResult.actualReps;
           }
         }
       }
@@ -325,7 +338,9 @@ class LeaderboardService extends ChangeNotifier {
           history.date.isBefore(oneWeekAgo)) {
         for (var exerciseResult in history.session.exerciseResults) {
           for (var setResult in exerciseResult.setResults) {
-            previousWeekWeight += setResult.weight * setResult.actualReps;
+            final effectiveWeight =
+                setResult.weight > 0 ? setResult.weight : userBodyWeight;
+            previousWeekWeight += effectiveWeight * setResult.actualReps;
           }
         }
       }
