@@ -6,6 +6,8 @@ import '../models/exercise.dart';
 import '../models/wellness_entry.dart';
 import 'profile_service.dart';
 import 'goal_coefficients_service.dart';
+import 'data_manager.dart';
+import 'wellness_service.dart';
 
 class ProgressMetrics {
   final double completionRate;
@@ -397,5 +399,68 @@ class ProgressionService {
       'reasons': reasons,
       'needsDeload': needsDeload,
     };
+  }
+
+  Future<void> applyProgressionToProgram(String workoutId) async {
+    final dataManager = DataManager();
+    final workout = dataManager.getWorkoutById(workoutId);
+    if (workout == null) {
+      print('[PROGRESSION] Workout not found: $workoutId');
+      return;
+    }
+
+    final histories = dataManager.workoutHistory;
+
+    final wellnessService = WellnessService();
+    await wellnessService.load();
+    final todayWellness = wellnessService.entries.isNotEmpty
+        ? wellnessService.entries.last
+        : null;
+
+    final profileService = ProfileService();
+    await profileService.load();
+
+    final goals = profileService.goals
+        .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
+            orElse: () => TrainingGoal.generalFitness))
+        .toList();
+    final experience = profileService.experienceLevel != null
+        ? ExperienceLevel.values.firstWhere(
+            (e) => e.name == profileService.experienceLevel,
+            orElse: () => ExperienceLevel.intermediate)
+        : ExperienceLevel.intermediate;
+    final intensity = profileService.preferredIntensity != null
+        ? TrainingIntensity.values.firstWhere(
+            (e) => e.name == profileService.preferredIntensity,
+            orElse: () => TrainingIntensity.moderate)
+        : TrainingIntensity.moderate;
+
+    final profile = UserProfile(
+      goals: goals,
+      experienceLevel: experience,
+      trainingFocus: profileService.trainingFocus,
+      preferredIntensity: intensity,
+      age: profileService.age,
+      weightKg: profileService.weightKg,
+      yearsTraining: profileService.yearsTraining,
+    );
+
+    final result = await suggestNextWorkout(
+      workout,
+      histories,
+      lookback: 5,
+      profile: profile,
+      todayWellness: todayWellness,
+    );
+
+    final updatedWorkout = result['workout'] as Workout;
+    final reasons = result['reasons'] as Map<String, String>;
+
+    dataManager.updateWorkoutById(workoutId, updatedWorkout);
+
+    print('[PROGRESSION] Applied progression to program: ${workout.name}');
+    for (var entry in reasons.entries) {
+      print('[PROGRESSION]   ${entry.key}: ${entry.value}');
+    }
   }
 }
