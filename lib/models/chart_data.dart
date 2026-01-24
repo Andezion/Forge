@@ -67,6 +67,7 @@ class OverallStrengthData {
 class WorkoutVolumeData {
   final List<ChartDataPoint> weeklyVolumeData;
   final List<ChartDataPoint> dailyVolumeData;
+  final double totalPeriodVolume;
   final double currentWeekVolume;
   final double previousWeekVolume;
   final double averageVolume;
@@ -74,6 +75,7 @@ class WorkoutVolumeData {
   WorkoutVolumeData({
     required this.weeklyVolumeData,
     required this.dailyVolumeData,
+    required this.totalPeriodVolume,
     required this.currentWeekVolume,
     required this.previousWeekVolume,
     required this.averageVolume,
