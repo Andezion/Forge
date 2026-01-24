@@ -11,6 +11,7 @@ import '../models/workout_history.dart';
 import '../services/data_manager.dart';
 import '../services/leaderboard_service.dart';
 import '../services/settings_service.dart';
+import '../services/progression_service.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
   final Workout workout;
@@ -560,6 +561,15 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       session: completedSession,
     );
     DataManager().addWorkoutHistory(history);
+
+    try {
+      final progressionService = ProgressionService();
+      await progressionService.applyProgressionToProgram(widget.workout.id);
+      debugPrint(
+          '[WORKOUT] Progression applied to program: ${widget.workout.name}');
+    } catch (e) {
+      debugPrint('[WORKOUT] Error applying progression: $e');
+    }
 
     try {
       final leaderboardService =
