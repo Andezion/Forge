@@ -276,13 +276,26 @@ class WorkoutRecommendationService extends ChangeNotifier {
       final readiness = factors['readiness'] as double;
       final exerciseCount = workout.exercises.length;
 
+      if (exerciseCount >= 8) {
+        score += 30.0;
+      } else if (exerciseCount >= 6) {
+        score += 15.0;
+      } else if (exerciseCount >= 4) {
+        score += 5.0;
+      }
+
       if (readiness < 0.5) {
         if (exerciseCount <= 4) {
-          score += 20.0;
+          score += 25.0;
         }
-      } else if (readiness > 0.7) {
-        if (exerciseCount >= 6) {
-          score += 15.0;
+        if (exerciseCount >= 8) {
+          score -= 20.0;
+        }
+      } else if (readiness >= 0.7) {
+        if (exerciseCount >= 8) {
+          score += 20.0;
+        } else if (exerciseCount >= 6) {
+          score += 10.0;
         }
       }
 
