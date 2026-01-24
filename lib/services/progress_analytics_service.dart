@@ -297,6 +297,7 @@ class ProgressAnalyticsService {
 
     final dailyVolumePoints = <ChartDataPoint>[];
     final weeklyVolumes = <DateTime, double>{};
+    double totalPeriodVolume = 0;
 
     for (var history in relevantHistories) {
       double dailyVolume = 0;
@@ -307,6 +308,8 @@ class ProgressAnalyticsService {
           dailyVolume += effectiveWeight * set.actualReps.toDouble();
         }
       }
+
+      totalPeriodVolume += dailyVolume;
 
       dailyVolumePoints.add(ChartDataPoint(
         date: history.date,
@@ -336,6 +339,7 @@ class ProgressAnalyticsService {
     return WorkoutVolumeData(
       weeklyVolumeData: weeklyVolumePoints,
       dailyVolumeData: dailyVolumePoints,
+      totalPeriodVolume: totalPeriodVolume,
       currentWeekVolume: currentWeek,
       previousWeekVolume: previousWeek,
       averageVolume: averageVolume,
