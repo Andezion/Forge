@@ -1,22 +1,22 @@
-# ⚒️ SYHA FORGE
+# FORGE
 
 **Your Ultimate Workout Companion for Strength Training**
 
-SYHA Forge is a powerful mobile app built with Flutter for tracking workout progress, analyzing strength gains, and optimizing training programs. Designed specifically for powerlifters, street lifters, and armwrestlers.
+Forge is a powerful mobile app built with Flutter for tracking workout progress, analyzing strength gains, and optimizing training programs. Designed specifically for powerlifters, street lifters, and armwrestlers.
 
-## 🌐 Documentation
+## Documentation
 
-📖 **[Visit our documentation site](https://vdoro.github.io/Dyplom/)** for:
+**[Visit our documentation site](https://vdoro.github.io/Dyplom/)** for:
 - Detailed analytics formulas
 - Technical documentation
 - Contributing guidelines
 - User guides and tutorials
 
-## ✨ Features
+## Features
 
-- 📊 **Advanced Analytics** - Track progress with strength coefficient, volume, frequency, and consistency metrics
-- 💪 **Specialized Programs** - Pre-built programs for Powerlifting, Street Lifting, and Armwrestling
-- 📅 **Smart Calendar** - Visual workout tracking with streaks and history
+- **Advanced Analytics** - Track progress with strength coefficient, volume, frequency, and consistency metrics
+- **Specialized Programs** - Pre-built programs for Powerlifting, Street Lifting, and Armwrestling
+- **Smart Calendar** - Visual workout tracking with streaks and history
 - 🔥 **Body Weight Tracking** - Monitor weight changes over time with complete history
 - 🏆 **Personal Records** - Track 1RM and compare with world records
 - 🎨 **Customizable UI** - Personalize with custom avatars, themes, and colors
