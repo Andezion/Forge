@@ -1011,6 +1011,16 @@ class DataManager extends ChangeNotifier {
     }
   }
 
+  void updateWorkoutById(String id, Workout updatedWorkout) {
+    final index = _workouts.indexWhere((workout) => workout.id == id);
+    if (index >= 0) {
+      _workouts[index] = updatedWorkout;
+      _saveData();
+      notifyListeners();
+      print('[DATA_MANAGER] Updated workout: ${updatedWorkout.name}');
+    }
+  }
+
   Workout? getTodayWorkout() {
     if (_workouts.isNotEmpty) {
       return _workouts[0];
