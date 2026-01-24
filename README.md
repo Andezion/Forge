@@ -101,7 +101,7 @@ We welcome contributions! Please read our [Contributing Guide](https://andezion.
 - Run `flutter analyze` to check for issues
 - Write tests for new features
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -111,11 +111,11 @@ flutter test
 flutter test --coverage
 ```
 
-## 📱 Screenshots
+## Screenshots
 
 *(Add screenshots here once available)*
 
-## 🎯 Roadmap
+## Roadmap
 
 - [ ] Cloud sync across devices
 - [ ] AI-powered form check
@@ -125,20 +125,20 @@ flutter test --coverage
 - [ ] Advanced analytics (predicted 1RM, deload recommendations)
 - [ ] Exercise video library
 
-## 📄 License
+## License
 
-This project is licensed under the [MIT License](LICENSE) *(or your chosen license)*.
+This project is licensed under the [MIT License](LICENSE)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Flutter team for the amazing framework
 - Firebase for backend services
 - All contributors and supporters
 
-## 📞 Contact
+## Contact
 
 - **GitHub**: [@vdoro](https://github.com/vdoro)
-- **Project**: [SYHA Forge](https://github.com/vdoro/Dyplom)
+- **Project**: [Forge](https://github.com/vdoro/Dyplom)
 - **Documentation**: [https://vdoro.github.io/Dyplom/](https://vdoro.github.io/Dyplom/)
 
 ---
