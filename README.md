@@ -137,9 +137,9 @@ This project is licensed under the [MIT License](LICENSE)
 
 ## Contact
 
-- **GitHub**: [@vdoro](https://github.com/vdoro)
-- **Project**: [Forge](https://github.com/vdoro/Dyplom)
-- **Documentation**: [https://vdoro.github.io/Dyplom/](https://vdoro.github.io/Dyplom/)
+- **GitHub**: [Andezion](https://github.com/Andezion)
+- **Project**: [Forge](https://andezion.github.io/Forge/index.html)
+- **Documentation**: [Docs](https://github.com/Andezion/Forge)
 
 ---
 
