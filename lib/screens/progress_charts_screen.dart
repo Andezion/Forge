@@ -116,6 +116,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       _volumeData = _analyticsService.analyzeWorkoutVolume(
         histories,
         lookbackDays: _lookbackDays,
+        userBodyWeight: profileService.weightKg ?? 70.0,
       );
 
       await Future.delayed(const Duration(milliseconds: 10));
@@ -157,12 +158,15 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
     try {
       final histories = _dataManager.workoutHistory;
+      final profileService =
+          Provider.of<ProfileService>(context, listen: false);
 
       _exerciseProgressData = _analyticsService.analyzeExerciseProgress(
         exercise.id,
         exercise.name,
         histories,
         lookbackDays: _lookbackDays,
+        userBodyWeight: profileService.weightKg ?? 70.0,
       );
 
       if (mounted) {
