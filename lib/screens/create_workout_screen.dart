@@ -428,7 +428,12 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                       ),
                     )
                   : ReorderableListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 16 + MediaQuery.of(context).padding.bottom,
+                      ),
                       itemCount: _workoutExercises.length,
                       onReorder: (oldIndex, newIndex) {
                         setState(() {
