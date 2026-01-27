@@ -1,10 +1,10 @@
-# SYHA Forge Documentation Site
+# Forge Documentation Site
 
-This directory contains the GitHub Pages documentation website for SYHA Forge.
+This directory contains the GitHub Pages documentation website for Forge.
 
 ## Live Site
 
-Once deployed, the site will be available at: `https://[your-username].github.io/Dyplom/`
+Once deployed, the site will be available at: `https://andezion.github.io/Forge/`
 
 ## Structure
 
@@ -25,14 +25,14 @@ docs/
 ### Method 1: GitHub Settings (Recommended)
 
 1. Go to your repository on GitHub
-2. Click **Settings** → **Pages**
+2. Click **Settings** -> **Pages**
 3. Under "Build and deployment":
    - **Source**: Deploy from a branch
    - **Branch**: `main` (or `master`)
    - **Folder**: `/docs`
 4. Click **Save**
 5. Wait a few minutes for deployment
-6. Your site will be live at `https://[username].github.io/[repo-name]/`
+6. Your site will be live at `https://andezion.github.io/Forge/`
 
 ### Method 2: GitHub Actions (Advanced)
 
@@ -86,7 +86,7 @@ The site uses a black & gold fire theme. To customize colors, edit `assets/css/s
 
 Simply edit the HTML files directly. Changes will be live after pushing to GitHub.
 
-## 🧪 Local Testing
+## Local Testing
 
 To test the site locally:
 
@@ -130,7 +130,7 @@ npx http-server
 
 Before deploying, update these links in all pages:
 
-1. GitHub repository URL: `https://github.com/[username]/Dyplom`
+1. GitHub repository URL: `https://andezion.github.io/Forge/`
 2. Live site URL (after deployment)
 3. Your contact information (if adding)
 
