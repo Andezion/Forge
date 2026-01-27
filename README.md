@@ -6,7 +6,7 @@ Forge is a powerful mobile app built with Flutter for tracking workout progress,
 
 ## Documentation
 
-**[Visit our documentation site](https://vdoro.github.io/Dyplom/)** for:
+**[Visit our documentation site](https://andezion.github.io/Forge/formulas.html)** for:
 - Detailed analytics formulas
 - Technical documentation
 - Contributing guidelines
@@ -67,7 +67,7 @@ Coefficient = (Σ(max_weight / first_weight) / exercise_count) × 100
 - 150 = 50% stronger overall
 - 200 = Doubled your strength
 
-[See all formulas →](https://andezion.github.io/Forge/formulas.html)
+[See all formulas ->](https://andezion.github.io/Forge/formulas.html)
 
 ## Architecture
 
