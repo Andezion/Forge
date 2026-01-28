@@ -158,6 +158,28 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     );
   }
 
+  void _showEditExerciseDialog(Exercise exercise) {
+    showDialog(
+      context: context,
+      builder: (context) => EditExerciseDialog(
+        exercise: exercise,
+        onExerciseUpdated: (updatedExercise) {
+          _dataManager.updateExercise(updatedExercise);
+          setState(() {
+            _filteredExercises = List.from(_dataManager.exercises);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${updatedExercise.name} updated'),
+              backgroundColor: AppColors.success,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   void _deleteExercise(Exercise exercise) async {
     final isUsed = _dataManager.isExerciseUsed(exercise.id);
 
@@ -274,10 +296,16 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              color: AppColors.primary,
+              onPressed: () => _showEditExerciseDialog(exercise),
+              tooltip: AppStrings.edit,
+            ),
+            IconButton(
               icon: const Icon(Icons.delete_outline),
               color: AppColors.error,
               onPressed: () => _deleteExercise(exercise),
-              tooltip: 'Delete',
+              tooltip: AppStrings.delete,
             ),
             const Icon(Icons.add_circle_outline),
           ],
@@ -285,6 +313,394 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         onTap: () {
           widget.onExerciseSelected(exercise);
         },
+      ),
+    );
+  }
+}
+
+class EditExerciseDialog extends StatefulWidget {
+  final Exercise exercise;
+  final Function(Exercise) onExerciseUpdated;
+
+  const EditExerciseDialog({
+    super.key,
+    required this.exercise,
+    required this.onExerciseUpdated,
+  });
+
+  @override
+  State<EditExerciseDialog> createState() => _EditExerciseDialogState();
+}
+
+class _EditExerciseDialogState extends State<EditExerciseDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+  late final TextEditingController _descriptionController;
+  late ExerciseDifficulty _selectedDifficulty;
+  late Map<MuscleGroup, MuscleGroupIntensity> _selectedMuscleGroups;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.exercise.name);
+    _descriptionController =
+        TextEditingController(text: widget.exercise.description);
+    _selectedDifficulty = widget.exercise.difficulty;
+    _selectedMuscleGroups = {
+      for (var tag in widget.exercise.muscleGroups) tag.group: tag.intensity
+    };
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _saveExercise() {
+    if (_formKey.currentState!.validate()) {
+      final muscleTags = _selectedMuscleGroups.entries
+          .map((entry) => MuscleGroupTag(
+                group: entry.key,
+                intensity: entry.value,
+              ))
+          .toList();
+
+      final updatedExercise = Exercise(
+        id: widget.exercise.id,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        difficulty: _selectedDifficulty,
+        createdAt: widget.exercise.createdAt,
+        muscleGroups: muscleTags,
+      );
+
+      widget.onExerciseUpdated(updatedExercise);
+      Navigator.of(context).pop();
+    }
+  }
+
+  String _getMuscleGroupLabel(MuscleGroup group) {
+    return MuscleGroupUtils.getLabel(group);
+  }
+
+  String _getIntensityLabel(MuscleGroupIntensity intensity) {
+    return MuscleGroupUtils.getIntensityLabel(intensity);
+  }
+
+  Color _getIntensityColor(MuscleGroupIntensity intensity) {
+    switch (intensity) {
+      case MuscleGroupIntensity.primary:
+        return AppColors.primary;
+      case MuscleGroupIntensity.secondary:
+        return AppColors.warning;
+      case MuscleGroupIntensity.stabilizer:
+        return AppColors.textSecondary;
+    }
+  }
+
+  void _showMuscleGroupSelector() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppStrings.pickMuscleGroup,
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: MuscleGroup.values.map((group) {
+                    return ListTile(
+                      title: Text(_getMuscleGroupLabel(group)),
+                      trailing: _selectedMuscleGroups.containsKey(group)
+                          ? Icon(Icons.check, color: AppColors.success)
+                          : null,
+                      onTap: () {
+                        Navigator.pop(context, group);
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((selectedGroup) {
+      if (selectedGroup != null) {
+        _showIntensitySelector(selectedGroup);
+      }
+    });
+  }
+
+  void _showIntensitySelector(MuscleGroup group) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                '${AppStrings.intensityFor}\n${_getMuscleGroupLabel(group)}',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ...MuscleGroupIntensity.values.map((intensity) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMuscleGroups[group] = intensity;
+                      });
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: _getIntensityColor(intensity)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      _getIntensityLabel(intensity),
+                      style: TextStyle(color: _getIntensityColor(intensity)),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppStrings.edit,
+                  style: AppTextStyles.h3,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: AppStrings.exerciseName,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppStrings.errorFieldRequired;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: AppStrings.description,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppStrings.errorFieldRequired;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppStrings.difficulty,
+                  style: AppTextStyles.body1.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildDifficultyChip(
+                        AppStrings.easy,
+                        ExerciseDifficulty.easy,
+                        AppColors.success,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildDifficultyChip(
+                        AppStrings.medium,
+                        ExerciseDifficulty.medium,
+                        AppColors.warning,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildDifficultyChip(
+                        AppStrings.hard,
+                        ExerciseDifficulty.hard,
+                        AppColors.error,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppStrings.muscleGroups,
+                  style: AppTextStyles.body1.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (_selectedMuscleGroups.isEmpty)
+                  Text(
+                    AppStrings.pressToAddMuscleGroups,
+                    style: AppTextStyles.caption,
+                  )
+                else
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _selectedMuscleGroups.entries.map((entry) {
+                      return Chip(
+                        label: Text(
+                          '${_getMuscleGroupLabel(entry.key)} (${_getIntensityLabel(entry.value)})',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textOnPrimary,
+                          ),
+                        ),
+                        backgroundColor: _getIntensityColor(entry.value),
+                        deleteIcon: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: AppColors.textOnPrimary,
+                        ),
+                        onDeleted: () {
+                          setState(() {
+                            _selectedMuscleGroups.remove(entry.key);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _showMuscleGroupSelector,
+                  icon: const Icon(Icons.add),
+                  label: Text(AppStrings.addMuscleGroup),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(AppStrings.cancel),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _saveExercise,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.textOnPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(AppStrings.save),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultyChip(
+    String label,
+    ExerciseDifficulty difficulty,
+    Color color,
+  ) {
+    final isSelected = _selectedDifficulty == difficulty;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedDifficulty = difficulty;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color : color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.buttonSmall.copyWith(
+            color: isSelected ? AppColors.textOnPrimary : color,
+          ),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
