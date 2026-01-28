@@ -953,6 +953,53 @@ class DataManager extends ChangeNotifier {
     _saveData();
   }
 
+  void updateExercise(Exercise exercise) {
+    final index = _exercises.indexWhere((e) => e.id == exercise.id);
+    if (index >= 0) {
+      _exercises[index] = exercise;
+
+      for (var i = 0; i < _workouts.length; i++) {
+        final workout = _workouts[i];
+        bool workoutUpdated = false;
+        final updatedExercises = workout.exercises.map((we) {
+          if (we.exercise.id == exercise.id) {
+            workoutUpdated = true;
+            return WorkoutExercise(
+              exercise: exercise,
+              sets: we.sets,
+              targetReps: we.targetReps,
+              weight: we.weight,
+              alternativeExercise: we.alternativeExercise,
+            );
+          }
+          if (we.alternativeExercise?.id == exercise.id) {
+            workoutUpdated = true;
+            return WorkoutExercise(
+              exercise: we.exercise,
+              sets: we.sets,
+              targetReps: we.targetReps,
+              weight: we.weight,
+              alternativeExercise: exercise,
+            );
+          }
+          return we;
+        }).toList();
+
+        if (workoutUpdated) {
+          _workouts[i] = Workout(
+            id: workout.id,
+            name: workout.name,
+            exercises: updatedExercises,
+            createdAt: workout.createdAt,
+          );
+        }
+      }
+
+      _saveData();
+      notifyListeners();
+    }
+  }
+
   bool isExerciseUsed(String exerciseId) {
     for (var workout in _workouts) {
       for (var workoutExercise in workout.exercises) {
