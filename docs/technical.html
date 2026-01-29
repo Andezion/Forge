@@ -82,9 +82,14 @@
 ├── services/           # Business logic
 │   ├── data_manager.dart              # Central data management
 │   ├── progress_analytics_service.dart # Progress calculations
+│   ├── muscle_recovery_tracker.dart   # Muscle group recovery tracking
+│   ├── workout_recommendation_service.dart # Smart workout recommendations
 │   ├── profile_service.dart           # User profile management
 │   ├── auth_service.dart              # Firebase authentication
 │   └── theme_service.dart             # Theme customization
+├── widgets/            # Reusable UI components
+│   ├── muscle_recovery_card.dart      # Recovery status display
+│   └── compact_calendar.dart          # Week-view calendar
 └── main.dart           # App entry point</code></pre>
 
             <h3>Layer Responsibilities</h3>
@@ -200,6 +205,81 @@ Consumer<DataManager>(
     notifyListeners();
   }
 }</code></pre>
+
+            <h3>MuscleRecoveryTracker</h3>
+            <p>Tracks muscle group recovery status and calculates training readiness. Uses optimal recovery days per muscle group to determine which muscles are ready to train. See <a href="formulas.html#muscle-recovery">Muscle Recovery Formulas</a> for details.</p>
+            <pre><code>class MuscleRecoveryTracker {
+  // Optimal recovery days per muscle group (legs: 3, chest: 2, forearms: 1, etc.)
+  static const Map&lt;MuscleGroup, int&gt; _optimalRecoveryDays = { ... };
+
+  // Scans all workout history, cross-referencing old exercises
+  // with current muscle group assignments
+  Map&lt;MuscleGroup, int&gt; calculateDaysSinceLastTraining(
+    List&lt;WorkoutHistory&gt; histories,
+    {Map&lt;String, Exercise&gt;? currentExercises}
+  ) { ... }
+
+  // Converts days-since-training into 0.0-1.5 priority score
+  Map&lt;MuscleGroup, double&gt; calculateRecoveryPriority(
+    Map&lt;MuscleGroup, int&gt; daysSinceTraining
+  ) { ... }
+
+  // Returns muscles with priority >= 0.7 (ready to train)
+  List&lt;MuscleGroup&gt; getMusclesToTrain(...) { ... }
+
+  // Returns muscles with priority < 0.3 (need rest)
+  List&lt;MuscleGroup&gt; getMusclesToRest(...) { ... }
+}</code></pre>
+
+            <h3>WorkoutRecommendationService</h3>
+            <p>Generates daily workout recommendations by combining muscle recovery data, wellness status, and training history. Passes current exercise definitions to the recovery tracker to ensure old history entries without muscle groups are properly accounted for.</p>
+            <pre><code>class WorkoutRecommendationService extends ChangeNotifier {
+  final MuscleRecoveryTracker _recoveryTracker;
+  final DataManager _dataManager;
+
+  // Builds exercise ID -> Exercise map for cross-referencing
+  Map&lt;String, Exercise&gt; _buildCurrentExercisesMap() {
+    return {for (var e in _dataManager.exercises) e.id: e};
+  }
+
+  // All public methods pass currentExercises to the tracker
+  Map&lt;MuscleGroup, int&gt; getDaysSinceLastTraining() { ... }
+  Map&lt;MuscleGroup, double&gt; getMuscleRecoveryPriorities() { ... }
+
+  // Analyzes wellness, recovery, history to recommend workout
+  Future&lt;WorkoutRecommendation?&gt; generateTodaysRecommendation() { ... }
+}</code></pre>
+        </section>
+
+        <section id="visual-indicators">
+            <h2>Visual Indicators System</h2>
+            <p>Forge uses color-coded visual indicators to provide instant feedback on exercise performance and completion.</p>
+
+            <h3>Program View - Completion Status</h3>
+            <p>When viewing a program's exercise list (<code>programs_screen.dart</code>), each exercise is checked against the last completed session:</p>
+            <ul>
+                <li><strong style="color: green;">Green check icon:</strong> Exercise was completed in the last session</li>
+                <li><strong style="color: #d32f2f;">Red X icon + red text:</strong> Exercise was skipped/not completed last time. Shows "Not completed last time" hint.</li>
+            </ul>
+            <pre><code>// Find last session for this workout
+final lastSession = _findLastSessionForWorkout(dataManager, workout.id);
+final completedExerciseIds = lastSession.exerciseResults
+    .map((r) => r.exercise.id).toSet();
+
+// For each exercise in the program
+final wasCompleted = completedExerciseIds.contains(exercise.id);
+// Color: wasCompleted ? programColor : AppColors.error</code></pre>
+
+            <h3>Calendar View - Rep Regression</h3>
+            <p>When viewing expanded workout details in the calendar (<code>full_calendar_screen.dart</code>), exercises are compared against the previous session of the same workout:</p>
+            <ul>
+                <li><strong>Default (green circles):</strong> Same or more reps than last time</li>
+                <li><strong style="color: #e65100;">Orange highlight + trending-down icon:</strong> Fewer total reps than previous session. Shows comparison like "18 / 24 reps".</li>
+            </ul>
+            <pre><code>// Compare total reps against previous session
+final currentTotalReps = result.setResults.fold(0, (sum, s) => sum + s.actualReps);
+final prevReps = previousSessionReps[exercise.id];
+final isRegression = prevReps != null && currentTotalReps < prevReps;</code></pre>
         </section>
 
         <section id="models">
