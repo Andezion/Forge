@@ -150,7 +150,8 @@ class WorkoutRecommendationService extends ChangeNotifier {
     factors['daysSinceLastWorkout'] = daysSinceLastWorkout;
 
     final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+        _recoveryTracker.calculateDaysSinceLastTraining(histories,
+            currentExercises: _buildCurrentExercisesMap());
     final recoveryPriorities =
         _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
 
@@ -478,22 +479,29 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return await generateTodaysRecommendation();
   }
 
+  Map<String, Exercise> _buildCurrentExercisesMap() {
+    return {for (var e in _dataManager.exercises) e.id: e};
+  }
+
   Map<MuscleGroup, String> getMuscleRecoveryStatus() {
     final histories = _dataManager.workoutHistory;
     final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+        _recoveryTracker.calculateDaysSinceLastTraining(histories,
+            currentExercises: _buildCurrentExercisesMap());
     return _recoveryTracker.getRecoveryRecommendations(daysSinceTraining);
   }
 
   Map<MuscleGroup, double> getMuscleRecoveryPriorities() {
     final histories = _dataManager.workoutHistory;
     final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories);
+        _recoveryTracker.calculateDaysSinceLastTraining(histories,
+            currentExercises: _buildCurrentExercisesMap());
     return _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
   }
 
   Map<MuscleGroup, int> getDaysSinceLastTraining() {
     final histories = _dataManager.workoutHistory;
-    return _recoveryTracker.calculateDaysSinceLastTraining(histories);
+    return _recoveryTracker.calculateDaysSinceLastTraining(histories,
+        currentExercises: _buildCurrentExercisesMap());
   }
 }
