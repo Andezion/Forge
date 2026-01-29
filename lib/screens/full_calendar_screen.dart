@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../services/data_manager.dart';
 import 'package:provider/provider.dart';
 import '../models/workout_history.dart';
+import '../models/workout_session.dart';
 
 class FullCalendarScreen extends StatefulWidget {
   const FullCalendarScreen({super.key});
@@ -23,7 +24,6 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     _selectedDay = DateTime.now();
     _focusedDay = DateTime.now();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +149,8 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       itemCount: workouts.length,
-      itemBuilder: (context, index) => _WorkoutCardWidget(workout: workouts[index]),
+      itemBuilder: (context, index) =>
+          _WorkoutCardWidget(workout: workouts[index]),
     );
   }
 }
@@ -166,6 +167,34 @@ class _WorkoutCardWidget extends StatefulWidget {
 class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
   bool _isExpanded = false;
 
+  Map<String, int> _getPreviousSessionReps() {
+    final dataManager = DataManager();
+    final allHistory = dataManager.workoutHistory;
+    final currentDate = widget.workout.date;
+    final workoutId = widget.workout.session.workoutId;
+
+    WorkoutSession? previousSession;
+    for (var i = allHistory.length - 1; i >= 0; i--) {
+      final h = allHistory[i];
+      if (h.session.workoutId == workoutId && h.date.isBefore(currentDate)) {
+        previousSession = h.session;
+        break;
+      }
+    }
+
+    if (previousSession == null) return {};
+
+    final result = <String, int>{};
+    for (var exerciseResult in previousSession.exerciseResults) {
+      final totalReps = exerciseResult.setResults.fold<int>(
+        0,
+        (sum, set) => sum + set.actualReps,
+      );
+      result[exerciseResult.exercise.id] = totalReps;
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = widget.workout.session;
@@ -173,6 +202,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
     final hours = duration ~/ 3600;
     final minutes = (duration % 3600) ~/ 60;
     final durationText = hours > 0 ? '${hours}h ${minutes}m' : '${minutes}m';
+    final previousReps = _isExpanded ? _getPreviousSessionReps() : <String, int>{};
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -288,24 +318,72 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
               const Divider(),
               const SizedBox(height: 8),
               ...session.exerciseResults.map((result) {
+                final currentTotalReps = result.setResults.fold<int>(
+                  0,
+                  (sum, set) => sum + set.actualReps,
+                );
+                final prevReps = previousReps[result.exercise.id];
+                final isRegression =
+                    prevReps != null && currentTotalReps < prevReps;
+                final cardColor = isRegression
+                    ? Colors.orange.withValues(alpha: 0.08)
+                    : AppColors.primary.withValues(alpha: 0.05);
+                final borderColor = isRegression
+                    ? Colors.orange.withValues(alpha: 0.5)
+                    : AppColors.divider;
+
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.05),
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: AppColors.divider,
+                      color: borderColor,
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        result.exercise.name,
-                        style: AppTextStyles.body1.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              result.exercise.name,
+                              style: AppTextStyles.body1.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isRegression ? Colors.orange[800] : null,
+                              ),
+                            ),
+                          ),
+                          if (isRegression)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.trending_down,
+                                      size: 12, color: Colors.orange[800]),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    '$currentTotalReps / $prevReps reps',
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: Colors.orange[800],
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       ...result.setResults.map((set) {
@@ -317,7 +395,9 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                                 width: 24,
                                 height: 24,
                                 decoration: BoxDecoration(
-                                  color: AppColors.success,
+                                  color: isRegression
+                                      ? Colors.orange
+                                      : AppColors.success,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
