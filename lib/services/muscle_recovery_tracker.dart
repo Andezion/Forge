@@ -18,7 +18,8 @@ class MuscleRecoveryTracker {
   };
 
   Map<MuscleGroup, int> calculateDaysSinceLastTraining(
-      List<WorkoutHistory> histories) {
+      List<WorkoutHistory> histories,
+      {Map<String, Exercise>? currentExercises}) {
     final result = <MuscleGroup, int>{};
     final now = DateTime.now();
 
@@ -38,7 +39,15 @@ class MuscleRecoveryTracker {
       for (var exerciseResult in session.exerciseResults) {
         final exercise = exerciseResult.exercise;
 
-        for (var muscleTag in exercise.muscleGroups) {
+        var muscleGroups = exercise.muscleGroups;
+        if (muscleGroups.isEmpty && currentExercises != null) {
+          final currentExercise = currentExercises[exercise.id];
+          if (currentExercise != null) {
+            muscleGroups = currentExercise.muscleGroups;
+          }
+        }
+
+        for (var muscleTag in muscleGroups) {
           final group = muscleTag.group;
 
           if (!lastTrainingDates.containsKey(group)) {
