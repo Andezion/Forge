@@ -282,6 +282,109 @@
             </ul>
         </section>
 
+        <section id="muscle-recovery">
+            <h2>Muscle Recovery & Training Readiness</h2>
+            <p>Forge tracks when each muscle group was last trained and calculates recovery priorities to recommend the best muscles to train next.</p>
+
+            <div class="formula">
+                <div class="formula-title">Days Since Last Training</div>
+                <div class="formula-content">
+                    days_since[group] = (now - last_training_date[group]).inDays
+                </div>
+                <div class="formula-explanation">
+                    For each muscle group, the system scans all workout history (including old exercises matched to current muscle group assignments) and finds the most recent date that muscle was trained.
+                    <br>Default value: <strong>14 days</strong> if a muscle group has never been trained.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Recovery Priority</div>
+                <div class="formula-content">
+                    if days &lt; optimal: priority = (days / optimal) &times; 0.3<br>
+                    if days == optimal: priority = 0.7<br>
+                    if days &lt; optimal &times; 2: priority = 0.7 + ((days - optimal) / optimal) &times; 0.3<br>
+                    if days &ge; optimal &times; 2: priority = 1.0 + ((days - optimal &times; 2) / 7).clamp(0, 0.5)
+                </div>
+                <div class="formula-explanation">
+                    <strong>Where:</strong>
+                    <ul>
+                        <li><strong>days:</strong> Days since last training for this muscle group</li>
+                        <li><strong>optimal:</strong> Optimal recovery days for this muscle group (see table below)</li>
+                    </ul>
+                    <p>Priority &lt; 0.3 = needs rest, 0.3&ndash;0.7 = recovering, &ge; 0.7 = ready to train.</p>
+                </div>
+            </div>
+
+            <h3>Optimal Recovery Days per Muscle Group</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Muscle Group</th>
+                        <th>Recovery Days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Legs</td><td>3 days</td></tr>
+                    <tr><td>Back</td><td>3 days</td></tr>
+                    <tr><td>Glutes</td><td>3 days</td></tr>
+                    <tr><td>Chest</td><td>2 days</td></tr>
+                    <tr><td>Shoulders</td><td>2 days</td></tr>
+                    <tr><td>Biceps</td><td>2 days</td></tr>
+                    <tr><td>Triceps</td><td>2 days</td></tr>
+                    <tr><td>Calves</td><td>2 days</td></tr>
+                    <tr><td>Forearms</td><td>1 day</td></tr>
+                    <tr><td>Wrists</td><td>1 day</td></tr>
+                    <tr><td>Core</td><td>1 day</td></tr>
+                    <tr><td>Cardio</td><td>1 day</td></tr>
+                </tbody>
+            </table>
+
+            <div class="formula">
+                <div class="formula-title">Workout Priority Score</div>
+                <div class="formula-content">
+                    Workout Priority = &Sigma;(recovery_priority[group] &times; muscle_score) / &Sigma;(muscle_score)
+                </div>
+                <div class="formula-explanation">
+                    <strong>Where muscle_score depends on intensity:</strong>
+                    <ul>
+                        <li><strong>Primary:</strong> score = 3</li>
+                        <li><strong>Secondary:</strong> score = 2</li>
+                        <li><strong>Stabilizer:</strong> score = 1</li>
+                    </ul>
+                    <p>This weighted average prioritizes workouts that target muscles most in need of training, while accounting for which muscles are primary vs secondary in each exercise.</p>
+                </div>
+            </div>
+
+            <h3>Cross-referencing Old History</h3>
+            <p>When exercises in old workout history don't have muscle group assignments (because they were added before the muscle group feature), the system automatically matches them by exercise ID to the current exercise definitions. This ensures that <strong>all historical data</strong> is used when calculating days since last training, not just recent workouts.</p>
+        </section>
+
+        <section id="exercise-completion">
+            <h2>Exercise Completion & Regression Tracking</h2>
+            <p>Forge visually indicates exercise completion status and performance regression to help you stay on track.</p>
+
+            <div class="formula">
+                <div class="formula-title">Completion Status (Program View)</div>
+                <div class="formula-content">
+                    is_completed = exercise.id &isin; {last_session.exerciseResults[].exercise.id}
+                </div>
+                <div class="formula-explanation">
+                    When viewing a program's exercise list, each exercise is checked against the most recent completed session of that workout. Exercises that were <strong>not completed</strong> last time are highlighted in <strong style="color: #d32f2f;">red</strong> with a &times; icon, so you know what you skipped and need to focus on next time.
+                </div>
+            </div>
+
+            <div class="formula">
+                <div class="formula-title">Rep Regression Detection (Calendar View)</div>
+                <div class="formula-content">
+                    is_regression = (current_total_reps &lt; previous_total_reps)<br>
+                    where total_reps = &Sigma;(set.actualReps) for all sets of an exercise
+                </div>
+                <div class="formula-explanation">
+                    When viewing workout history through the calendar, each exercise's total reps are compared against the previous session of the same workout. If you performed <strong>fewer total reps</strong> than last time, the exercise is highlighted in <strong style="color: #e65100;">yellow/orange</strong> with a trending-down indicator showing the comparison (e.g., "18 / 24 reps").
+                </div>
+            </div>
+        </section>
+
         <section id="lookback">
             <h2>Lookback Period</h2>
             <p>All formulas use a configurable lookback period to filter relevant data.</p>
