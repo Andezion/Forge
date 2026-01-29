@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../services/data_manager.dart';
 import '../models/workout.dart';
+import '../models/workout_session.dart';
 
 class ProgramsScreen extends StatelessWidget {
   const ProgramsScreen({super.key});
@@ -177,7 +178,25 @@ class ProgramsScreen extends StatelessWidget {
     );
   }
 
+  WorkoutSession? _findLastSessionForWorkout(
+      DataManager dataManager, String workoutId) {
+    final history = dataManager.workoutHistory;
+    for (var i = history.length - 1; i >= 0; i--) {
+      if (history[i].session.workoutId == workoutId) {
+        return history[i].session;
+      }
+    }
+    return null;
+  }
+
   void _showWorkoutDetails(BuildContext context, Workout workout, Color color) {
+    final dataManager = Provider.of<DataManager>(context, listen: false);
+    final lastSession = _findLastSessionForWorkout(dataManager, workout.id);
+    final completedExerciseIds = lastSession != null
+        ? lastSession.exerciseResults.map((r) => r.exercise.id).toSet()
+        : <String>{};
+    final hasHistory = lastSession != null;
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -214,6 +233,10 @@ class ProgramsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         ...workout.exercises.map((we) {
+                          final wasCompleted = !hasHistory ||
+                              completedExerciseIds.contains(we.exercise.id);
+                          final exerciseColor =
+                              wasCompleted ? color : AppColors.error;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Row(
@@ -222,10 +245,14 @@ class ProgramsScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: color.withValues(alpha: 0.1),
+                                    color: exerciseColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: Icon(Icons.check, color: color, size: 16),
+                                  child: Icon(
+                                    wasCompleted ? Icons.check : Icons.close,
+                                    color: exerciseColor,
+                                    size: 16,
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -236,12 +263,29 @@ class ProgramsScreen extends StatelessWidget {
                                         we.exercise.name,
                                         style: AppTextStyles.body2.copyWith(
                                           fontWeight: FontWeight.w600,
+                                          color: wasCompleted
+                                              ? null
+                                              : AppColors.error,
                                         ),
                                       ),
                                       Text(
                                         '${we.sets} sets × ${we.targetReps} reps${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
-                                        style: AppTextStyles.caption,
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: wasCompleted
+                                              ? null
+                                              : AppColors.error
+                                                  .withValues(alpha: 0.7),
+                                        ),
                                       ),
+                                      if (!wasCompleted)
+                                        Text(
+                                          'Not completed last time',
+                                          style: AppTextStyles.caption.copyWith(
+                                            color: AppColors.error,
+                                            fontStyle: FontStyle.italic,
+                                            fontSize: 10,
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
