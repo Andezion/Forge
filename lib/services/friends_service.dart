@@ -174,11 +174,6 @@ class FriendsService extends ChangeNotifier {
     }
 
     try {
-      await _db.collection('friendRequests').doc(request.id).update({
-        'status': 'accepted',
-        'respondedAt': DateTime.now().toIso8601String(),
-      });
-
       final fromUserDoc =
           await _db.collection('users').doc(request.fromUserId).get();
       final toUserDoc =
@@ -225,19 +220,32 @@ class FriendsService extends ChangeNotifier {
         friendsSince: now,
       );
 
-      await _db
-          .collection('users')
-          .doc(request.toUserId)
-          .collection('friends')
-          .doc(request.fromUserId)
-          .set(friendForCurrentUser.toJson());
+      final batch = _db.batch();
 
-      await _db
-          .collection('users')
-          .doc(request.fromUserId)
-          .collection('friends')
-          .doc(request.toUserId)
-          .set(friendForRequestSender.toJson());
+      batch.update(_db.collection('friendRequests').doc(request.id), {
+        'status': 'accepted',
+        'respondedAt': DateTime.now().toIso8601String(),
+      });
+
+      batch.set(
+        _db
+            .collection('users')
+            .doc(request.toUserId)
+            .collection('friends')
+            .doc(request.fromUserId),
+        friendForCurrentUser.toJson(),
+      );
+
+      batch.set(
+        _db
+            .collection('users')
+            .doc(request.fromUserId)
+            .collection('friends')
+            .doc(request.toUserId),
+        friendForRequestSender.toJson(),
+      );
+
+      await batch.commit();
 
       await loadFriends();
       await loadReceivedRequests();
@@ -275,19 +283,21 @@ class FriendsService extends ChangeNotifier {
     }
 
     try {
-      await _db
-          .collection('users')
-          .doc(_currentUserId)
-          .collection('friends')
-          .doc(friendUserId)
-          .delete();
+      final batch = _db.batch();
 
-      await _db
+      batch.delete(_db
+          .collection('users')
+          .doc(_currentUserId)
+          .collection('friends')
+          .doc(friendUserId));
+
+      batch.delete(_db
           .collection('users')
           .doc(friendUserId)
           .collection('friends')
-          .doc(_currentUserId)
-          .delete();
+          .doc(_currentUserId));
+
+      await batch.commit();
 
       await loadFriends();
 
