@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +29,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
   List<WorkoutExercise> _workoutExercises = [];
   static const String _draftKey = 'workout_draft';
   bool _isDraft = false;
+  Timer? _draftDebounceTimer;
 
   @override
   bool get wantKeepAlive => true;
@@ -42,13 +44,14 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     } else {
       _loadDraft();
     }
-    _nameController.addListener(_saveDraft);
+    _nameController.addListener(_scheduleDraftSave);
   }
 
   @override
   void dispose() {
+    _draftDebounceTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
-    _nameController.removeListener(_saveDraft);
+    _nameController.removeListener(_scheduleDraftSave);
     _nameController.dispose();
     super.dispose();
   }
@@ -88,8 +91,15 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         }
       }
     } catch (e) {
-      print('Error loading draft: $e');
+      debugPrint('Error loading draft: $e');
     }
+  }
+
+  void _scheduleDraftSave() {
+    _draftDebounceTimer?.cancel();
+    _draftDebounceTimer = Timer(const Duration(seconds: 2), () {
+      _saveDraft();
+    });
   }
 
   Future<void> _saveDraft() async {
@@ -103,7 +113,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       };
       await prefs.setString(_draftKey, jsonEncode(draft));
     } catch (e) {
-      print('Error saving draft: $e');
+      debugPrint('Error saving draft: $e');
     }
   }
 
@@ -113,7 +123,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       await prefs.remove(_draftKey);
       _isDraft = false;
     } catch (e) {
-      print('Error clearing draft: $e');
+      debugPrint('Error clearing draft: $e');
     }
   }
 
