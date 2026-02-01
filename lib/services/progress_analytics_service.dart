@@ -2,6 +2,34 @@ import '../models/chart_data.dart';
 import '../models/workout_history.dart';
 
 class ProgressAnalyticsService {
+  final Map<String, _CacheEntry> _cache = {};
+  static const _cacheDuration = Duration(minutes: 5);
+  int _lastHistoryLength = 0;
+
+  void _invalidateCacheIfNeeded(int currentHistoryLength) {
+    if (currentHistoryLength != _lastHistoryLength) {
+      _cache.clear();
+      _lastHistoryLength = currentHistoryLength;
+    }
+  }
+
+  T? _getFromCache<T>(String key) {
+    final entry = _cache[key];
+    if (entry != null && DateTime.now().difference(entry.timestamp) < _cacheDuration) {
+      return entry.data as T;
+    }
+    _cache.remove(key);
+    return null;
+  }
+
+  void _putInCache(String key, dynamic data) {
+    _cache[key] = _CacheEntry(data: data, timestamp: DateTime.now());
+  }
+
+  void invalidateCache() {
+    _cache.clear();
+  }
+
   ExerciseProgressData analyzeExerciseProgress(
     String exerciseId,
     String exerciseName,
@@ -9,6 +37,11 @@ class ProgressAnalyticsService {
     int lookbackDays = 90,
     double userBodyWeight = 70.0,
   }) {
+    _invalidateCacheIfNeeded(histories.length);
+    final cacheKey = 'exercise_${exerciseId}_$lookbackDays';
+    final cached = _getFromCache<ExerciseProgressData>(cacheKey);
+    if (cached != null) return cached;
+
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
     final relevantHistories = histories
@@ -75,7 +108,7 @@ class ProgressAnalyticsService {
       progressPercentage = ((currentMax - previousMax) / previousMax) * 100;
     }
 
-    return ExerciseProgressData(
+    final result = ExerciseProgressData(
       exerciseId: exerciseId,
       exerciseName: exerciseName,
       maxWeightData: maxWeightPoints,
@@ -85,6 +118,8 @@ class ProgressAnalyticsService {
       previousMax: previousMax,
       progressPercentage: progressPercentage,
     );
+    _putInCache(cacheKey, result);
+    return result;
   }
 
   BodyWeightData analyzeBodyWeight(
@@ -155,6 +190,11 @@ class ProgressAnalyticsService {
     List<WorkoutHistory> histories, {
     int lookbackDays = 90,
   }) {
+    _invalidateCacheIfNeeded(histories.length);
+    final cacheKey = 'strength_$lookbackDays';
+    final cached = _getFromCache<OverallStrengthData>(cacheKey);
+    if (cached != null) return cached;
+
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
     final relevantHistories = histories
@@ -273,7 +313,7 @@ class ProgressAnalyticsService {
       }
     }
 
-    return OverallStrengthData(
+    final result = OverallStrengthData(
       totalStrengthData: totalStrengthPoints,
       averageStrengthData: averageStrengthPoints,
       currentTotalStrength: currentTotal,
@@ -281,6 +321,8 @@ class ProgressAnalyticsService {
       progressPercentage: progressPercentage,
       exerciseContributions: contributions,
     );
+    _putInCache(cacheKey, result);
+    return result;
   }
 
   WorkoutVolumeData analyzeWorkoutVolume(
@@ -288,6 +330,11 @@ class ProgressAnalyticsService {
     int lookbackDays = 90,
     double userBodyWeight = 70.0,
   }) {
+    _invalidateCacheIfNeeded(histories.length);
+    final cacheKey = 'volume_$lookbackDays';
+    final cached = _getFromCache<WorkoutVolumeData>(cacheKey);
+    if (cached != null) return cached;
+
     final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
 
     final relevantHistories = histories
@@ -336,7 +383,7 @@ class ProgressAnalyticsService {
             weeklyVolumePoints.length.toDouble()
         : 0.0;
 
-    return WorkoutVolumeData(
+    final result = WorkoutVolumeData(
       weeklyVolumeData: weeklyVolumePoints,
       dailyVolumeData: dailyVolumePoints,
       totalPeriodVolume: totalPeriodVolume,
@@ -344,6 +391,8 @@ class ProgressAnalyticsService {
       previousWeekVolume: previousWeek,
       averageVolume: averageVolume,
     );
+    _putInCache(cacheKey, result);
+    return result;
   }
 
   WorkoutFrequencyData analyzeWorkoutFrequency(
@@ -466,4 +515,11 @@ class ProgressAnalyticsService {
     return DateTime(date.year, date.month, date.day)
         .subtract(Duration(days: weekday - 1));
   }
+}
+
+class _CacheEntry {
+  final dynamic data;
+  final DateTime timestamp;
+
+  _CacheEntry({required this.data, required this.timestamp});
 }
