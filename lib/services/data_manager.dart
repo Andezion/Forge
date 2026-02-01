@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +19,9 @@ class DataManager extends ChangeNotifier {
   List<Workout> _workouts = [];
   List<WorkoutHistory> _workoutHistory = [];
   bool _isInitialized = false;
+  Timer? _saveDebounceTimer;
+  bool _savePending = false;
+  static const _saveDebounceDuration = Duration(milliseconds: 500);
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -74,29 +78,45 @@ class DataManager extends ChangeNotifier {
         seen.add(uniqueKey);
         _workoutHistory.add(history);
       } else {
-        print(
+        debugPrint(
             '[DATA_MANAGER] Removed duplicate history: ${history.session.workoutName} on ${history.dateOnly}');
       }
     }
 
     if (_workoutHistory.length != loadedHistory.length) {
-      print(
+      debugPrint(
           '[DATA_MANAGER] Cleaned ${loadedHistory.length - _workoutHistory.length} duplicate(s)');
       await _saveData();
     }
   }
 
-  Future<void> _saveData() async {
+  void _scheduleSave() {
+    _savePending = true;
+    _saveDebounceTimer?.cancel();
+    _saveDebounceTimer = Timer(_saveDebounceDuration, () {
+      if (_savePending) {
+        _savePending = false;
+        _saveDataNow();
+      }
+    });
+  }
+
+  Future<void> _saveDataNow() async {
     final exercisesJson =
         _exercises.map((e) => jsonEncode(e.toJson())).toList();
-    await _prefs?.setStringList('exercises', exercisesJson);
-
     final workoutsJson = _workouts.map((w) => jsonEncode(w.toJson())).toList();
-    await _prefs?.setStringList('workouts', workoutsJson);
-
     final historyJson =
         _workoutHistory.map((h) => jsonEncode(h.toJson())).toList();
-    await _prefs?.setStringList('workout_history', historyJson);
+
+    await Future.wait([
+      _prefs?.setStringList('exercises', exercisesJson) ?? Future.value(),
+      _prefs?.setStringList('workouts', workoutsJson) ?? Future.value(),
+      _prefs?.setStringList('workout_history', historyJson) ?? Future.value(),
+    ]);
+  }
+
+  Future<void> _saveData() async {
+    await _saveDataNow();
   }
 
   List<Exercise> get exercises => List.unmodifiable(_exercises);
@@ -950,7 +970,7 @@ class DataManager extends ChangeNotifier {
 
   void addExercise(Exercise exercise) {
     _exercises.add(exercise);
-    _saveData();
+    _scheduleSave();
   }
 
   void updateExercise(Exercise exercise) {
@@ -995,7 +1015,7 @@ class DataManager extends ChangeNotifier {
         }
       }
 
-      _saveData();
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -1016,7 +1036,7 @@ class DataManager extends ChangeNotifier {
 
   void removeExercise(String id) {
     _exercises.removeWhere((exercise) => exercise.id == id);
-    _saveData();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -1030,14 +1050,14 @@ class DataManager extends ChangeNotifier {
 
   void addWorkout(Workout workout) {
     _workouts.add(workout);
-    _saveData();
+    _scheduleSave();
     notifyListeners();
   }
 
   void updateWorkout(int index, Workout workout) {
     if (index >= 0 && index < _workouts.length) {
       _workouts[index] = workout;
-      _saveData();
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -1045,7 +1065,7 @@ class DataManager extends ChangeNotifier {
   void removeWorkout(int index) {
     if (index >= 0 && index < _workouts.length) {
       _workouts.removeAt(index);
-      _saveData();
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -1062,9 +1082,8 @@ class DataManager extends ChangeNotifier {
     final index = _workouts.indexWhere((workout) => workout.id == id);
     if (index >= 0) {
       _workouts[index] = updatedWorkout;
-      _saveData();
+      _scheduleSave();
       notifyListeners();
-      print('[DATA_MANAGER] Updated workout: ${updatedWorkout.name}');
     }
   }
 
@@ -1076,23 +1095,14 @@ class DataManager extends ChangeNotifier {
   }
 
   void addWorkoutHistory(WorkoutHistory history) {
-    print('[DATA_MANAGER] Adding workout history: ${history.id}');
-    print('[DATA_MANAGER] Current history count: ${_workoutHistory.length}');
-
     final exists = _workoutHistory.any((h) => h.id == history.id);
-    if (exists) {
-      print('[DATA_MANAGER] WARNING: Duplicate history detected, skipping add');
-      return;
-    }
+    if (exists) return;
 
     _workoutHistory.add(history);
-    print('[DATA_MANAGER] New history count: ${_workoutHistory.length}');
-    _saveData();
+    _scheduleSave();
     notifyListeners();
 
     _updateChallengeScoresAfterWorkout();
-
-    notifyListeners();
   }
 
   Future<void> _updateChallengeScoresAfterWorkout() async {
