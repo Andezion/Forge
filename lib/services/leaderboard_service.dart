@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import '../models/user_stats.dart';
 import '../models/workout_history.dart';
-import 'profile_service.dart';
+
 
 class LeaderboardService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -14,17 +14,16 @@ class LeaderboardService extends ChangeNotifier {
   Future<void> syncUserStats({
     required List<WorkoutHistory> workoutHistory,
     required bool isProfileHidden,
+    double? userBodyWeight,
   }) async {
     final userId = _currentUserId;
     if (userId == null) return;
 
     try {
-      final profileService = ProfileService();
-      await profileService.load();
-      final userBodyWeight = profileService.weightKg ?? 70.0;
+      final bodyWeight = userBodyWeight ?? 70.0;
 
       final stats = _calculateStats(
-          workoutHistory, userId, isProfileHidden, userBodyWeight);
+          workoutHistory, userId, isProfileHidden, bodyWeight);
 
       await _db.collection('user_stats').doc(userId).set(
             stats.toJson(),
@@ -225,6 +224,8 @@ class LeaderboardService extends ChangeNotifier {
     return _db
         .collection('user_stats')
         .where('isProfileHidden', isEqualTo: false)
+        .where('exerciseRecords.$exerciseId', isGreaterThan: 0)
+        .limit(limit * 2)
         .snapshots()
         .map((snapshot) {
       final users = snapshot.docs
@@ -237,7 +238,6 @@ class LeaderboardService extends ChangeNotifier {
             }
           })
           .whereType<UserStats>()
-          .where((user) => user.exerciseRecords.containsKey(exerciseId))
           .toList();
 
       users.sort((a, b) {
@@ -289,9 +289,12 @@ class LeaderboardService extends ChangeNotifier {
     return _db
         .collection('user_stats')
         .where('isProfileHidden', isEqualTo: false)
+        .where('weeklyProgressPercentage', isGreaterThan: 0)
+        .orderBy('weeklyProgressPercentage', descending: true)
+        .limit(limit)
         .snapshots()
         .map((snapshot) {
-      final users = snapshot.docs
+      return snapshot.docs
           .map((doc) {
             try {
               return UserStats.fromJson(doc.data());
@@ -301,13 +304,7 @@ class LeaderboardService extends ChangeNotifier {
             }
           })
           .whereType<UserStats>()
-          .where((user) => user.weeklyProgressPercentage > 0)
           .toList();
-
-      users.sort((a, b) =>
-          b.weeklyProgressPercentage.compareTo(a.weeklyProgressPercentage));
-
-      return users.take(limit).toList();
     });
   }
 
