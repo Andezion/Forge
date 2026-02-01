@@ -11,6 +11,7 @@ import '../models/workout_history.dart';
 import '../services/data_manager.dart';
 import '../services/leaderboard_service.dart';
 import '../services/settings_service.dart';
+import '../services/profile_service.dart';
 import '../services/progression_service.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
@@ -519,9 +520,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
           Provider.of<SettingsService>(context, listen: false);
       final workoutHistory = DataManager().workoutHistory;
 
+      final profileService =
+          Provider.of<ProfileService>(context, listen: false);
       await leaderboardService.syncUserStats(
         workoutHistory: workoutHistory,
         isProfileHidden: settingsService.isProfileHidden,
+        userBodyWeight: profileService.weightKg,
       );
     } catch (e) {
       debugPrint('[WORKOUT] Error syncing stats to Firebase: $e');
