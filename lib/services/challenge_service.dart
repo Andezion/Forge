@@ -172,6 +172,11 @@ class ChallengeService extends ChangeNotifier {
           .where('status', isEqualTo: 'active')
           .get();
 
+      if (challengesSnapshot.docs.isEmpty) return;
+
+      final batch = _db.batch();
+      bool hasBatchOps = false;
+
       for (var doc in challengesSnapshot.docs) {
         final challenge = Challenge.fromJson({...doc.data(), 'id': doc.id});
 
@@ -205,7 +210,15 @@ class ChallengeService extends ChangeNotifier {
             break;
         }
 
-        await updateChallengeScores(challenge.id, userId, newScore);
+        batch.update(doc.reference, {
+          'scores.$userId': newScore,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        hasBatchOps = true;
+      }
+
+      if (hasBatchOps) {
+        await batch.commit();
       }
     } catch (e) {
       debugPrint('Error recalculating challenge scores: $e');
