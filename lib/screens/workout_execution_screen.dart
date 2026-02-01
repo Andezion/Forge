@@ -31,16 +31,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   late List<WorkoutExercise> _exerciseQueue;
   final Map<String, int> _skipCounts = {};
   final List<Exercise> _skippedExercises = [];
-  int _currentSetNumber = 1;
   Timer? _timer;
-  int _setDurationSeconds = 0;
   int _totalDurationSeconds = 0;
-  bool _isSetInProgress = false;
   final List<ExerciseResult> _exerciseResults = [];
   ExerciseResult? _currentExerciseResult;
   final DataManager _dataManager = DataManager();
   ExerciseResult? _previousExercisePerformance;
   bool _workoutFinished = false;
+
+  int? _activeSetIndex;
+  List<TextEditingController> _repsControllers = [];
+  List<TextEditingController> _weightControllers = [];
+  List<int> _setTimers = [];
+  List<bool> _setCompleted = [];
 
   @override
   void initState() {
@@ -52,7 +55,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _disposeControllers();
     super.dispose();
+  }
+
+  void _disposeControllers() {
+    for (final c in _repsControllers) {
+      c.dispose();
+    }
+    for (final c in _weightControllers) {
+      c.dispose();
+    }
+    _repsControllers = [];
+    _weightControllers = [];
   }
 
   void _initializeSession() {
@@ -77,6 +92,26 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     );
 
     _loadPreviousPerformance();
+    _initSetControllers(_exerciseQueue[0]);
+  }
+
+  void _initSetControllers(WorkoutExercise workoutExercise) {
+    _disposeControllers();
+    final numSets = workoutExercise.sets;
+    _repsControllers = List.generate(
+      numSets,
+      (_) => TextEditingController(),
+    );
+    _weightControllers = List.generate(
+      numSets,
+      (_) => TextEditingController(
+        text:
+            workoutExercise.weight > 0 ? workoutExercise.weight.toString() : '',
+      ),
+    );
+    _setTimers = List.filled(numSets, 0);
+    _setCompleted = List.filled(numSets, false);
+    _activeSetIndex = null;
   }
 
   void _loadPreviousPerformance() {
@@ -105,106 +140,58 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       if (mounted) {
         setState(() {
           _totalDurationSeconds++;
-          if (_isSetInProgress) {
-            _setDurationSeconds++;
+          if (_activeSetIndex != null) {
+            _setTimers[_activeSetIndex!]++;
           }
         });
       }
     });
   }
 
-  void _startSet() {
+  void _startSet(int index) {
     setState(() {
-      _isSetInProgress = true;
-      _setDurationSeconds = 0;
+      if (_activeSetIndex != null) return;
+      _activeSetIndex = index;
+      _setTimers[index] = 0;
     });
   }
 
-  void _showCompleteSetDialog() {
-    final repsController = TextEditingController();
-    final weightController = TextEditingController(
-      text: _currentExerciseResult!.targetWeight > 0
-          ? _currentExerciseResult!.targetWeight.toString()
-          : '',
-    );
+  void _completeSetAtIndex(int index) {
+    final repsText = _repsControllers[index].text;
+    final weightText = _weightControllers[index].text;
+    final actualReps = int.tryParse(repsText) ?? 0;
+    final actualWeight = double.tryParse(weightText) ??
+        _currentExerciseResult!.targetWeight.clamp(0.0, double.infinity);
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+    if (actualReps <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter the number of reps'),
+          backgroundColor: AppColors.warning,
+          duration: const Duration(seconds: 2),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Set $_currentSetNumber Complete',
-                style: AppTextStyles.h4,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Target: ${_currentExerciseResult!.targetReps} reps',
-                style: AppTextStyles.body2,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: repsController,
-                keyboardType: TextInputType.number,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: AppStrings.actualReps,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: weightController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: '${AppStrings.weight} (kg)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  final actualReps = int.tryParse(repsController.text) ?? 0;
-                  final parsedWeight = double.tryParse(weightController.text);
-                  final actualWeight = parsedWeight ??
-                      _currentExerciseResult!.targetWeight
-                          .clamp(0.0, double.infinity);
+      );
+      return;
+    }
 
-                  if (actualReps > 0) {
-                    _completeSet(actualReps, actualWeight);
-                    Navigator.of(context).pop();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textOnPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(AppStrings.done),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    setState(() {
+      _setCompleted[index] = true;
+      _activeSetIndex = null;
+
+      final setResult = ExerciseSetResult(
+        setNumber: index + 1,
+        actualReps: actualReps,
+        weight: actualWeight,
+        timestamp: DateTime.now(),
+        durationSeconds: _setTimers[index],
+      );
+
+      _currentExerciseResult!.setResults.add(setResult);
+    });
+
+    if (_setCompleted.every((c) => c)) {
+      Future.microtask(() => _showExerciseDifficultyDialog());
+    }
   }
 
   void _swapExercise(WorkoutExercise currentWorkoutExercise) {
@@ -273,8 +260,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                   targetSets: currentWorkoutExercise.sets,
                   targetReps: currentWorkoutExercise.targetReps,
                   targetWeight: currentWorkoutExercise.weight,
-                  setResults: _currentExerciseResult!.setResults,
+                  setResults: [],
                 );
+
+                _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
+                _loadPreviousPerformance();
               });
               Navigator.of(dialogContext).pop();
 
@@ -300,44 +290,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     );
   }
 
-  void _completeSet(int actualReps, double weight) {
-    print('[WORKOUT_EXEC] Completing set $_currentSetNumber');
-    if (_currentExerciseResult!.setResults
-        .any((s) => s.setNumber == _currentSetNumber)) {
-      print('[WORKOUT_EXEC] Set already completed, ignoring duplicate');
-      return;
-    }
-
-    setState(() {
-      _isSetInProgress = false;
-
-      final setResult = ExerciseSetResult(
-        setNumber: _currentSetNumber,
-        actualReps: actualReps,
-        weight: weight,
-        timestamp: DateTime.now(),
-        durationSeconds: _setDurationSeconds,
-      );
-
-      _currentExerciseResult!.setResults.add(setResult);
-      print(
-          '[WORKOUT_EXEC] Set completed. Total sets done: ${_currentExerciseResult!.setResults.length}/${_currentExerciseResult!.targetSets}');
-
-      if (_currentSetNumber >= _currentExerciseResult!.targetSets) {
-        print(
-            '[WORKOUT_EXEC] All sets completed for exercise. Showing difficulty dialog...');
-
-        Future.microtask(() => _showExerciseDifficultyDialog());
-      } else {
-        _currentSetNumber++;
-        _setDurationSeconds = 0;
-        print('[WORKOUT_EXEC] Moving to set $_currentSetNumber');
-      }
-    });
-  }
-
   void _showExerciseDifficultyDialog() {
-    print('[WORKOUT_EXEC] Showing exercise difficulty dialog...');
     ExerciseDifficulty? selectedDifficulty;
 
     showDialog(
@@ -407,10 +360,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 ElevatedButton(
                   onPressed: selectedDifficulty != null
                       ? () {
-                          print(
-                              '[WORKOUT_EXEC] Difficulty selected: $selectedDifficulty. Closing dialog...');
                           Navigator.of(context).pop();
-                          print('[WORKOUT_EXEC] Difficulty dialog closed.');
                           _completeExercise(selectedDifficulty!);
                         }
                       : null,
@@ -464,12 +414,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   }
 
   void _completeExercise(ExerciseDifficulty perceivedDifficulty) {
-    print(
-        '[WORKOUT_EXEC] Completing exercise: ${_currentExerciseResult!.exercise.name}');
-    print('[WORKOUT_EXEC] Perceived difficulty: $perceivedDifficulty');
-    print(
-        '[WORKOUT_EXEC] Current exercise index: $_currentExerciseIndex, Total exercises: ${_exerciseQueue.length}');
-
     setState(() {
       _currentExerciseResult = _currentExerciseResult!.copyWith(
         perceivedDifficulty: perceivedDifficulty,
@@ -487,9 +431,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         _currentExerciseIndex = 0;
       }
 
-      _currentSetNumber = 1;
-      _setDurationSeconds = 0;
-
       _currentExerciseResult = ExerciseResult(
         exercise: _exerciseQueue[_currentExerciseIndex].exercise,
         targetSets: _exerciseQueue[_currentExerciseIndex].sets,
@@ -498,6 +439,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         setResults: [],
       );
 
+      _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
       _loadPreviousPerformance();
     });
   }
@@ -527,8 +469,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         _currentExerciseIndex = 0;
       }
 
-      _currentSetNumber = 1;
-      _setDurationSeconds = 0;
       _currentExerciseResult = ExerciseResult(
         exercise: _exerciseQueue[_currentExerciseIndex].exercise,
         targetSets: _exerciseQueue[_currentExerciseIndex].sets,
@@ -536,14 +476,14 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
         setResults: [],
       );
+
+      _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
+      _loadPreviousPerformance();
     });
   }
 
   void _finishWorkout() async {
-    if (_workoutFinished) {
-      print('[WORKOUT_EXEC] Workout already finished, ignoring duplicate call');
-      return;
-    }
+    if (_workoutFinished) return;
 
     _workoutFinished = true;
     _timer?.cancel();
@@ -572,6 +512,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     }
 
     try {
+      if (!mounted) return;
       final leaderboardService =
           Provider.of<LeaderboardService>(context, listen: false);
       final settingsService =
@@ -586,6 +527,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       debugPrint('[WORKOUT] Error syncing stats to Firebase: $e');
     }
 
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -703,6 +645,226 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     }
   }
 
+  void _tryFinishExerciseEarly() {
+    final completedCount = _setCompleted.where((c) => c).length;
+    if (completedCount == 0) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Finish exercise early?'),
+        content: Text(
+          'You completed $completedCount of ${_setCompleted.length} sets. Finish this exercise now?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _showExerciseDifficultyDialog();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+            ),
+            child: const Text('Finish'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetRow(int index, WorkoutExercise currentExercise) {
+    final isActive = _activeSetIndex == index;
+    final isCompleted = _setCompleted[index];
+    final setNum = index + 1;
+
+    ExerciseSetResult? prevSet;
+    if (_previousExercisePerformance != null &&
+        index < _previousExercisePerformance!.setResults.length) {
+      prevSet = _previousExercisePerformance!.setResults[index];
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isCompleted
+            ? BorderSide(color: AppColors.success, width: 2)
+            : isActive
+                ? BorderSide(color: AppColors.primary, width: 2)
+                : BorderSide.none,
+      ),
+      color: isCompleted ? AppColors.success.withValues(alpha: 0.05) : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 14,
+                  backgroundColor: isCompleted
+                      ? AppColors.success
+                      : isActive
+                          ? AppColors.primary
+                          : AppColors.divider,
+                  child: isCompleted
+                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      : Text(
+                          '$setNum',
+                          style: AppTextStyles.caption.copyWith(
+                            color: isActive
+                                ? AppColors.textOnPrimary
+                                : AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Target: ${currentExercise.targetReps} reps'
+                        '${currentExercise.weight > 0 ? " × ${currentExercise.weight} kg" : ""}',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      if (prevSet != null)
+                        Text(
+                          'Last time: ${prevSet.actualReps} reps'
+                          '${prevSet.weight > 0 ? " × ${prevSet.weight} kg" : ""}',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textSecondary,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 11,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (isActive)
+                  Text(
+                    _formatDuration(_setTimers[index]),
+                    style: AppTextStyles.body1.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 42,
+                    child: TextField(
+                      controller: _repsControllers[index],
+                      keyboardType: TextInputType.number,
+                      enabled: !isCompleted,
+                      decoration: InputDecoration(
+                        hintText: '${currentExercise.targetReps}',
+                        labelText: 'Reps',
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      style: AppTextStyles.body2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 42,
+                    child: TextField(
+                      controller: _weightControllers[index],
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      enabled: !isCompleted,
+                      decoration: InputDecoration(
+                        hintText: currentExercise.weight > 0
+                            ? '${currentExercise.weight}'
+                            : '0',
+                        labelText: 'kg',
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      style: AppTextStyles.body2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 42,
+                  width: 90,
+                  child: isCompleted
+                      ? OutlinedButton(
+                          onPressed: null,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: AppColors.success),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Icon(Icons.check, color: AppColors.success),
+                        )
+                      : isActive
+                          ? ElevatedButton(
+                              onPressed: () => _completeSetAtIndex(index),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.success,
+                                foregroundColor: AppColors.textOnPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: const Text('Done'),
+                            )
+                          : ElevatedButton(
+                              onPressed: _activeSetIndex != null
+                                  ? null
+                                  : () => _startSet(index),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: AppColors.textOnPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: const Text('Start'),
+                            ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_exerciseQueue.isEmpty) {
@@ -736,7 +898,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     }
 
     final currentExercise = _exerciseQueue[_currentExerciseIndex];
-    final progress = (_currentExerciseIndex + 1) / _exerciseQueue.length;
+    final completedExercises =
+        widget.workout.exercises.length - _exerciseQueue.length;
+    final totalExercises = widget.workout.exercises.length;
+    final progress = completedExercises / totalExercises;
+    final allSetsCompleted = _setCompleted.every((c) => c);
+    final anySetsCompleted = _setCompleted.any((c) => c);
 
     return PopScope(
       canPop: false,
@@ -784,16 +951,26 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
               minHeight: 6,
             ),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               color: AppColors.surface,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.timer, size: 20),
-                  const SizedBox(width: 8),
                   Text(
-                    'Total: ${_formatDuration(_totalDurationSeconds)}',
-                    style: AppTextStyles.h4,
+                    'Exercise ${completedExercises + 1} of $totalExercises',
+                    style: AppTextStyles.caption,
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.timer, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatDuration(_totalDurationSeconds),
+                        style: AppTextStyles.body1.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -804,166 +981,67 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Exercise ${_currentExerciseIndex + 1} of ${_exerciseQueue.length}',
-                              style: AppTextStyles.caption,
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    currentExercise.exercise.name,
-                                    style: AppTextStyles.h2,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                if ((_skipCounts[currentExercise.exercise.id] ??
-                                        0) ==
-                                    1)
-                                  Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.warning,
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: AppColors.surface),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            if (currentExercise.alternativeExercise !=
-                                null) ...[
-                              const SizedBox(height: 12),
-                              OutlinedButton.icon(
-                                onPressed: () => _swapExercise(currentExercise),
-                                icon: const Icon(Icons.swap_horiz, size: 18),
-                                label: Text(
-                                  'Swap',
-                                  style: AppTextStyles.caption,
-                                ),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.primary,
-                                  side: BorderSide(
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.5),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 16),
-                            Text(
-                              currentExercise.exercise.description,
-                              style: AppTextStyles.body2,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 24),
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Set $_currentSetNumber of ${currentExercise.sets}',
-                                    style: AppTextStyles.h3.copyWith(
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  if (_previousExercisePerformance != null &&
-                                      _currentSetNumber <=
-                                          _previousExercisePerformance!
-                                              .setResults.length) ...[
-                                    Text(
-                                      'Last time: ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].actualReps} reps${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight > 0 ? " with ${_previousExercisePerformance!.setResults[_currentSetNumber - 1].weight} kg" : ""}',
-                                      style: AppTextStyles.caption.copyWith(
-                                        color: AppColors.textSecondary,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                  ],
-                                  Text(
-                                    'Target: ${currentExercise.targetReps} reps',
-                                    style: AppTextStyles.body1,
-                                  ),
-                                  if (currentExercise.weight > 0)
-                                    Text(
-                                      'Weight: ${currentExercise.weight} kg',
-                                      style: AppTextStyles.body1,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (_isSetInProgress) ...[
-                              const SizedBox(height: 24),
-                              Text(
-                                _formatDuration(_setDurationSeconds),
-                                style: AppTextStyles.h1.copyWith(
-                                  color: AppColors.primary,
-                                  fontSize: 48,
-                                ),
-                              ),
-                            ],
-                          ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            currentExercise.exercise.name,
+                            style: AppTextStyles.h3,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (_currentExerciseResult!.setResults.isNotEmpty) ...[
-                      Text(
-                        'Completed Sets',
-                        style: AppTextStyles.h4,
-                      ),
-                      const SizedBox(height: 12),
-                      ..._currentExerciseResult!.setResults.map((setResult) {
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor:
-                                  AppColors.success.withValues(alpha: 0.1),
-                              child: Text(
-                                '${setResult.setNumber}',
-                                style: AppTextStyles.body1.copyWith(
-                                  color: AppColors.success,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            title: Text('${setResult.actualReps} reps'),
-                            subtitle: Text('${setResult.weight} kg'),
-                            trailing: Text(
-                              _formatDuration(setResult.durationSeconds),
-                              style: AppTextStyles.caption,
+                        if ((_skipCounts[currentExercise.exercise.id] ?? 0) ==
+                            1) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: AppColors.warning,
+                              shape: BoxShape.circle,
                             ),
                           ),
-                        );
-                      }),
-                      const SizedBox(height: 24),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      currentExercise.exercise.description,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (currentExercise.alternativeExercise != null) ...[
+                      const SizedBox(height: 8),
+                      Center(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _swapExercise(currentExercise),
+                          icon: const Icon(Icons.swap_horiz, size: 18),
+                          label: Text('Swap', style: AppTextStyles.caption),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primary,
+                            side: BorderSide(
+                              color: AppColors.primary.withValues(alpha: 0.5),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
+                    const SizedBox(height: 16),
+                    ...List.generate(
+                      currentExercise.sets,
+                      (i) => _buildSetRow(i, currentExercise),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -976,7 +1054,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 child: Row(
                   children: [
                     SizedBox(
-                      height: 56,
+                      height: 50,
                       child: OutlinedButton(
                         onPressed: _skipCurrentExercise,
                         style: OutlinedButton.styleFrom(
@@ -992,13 +1070,15 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: SizedBox(
-                        height: 56,
+                        height: 50,
                         child: ElevatedButton(
-                          onPressed: _isSetInProgress
-                              ? _showCompleteSetDialog
-                              : _startSet,
+                          onPressed: allSetsCompleted
+                              ? _showExerciseDifficultyDialog
+                              : anySetsCompleted
+                                  ? _tryFinishExerciseEarly
+                                  : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _isSetInProgress
+                            backgroundColor: allSetsCompleted
                                 ? AppColors.success
                                 : AppColors.primary,
                             foregroundColor: AppColors.textOnPrimary,
@@ -1007,8 +1087,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                             ),
                           ),
                           child: Text(
-                            _isSetInProgress ? 'Complete Set' : 'Start Set',
-                            style: AppTextStyles.button.copyWith(fontSize: 18),
+                            allSetsCompleted
+                                ? 'Finish Exercise'
+                                : 'Finish Early',
+                            style: AppTextStyles.button.copyWith(fontSize: 16),
                           ),
                         ),
                       ),
