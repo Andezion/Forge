@@ -179,15 +179,6 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               ? AppStrings.editPlan
               : AppStrings.createPlan,
         ),
-        actions: [
-          TextButton(
-            onPressed: _save,
-            child: Text(
-              AppStrings.save,
-              style: TextStyle(color: AppColors.primary, fontSize: 16),
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -233,6 +224,28 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
                   onRemove: (sw) => _removeWorkoutFromDay(day, sw),
                 );
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.save),
+                label: const Text(
+                  AppStrings.save,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -315,45 +328,83 @@ class _DayCard extends StatelessWidget {
             ),
             if (workouts.isNotEmpty) ...[
               const SizedBox(height: 12),
-              ...workouts.map(
-                (sw) => Padding(
+              if (workouts.length > 1)
+                Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      Icon(Icons.fitness_center,
-                          size: 14, color: AppColors.primary),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          sw.workoutName,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          sw.frequencyWeeks == 1
-                              ? AppStrings.everyWeek
-                              : AppStrings.everyTwoWeeks,
-                          style:
-                              TextStyle(fontSize: 10, color: AppColors.primary),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: () => onRemove(sw),
-                        child: Icon(Icons.close,
-                            size: 16, color: AppColors.textSecondary),
-                      ),
-                    ],
+                  child: Text(
+                    'Choose one on this day:',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ),
-              ),
+              ...List.generate(workouts.length, (idx) {
+                final sw = workouts[idx];
+                return Column(
+                  children: [
+                    if (idx > 0)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Expanded(child: Divider(color: AppColors.divider, height: 1)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: AppColors.divider, height: 1)),
+                          ],
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          Icon(Icons.fitness_center,
+                              size: 14, color: AppColors.primary),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              sw.workoutName,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              sw.frequencyWeeks == 1
+                                  ? AppStrings.everyWeek
+                                  : AppStrings.everyTwoWeeks,
+                              style: TextStyle(
+                                  fontSize: 10, color: AppColors.primary),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () => onRemove(sw),
+                            child: Icon(Icons.close,
+                                size: 16, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ],
           ],
         ),
