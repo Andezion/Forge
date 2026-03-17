@@ -1,0 +1,110 @@
+[
+  {
+    "id": "ipf_male_59_squat_raw",
+    "exercise": "squat",
+    "federation": "IPF",
+    "weightClass": "-59kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 230.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_59_bench_raw",
+    "exercise": "bench",
+    "federation": "IPF",
+    "weightClass": "-59kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 155.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_59_deadlift_raw",
+    "exercise": "deadlift",
+    "federation": "IPF",
+    "weightClass": "-59kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 272.5,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_66_squat_raw",
+    "exercise": "squat",
+    "federation": "IPF",
+    "weightClass": "59-66kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 275.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_66_bench_raw",
+    "exercise": "bench",
+    "federation": "IPF",
+    "weightClass": "59-66kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 170.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_66_deadlift_raw",
+    "exercise": "deadlift",
+    "federation": "IPF",
+    "weightClass": "59-66kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 310.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_74_squat_raw",
+    "exercise": "squat",
+    "federation": "IPF",
+    "weightClass": "66-74kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 320.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_74_bench_raw",
+    "exercise": "bench",
+    "federation": "IPF",
+    "weightClass": "66-74kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 192.5,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ipf_male_74_deadlift_raw",
+    "exercise": "deadlift",
+    "federation": "IPF",
+    "weightClass": "66-74kg",
+    "gender": "male",
+    "equipped": false,
+    "weight": 350.0,
+    "athleteName": "Example Athlete",
+    "country": "USA",
+    "recordDate": "2024-01-01T00:00:00.000Z"
+  }
+]
