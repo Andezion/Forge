@@ -13,12 +13,10 @@ class ScheduledWorkout {
     this.weekOffset = 0,
   });
 
-  /// Returns true if this workout should happen on [date].
   bool isScheduledForDate(DateTime date) {
     if (!daysOfWeek.contains(date.weekday)) return false;
     if (frequencyWeeks == 1) return true;
-    // Biweekly: use a fixed epoch Monday to count weeks
-    final epoch = DateTime(2024, 1, 1); // a Monday
+    final epoch = DateTime(2024, 1, 1);
     final daysDiff = date.difference(epoch).inDays;
     final weekIndex = daysDiff ~/ 7;
     return weekIndex % frequencyWeeks == weekOffset % frequencyWeeks;
@@ -72,7 +70,6 @@ class TrainingPlan {
     required this.schedule,
   });
 
-  /// Returns workouts scheduled for [date].
   List<ScheduledWorkout> workoutsForDate(DateTime date) =>
       schedule.where((sw) => sw.isScheduledForDate(date)).toList();
 
