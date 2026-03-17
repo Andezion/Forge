@@ -455,11 +455,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     setState(() {
       final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
       if (count == 1) {
-        // Move to next position (right after current)
-        final insertIndex = (_currentExerciseIndex + 1).clamp(0, _exerciseQueue.length);
+        final insertIndex =
+            (_currentExerciseIndex + 1).clamp(0, _exerciseQueue.length);
         _exerciseQueue.insert(insertIndex, moved);
       } else {
-        // Move to end of queue
         _exerciseQueue.add(moved);
       }
 
