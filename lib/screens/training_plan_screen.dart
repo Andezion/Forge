@@ -198,65 +198,114 @@ class _TodayCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             )
-          else
-            ...todayWorkouts.map((sw) {
+          else ...[
+            if (todayWorkouts.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'Choose a workout:',
+                  style: TextStyle(
+                    color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ...List.generate(todayWorkouts.length, (idx) {
+              final sw = todayWorkouts[idx];
               final workout = dataManager.workouts
                   .where((w) => w.id == sw.workoutId)
                   .firstOrNull;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              return Column(
+                children: [
+                  if (idx > 0)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
                         children: [
-                          Text(
-                            sw.workoutName,
-                            style: TextStyle(
-                              color: AppColors.textOnPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (workout != null)
-                            Text(
-                              '${workout.exercises.length} exercises',
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.textOnPrimary
+                                      .withValues(alpha: 0.3),
+                                  height: 1)),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              'OR',
                               style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
                                 color: AppColors.textOnPrimary
-                                    .withValues(alpha: 0.7),
-                                fontSize: 13,
+                                    .withValues(alpha: 0.6),
                               ),
                             ),
+                          ),
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.textOnPrimary
+                                      .withValues(alpha: 0.3),
+                                  height: 1)),
                         ],
                       ),
                     ),
-                    if (workout != null)
-                      ElevatedButton(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                WorkoutExecutionScreen(workout: workout),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                sw.workoutName,
+                                style: TextStyle(
+                                  color: AppColors.textOnPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (workout != null)
+                                Text(
+                                  '${workout.exercises.length} exercises',
+                                  style: TextStyle(
+                                    color: AppColors.textOnPrimary
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.textOnPrimary,
-                          foregroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        if (workout != null)
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    WorkoutExecutionScreen(workout: workout),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.textOnPrimary,
+                              foregroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              AppStrings.startWorkout,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          AppStrings.startWorkout,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             }),
+          ],
         ],
       ),
     );
