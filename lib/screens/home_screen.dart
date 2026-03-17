@@ -234,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildActivePlanBanner(dataManager),
                   Text(
                     'Today\'s Workout',
                     style: AppTextStyles.h3,
@@ -302,6 +303,99 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildActivePlanBanner(DataManager dataManager) {
+    final activePlan = dataManager.activePlan;
+    if (activePlan == null) return const SizedBox.shrink();
+
+    final today = DateTime.now();
+    final todayWorkouts = activePlan.workoutsForDate(today);
+
+    if (todayWorkouts.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.divider,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.event_available, size: 16, color: AppColors.textSecondary),
+            const SizedBox(width: 8),
+            Text(
+              '${activePlan.name}: rest day today',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.event_note, size: 16, color: AppColors.primary),
+            const SizedBox(width: 6),
+            Text(
+              AppStrings.todayFromPlan,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '· ${activePlan.name}',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ...todayWorkouts.map((sw) {
+          final workout = dataManager.workouts
+              .where((w) => w.id == sw.workoutId)
+              .firstOrNull;
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.fitness_center, color: AppColors.primary),
+              title: Text(sw.workoutName,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: workout != null
+                  ? Text('${workout.exercises.length} exercises')
+                  : null,
+              trailing: workout != null
+                  ? ElevatedButton(
+                      onPressed: () => _startWorkout(workout),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.textOnPrimary,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text(AppStrings.startWorkout,
+                          style: TextStyle(fontSize: 12)),
+                    )
+                  : null,
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        const Divider(),
+        const SizedBox(height: 4),
+      ],
     );
   }
 
