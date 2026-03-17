@@ -37,3 +37,10 @@ devtools_options.yaml
 firebase.json
 pubspec.lock
 pubspec.yaml
+.vscode/
+android/
+ios/
+linux/
+macos/
+windows/
+web/
