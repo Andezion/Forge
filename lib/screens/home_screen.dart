@@ -716,7 +716,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
               ),
-              icon: const Icon(Icons.add, size: 18),
+              icon: Icon(Icons.add, size: 18, color: AppColors.primary),
               label: const Text(AppStrings.createPlan),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
@@ -754,7 +754,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     MaterialPageRoute(
                         builder: (_) => const PlanEditorScreen()),
                   ),
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.add, color: Colors.white),
                   label: const Text(AppStrings.createPlan),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
