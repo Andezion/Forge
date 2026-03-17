@@ -1,9 +1,9 @@
 class ScheduledWorkout {
   final String workoutId;
   final String workoutName;
-  final List<int> daysOfWeek; // 1=Monday ... 7=Sunday
-  final int frequencyWeeks; // 1=every week, 2=every 2 weeks
-  final int weekOffset; // 0 or 1, used for biweekly to pick which week
+  final List<int> daysOfWeek;
+  final int frequencyWeeks;
+  final int weekOffset;
 
   ScheduledWorkout({
     required this.workoutId,
