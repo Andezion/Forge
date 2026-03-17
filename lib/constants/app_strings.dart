@@ -119,4 +119,23 @@ class AppStrings {
   static const String intensityFor = 'Intensity for';
   static const String pressToAddMuscleGroups =
       'Press the button below to add muscle groups';
+
+  // Training Plan
+  static const String trainingPlan = 'My Plan';
+  static const String trainingPlans = 'Training Plans';
+  static const String createPlan = 'Create Plan';
+  static const String editPlan = 'Edit Plan';
+  static const String planName = 'Plan Name';
+  static const String activatePlan = 'Activate';
+  static const String deactivatePlan = 'Deactivate';
+  static const String noPlanActive = 'No active plan';
+  static const String noPlansYet = 'No plans yet';
+  static const String addWorkoutToDay = 'Add workout';
+  static const String frequency = 'Frequency';
+  static const String everyWeek = 'Every week';
+  static const String everyTwoWeeks = 'Every 2 weeks';
+  static const String todayFromPlan = 'Today from plan';
+  static const String noWorkoutToday = 'Rest day';
+  static const String planMode = 'Plan';
+  static const String autoMode = 'Auto';
 }
