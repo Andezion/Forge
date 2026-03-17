@@ -226,13 +226,15 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          SafeArea(
+            top: false,
+            child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _save,
-                icon: const Icon(Icons.save),
+                icon: const Icon(Icons.save, color: Colors.white),
                 label: const Text(
                   AppStrings.save,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -247,6 +249,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
                 ),
               ),
             ),
+          ),
           ),
         ],
       ),
@@ -445,33 +448,34 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
       title: const Text('Select workout'),
       content: SizedBox(
         width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.workouts.length,
-                itemBuilder: (ctx, i) {
-                  final w = widget.workouts[i];
-                  return RadioListTile<Workout>(
-                    title: Text(w.name, style: const TextStyle(fontSize: 14)),
-                    subtitle: Text(
-                      '${w.exercises.length} exercises',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    value: w,
-                    groupValue: _selected,
-                    onChanged: (v) => setState(() => _selected = v),
-                    dense: true,
-                    activeColor: AppColors.primary,
-                  );
-                },
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.workouts.length,
+                  itemBuilder: (ctx, i) {
+                    final w = widget.workouts[i];
+                    return RadioListTile<Workout>(
+                      title: Text(w.name, style: const TextStyle(fontSize: 14)),
+                      subtitle: Text(
+                        '${w.exercises.length} exercises',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      value: w,
+                      groupValue: _selected,
+                      onChanged: (v) => setState(() => _selected = v),
+                      dense: true,
+                      activeColor: AppColors.primary,
+                    );
+                  },
+                ),
               ),
-            ),
-            const Divider(),
+              const Divider(),
             Text(AppStrings.frequency,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
@@ -499,6 +503,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
               ),
             ],
           ],
+          ),
         ),
       ),
       actions: [
