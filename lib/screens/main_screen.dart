@@ -6,6 +6,7 @@ import 'profile_screen.dart';
 import 'friends_screen.dart';
 import 'programs_screen.dart';
 import 'workshop_screen.dart';
+import 'training_plan_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -21,6 +22,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const ProfileScreen(),
     const FriendsScreen(),
+    const TrainingPlanScreen(),
     const ProgramsScreen(),
     const WorkshopScreen(),
   ];
@@ -57,6 +59,11 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.people_outlined),
             activeIcon: Icon(Icons.people),
             label: AppStrings.friends,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month),
+            label: AppStrings.planMode,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center_outlined),
