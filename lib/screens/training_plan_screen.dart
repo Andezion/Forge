@@ -25,8 +25,7 @@ class TrainingPlanScreen extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 tooltip: AppStrings.createPlan,
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => const PlanEditorScreen()),
+                  MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
                 ),
               ),
             ],
@@ -34,14 +33,12 @@ class TrainingPlanScreen extends StatelessWidget {
           body: plans.isEmpty
               ? _EmptyState(
                   onCreateTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => const PlanEditorScreen()),
+                    MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
                   ),
                 )
               : Column(
                   children: [
-                    if (activePlan != null)
-                      _TodayCard(plan: activePlan),
+                    if (activePlan != null) _TodayCard(plan: activePlan),
                     Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.all(16),
@@ -51,8 +48,7 @@ class TrainingPlanScreen extends StatelessWidget {
                           isActive: plans[i].isActive,
                           onActivate: () =>
                               dataManager.setActivePlan(plans[i].id),
-                          onDeactivate: () =>
-                              dataManager.setActivePlan(null),
+                          onDeactivate: () => dataManager.setActivePlan(null),
                           onEdit: () => Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) =>
@@ -133,8 +129,7 @@ class _EmptyState extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -289,7 +284,6 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Collect which days have any workout
     final activeDays = <int>{};
     for (final sw in plan.schedule) {
       activeDays.addAll(sw.daysOfWeek);
@@ -375,7 +369,6 @@ class _PlanCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            // Day pills
             Row(
               children: List.generate(7, (i) {
                 final day = i + 1;
@@ -385,9 +378,7 @@ class _PlanCard extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: hasWorkout
-                          ? AppColors.primary
-                          : AppColors.divider,
+                      color: hasWorkout ? AppColors.primary : AppColors.divider,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     alignment: Alignment.center,
