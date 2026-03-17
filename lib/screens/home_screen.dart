@@ -361,39 +361,80 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        ...todayWorkouts.map((sw) {
+        if (todayWorkouts.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              'Choose one:',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ...List.generate(todayWorkouts.length, (idx) {
+          final sw = todayWorkouts[idx];
           final workout = dataManager.workouts
               .where((w) => w.id == sw.workoutId)
               .firstOrNull;
-          return Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-            child: ListTile(
-              leading: Icon(Icons.fitness_center, color: AppColors.primary),
-              title: Text(sw.workoutName,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: workout != null
-                  ? Text('${workout.exercises.length} exercises')
-                  : null,
-              trailing: workout != null
-                  ? ElevatedButton(
-                      onPressed: () => _startWorkout(workout),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.textOnPrimary,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+          return Column(
+            children: [
+              if (idx > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Divider(color: AppColors.divider, height: 1)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                       ),
-                      child: const Text(AppStrings.startWorkout,
-                          style: TextStyle(fontSize: 12)),
-                    )
-                  : null,
-            ),
+                      Expanded(
+                          child: Divider(color: AppColors.divider, height: 1)),
+                    ],
+                  ),
+                ),
+              Card(
+                margin: const EdgeInsets.only(bottom: 6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: AppColors.primary, width: 1.5),
+                ),
+                child: ListTile(
+                  leading:
+                      Icon(Icons.fitness_center, color: AppColors.primary),
+                  title: Text(sw.workoutName,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: workout != null
+                      ? Text('${workout.exercises.length} exercises')
+                      : null,
+                  trailing: workout != null
+                      ? ElevatedButton(
+                          onPressed: () => _startWorkout(workout),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.textOnPrimary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: const Text(AppStrings.startWorkout,
+                              style: TextStyle(fontSize: 12)),
+                        )
+                      : null,
+                ),
+              ),
+            ],
           );
         }),
         const SizedBox(height: 8),
