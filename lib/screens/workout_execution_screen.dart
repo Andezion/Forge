@@ -453,11 +453,13 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     final count = _skipCounts[id]!;
 
     setState(() {
-      if (count >= 2) {
-        _exerciseQueue.removeAt(_currentExerciseIndex);
-        _skippedExercises.add(current.exercise);
+      final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
+      if (count == 1) {
+        // Move to next position (right after current)
+        final insertIndex = (_currentExerciseIndex + 1).clamp(0, _exerciseQueue.length);
+        _exerciseQueue.insert(insertIndex, moved);
       } else {
-        final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
+        // Move to end of queue
         _exerciseQueue.add(moved);
       }
 
