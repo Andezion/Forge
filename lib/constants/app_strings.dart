@@ -120,7 +120,6 @@ class AppStrings {
   static const String pressToAddMuscleGroups =
       'Press the button below to add muscle groups';
 
-  // Training Plan
   static const String trainingPlan = 'My Plan';
   static const String trainingPlans = 'Training Plans';
   static const String createPlan = 'Create Plan';
