@@ -17,7 +17,6 @@ class PlanEditorScreen extends StatefulWidget {
 
 class _PlanEditorScreenState extends State<PlanEditorScreen> {
   final _nameController = TextEditingController();
-  // dayOfWeek (1-7) -> list of scheduled workouts for that day
   final Map<int, List<ScheduledWorkout>> _daySchedule = {};
 
   static const _dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -27,7 +26,6 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
     super.initState();
     if (widget.existingPlan != null) {
       _nameController.text = widget.existingPlan!.name;
-      // Rebuild day map from schedule
       for (final sw in widget.existingPlan!.schedule) {
         for (final day in sw.daysOfWeek) {
           _daySchedule.putIfAbsent(day, () => []).add(sw);
@@ -64,13 +62,10 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
     if (result == null) return;
 
     setState(() {
-      // Remove existing entry for same workoutId on this day (replace)
       _daySchedule[day]?.removeWhere((sw) => sw.workoutId == result.workout.id);
 
-      // Check if this workout already exists in schedule (other days)
       final existing = _findExistingEntry(result.workout.id);
       if (existing != null) {
-        // Add this day to the existing entry's daysOfWeek
         final updated = existing.copyWith(
           daysOfWeek: [...existing.daysOfWeek, day]..sort(),
           frequencyWeeks: result.frequencyWeeks,
@@ -108,7 +103,6 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
         list[idx] = updated;
       }
     }
-    // Ensure new days are populated
     for (final day in updated.daysOfWeek) {
       _daySchedule.putIfAbsent(day, () => []);
       if (!_daySchedule[day]!.any((sw) => sw.workoutId == updated.workoutId)) {
@@ -121,7 +115,6 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
     setState(() {
       final daysLeft = sw.daysOfWeek.where((d) => d != day).toList();
       if (daysLeft.isEmpty) {
-        // Remove entirely
         for (final d in _daySchedule.keys) {
           _daySchedule[d]?.removeWhere((s) => s.workoutId == sw.workoutId);
         }
@@ -230,7 +223,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: 7,
               itemBuilder: (ctx, i) {
-                final day = i + 1; // 1=Mon...7=Sun
+                final day = i + 1;
                 final dayWorkouts = _daySchedule[day] ?? [];
                 return _DayCard(
                   dayName: _dayNames[i],
@@ -311,7 +304,8 @@ class _DayCard extends StatelessWidget {
                   ),
                 const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.add_circle_outline, color: AppColors.primary),
+                  icon:
+                      Icon(Icons.add_circle_outline, color: AppColors.primary),
                   onPressed: onAdd,
                   tooltip: AppStrings.addWorkoutToDay,
                   padding: EdgeInsets.zero,
@@ -346,8 +340,8 @@ class _DayCard extends StatelessWidget {
                           sw.frequencyWeeks == 1
                               ? AppStrings.everyWeek
                               : AppStrings.everyTwoWeeks,
-                          style: TextStyle(
-                              fontSize: 10, color: AppColors.primary),
+                          style:
+                              TextStyle(fontSize: 10, color: AppColors.primary),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -412,8 +406,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                 itemBuilder: (ctx, i) {
                   final w = widget.workouts[i];
                   return RadioListTile<Workout>(
-                    title: Text(w.name,
-                        style: const TextStyle(fontSize: 14)),
+                    title: Text(w.name, style: const TextStyle(fontSize: 14)),
                     subtitle: Text(
                       '${w.exercises.length} exercises',
                       style: const TextStyle(fontSize: 12),
@@ -472,8 +465,8 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                       weekOffset: _weekOffset,
                     ),
                   ),
-          child: Text(AppStrings.add,
-              style: TextStyle(color: AppColors.primary)),
+          child:
+              Text(AppStrings.add, style: TextStyle(color: AppColors.primary)),
         ),
       ],
     );
