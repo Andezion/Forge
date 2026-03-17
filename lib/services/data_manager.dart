@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
+import '../models/training_plan.dart';
 import 'challenge_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
@@ -18,6 +19,7 @@ class DataManager extends ChangeNotifier {
   List<Exercise> _exercises = [];
   List<Workout> _workouts = [];
   List<WorkoutHistory> _workoutHistory = [];
+  List<TrainingPlan> _trainingPlans = [];
   bool _isInitialized = false;
   Timer? _saveDebounceTimer;
   bool _savePending = false;
@@ -60,6 +62,11 @@ class DataManager extends ChangeNotifier {
         _initializeDemoWorkout();
       }
     }
+
+    final plansJson = _prefs?.getStringList('training_plans') ?? [];
+    _trainingPlans = plansJson
+        .map((json) => TrainingPlan.fromJson(jsonDecode(json)))
+        .toList();
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
     final loadedHistory = historyJson
@@ -108,10 +115,14 @@ class DataManager extends ChangeNotifier {
     final historyJson =
         _workoutHistory.map((h) => jsonEncode(h.toJson())).toList();
 
+    final plansJson =
+        _trainingPlans.map((p) => jsonEncode(p.toJson())).toList();
+
     await Future.wait([
       _prefs?.setStringList('exercises', exercisesJson) ?? Future.value(),
       _prefs?.setStringList('workouts', workoutsJson) ?? Future.value(),
       _prefs?.setStringList('workout_history', historyJson) ?? Future.value(),
+      _prefs?.setStringList('training_plans', plansJson) ?? Future.value(),
     ]);
   }
 
@@ -122,6 +133,37 @@ class DataManager extends ChangeNotifier {
   List<Exercise> get exercises => List.unmodifiable(_exercises);
   List<Workout> get workouts => List.unmodifiable(_workouts);
   List<WorkoutHistory> get workoutHistory => List.unmodifiable(_workoutHistory);
+  List<TrainingPlan> get trainingPlans => List.unmodifiable(_trainingPlans);
+  TrainingPlan? get activePlan =>
+      _trainingPlans.where((p) => p.isActive).firstOrNull;
+
+  void addTrainingPlan(TrainingPlan plan) {
+    _trainingPlans.add(plan);
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void updateTrainingPlan(TrainingPlan plan) {
+    final index = _trainingPlans.indexWhere((p) => p.id == plan.id);
+    if (index == -1) return;
+    _trainingPlans[index] = plan;
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void removeTrainingPlan(String planId) {
+    _trainingPlans.removeWhere((p) => p.id == planId);
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void setActivePlan(String? planId) {
+    _trainingPlans = _trainingPlans.map((p) {
+      return p.copyWith(isActive: p.id == planId);
+    }).toList();
+    _scheduleSave();
+    notifyListeners();
+  }
 
   void _loadDefaultExercises() {
     _exercises = [
