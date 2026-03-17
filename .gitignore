@@ -31,3 +31,9 @@ lib/firebase_options.dart
 firestore.rules
 firestore.indexes.json
 firestore_rules_updated.rules
+.metadata
+analysis_options.yaml
+devtools_options.yaml
+firebase.json
+pubspec.lock
+pubspec.yaml
