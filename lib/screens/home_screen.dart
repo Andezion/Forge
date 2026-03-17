@@ -7,10 +7,12 @@ import '../services/data_manager.dart';
 import '../services/workout_recommendation_service.dart';
 import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
+import '../models/training_plan.dart';
 import '../widgets/compact_calendar.dart';
 import '../widgets/muscle_recovery_card.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
+import 'plan_editor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -297,6 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+                  _buildTrainingPlansSection(dataManager),
                 ],
               ),
             ),
@@ -652,6 +656,220 @@ class _HomeScreenState extends State<HomeScreen> {
               style: AppTextStyles.caption,
               textAlign: TextAlign.center,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrainingPlansSection(DataManager dataManager) {
+    final plans = dataManager.trainingPlans;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Training Plans', style: AppTextStyles.h4),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
+              ),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text(AppStrings.createPlan),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (plans.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.calendar_today_outlined,
+                    size: 40, color: AppColors.textSecondary),
+                const SizedBox(height: 10),
+                Text(AppStrings.noPlansYet,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary)),
+                const SizedBox(height: 4),
+                Text(
+                  'Create a weekly training plan\nto follow a structured schedule.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppColors.textSecondary, fontSize: 13),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const PlanEditorScreen()),
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: const Text(AppStrings.createPlan),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textOnPrimary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ...plans.map((plan) => _buildHomePlanCard(dataManager, plan)),
+      ],
+    );
+  }
+
+  Widget _buildHomePlanCard(DataManager dataManager, TrainingPlan plan) {
+    final isActive = plan.isActive;
+    final activeDays = <int>{};
+    for (final sw in plan.schedule) {
+      activeDays.addAll(sw.daysOfWeek);
+    }
+    const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isActive
+            ? BorderSide(color: AppColors.primary, width: 2)
+            : BorderSide.none,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (isActive)
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'ACTIVE',
+                      style: TextStyle(
+                          color: AppColors.textOnPrimary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    plan.name,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (v) {
+                    if (v == 'activate') dataManager.setActivePlan(plan.id);
+                    if (v == 'deactivate') dataManager.setActivePlan(null);
+                    if (v == 'edit') {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) =>
+                              PlanEditorScreen(existingPlan: plan)));
+                    }
+                    if (v == 'delete') {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Delete plan?'),
+                          content: Text('Delete "${plan.name}"?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: const Text(AppStrings.cancel),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                dataManager.removeTrainingPlan(plan.id);
+                                Navigator.of(ctx).pop();
+                              },
+                              child: const Text(AppStrings.delete,
+                                  style:
+                                      TextStyle(color: AppColors.error)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  itemBuilder: (_) => [
+                    if (!isActive)
+                      const PopupMenuItem(
+                          value: 'activate',
+                          child: Text(AppStrings.activatePlan)),
+                    if (isActive)
+                      const PopupMenuItem(
+                          value: 'deactivate',
+                          child: Text(AppStrings.deactivatePlan)),
+                    const PopupMenuItem(
+                        value: 'edit', child: Text(AppStrings.edit)),
+                    const PopupMenuItem(
+                        value: 'delete',
+                        child: Text(AppStrings.delete,
+                            style: TextStyle(color: AppColors.error))),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: List.generate(7, (i) {
+                final day = i + 1;
+                final has = activeDays.contains(day);
+                return Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: has ? AppColors.primary : AppColors.divider,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      dayNames[i],
+                      style: TextStyle(
+                        color: has
+                            ? AppColors.textOnPrimary
+                            : AppColors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            if (plan.schedule.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                plan.schedule.map((sw) => sw.workoutName).join(' · '),
+                style: TextStyle(
+                    color: AppColors.textSecondary, fontSize: 12),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ],
         ),
       ),
