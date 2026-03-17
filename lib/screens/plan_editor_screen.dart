@@ -260,7 +260,7 @@ class _DayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isToday = DateTime.now().weekday == dayIndex;
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 14),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isToday
@@ -268,15 +268,15 @@ class _DayCard extends StatelessWidget {
             : BorderSide.none,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: isToday ? AppColors.primary : AppColors.divider,
                     shape: BoxShape.circle,
@@ -289,7 +289,7 @@ class _DayCard extends StatelessWidget {
                           ? AppColors.textOnPrimary
                           : AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 11,
+                      fontSize: 12,
                     ),
                   ),
                 ),
@@ -314,10 +314,10 @@ class _DayCard extends StatelessWidget {
               ],
             ),
             if (workouts.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               ...workouts.map(
                 (sw) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.only(bottom: 6),
                   child: Row(
                     children: [
                       Icon(Icons.fitness_center,
@@ -326,7 +326,7 @@ class _DayCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           sw.workoutName,
-                          style: const TextStyle(fontSize: 13),
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ),
                       Container(
