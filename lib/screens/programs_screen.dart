@@ -20,7 +20,63 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   final GroqService _groqService = GroqService();
   bool _isGenerating = false;
 
+  Future<TrainingDirection?> _pickTrainingDirection() {
+    const aiColor = Color(0xFF6C63FF);
+    final options = [
+      (TrainingDirection.fullBody, 'Full Body', Icons.fitness_center, 'Balanced development of all muscle groups'),
+      (TrainingDirection.powerlifting, 'Powerlifting', Icons.sports_martial_arts, 'Max strength: squat, bench, deadlift'),
+      (TrainingDirection.armWrestling, 'Arm Wrestling', Icons.back_hand, 'Forearms, wrists, grip & pulling strength'),
+      (TrainingDirection.streetlifting, 'Streetlifting', Icons.sports_gymnastics, 'Weighted calisthenics & bodyweight skills'),
+    ];
+
+    return showModalBottomSheet<TrainingDirection>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Choose training direction', style: AppTextStyles.h3),
+            const SizedBox(height: 4),
+            Text('AI will tailor the program to your goals', style: AppTextStyles.caption),
+            const SizedBox(height: 16),
+            ...options.map(
+              (opt) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  onTap: () => Navigator.pop(ctx, opt.$1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: aiColor.withValues(alpha: 0.25)),
+                  ),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: aiColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(opt.$3, color: aiColor, size: 22),
+                  ),
+                  title: Text(opt.$2, style: AppTextStyles.body1),
+                  subtitle: Text(opt.$4, style: AppTextStyles.caption),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _generateAiProgram() async {
+    final direction = await _pickTrainingDirection();
+    if (direction == null) return;
+
+    if (!mounted) return;
     final dataManager = Provider.of<DataManager>(context, listen: false);
 
     setState(() => _isGenerating = true);
@@ -28,6 +84,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     final suggestion = await _groqService.generateProgram(
       history: dataManager.workoutHistory,
       exercises: dataManager.exercises,
+      direction: direction,
     );
 
     if (!mounted) return;
