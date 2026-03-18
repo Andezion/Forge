@@ -109,67 +109,61 @@ class ProgramsScreen extends StatelessWidget {
             style: AppTextStyles.caption,
           ),
           children: [
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                itemCount: workouts.length,
-                itemBuilder: (context, index) {
-                  final workout = workouts[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: GestureDetector(
-                      onTap: () {
-                        _showWorkoutDetails(context, workout, color);
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Column(
+                children: workouts.map((workout) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      _showWorkoutDetails(context, workout, color);
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 2,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(Icons.fitness_center, color: color),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      workout.name,
-                                      style: AppTextStyles.body1.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                              child: Icon(Icons.fitness_center, color: color),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    workout.name,
+                                    style: AppTextStyles.body1.copyWith(
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${workout.exercises.length} exercises',
-                                      style: AppTextStyles.caption,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${workout.exercises.length} exercises',
+                                    style: AppTextStyles.caption,
+                                  ),
+                                ],
                               ),
-                              const Icon(Icons.chevron_right, size: 24),
-                            ],
-                          ),
+                            ),
+                            const Icon(Icons.chevron_right, size: 24),
+                          ],
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                )).toList(),
               ),
             ),
           ],
