@@ -10,13 +10,87 @@ import '../models/ai_suggested_workout.dart';
 const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 const String _model = 'llama-3.3-70b-versatile';
 
+enum TrainingDirection {
+  fullBody,
+  powerlifting,
+  armWrestling,
+  streetlifting,
+}
+
+extension TrainingDirectionDetails on TrainingDirection {
+  String get displayName {
+    switch (this) {
+      case TrainingDirection.fullBody:
+        return 'Full Body';
+      case TrainingDirection.powerlifting:
+        return 'Powerlifting';
+      case TrainingDirection.armWrestling:
+        return 'Arm Wrestling';
+      case TrainingDirection.streetlifting:
+        return 'Streetlifting';
+    }
+  }
+
+  String get contextPrompt {
+    switch (this) {
+      case TrainingDirection.fullBody:
+        return '''
+TRAINING DIRECTION: Full Body
+Goal: Balanced development of all major muscle groups.
+Muscle Group Priorities (high → low): chest, back, legs, shoulders, core, biceps, triceps
+Rules:
+- Equal attention to upper body, lower body, and core
+- Mix of compound and isolation exercises
+- Aim for 2 exercises per major muscle group
+- Include both bilateral and unilateral movements
+''';
+      case TrainingDirection.powerlifting:
+        return '''
+TRAINING DIRECTION: Powerlifting
+Goal: Maximum strength in squat, bench press, and deadlift.
+Muscle Group Priorities (high → low): legs, back, chest, core, triceps, shoulders
+Rules:
+- Squat, bench press, deadlift are MANDATORY if in library
+- Accessory work must directly support the big 3
+- Low reps (3-6), heavy weights
+- Minimal isolation work — only what increases main lifts
+''';
+      case TrainingDirection.armWrestling:
+        return '''
+TRAINING DIRECTION: Arm Wrestling
+Goal: Arm wrestling-specific strength.
+Muscle Group Priorities (high → low): forearms, wrists, biceps, back, shoulders, triceps
+Rules:
+- MAXIMUM forearms/wrists/grip exercises — this is the #1 priority
+- Include pronation, supination, wrist flexion/extension movements
+- Back (lats/traps) and biceps are secondary priority
+- Legs: MAXIMUM 1-2 exercises, only for general fitness
+- Include hammer curls, wrist curls, pronation training if available
+''';
+      case TrainingDirection.streetlifting:
+        return '''
+TRAINING DIRECTION: Streetlifting / Calisthenics
+Goal: Bodyweight strength and weighted calisthenics.
+Muscle Group Priorities (high → low): back, chest, core, biceps, triceps, legs
+Rules:
+- Foundation: pull-ups, dips, push-ups, squats, core — these are base movements
+- Progress toward skills: muscle-up, front lever, back lever, planche
+- Add weight to basic movements for progression
+- Balance push and pull movements
+- Core stability is critical for skills
+''';
+    }
+  }
+}
+
 class GroqService {
   Future<AiSuggestedWorkout?> generateProgram({
     required List<WorkoutHistory> history,
     required List<Exercise> exercises,
+    required TrainingDirection direction,
   }) async {
     try {
-      final prompt = _buildPrompt(history, exercises);
+      final prompt = _buildPrompt(history, exercises, direction);
 
       final response = await http.post(
         Uri.parse(_groqApiUrl),
@@ -27,7 +101,7 @@ class GroqService {
         body: jsonEncode({
           'model': _model,
           'temperature': 0.7,
-          'max_tokens': 1500,
+          'max_tokens': 2000,
           'messages': [
             {
               'role': 'system',
@@ -57,7 +131,7 @@ class GroqService {
     }
   }
 
-  String _buildPrompt(List<WorkoutHistory> history, List<Exercise> exercises) {
+  String _buildPrompt(List<WorkoutHistory> history, List<Exercise> exercises, TrainingDirection direction) {
     final recentHistory = history.reversed.take(10).toList();
     final historySummary = recentHistory.map((h) {
       final date = '${h.date.day}.${h.date.month}.${h.date.year}';
@@ -87,20 +161,30 @@ class GroqService {
     }).join(',\n');
 
     return '''
-Analyze this athlete's recent workout history and create a personalized workout program using ONLY exercises from their library.
+You are an expert strength & conditioning coach. Your task is to design a workout program for an athlete.
+
+${direction.contextPrompt}
 
 WORKOUT HISTORY (last ${recentHistory.length} sessions):
-$historySummary
+${historySummary.isEmpty ? 'No history yet — this is a beginner session.' : historySummary}
 
 AVAILABLE EXERCISES:
 [$exerciseList]
 
-Based on the history, identify:
-- Which muscle groups are most trained
-- Current weight/rep progression trends
-- What would be a good next program step
+RESEARCH INSTRUCTIONS:
+For each exercise you select, do the following analysis before including it:
+1. Identify which muscle groups it actually activates (primary, secondary, stabilizers)
+2. Assess its difficulty — does the difficulty tag in the library match your knowledge?
+3. Consider which exercises pair well with it in the same session
+4. If an exercise name is unfamiliar or unclear, reason carefully from its name and any clues in the muscle tag data to estimate its purpose and difficulty
+5. Avoid pairing exercises that heavily fatigue the same muscle group back-to-back
 
-Return ONLY a JSON object (no markdown, no extra text) with this exact structure:
+Based on the athlete's history and training direction above:
+- Identify progression trends (weights, reps)
+- Prioritize muscle groups according to the training direction rules
+- Select exercises that complement each other well within the session
+
+Return ONLY a JSON object (no markdown, no extra text):
 {
   "name": "Program name (short, max 40 chars)",
   "exercises": [
@@ -111,14 +195,15 @@ Return ONLY a JSON object (no markdown, no extra text) with this exact structure
       "weight": 60.0
     }
   ],
-  "reasoning": "2-3 sentences explaining why this program suits the athlete based on their history"
+  "reasoning": "3-4 sentences: explain why these specific exercises were chosen for this training direction, and how they support the athlete's current progression"
 }
 
 Rules:
 - Include 6-8 exercises
-- Use only exerciseIds from the provided library
-- Set realistic weights based on history (slightly progressive)
-- Balance muscle groups
+- Use ONLY exerciseIds from the provided library
+- Follow the muscle group priorities from the training direction
+- Set realistic weights based on history (slightly progressive — about 2-5% more than last session)
+- weight: 0.0 for bodyweight exercises
 ''';
   }
 
