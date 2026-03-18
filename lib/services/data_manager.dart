@@ -6,6 +6,7 @@ import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/training_plan.dart';
+import '../models/ai_suggested_workout.dart';
 import 'challenge_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
@@ -20,6 +21,7 @@ class DataManager extends ChangeNotifier {
   List<Workout> _workouts = [];
   List<WorkoutHistory> _workoutHistory = [];
   List<TrainingPlan> _trainingPlans = [];
+  List<AiSuggestedWorkout> _aiSuggestedWorkouts = [];
   bool _isInitialized = false;
   Timer? _saveDebounceTimer;
   bool _savePending = false;
@@ -66,6 +68,11 @@ class DataManager extends ChangeNotifier {
     final plansJson = _prefs?.getStringList('training_plans') ?? [];
     _trainingPlans = plansJson
         .map((json) => TrainingPlan.fromJson(jsonDecode(json)))
+        .toList();
+
+    final aiSuggestedJson = _prefs?.getStringList('ai_suggested_workouts') ?? [];
+    _aiSuggestedWorkouts = aiSuggestedJson
+        .map((json) => AiSuggestedWorkout.fromJson(jsonDecode(json)))
         .toList();
 
     final historyJson = _prefs?.getStringList('workout_history') ?? [];
@@ -117,12 +124,15 @@ class DataManager extends ChangeNotifier {
 
     final plansJson =
         _trainingPlans.map((p) => jsonEncode(p.toJson())).toList();
+    final aiSuggestedJson =
+        _aiSuggestedWorkouts.map((s) => jsonEncode(s.toJson())).toList();
 
     await Future.wait([
       _prefs?.setStringList('exercises', exercisesJson) ?? Future.value(),
       _prefs?.setStringList('workouts', workoutsJson) ?? Future.value(),
       _prefs?.setStringList('workout_history', historyJson) ?? Future.value(),
       _prefs?.setStringList('training_plans', plansJson) ?? Future.value(),
+      _prefs?.setStringList('ai_suggested_workouts', aiSuggestedJson) ?? Future.value(),
     ]);
   }
 
@@ -134,8 +144,31 @@ class DataManager extends ChangeNotifier {
   List<Workout> get workouts => List.unmodifiable(_workouts);
   List<WorkoutHistory> get workoutHistory => List.unmodifiable(_workoutHistory);
   List<TrainingPlan> get trainingPlans => List.unmodifiable(_trainingPlans);
+  List<AiSuggestedWorkout> get aiSuggestedWorkouts =>
+      List.unmodifiable(_aiSuggestedWorkouts);
   TrainingPlan? get activePlan =>
       _trainingPlans.where((p) => p.isActive).firstOrNull;
+
+  void addAiSuggestedWorkout(AiSuggestedWorkout suggestion) {
+    _aiSuggestedWorkouts.add(suggestion);
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void approveAiSuggestedWorkout(String id) {
+    final index = _aiSuggestedWorkouts.indexWhere((s) => s.id == id);
+    if (index == -1) return;
+    _workouts.add(_aiSuggestedWorkouts[index].workout);
+    _aiSuggestedWorkouts.removeAt(index);
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void rejectAiSuggestedWorkout(String id) {
+    _aiSuggestedWorkouts.removeWhere((s) => s.id == id);
+    _scheduleSave();
+    notifyListeners();
+  }
 
   void addTrainingPlan(TrainingPlan plan) {
     _trainingPlans.add(plan);
