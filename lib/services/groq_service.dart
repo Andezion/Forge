@@ -11,8 +11,6 @@ const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 const String _model = 'llama-3.3-70b-versatile';
 
 class GroqService {
-  /// Generates an AI workout program based on user history and available exercises.
-  /// Returns null on failure.
   Future<AiSuggestedWorkout?> generateProgram({
     required List<WorkoutHistory> history,
     required List<Exercise> exercises,
@@ -60,7 +58,6 @@ class GroqService {
   }
 
   String _buildPrompt(List<WorkoutHistory> history, List<Exercise> exercises) {
-    // Last 10 sessions summary
     final recentHistory = history.reversed.take(10).toList();
     final historySummary = recentHistory.map((h) {
       final date = '${h.date.day}.${h.date.month}.${h.date.year}';
@@ -82,7 +79,6 @@ class GroqService {
       return '[$date] ${h.session.workoutName}: $exercisesSummary';
     }).join('\n');
 
-    // Available exercises
     final exerciseList = exercises.map((e) {
       final muscles = e.muscleGroups
           .map((mg) => '${mg.group.name}(${mg.intensity.name})')
@@ -128,7 +124,6 @@ Rules:
 
   AiSuggestedWorkout? _parseResponse(String content, List<Exercise> exercises) {
     try {
-      // Strip markdown code blocks if present
       var jsonStr = content.trim();
       if (jsonStr.startsWith('```')) {
         jsonStr = jsonStr
