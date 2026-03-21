@@ -427,9 +427,6 @@ class ProgressionService {
     };
   }
 
-  /// Returns a weight-increase multiplier based on how well the exercise
-  /// matches the user's training focus (e.g. forearms for arm wrestling).
-  /// Priority muscles get up to +30% on the increase delta.
   double _getTrainingFocusMultiplier(WorkoutExercise we, UserProfile prof) {
     if (prof.trainingFocus.isEmpty) return 1.0;
 
