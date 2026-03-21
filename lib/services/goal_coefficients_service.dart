@@ -273,18 +273,22 @@ class GoalCoefficientsService {
     required WellnessModifiers wellnessModifiers,
     bool wasHard = false,
   }) {
-    double newWeight = currentWeight;
+    final wellness = wellnessModifiers.weightMultiplier;
 
     if (completionRate >= 0.95 && !wasHard) {
-      newWeight *= (1.0 + params.weightIncreaseCoefficient);
+      // Great performance: increase weight; wellness scales how much we increase
+      final increment = currentWeight * params.weightIncreaseCoefficient * wellness;
+      return ((currentWeight + increment) * 2).round() / 2.0;
     } else if (completionRate >= 0.85 && completionRate < 0.95) {
-      newWeight *= (1.0 + params.weightIncreaseCoefficient / 2);
+      // Good performance: small increase; wellness scales the increment
+      final increment = currentWeight * (params.weightIncreaseCoefficient / 2) * wellness;
+      return ((currentWeight + increment) * 2).round() / 2.0;
     } else if (completionRate < 0.75 || wasHard) {
-      newWeight *= (1.0 - params.weightDecreaseCoefficient);
+      // Poor performance: always reduce — wellness does NOT reduce base further
+      return (currentWeight * (1.0 - params.weightDecreaseCoefficient) * 2).round() / 2.0;
     }
 
-    newWeight *= wellnessModifiers.weightMultiplier;
-
-    return (newWeight * 2).round() / 2.0;
+    // Maintenance zone (75–85%): keep current weight exactly
+    return (currentWeight * 2).round() / 2.0;
   }
 }
