@@ -120,13 +120,17 @@ class ProgressionService {
     String exerciseId,
     List<WorkoutHistory> histories, {
     int lookback = 5,
+    String? exerciseName,
   }) {
     final sessions = <ExerciseResult>[];
     final sessionDates = <DateTime>[];
 
     for (var h in histories.reversed) {
       for (var er in h.session.exerciseResults) {
-        if (er.exercise.id == exerciseId) {
+        final matchById = er.exercise.id == exerciseId;
+        final matchByName = exerciseName != null &&
+            er.exercise.name.toLowerCase() == exerciseName.toLowerCase();
+        if (matchById || matchByName) {
           sessions.add(er);
           sessionDates.add(h.date);
         }
@@ -152,7 +156,6 @@ class ProgressionService {
     double totalCompletion = 0.0;
     double totalWeight = 0.0;
     double totalReps = 0.0;
-    int totalSets = 0;
     int totalDuration = 0;
     ExerciseDifficulty? lastPerceived;
 
@@ -171,7 +174,6 @@ class ProgressionService {
         completion = 1.0;
         avgWeightThisSession = er.targetWeight;
         repsThisSession = er.targetReps.toDouble();
-        totalSets += er.targetSets;
         if (er.targetWeight > 0) {
           final estimated = calculate1RM(er.targetWeight, er.targetReps);
           if (estimated > maxEstimated1RM) maxEstimated1RM = estimated;
@@ -186,7 +188,6 @@ class ProgressionService {
         avgWeightThisSession =
             er.setResults.fold(0.0, (s, r) => s + r.weight) / sets;
         repsThisSession = achievedReps / sets;
-        totalSets += sets;
         totalDuration += er.setResults.fold(0, (s, r) => s + r.durationSeconds);
         for (var setResult in er.setResults) {
           final estimated =
@@ -230,7 +231,7 @@ class ProgressionService {
     return ProgressMetrics(
       completionRate: (totalCompletion / count).clamp(0.0, 1.0),
       avgWeight: totalWeight / count,
-      avgRepsPerSet: count == 0 || totalSets == 0 ? 0.0 : (totalReps / count),
+      avgRepsPerSet: count == 0 ? 0.0 : (totalReps / count),
       sessionsCount: count,
       avgDurationSeconds: count == 0 ? 0 : (totalDuration ~/ count),
       lastPerceivedDifficulty: lastPerceived,
@@ -295,8 +296,12 @@ class ProgressionService {
     final userAge = prof.age ?? 30;
 
     for (var we in workout.exercises) {
-      final metrics =
-          analyzeExerciseHistory(we.exercise.id, histories, lookback: lookback);
+      final metrics = analyzeExerciseHistory(
+        we.exercise.id,
+        histories,
+        lookback: lookback,
+        exerciseName: we.exercise.name,
+      );
 
       double newWeight = we.weight;
       int newReps = we.targetReps;
