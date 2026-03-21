@@ -96,8 +96,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
             _buildStrengthCoefficientCard(
                 records[_selectedExercise!.id], userWeight),
             const SizedBox(height: 16),
-            _buildProgressChart(_selectedExercise!, dataManager),
-            const SizedBox(height: 16),
             _buildRecordHistory(_selectedExercise!, dataManager),
           ] else ...[
             _buildTotalStrengthCard(records, userWeight),
@@ -175,7 +173,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  Widget _buildRecordCard(PersonalRecord? record, Exercise exercise) {
+  Widget _buildRecordCard(ExerciseSummary? summary, Exercise exercise) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -186,92 +184,84 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
           children: [
             Row(
               children: [
-                Expanded(
+                Expanded(child: Text(exercise.name, style: AppTextStyles.h2)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                   child: Text(
-                    exercise.name,
-                    style: AppTextStyles.h2,
+                    'Last 30 days',
+                    style: AppTextStyles.caption.copyWith(color: AppColors.primary),
                   ),
                 ),
-                if (record?.isTheoretical ?? false)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.warning.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'Theoretical',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.warning,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
               ],
             ),
             const SizedBox(height: 20),
-            if (record != null) ...[
+            if (summary != null && summary.hasAnyRecord) ...[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Weight', style: AppTextStyles.caption),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${record.weight.toStringAsFixed(1)} kg',
-                        style: AppTextStyles.h1.copyWith(
-                          color: AppColors.primary,
-                        ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Actual Max', style: AppTextStyles.caption),
+                          const SizedBox(height: 6),
+                          if (summary.actualMax != null) ...[
+                            Text(
+                              '${summary.actualMax!.toStringAsFixed(1)} kg',
+                              style: AppTextStyles.h2.copyWith(color: AppColors.primary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '1 rep · ${_formatDate(summary.actualMaxDate!)}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ] else
+                            Text(
+                              'No 1-rep sets',
+                              style: AppTextStyles.body2.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('Reps', style: AppTextStyles.caption),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${record.reps}',
-                        style: AppTextStyles.h2,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Divider(color: AppColors.divider),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Date', style: AppTextStyles.caption),
-                      const SizedBox(height: 4),
-                      Text(
-                        _formatDate(record.date),
-                        style: AppTextStyles.body1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Estimated 1RM', style: AppTextStyles.caption),
+                          const SizedBox(height: 6),
+                          if (summary.estimated1RM != null) ...[
+                            Text(
+                              '${summary.estimated1RM!.toStringAsFixed(1)} kg',
+                              style: AppTextStyles.h2.copyWith(color: AppColors.accent),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${summary.bestSetWeight!.toStringAsFixed(1)} kg × ${summary.bestSetReps} · ${_formatDate(summary.estimated1RMDate!)}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('1RM (estimated)', style: AppTextStyles.caption),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${record.estimated1RM.toStringAsFixed(1)} kg',
-                        style: AppTextStyles.body1.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -280,10 +270,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 child: Padding(
                   padding: const EdgeInsets.all(32),
                   child: Text(
-                    'No records yet',
-                    style: AppTextStyles.body1.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                    'No workouts in last 30 days',
+                    style: AppTextStyles.body1.copyWith(color: AppColors.textSecondary),
                   ),
                 ),
               ),
@@ -360,7 +348,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   }
 
   Widget _buildAllRecordsList(
-    Map<String, PersonalRecord> records,
+    Map<String, ExerciseSummary> records,
     DataManager dataManager,
   ) {
     if (records.isEmpty) {
@@ -409,7 +397,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  Widget _buildRecordListItem(Exercise exercise, PersonalRecord record) {
+  Widget _buildRecordListItem(Exercise exercise, ExerciseSummary record) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 1,
@@ -423,43 +411,26 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
           backgroundColor: AppColors.primary.withValues(alpha: 0.2),
           child: Icon(Icons.fitness_center, color: AppColors.primary),
         ),
-        title: Row(
-          children: [
-            Expanded(child: Text(exercise.name)),
-            if (record.isTheoretical)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'T',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.warning,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-          ],
+        title: Text(exercise.name),
+        subtitle: Text(
+          record.estimated1RMDate != null
+              ? _formatDate(record.estimated1RMDate!)
+              : '',
         ),
-        subtitle: Text(_formatDate(record.date)),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              '${record.weight.toStringAsFixed(1)} kg',
-              style: AppTextStyles.body1.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+            if (record.actualMax != null)
+              Text(
+                '${record.actualMax!.toStringAsFixed(1)} kg',
+                style: AppTextStyles.body1.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
               ),
-            ),
             Text(
-              '${record.reps} reps',
+              'est. ${(record.estimated1RM ?? 0).toStringAsFixed(1)} kg',
               style: AppTextStyles.caption,
             ),
           ],
@@ -551,11 +522,11 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   }
 
   Widget _buildStrengthCoefficientCard(
-      PersonalRecord? record, double bodyWeight) {
-    if (record == null) return const SizedBox.shrink();
+      ExerciseSummary? summary, double bodyWeight) {
+    if (summary == null || summary.estimated1RM == null) return const SizedBox.shrink();
 
-    final wilks = _calculateWilksCoefficient(bodyWeight, record.estimated1RM);
-    final dots = _calculateDotsCoefficient(bodyWeight, record.estimated1RM);
+    final wilks = _calculateWilksCoefficient(bodyWeight, summary.estimated1RM!);
+    final dots = _calculateDotsCoefficient(bodyWeight, summary.estimated1RM!);
 
     return Card(
       elevation: 2,
@@ -631,7 +602,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   }
 
   Widget _buildTotalStrengthCard(
-      Map<String, PersonalRecord> records, double bodyWeight) {
+      Map<String, ExerciseSummary> records, double bodyWeight) {
     final bigThree = ['Squat', 'Bench Press', 'Deadlift'];
     double total = 0;
     int foundLifts = 0;
@@ -640,7 +611,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       final exercise = _getExerciseById(
           entry.key, Provider.of<DataManager>(context, listen: false));
       if (exercise != null && bigThree.contains(exercise.name)) {
-        total += entry.value.estimated1RM;
+        total += entry.value.estimated1RM ?? 0;
         foundLifts++;
       }
     }
@@ -907,35 +878,55 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  Map<String, PersonalRecord> _getPersonalRecords(DataManager dataManager) {
-    final records = <String, PersonalRecord>{};
-    final completedWorkouts = dataManager.workoutHistory;
+  Map<String, ExerciseSummary> _getPersonalRecords(DataManager dataManager) {
+    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
 
-    for (final workout in completedWorkouts) {
+    final actualMaxWeight = <String, double>{};
+    final actualMaxDate = <String, DateTime>{};
+    final bestEstimated = <String, double>{};
+    final bestEstimatedDate = <String, DateTime>{};
+    final bestSetWeight = <String, double>{};
+    final bestSetReps = <String, int>{};
+
+    for (final workout in dataManager.workoutHistory) {
+      if (workout.date.isBefore(thirtyDaysAgo)) continue;
+
       for (final exercise in workout.session.exerciseResults) {
+        final id = exercise.exercise.id;
         for (final set in exercise.setResults) {
-          if (set.weight > 0 && set.actualReps > 0) {
-            final exerciseId = exercise.exercise.id;
-            final weight = set.weight;
-            final reps = set.actualReps;
-            final estimated1RM = _calculate1RM(weight, reps);
+          if (set.weight <= 0 || set.actualReps <= 0) continue;
 
-            if (!records.containsKey(exerciseId) ||
-                estimated1RM > records[exerciseId]!.estimated1RM) {
-              records[exerciseId] = PersonalRecord(
-                weight: weight,
-                reps: reps,
-                date: workout.date,
-                estimated1RM: estimated1RM,
-                isTheoretical: reps > 1,
-              );
+          if (set.actualReps == 1) {
+            if (!actualMaxWeight.containsKey(id) ||
+                set.weight > actualMaxWeight[id]!) {
+              actualMaxWeight[id] = set.weight;
+              actualMaxDate[id] = workout.date;
             }
+          }
+
+          final e1rm = _calculate1RM(set.weight, set.actualReps);
+          if (!bestEstimated.containsKey(id) || e1rm > bestEstimated[id]!) {
+            bestEstimated[id] = e1rm;
+            bestEstimatedDate[id] = workout.date;
+            bestSetWeight[id] = set.weight;
+            bestSetReps[id] = set.actualReps;
           }
         }
       }
     }
 
-    return records;
+    final allIds = <String>{...actualMaxWeight.keys, ...bestEstimated.keys};
+    return {
+      for (final id in allIds)
+        id: ExerciseSummary(
+          actualMax: actualMaxWeight[id],
+          actualMaxDate: actualMaxDate[id],
+          estimated1RM: bestEstimated[id],
+          estimated1RMDate: bestEstimatedDate[id],
+          bestSetWeight: bestSetWeight[id],
+          bestSetReps: bestSetReps[id],
+        ),
+    };
   }
 
   List<PersonalRecord> _getRecordHistory(
@@ -1210,4 +1201,24 @@ class PersonalRecord {
     required this.estimated1RM,
     required this.isTheoretical,
   });
+}
+
+class ExerciseSummary {
+  final double? actualMax;
+  final DateTime? actualMaxDate;
+  final double? estimated1RM;
+  final DateTime? estimated1RMDate;
+  final double? bestSetWeight;
+  final int? bestSetReps;
+
+  ExerciseSummary({
+    this.actualMax,
+    this.actualMaxDate,
+    this.estimated1RM,
+    this.estimated1RMDate,
+    this.bestSetWeight,
+    this.bestSetReps,
+  });
+
+  bool get hasAnyRecord => actualMax != null || estimated1RM != null;
 }
