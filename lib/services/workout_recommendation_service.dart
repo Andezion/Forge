@@ -504,4 +504,57 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return _recoveryTracker.calculateDaysSinceLastTraining(histories,
         currentExercises: _buildCurrentExercisesMap());
   }
+
+  /// Returns a wellness-adjusted version of the given workout.
+  /// If the workout matches today's recommendation, uses already-computed adjustments.
+  /// Otherwise applies wellness modifiers fresh via ProgressionService.
+  Future<Workout> getAdjustedWorkout(Workout workout) async {
+    if (_todaysRecommendation != null &&
+        _todaysRecommendation!.workoutId == workout.id &&
+        _todaysRecommendation!.exercises.isNotEmpty) {
+      return workout.copyWith(
+        exercises:
+            _todaysRecommendation!.exercises.map((e) => e.exercise).toList(),
+      );
+    }
+
+    final histories = _dataManager.workoutHistory;
+    await _profileService.load();
+    final goals = _profileService.goals
+        .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
+            orElse: () => TrainingGoal.generalFitness))
+        .toList();
+    final experience = _profileService.experienceLevel != null
+        ? ExperienceLevel.values.firstWhere(
+            (e) => e.name == _profileService.experienceLevel,
+            orElse: () => ExperienceLevel.intermediate)
+        : ExperienceLevel.intermediate;
+    final intensity = _profileService.preferredIntensity != null
+        ? TrainingIntensity.values.firstWhere(
+            (e) => e.name == _profileService.preferredIntensity,
+            orElse: () => TrainingIntensity.moderate)
+        : TrainingIntensity.moderate;
+    final profile = UserProfile(
+      goals: goals,
+      experienceLevel: experience,
+      trainingFocus: _profileService.trainingFocus,
+      preferredIntensity: intensity,
+      age: _profileService.age,
+      weightKg: _profileService.weightKg,
+      yearsTraining: _profileService.yearsTraining,
+    );
+
+    final todayWellness = _wellnessService.entries.isNotEmpty
+        ? _wellnessService.entries.last
+        : null;
+
+    final result = await _progressionService.suggestNextWorkout(
+      workout,
+      histories,
+      lookback: 5,
+      profile: profile,
+      todayWellness: todayWellness,
+    );
+    return result['workout'] as Workout;
+  }
 }
