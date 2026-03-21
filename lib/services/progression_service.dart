@@ -93,12 +93,12 @@ class ProgressionService {
     const optimalRecoveryDays = 2.5;
 
     double ageModifier = 1.0;
-    if (userAge > 40) {
-      ageModifier = 1.2;
+    if (userAge > 60) {
+      ageModifier = 1.6;
     } else if (userAge > 50) {
       ageModifier = 1.4;
-    } else if (userAge > 60) {
-      ageModifier = 1.6;
+    } else if (userAge > 40) {
+      ageModifier = 1.2;
     }
 
     final optimalWithAge = optimalRecoveryDays * ageModifier;
@@ -198,18 +198,18 @@ class ProgressionService {
       final secondHalf =
           weights.skip(weights.length ~/ 2).fold(0.0, (a, b) => a + b) /
               (weights.length - weights.length ~/ 2);
-      weightTrend = secondHalf - firstHalf;
+      weightTrend = firstHalf - secondHalf; // newest - oldest = positive when improving
     }
 
     double performanceTrend = 0.0;
     if (completionRates.length >= 2 && weights.length >= 2) {
       final firstPerf = (completionRates[0] * weights[0]);
       final lastPerf = (completionRates.last * weights.last);
-      performanceTrend = lastPerf - firstPerf;
+      performanceTrend = firstPerf - lastPerf; // newest - oldest = positive when improving
     }
 
     final daysSince = sessionDates.isNotEmpty
-        ? DateTime.now().difference(sessionDates.last).inDays
+        ? DateTime.now().difference(sessionDates.first).inDays // .first = most recent session
         : 0;
 
     return ProgressMetrics(
@@ -330,11 +330,7 @@ class ProgressionService {
             newReps = (newReps * 1.1).round().clamp(actualReps + 1, 50);
             reason = 'Excellent performance - increasing repetitions';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
-            newSets = _goalService.calculateTargetSets(
-              params: trainingParams,
-              wellnessModifiers: wellnessModifiers,
-            );
-            newSets = (newSets + 1).clamp(we.sets, 10);
+            newSets = (we.sets + 1).clamp(1, 10);
             reason = 'Good progress - adding a set';
           } else if (c < 0.70 || wasHard) {
             newReps = (we.targetReps * 0.85).round().clamp(1, we.targetReps);
@@ -351,6 +347,19 @@ class ProgressionService {
             wasHard: wasHard,
           );
 
+          // Apply training focus multiplier: priority muscles progress faster
+          if (newWeight > we.weight) {
+            final focusMultiplier = _getTrainingFocusMultiplier(we, prof);
+            final increase = newWeight - we.weight;
+            newWeight = we.weight + increase * focusMultiplier;
+          }
+
+          // Momentum boost: if weight has been consistently increasing, be more aggressive
+          if (metrics.weightTrend > 0 && c >= 0.85 && !wasHard && newWeight > we.weight) {
+            final momentumBonus = (metrics.weightTrend / we.weight).clamp(0.0, 0.02);
+            newWeight *= (1.0 + momentumBonus);
+          }
+
           final actualReps = metrics.avgRepsPerSet > 0
               ? metrics.avgRepsPerSet.round()
               : we.targetReps;
@@ -360,10 +369,14 @@ class ProgressionService {
             previousReps: actualReps,
           );
 
-          newSets = _goalService.calculateTargetSets(
-            params: trainingParams,
-            wellnessModifiers: wellnessModifiers,
-          );
+          // Base sets on current workout sets (preserve user's actual progression)
+          int baseSets = we.sets;
+          if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
+            baseSets += 1;
+          } else if (c < 0.70 || wasHard) {
+            baseSets = (baseSets - 1).clamp(1, baseSets);
+          }
+          newSets = (baseSets * wellnessModifiers.volumeMultiplier).round().clamp(1, 10);
 
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
@@ -405,6 +418,29 @@ class ProgressionService {
       'reasons': reasons,
       'needsDeload': needsDeload,
     };
+  }
+
+  /// Returns a weight-increase multiplier based on how well the exercise
+  /// matches the user's training focus (e.g. forearms for arm wrestling).
+  /// Priority muscles get up to +30% on the increase delta.
+  double _getTrainingFocusMultiplier(WorkoutExercise we, UserProfile prof) {
+    if (prof.trainingFocus.isEmpty) return 1.0;
+
+    final focusSet = prof.trainingFocus.map((s) => s.toLowerCase()).toSet();
+    double multiplier = 1.0;
+
+    for (final mg in we.exercise.muscleGroups) {
+      if (focusSet.contains(mg.group.name.toLowerCase())) {
+        final bonus = switch (mg.intensity) {
+          MuscleGroupIntensity.primary => 0.30,
+          MuscleGroupIntensity.secondary => 0.15,
+          MuscleGroupIntensity.stabilizer => 0.05,
+        };
+        if (1.0 + bonus > multiplier) multiplier = 1.0 + bonus;
+      }
+    }
+
+    return multiplier;
   }
 
   Future<void> applyProgressionToProgram(String workoutId) async {
