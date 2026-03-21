@@ -177,9 +177,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startWorkout(Workout workout) async {
+    final recommendationService = Provider.of<WorkoutRecommendationService>(
+      context,
+      listen: false,
+    );
+    final adjustedWorkout = await recommendationService.getAdjustedWorkout(workout);
+
+    if (!mounted) return;
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => WorkoutExecutionScreen(workout: workout),
+        builder: (context) => WorkoutExecutionScreen(workout: adjustedWorkout),
       ),
     );
 
