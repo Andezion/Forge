@@ -168,8 +168,6 @@ class ProgressionService {
       final double repsThisSession;
 
       if (sets == 0) {
-        // No set-level data recorded: assume targets were met (benefit of doubt)
-        // to avoid falsely penalising the athlete with 0% completion.
         completion = 1.0;
         avgWeightThisSession = er.targetWeight;
         repsThisSession = er.targetReps.toDouble();
@@ -191,7 +189,8 @@ class ProgressionService {
         totalSets += sets;
         totalDuration += er.setResults.fold(0, (s, r) => s + r.durationSeconds);
         for (var setResult in er.setResults) {
-          final estimated = calculate1RM(setResult.weight, setResult.actualReps);
+          final estimated =
+              calculate1RM(setResult.weight, setResult.actualReps);
           if (estimated > maxEstimated1RM) maxEstimated1RM = estimated;
         }
       }
@@ -214,22 +213,18 @@ class ProgressionService {
       final secondHalf =
           weights.skip(weights.length ~/ 2).fold(0.0, (a, b) => a + b) /
               (weights.length - weights.length ~/ 2);
-      weightTrend =
-          firstHalf - secondHalf; // newest - oldest = positive when improving
+      weightTrend = firstHalf - secondHalf;
     }
 
     double performanceTrend = 0.0;
     if (completionRates.length >= 2 && weights.length >= 2) {
       final firstPerf = (completionRates[0] * weights[0]);
       final lastPerf = (completionRates.last * weights.last);
-      performanceTrend =
-          firstPerf - lastPerf; // newest - oldest = positive when improving
+      performanceTrend = firstPerf - lastPerf;
     }
 
     final daysSince = sessionDates.isNotEmpty
-        ? DateTime.now()
-            .difference(sessionDates.first)
-            .inDays // .first = most recent session
+        ? DateTime.now().difference(sessionDates.first).inDays
         : 0;
 
     return ProgressMetrics(
