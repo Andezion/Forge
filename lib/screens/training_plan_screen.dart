@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../models/training_plan.dart';
+import '../models/workout.dart';
 import '../services/data_manager.dart';
+import '../services/workout_recommendation_service.dart';
 import 'plan_editor_screen.dart';
 import 'workout_execution_screen.dart';
 
@@ -279,12 +281,22 @@ class _TodayCard extends StatelessWidget {
                         ),
                         if (workout != null)
                           ElevatedButton(
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    WorkoutExecutionScreen(workout: workout),
-                              ),
-                            ),
+                            onPressed: () async {
+                              final recommendationService =
+                                  Provider.of<WorkoutRecommendationService>(
+                                context,
+                                listen: false,
+                              );
+                              final Workout adjusted = await recommendationService
+                                  .getAdjustedWorkout(workout);
+                              if (!context.mounted) return;
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      WorkoutExecutionScreen(workout: adjusted),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.textOnPrimary,
                               foregroundColor: AppColors.primary,
