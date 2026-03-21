@@ -161,31 +161,47 @@ class ProgressionService {
     double maxEstimated1RM = 0.0;
 
     for (var er in sessions) {
-      int sets = er.setResults.length;
-      int possibleReps = er.targetReps * sets;
-      int achievedReps = er.setResults.fold(0, (s, r) => s + r.actualReps);
-      final completion = possibleReps > 0 ? (achievedReps / possibleReps) : 0.0;
+      final int sets = er.setResults.length;
+
+      final double completion;
+      final double avgWeightThisSession;
+      final double repsThisSession;
+
+      if (sets == 0) {
+        // No set-level data recorded: assume targets were met (benefit of doubt)
+        // to avoid falsely penalising the athlete with 0% completion.
+        completion = 1.0;
+        avgWeightThisSession = er.targetWeight;
+        repsThisSession = er.targetReps.toDouble();
+        totalSets += er.targetSets;
+        if (er.targetWeight > 0) {
+          final estimated = calculate1RM(er.targetWeight, er.targetReps);
+          if (estimated > maxEstimated1RM) maxEstimated1RM = estimated;
+        }
+      } else {
+        final int achievedReps =
+            er.setResults.fold(0, (s, r) => s + r.actualReps);
+        final int possibleReps = er.targetReps * sets;
+        completion = possibleReps > 0
+            ? (achievedReps / possibleReps).clamp(0.0, 1.0)
+            : 1.0;
+        avgWeightThisSession =
+            er.setResults.fold(0.0, (s, r) => s + r.weight) / sets;
+        repsThisSession = achievedReps / sets;
+        totalSets += sets;
+        totalDuration += er.setResults.fold(0, (s, r) => s + r.durationSeconds);
+        for (var setResult in er.setResults) {
+          final estimated = calculate1RM(setResult.weight, setResult.actualReps);
+          if (estimated > maxEstimated1RM) maxEstimated1RM = estimated;
+        }
+      }
 
       totalCompletion += completion;
       completionRates.add(completion);
-
-      final avgWeightThisSession =
-          er.setResults.fold(0.0, (s, r) => s + r.weight) /
-              (sets == 0 ? 1 : sets);
       weights.add(avgWeightThisSession);
       totalWeight += avgWeightThisSession;
-
-      totalReps += sets == 0 ? 0 : (achievedReps / sets);
-      totalSets += sets;
-      totalDuration += er.setResults.fold(0, (s, r) => s + r.durationSeconds);
+      totalReps += repsThisSession;
       lastPerceived = er.perceivedDifficulty ?? lastPerceived;
-
-      for (var setResult in er.setResults) {
-        final estimated = calculate1RM(setResult.weight, setResult.actualReps);
-        if (estimated > maxEstimated1RM) {
-          maxEstimated1RM = estimated;
-        }
-      }
     }
 
     final count = sessions.length;
