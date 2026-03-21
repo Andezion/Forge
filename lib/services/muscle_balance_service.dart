@@ -200,6 +200,66 @@ class MuscleBalanceService {
           priorities[MuscleGroup.back] = 2.5;
           priorities[MuscleGroup.chest] = 2.0;
           break;
+
+        case 'legs':
+        case 'ноги':
+          priorities[MuscleGroup.legs] = 3.0;
+          priorities[MuscleGroup.glutes] = 2.0;
+          priorities[MuscleGroup.calves] = 1.5;
+          break;
+
+        case 'arms':
+        case 'руки':
+          priorities[MuscleGroup.biceps] = 2.5;
+          priorities[MuscleGroup.triceps] = 2.5;
+          priorities[MuscleGroup.forearms] = 2.0;
+          priorities[MuscleGroup.wrists] = 1.5;
+          break;
+
+        case 'chest':
+        case 'грудь':
+          priorities[MuscleGroup.chest] = 3.0;
+          priorities[MuscleGroup.shoulders] = 2.0;
+          priorities[MuscleGroup.triceps] = 1.5;
+          break;
+
+        case 'back':
+        case 'спина':
+          priorities[MuscleGroup.back] = 3.0;
+          priorities[MuscleGroup.biceps] = 1.5;
+          priorities[MuscleGroup.shoulders] = 1.5;
+          break;
+
+        case 'shoulders':
+        case 'плечи':
+          priorities[MuscleGroup.shoulders] = 3.0;
+          priorities[MuscleGroup.triceps] = 1.5;
+          break;
+
+        case 'core':
+        case 'кор':
+          priorities[MuscleGroup.core] = 3.0;
+          break;
+
+        case 'glutes':
+        case 'ягодицы':
+          priorities[MuscleGroup.glutes] = 3.0;
+          priorities[MuscleGroup.legs] = 2.0;
+          break;
+
+        case 'cardio':
+        case 'кардио':
+          priorities[MuscleGroup.cardio] = 3.0;
+          break;
+
+        case 'upper body':
+        case 'верх тела':
+          priorities[MuscleGroup.chest] = 2.5;
+          priorities[MuscleGroup.back] = 2.5;
+          priorities[MuscleGroup.shoulders] = 2.0;
+          priorities[MuscleGroup.biceps] = 2.0;
+          priorities[MuscleGroup.triceps] = 2.0;
+          break;
       }
     }
 
