@@ -18,7 +18,7 @@ class _WeightScreenState extends State<WeightScreen> {
   final int _maxKg = 200;
   late int _selectedKg;
   late int _selectedGramsIndex;
-  final List<int> _gramsList = List<int>.generate(100, (i) => i * 10);
+  final List<int> _gramsList = List<int>.generate(10, (i) => i * 100);
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _WeightScreenState extends State<WeightScreen> {
     final current = profile.weightKg ?? 75.0;
     _selectedKg = current.floor();
     final grams = ((current - _selectedKg) * 1000).round();
-    final g = (grams / 10).round();
+    final g = (grams / 100).round();
     _selectedGramsIndex = g.clamp(0, _gramsList.length - 1);
   }
 
@@ -78,9 +78,9 @@ class _WeightScreenState extends State<WeightScreen> {
                     onSelectedItemChanged: (i) =>
                         setState(() => _selectedGramsIndex = i),
                     itemBuilder: (context, index) {
-                      final g = _gramsList[index];
+                      final g = _gramsList[index] ~/ 100;
                       return Center(
-                          child: Text('$g g', style: AppTextStyles.body1));
+                          child: Text('.$g', style: AppTextStyles.body1));
                     },
                   ),
                 ),
