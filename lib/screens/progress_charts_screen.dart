@@ -593,6 +593,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               child: _buildLineChart(
                 _bodyWeightData!.weightData,
                 color: AppColors.primary,
+                yAxisDecimals: 1,
               ),
             ),
           ],
@@ -950,6 +951,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     required Color color,
     double? minY,
     double? maxY,
+    int yAxisDecimals = 0,
   }) {
     final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
@@ -977,7 +979,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               reservedSize: 42,
               getTitlesWidget: (value, meta) {
                 return Text(
-                  value.toStringAsFixed(0),
+                  value.toStringAsFixed(yAxisDecimals),
                   style: const TextStyle(fontSize: 10),
                 );
               },
