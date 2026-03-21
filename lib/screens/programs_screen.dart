@@ -31,11 +31,12 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
     return showModalBottomSheet<TrainingDirection>(
       context: context,
+      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+      builder: (ctx) => SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(16, 20, 16, 24 + MediaQuery.of(ctx).viewPadding.bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,7 +229,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: Colors.white),
                             )
-                          : const Icon(Icons.auto_awesome),
+                          : const Icon(Icons.auto_awesome, color: Colors.white),
                       label: Text(
                           _isGenerating ? 'Generating...' : 'Generate Program'),
                       style: ElevatedButton.styleFrom(
