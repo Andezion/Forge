@@ -448,7 +448,6 @@ class ProgressionService {
 
     final focusSet = prof.trainingFocus.map((s) => s.toLowerCase()).toSet();
 
-    // Expand composite focus names to individual MuscleGroup names
     final expandedFocus = <String>{};
     for (final f in focusSet) {
       switch (f) {
