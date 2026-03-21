@@ -149,9 +149,9 @@ class WorkoutRecommendationService extends ChangeNotifier {
         : 14;
     factors['daysSinceLastWorkout'] = daysSinceLastWorkout;
 
-    final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories,
-            currentExercises: _buildCurrentExercisesMap());
+    final daysSinceTraining = _recoveryTracker.calculateDaysSinceLastTraining(
+        histories,
+        currentExercises: _buildCurrentExercisesMap());
     final recoveryPriorities =
         _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
 
@@ -485,17 +485,17 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
   Map<MuscleGroup, String> getMuscleRecoveryStatus() {
     final histories = _dataManager.workoutHistory;
-    final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories,
-            currentExercises: _buildCurrentExercisesMap());
+    final daysSinceTraining = _recoveryTracker.calculateDaysSinceLastTraining(
+        histories,
+        currentExercises: _buildCurrentExercisesMap());
     return _recoveryTracker.getRecoveryRecommendations(daysSinceTraining);
   }
 
   Map<MuscleGroup, double> getMuscleRecoveryPriorities() {
     final histories = _dataManager.workoutHistory;
-    final daysSinceTraining =
-        _recoveryTracker.calculateDaysSinceLastTraining(histories,
-            currentExercises: _buildCurrentExercisesMap());
+    final daysSinceTraining = _recoveryTracker.calculateDaysSinceLastTraining(
+        histories,
+        currentExercises: _buildCurrentExercisesMap());
     return _recoveryTracker.calculateRecoveryPriority(daysSinceTraining);
   }
 
@@ -505,9 +505,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
         currentExercises: _buildCurrentExercisesMap());
   }
 
-  /// Returns a wellness-adjusted version of the given workout.
-  /// If the workout matches today's recommendation, uses already-computed adjustments.
-  /// Otherwise applies wellness modifiers fresh via ProgressionService.
   Future<Workout> getAdjustedWorkout(Workout workout) async {
     if (_todaysRecommendation != null &&
         _todaysRecommendation!.workoutId == workout.id &&
