@@ -303,7 +303,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
         }
       }
 
-      // Boost score for workouts that target the user's training focus
       final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
       if (trainingFocus.isNotEmpty) {
         final focusPriorities =
