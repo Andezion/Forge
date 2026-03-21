@@ -10,6 +10,7 @@ import 'wellness_service.dart';
 import 'data_manager.dart';
 import 'profile_service.dart';
 import 'muscle_recovery_tracker.dart';
+import 'muscle_balance_service.dart';
 
 class WorkoutRecommendationService extends ChangeNotifier {
   final ProgressionService _progressionService = ProgressionService();
@@ -17,6 +18,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
   final DataManager _dataManager;
   final ProfileService _profileService;
   final MuscleRecoveryTracker _recoveryTracker = MuscleRecoveryTracker();
+  final MuscleBalanceService _muscleBalanceService = MuscleBalanceService();
 
   WorkoutRecommendation? _todaysRecommendation;
   DateTime? _lastRecommendationDate;
@@ -212,6 +214,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
     factors['experienceLevel'] = profile.experienceLevel.name;
     factors['preferredIntensity'] = profile.preferredIntensity.name;
     factors['age'] = profile.age ?? 30;
+    factors['trainingFocus'] = profile.trainingFocus;
 
     return factors;
   }
@@ -297,6 +300,20 @@ class WorkoutRecommendationService extends ChangeNotifier {
           score += 20.0;
         } else if (exerciseCount >= 6) {
           score += 10.0;
+        }
+      }
+
+      // Boost score for workouts that target the user's training focus
+      final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
+      if (trainingFocus.isNotEmpty) {
+        final focusPriorities =
+            _muscleBalanceService.getMuscleGroupPriorities(trainingFocus);
+        if (focusPriorities.isNotEmpty) {
+          final focusScore = _muscleBalanceService.evaluateWorkoutForGoals(
+            workout,
+            trainingFocus,
+          );
+          score += focusScore * 50.0;
         }
       }
 
