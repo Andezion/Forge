@@ -246,7 +246,9 @@ class GoalCoefficientsService {
     required WellnessModifiers wellnessModifiers,
     int? previousReps,
   }) {
-    int targetReps = ((params.minReps + params.maxReps) / 2).round();
+    int targetReps = (previousReps != null && previousReps > 0)
+        ? previousReps
+        : ((params.minReps + params.maxReps) / 2).round();
 
     targetReps = (targetReps * wellnessModifiers.volumeMultiplier).round();
 
