@@ -447,10 +447,33 @@ class ProgressionService {
     if (prof.trainingFocus.isEmpty) return 1.0;
 
     final focusSet = prof.trainingFocus.map((s) => s.toLowerCase()).toSet();
+
+    // Expand composite focus names to individual MuscleGroup names
+    final expandedFocus = <String>{};
+    for (final f in focusSet) {
+      switch (f) {
+        case 'arms':
+        case 'руки':
+          expandedFocus.addAll(['biceps', 'triceps', 'forearms', 'wrists']);
+          break;
+        case 'upper body':
+        case 'верх тела':
+          expandedFocus
+              .addAll(['chest', 'back', 'shoulders', 'biceps', 'triceps']);
+          break;
+        case 'legs':
+        case 'ноги':
+          expandedFocus.addAll(['legs', 'glutes', 'calves']);
+          break;
+        default:
+          expandedFocus.add(f);
+      }
+    }
+
     double multiplier = 1.0;
 
     for (final mg in we.exercise.muscleGroups) {
-      if (focusSet.contains(mg.group.name.toLowerCase())) {
+      if (expandedFocus.contains(mg.group.name.toLowerCase())) {
         final bonus = switch (mg.intensity) {
           MuscleGroupIntensity.primary => 0.30,
           MuscleGroupIntensity.secondary => 0.15,
