@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/exercise.dart';
@@ -703,119 +702,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  Widget _buildProgressChart(Exercise exercise, DataManager dataManager) {
-    final history = _getRecordHistoryChronological(exercise, dataManager);
-
-    if (history.length < 2) {
-      return const SizedBox.shrink();
-    }
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Progress Over Time', style: AppTextStyles.h3),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 200,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: 20,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: AppColors.divider,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            '${value.toInt()}',
-                            style: AppTextStyles.caption,
-                          );
-                        },
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: (value, meta) {
-                          if (value.toInt() >= 0 &&
-                              value.toInt() < history.length) {
-                            final date = history[value.toInt()].date;
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                '${date.day}/${date.month}',
-                                style: AppTextStyles.caption,
-                              ),
-                            );
-                          }
-                          return const Text('');
-                        },
-                      ),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: history
-                          .asMap()
-                          .entries
-                          .map((entry) => FlSpot(
-                                entry.key.toDouble(),
-                                entry.value.estimated1RM,
-                              ))
-                          .toList(),
-                      isCurved: true,
-                      color: AppColors.primary,
-                      barWidth: 3,
-                      dotData: FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, barData, index) {
-                          return FlDotCirclePainter(
-                            radius: 4,
-                            color: AppColors.primary,
-                            strokeWidth: 2,
-                            strokeColor: AppColors.surface,
-                          );
-                        },
-                      ),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ],
-                  minY: 0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildWorldRecordsList(String weightClass) {
     final records = _getWorldRecords(weightClass, _selectedFederation);
 
@@ -1057,51 +943,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     if (dots < 500) return 'Advanced';
     if (dots < 600) return 'Elite';
     return 'World Class';
-  }
-
-  List<PersonalRecord> _getRecordHistoryChronological(
-    Exercise exercise,
-    DataManager dataManager,
-  ) {
-    final history = <PersonalRecord>[];
-    final completedWorkouts = dataManager.workoutHistory;
-
-    for (final workout in completedWorkouts) {
-      for (final ex in workout.session.exerciseResults) {
-        if (ex.exercise.id == exercise.id) {
-          for (final set in ex.setResults) {
-            if (set.weight > 0 && set.actualReps > 0) {
-              final weight = set.weight;
-              final reps = set.actualReps;
-              final estimated1RM = _calculate1RM(weight, reps);
-
-              history.add(PersonalRecord(
-                weight: weight,
-                reps: reps,
-                date: workout.date,
-                estimated1RM: estimated1RM,
-                isTheoretical: reps > 1,
-              ));
-            }
-          }
-        }
-      }
-    }
-
-    history.sort((a, b) => a.date.compareTo(b.date));
-
-    final monthlyBest = <String, PersonalRecord>{};
-    for (final record in history) {
-      final key = '${record.date.year}-${record.date.month}';
-      if (!monthlyBest.containsKey(key) ||
-          record.estimated1RM > monthlyBest[key]!.estimated1RM) {
-        monthlyBest[key] = record;
-      }
-    }
-
-    final result = monthlyBest.values.toList();
-    result.sort((a, b) => a.date.compareTo(b.date));
-    return result;
   }
 
   String _getWeightClass(double weight) {
