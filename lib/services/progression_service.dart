@@ -319,12 +319,15 @@ class ProgressionService {
           reason = 'Week deload - reducing intensity for recovery';
         } else if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
+            final actualReps = metrics.avgRepsPerSet > 0
+                ? metrics.avgRepsPerSet.round()
+                : we.targetReps;
             newReps = _goalService.calculateTargetReps(
               params: trainingParams,
               wellnessModifiers: wellnessModifiers,
-              previousReps: we.targetReps,
+              previousReps: actualReps,
             );
-            newReps = (newReps * 1.1).round().clamp(we.targetReps + 1, 50);
+            newReps = (newReps * 1.1).round().clamp(actualReps + 1, 50);
             reason = 'Excellent performance - increasing repetitions';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = _goalService.calculateTargetSets(
@@ -348,10 +351,13 @@ class ProgressionService {
             wasHard: wasHard,
           );
 
+          final actualReps = metrics.avgRepsPerSet > 0
+              ? metrics.avgRepsPerSet.round()
+              : we.targetReps;
           newReps = _goalService.calculateTargetReps(
             params: trainingParams,
             wellnessModifiers: wellnessModifiers,
-            previousReps: we.targetReps,
+            previousReps: actualReps,
           );
 
           newSets = _goalService.calculateTargetSets(
