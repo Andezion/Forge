@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
+import '../services/workout_recommendation_service.dart';
 import 'create_workout_screen.dart';
 import 'workout_execution_screen.dart';
 
@@ -104,9 +106,16 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   }
 
   void _startWorkout(Workout workout) async {
+    final recommendationService = Provider.of<WorkoutRecommendationService>(
+      context,
+      listen: false,
+    );
+    final adjustedWorkout = await recommendationService.getAdjustedWorkout(workout);
+
+    if (!mounted) return;
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => WorkoutExecutionScreen(workout: workout),
+        builder: (context) => WorkoutExecutionScreen(workout: adjustedWorkout),
       ),
     );
 
