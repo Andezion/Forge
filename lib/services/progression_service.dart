@@ -198,18 +198,22 @@ class ProgressionService {
       final secondHalf =
           weights.skip(weights.length ~/ 2).fold(0.0, (a, b) => a + b) /
               (weights.length - weights.length ~/ 2);
-      weightTrend = firstHalf - secondHalf; // newest - oldest = positive when improving
+      weightTrend =
+          firstHalf - secondHalf; // newest - oldest = positive when improving
     }
 
     double performanceTrend = 0.0;
     if (completionRates.length >= 2 && weights.length >= 2) {
       final firstPerf = (completionRates[0] * weights[0]);
       final lastPerf = (completionRates.last * weights.last);
-      performanceTrend = firstPerf - lastPerf; // newest - oldest = positive when improving
+      performanceTrend =
+          firstPerf - lastPerf; // newest - oldest = positive when improving
     }
 
     final daysSince = sessionDates.isNotEmpty
-        ? DateTime.now().difference(sessionDates.first).inDays // .first = most recent session
+        ? DateTime.now()
+            .difference(sessionDates.first)
+            .inDays // .first = most recent session
         : 0;
 
     return ProgressMetrics(
@@ -347,16 +351,18 @@ class ProgressionService {
             wasHard: wasHard,
           );
 
-          // Apply training focus multiplier: priority muscles progress faster
           if (newWeight > we.weight) {
             final focusMultiplier = _getTrainingFocusMultiplier(we, prof);
             final increase = newWeight - we.weight;
             newWeight = we.weight + increase * focusMultiplier;
           }
 
-          // Momentum boost: if weight has been consistently increasing, be more aggressive
-          if (metrics.weightTrend > 0 && c >= 0.85 && !wasHard && newWeight > we.weight) {
-            final momentumBonus = (metrics.weightTrend / we.weight).clamp(0.0, 0.02);
+          if (metrics.weightTrend > 0 &&
+              c >= 0.85 &&
+              !wasHard &&
+              newWeight > we.weight) {
+            final momentumBonus =
+                (metrics.weightTrend / we.weight).clamp(0.0, 0.02);
             newWeight *= (1.0 + momentumBonus);
           }
 
@@ -369,14 +375,15 @@ class ProgressionService {
             previousReps: actualReps,
           );
 
-          // Base sets on current workout sets (preserve user's actual progression)
           int baseSets = we.sets;
           if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
             baseSets += 1;
           } else if (c < 0.70 || wasHard) {
             baseSets = (baseSets - 1).clamp(1, baseSets);
           }
-          newSets = (baseSets * wellnessModifiers.volumeMultiplier).round().clamp(1, 10);
+          newSets = (baseSets * wellnessModifiers.volumeMultiplier)
+              .round()
+              .clamp(1, 10);
 
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
