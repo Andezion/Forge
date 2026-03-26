@@ -140,9 +140,9 @@ class MuscleRecoveryCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: Color.fromRGBO(
-                color.red,
-                color.green,
-                color.blue,
+                color.r.toInt(),
+                color.g.toInt(),
+                color.b.toInt(),
                 0.2,
               ),
               borderRadius: BorderRadius.circular(12),
