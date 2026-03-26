@@ -484,7 +484,6 @@ class _MacroCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Calories banner
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
