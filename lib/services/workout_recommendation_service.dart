@@ -70,8 +70,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
         : TrainingIntensity.moderate;
 
     final gender = _profileService.gender != null
-        ? Gender.values.firstWhere(
-            (e) => e.name == _profileService.gender,
+        ? Gender.values.firstWhere((e) => e.name == _profileService.gender,
             orElse: () => Gender.other)
         : null;
     final sessionDuration = _profileService.sessionDuration != null
@@ -235,20 +234,16 @@ class WorkoutRecommendationService extends ChangeNotifier {
     factors['sessionDuration'] = profile.sessionDuration;
     factors['trainingDaysPerWeek'] = profile.trainingDaysPerWeek ?? 3;
 
-    // Determine if today is a scheduled training day based on target frequency.
-    // Uses workouts in the last 7 days vs target days/week.
     if (histories.isNotEmpty) {
       final last7Days = histories.where((h) {
         return DateTime.now().difference(h.date).inDays <= 7;
       }).length;
       final targetDays = profile.trainingDaysPerWeek ?? 3;
       factors['workoutsLast7Days'] = last7Days;
-      // Positive = still has sessions to fill this week; negative = over target
       factors['remainingSessionsThisWeek'] = targetDays - last7Days;
     } else {
       factors['workoutsLast7Days'] = 0;
-      factors['remainingSessionsThisWeek'] =
-          (profile.trainingDaysPerWeek ?? 3);
+      factors['remainingSessionsThisWeek'] = (profile.trainingDaysPerWeek ?? 3);
     }
 
     return factors;
@@ -317,14 +312,12 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
       // ── Session duration scoring ──────────────────────────────────────
       // Prefer workouts whose exercise count fits the user's available time.
-      final sessionDuration =
-          factors['sessionDuration'] as SessionDuration?;
+      final sessionDuration = factors['sessionDuration'] as SessionDuration?;
       if (sessionDuration != null) {
         final (minEx, maxEx) = sessionDuration.exerciseRange;
         if (exerciseCount >= minEx && exerciseCount <= maxEx) {
           score += 30.0; // perfect fit
-        } else if (exerciseCount >= minEx - 1 &&
-            exerciseCount <= maxEx + 1) {
+        } else if (exerciseCount >= minEx - 1 && exerciseCount <= maxEx + 1) {
           score += 15.0; // close fit
         } else if (exerciseCount > maxEx) {
           // Too many exercises for available time
@@ -431,8 +424,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
     // If user hasn't filled their weekly quota and readiness is borderline,
     // prefer moderate over rest so they stay on schedule.
-    final remaining =
-        factors['remainingSessionsThisWeek'] as int? ?? 0;
+    final remaining = factors['remainingSessionsThisWeek'] as int? ?? 0;
     final onSchedule = remaining > 0;
 
     if (readiness >= 0.75 && daysSince >= 2) {
@@ -628,8 +620,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
             orElse: () => TrainingIntensity.moderate)
         : TrainingIntensity.moderate;
     final gender2 = _profileService.gender != null
-        ? Gender.values.firstWhere(
-            (e) => e.name == _profileService.gender,
+        ? Gender.values.firstWhere((e) => e.name == _profileService.gender,
             orElse: () => Gender.other)
         : null;
     final sessionDuration2 = _profileService.sessionDuration != null
