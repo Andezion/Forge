@@ -1,10 +1,7 @@
 import '../models/nutrition_profile.dart';
 import '../models/user.dart';
 
-/// Calculates daily calorie and macro targets using the Mifflin-St Jeor BMR formula.
 class NutritionAlgorithmService {
-  /// Returns daily [MacroTargets] based on user body parameters, activity level,
-  /// nutrition goal, and optional calories burned in today's workout.
   MacroTargets calculateTargets({
     required double weightKg,
     required double heightCm,
@@ -14,7 +11,6 @@ class NutritionAlgorithmService {
     required NutritionGoal goal,
     double workoutCaloriesBurned = 0,
   }) {
-    // ── BMR (Mifflin-St Jeor) ──────────────────────────────────────────────
     final double bmr;
     switch (gender) {
       case Gender.male:
@@ -30,21 +26,19 @@ class NutritionAlgorithmService {
         break;
     }
 
-    // ── Activity multiplier ────────────────────────────────────────────────
     final double activityMultiplier;
     if (trainingDaysPerWeek <= 0) {
-      activityMultiplier = 1.2; // sedentary
+      activityMultiplier = 1.2;
     } else if (trainingDaysPerWeek <= 2) {
-      activityMultiplier = 1.375; // lightly active
+      activityMultiplier = 1.375;
     } else if (trainingDaysPerWeek <= 4) {
-      activityMultiplier = 1.55; // moderately active
+      activityMultiplier = 1.55;
     } else if (trainingDaysPerWeek <= 6) {
-      activityMultiplier = 1.725; // very active
+      activityMultiplier = 1.725;
     } else {
-      activityMultiplier = 1.9; // extra active
+      activityMultiplier = 1.9;
     }
 
-    // ── TDEE + workout calories + goal adjustment ──────────────────────────
     final double tdee = bmr * activityMultiplier + workoutCaloriesBurned;
     double targetCalories = tdee + goal.calorieAdjustment;
     // Safety floor / ceiling
