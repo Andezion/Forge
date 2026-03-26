@@ -102,9 +102,6 @@ class ProgressionService {
       ageModifier = 1.2;
     }
 
-    // Females generally have a slight hormonal recovery advantage for
-    // high-rep / moderate-load work; males may recover faster from very
-    // heavy strength sessions. Represented as a subtle ±5% modifier.
     final genderModifier = gender == 'female' ? 0.95 : 1.0;
 
     final optimalWithAge = optimalRecoveryDays * ageModifier * genderModifier;
