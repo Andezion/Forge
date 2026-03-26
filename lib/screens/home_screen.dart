@@ -191,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result != null) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Workout completed!'),
