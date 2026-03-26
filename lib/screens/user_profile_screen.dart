@@ -513,6 +513,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final now = DateTime.now();
     final endDate = now.add(Duration(days: template.defaultDurationDays));
 
+    final messenger = ScaffoldMessenger.of(context);
     final result = await challengeService.createChallenge(
       type: template.type,
       title: template.title,
@@ -525,11 +526,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     if (mounted) {
       if (result == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(content: Text('Challenge sent to ${widget.userName}!')),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(content: Text(result)),
         );
       }
