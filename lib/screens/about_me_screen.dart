@@ -128,7 +128,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Basic Information ──────────────────────────────────────
             _buildSectionCard(
               title: 'Basic Information',
               icon: Icons.person,
@@ -184,10 +183,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                     return FilterChip(
                       label: Text(_goalLabel(g)),
                       selected: selected,
-                      onSelected: (v) =>
-                          setState(() => _selectedGoals[g] = v),
-                      selectedColor:
-                          AppColors.primary.withValues(alpha: 0.2),
+                      onSelected: (v) => setState(() => _selectedGoals[g] = v),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
                       checkmarkColor: AppColors.primary,
                     );
                   }).toList(),
@@ -212,8 +209,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   suffixText: 'years',
                 ),
                 const SizedBox(height: 16),
-                Text('Days per week you can train',
-                    style: AppTextStyles.body1),
+                Text('Days per week you can train', style: AppTextStyles.body1),
                 const SizedBox(height: 4),
                 Text(
                   'Used to determine how often workouts are recommended',
@@ -244,12 +240,11 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 Text('Experience Level', style: AppTextStyles.body1),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: AppColors.textSecondary
-                            .withValues(alpha: 0.3)),
+                        color: AppColors.textSecondary.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<ExperienceLevel>(
@@ -417,9 +412,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                       color: selected
                           ? AppColors.primary
                           : AppColors.textSecondary,
-                      fontWeight: selected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          selected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -440,8 +434,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: GestureDetector(
-              onTap: () =>
-                  setState(() => _trainingDaysPerWeek = days),
+              onTap: () => setState(() => _trainingDaysPerWeek = days),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -464,9 +457,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                       color: selected
                           ? AppColors.primary
                           : AppColors.textSecondary,
-                      fontWeight: selected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          selected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -488,8 +480,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           onTap: () => setState(() => _sessionDuration = d),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: selected
                   ? AppColors.primary.withValues(alpha: 0.15)
@@ -505,11 +496,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             child: Text(
               d.label,
               style: AppTextStyles.body2.copyWith(
-                color: selected
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
-                fontWeight:
-                    selected ? FontWeight.bold : FontWeight.normal,
+                color: selected ? AppColors.primary : AppColors.textSecondary,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
@@ -529,8 +517,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
       optionsBuilder: (textEditingValue) {
         final input = textEditingValue.text.toLowerCase();
         if (input.isEmpty) return const Iterable<String>.empty();
-        return suggestions.where((s) =>
-            s.toLowerCase().contains(input) && !currentList.contains(s));
+        return suggestions.where(
+            (s) => s.toLowerCase().contains(input) && !currentList.contains(s));
       },
       fieldViewBuilder:
           (context, fieldController, focusNode, onFieldSubmitted) {
@@ -540,8 +528,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: hint,
-            hintStyle: AppTextStyles.body2
-                .copyWith(color: AppColors.textSecondary),
+            hintStyle:
+                AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             suffixIcon: IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
@@ -626,8 +614,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: hint,
-            hintStyle: AppTextStyles.body2
-                .copyWith(color: AppColors.textSecondary),
+            hintStyle:
+                AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             suffixText: suffixText,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -712,8 +700,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     final weight = double.tryParse(_weightController.text.trim());
     await profile.setWeightKg(weight);
 
-    final yearsTraining =
-        double.tryParse(_yearsTrainingController.text.trim());
+    final yearsTraining = double.tryParse(_yearsTrainingController.text.trim());
     await profile.setYearsTraining(yearsTraining);
 
     if (mounted) {
