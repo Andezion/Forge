@@ -987,7 +987,7 @@ class _CreateExerciseDialogState extends State<CreateExerciseDialog> {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
         ),
