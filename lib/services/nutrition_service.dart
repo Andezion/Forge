@@ -76,7 +76,6 @@ class NutritionService extends ChangeNotifier {
             0;
       }
 
-      // Step 2: Algorithm calculation (instant, always succeeds)
       final algoTargets = _algorithm.calculateTargets(
         weightKg: weightKg,
         heightCm: heightCm,
@@ -91,7 +90,6 @@ class NutritionService extends ChangeNotifier {
         goal: goal,
       );
 
-      // Step 3: AI nutrition plan (may fail — that's OK)
       final aiResult = await _groq.generateNutritionPlan(
         weightKg: weightKg,
         heightCm: heightCm,
@@ -104,7 +102,6 @@ class NutritionService extends ChangeNotifier {
 
       _profile = _profile.copyWith(
         algorithmTargets: algoTargets,
-        // Use AI meal schedule if available, otherwise algorithm's
         mealSchedule: aiResult?.mealSchedule ?? algoMeals,
         aiTargets: aiResult?.targets,
         aiReasoning: aiResult?.reasoning,
