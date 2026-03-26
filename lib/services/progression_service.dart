@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
@@ -493,7 +494,7 @@ class ProgressionService {
     final dataManager = DataManager();
     final workout = dataManager.getWorkoutById(workoutId);
     if (workout == null) {
-      print('[PROGRESSION] Workout not found: $workoutId');
+      debugPrint('[PROGRESSION] Workout not found: $workoutId');
       return;
     }
 
@@ -546,9 +547,9 @@ class ProgressionService {
 
     dataManager.updateWorkoutById(workoutId, updatedWorkout);
 
-    print('[PROGRESSION] Applied progression to program: ${workout.name}');
+    debugPrint('[PROGRESSION] Applied progression to program: ${workout.name}');
     for (var entry in reasons.entries) {
-      print('[PROGRESSION]   ${entry.key}: ${entry.value}');
+      debugPrint('[PROGRESSION]   ${entry.key}: ${entry.value}');
     }
   }
 }
