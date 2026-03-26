@@ -114,7 +114,6 @@ class NutritionAlgorithmService {
         break;
     }
 
-    // (name, hour, minute) templates
     const templates = {
       3: [
         ('Breakfast', 8, 0),
@@ -136,7 +135,6 @@ class NutritionAlgorithmService {
       ],
     };
 
-    // Calorie fractions per meal (must sum to 1.0)
     const fractions = {
       3: [0.30, 0.40, 0.30],
       4: [0.25, 0.35, 0.15, 0.25],
@@ -161,6 +159,5 @@ class NutritionAlgorithmService {
     });
   }
 
-  // Round to 1 decimal place
   double _r(double v) => (v * 10).round() / 10;
 }
