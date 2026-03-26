@@ -35,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
 
+    final auth = Provider.of<AuthService>(context, listen: false);
     Future.microtask(() async {
-      final auth = Provider.of<AuthService>(context, listen: false);
       if (auth.firebaseUser != null) {
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -192,9 +192,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         final auth =
                             Provider.of<AuthService>(context, listen: false);
+                        final messenger = ScaffoldMessenger.of(context);
                         final email = _emailController.text.trim();
                         if (email.isEmpty || !email.contains('@')) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          messenger.showSnackBar(
                             SnackBar(
                                 content: Text(AppStrings.errorInvalidEmail)),
                           );
@@ -202,14 +203,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         try {
                           await auth.sendPasswordReset(email);
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          if (!mounted) return;
+                          messenger.showSnackBar(
                             SnackBar(
                                 content: Text('Password reset email sent.')),
                           );
                         } catch (e) {
                           String msg = e is Exception ? e.toString() : '$e';
                           msg = msg.replaceFirst('Exception: ', '');
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          if (!mounted) return;
+                          messenger.showSnackBar(
                             SnackBar(content: Text(msg)),
                           );
                         }
