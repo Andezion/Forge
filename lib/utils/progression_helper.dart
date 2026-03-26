@@ -47,6 +47,7 @@ class ProgressionHelper {
         return originalWorkout;
       }
 
+      if (!context.mounted) return originalWorkout;
       final shouldUseOptimized = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
