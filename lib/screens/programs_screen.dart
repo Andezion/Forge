@@ -632,7 +632,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
