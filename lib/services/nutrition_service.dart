@@ -117,8 +117,6 @@ class NutritionService extends ChangeNotifier {
     }
   }
 
-  /// Quick recalculation using only the algorithm (no AI call).
-  /// Useful when profile parameters change.
   Future<void> recalculateAlgorithmOnly({
     required double weightKg,
     required double heightCm,
@@ -143,9 +141,8 @@ class NutritionService extends ChangeNotifier {
 
     _profile = _profile.copyWith(
       algorithmTargets: algoTargets,
-      mealSchedule: _profile.aiTargets != null
-          ? _profile.mealSchedule // keep AI schedule if we already have one
-          : algoMeals,
+      mealSchedule:
+          _profile.aiTargets != null ? _profile.mealSchedule : algoMeals,
       lastCalculated: DateTime.now(),
     );
     notifyListeners();
