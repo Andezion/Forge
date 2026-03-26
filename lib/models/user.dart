@@ -144,7 +144,6 @@ enum TrainingIntensity { light, moderate, intense }
 
 enum Gender { male, female, other }
 
-/// Preferred workout session duration in minutes.
 enum SessionDuration { thirtyMin, fortyFiveMin, sixtyMin, ninetyMin }
 
 extension SessionDurationExt on SessionDuration {
@@ -174,7 +173,6 @@ extension SessionDurationExt on SessionDuration {
     }
   }
 
-  /// Ideal exercise count range for this duration.
   (int, int) get exerciseRange {
     switch (this) {
       case SessionDuration.thirtyMin:
