@@ -164,7 +164,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
 
-            // ── Training Goals ─────────────────────────────────────────
             _buildSectionCard(
               title: 'Training Goals',
               icon: Icons.flag,
@@ -193,7 +192,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
 
-            // ── Training Schedule ──────────────────────────────────────
             _buildSectionCard(
               title: 'Training Schedule',
               icon: Icons.calendar_month,
@@ -232,7 +230,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
 
-            // ── Training Preferences ───────────────────────────────────
             _buildSectionCard(
               title: 'Training Preferences',
               icon: Icons.fitness_center,
