@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/world_record.dart';
 
@@ -20,7 +21,7 @@ class WorldRecordsService {
       _records = jsonList.map((json) => WorldRecord.fromJson(json)).toList();
       _isLoaded = true;
     } catch (e) {
-      print('Error loading world records: $e');
+      debugPrint('Error loading world records: $e');
       _records = [];
     }
   }
@@ -36,8 +37,9 @@ class WorldRecordsService {
   }) {
     return _records.where((record) {
       if (federation != null && record.federation != federation) return false;
-      if (weightClass != null && record.weightClass != weightClass)
+      if (weightClass != null && record.weightClass != weightClass) {
         return false;
+      }
       if (gender != null && record.gender != gender) return false;
       if (equipped != null && record.equipped != equipped) return false;
       if (exercise != null && record.exercise != exercise) return false;
