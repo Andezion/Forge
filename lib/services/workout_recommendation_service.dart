@@ -343,8 +343,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
         }
       }
 
-      // ── Injury penalty ────────────────────────────────────────────────
-      // Heavily penalise workouts that stress injured body parts.
       final injuries = factors['injuries'] as List<String>? ?? [];
       if (injuries.isNotEmpty) {
         final injuryMuscles =
@@ -363,7 +361,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
         }
       }
 
-      // ── Training focus ────────────────────────────────────────────────
       final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
       if (trainingFocus.isNotEmpty) {
         final focusPriorities =
@@ -416,8 +413,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return RecommendationLevel.rest;
     }
 
-    // If user hasn't filled their weekly quota and readiness is borderline,
-    // prefer moderate over rest so they stay on schedule.
     final remaining = factors['remainingSessionsThisWeek'] as int? ?? 0;
     final onSchedule = remaining > 0;
 
