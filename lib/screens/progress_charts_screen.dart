@@ -59,7 +59,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   }
 
   void _onDataChanged() {
-    print('[PROGRESS_CHARTS] Data changed, reloading charts...');
+    debugPrint('[PROGRESS_CHARTS] Data changed, reloading charts...');
     _loadData();
   }
 
@@ -137,8 +137,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         setState(() => _isLoading = false);
       }
     } catch (e, stackTrace) {
-      print('Error loading progress data: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error loading progress data: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isLoading = false);
         final l10n = AppLocalizations.of(context)!;
@@ -362,7 +362,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       children: [
         _buildStatsCard(
           'Strength Coefficient',
-          '${_overallStrengthData!.currentTotalStrength.toStringAsFixed(1)}',
+          _overallStrengthData!.currentTotalStrength.toStringAsFixed(1),
           _overallStrengthData!.progressPercentage,
         ),
         const SizedBox(height: 16),
