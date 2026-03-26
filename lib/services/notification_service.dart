@@ -133,8 +133,6 @@ class NotificationService {
     debugPrint('[Notifications] all cancelled');
   }
 
-  // ── Internal helpers ─────────────────────────────────────────────────────
-
   Future<void> _scheduleDailyAt({
     required int id,
     required String title,
