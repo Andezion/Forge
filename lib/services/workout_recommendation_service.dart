@@ -310,24 +310,19 @@ class WorkoutRecommendationService extends ChangeNotifier {
       final readiness = factors['readiness'] as double;
       final exerciseCount = workout.exercises.length;
 
-      // ── Session duration scoring ──────────────────────────────────────
-      // Prefer workouts whose exercise count fits the user's available time.
       final sessionDuration = factors['sessionDuration'] as SessionDuration?;
       if (sessionDuration != null) {
         final (minEx, maxEx) = sessionDuration.exerciseRange;
         if (exerciseCount >= minEx && exerciseCount <= maxEx) {
-          score += 30.0; // perfect fit
+          score += 30.0;
         } else if (exerciseCount >= minEx - 1 && exerciseCount <= maxEx + 1) {
-          score += 15.0; // close fit
+          score += 15.0;
         } else if (exerciseCount > maxEx) {
-          // Too many exercises for available time
           score -= (exerciseCount - maxEx) * 8.0;
         } else {
-          // Too few exercises — under-utilising the time
           score -= (minEx - exerciseCount) * 4.0;
         }
       } else {
-        // Fallback: same logic as before when no preference is set
         if (exerciseCount >= 8) {
           score += 30.0;
         } else if (exerciseCount >= 6) {
@@ -337,7 +332,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
         }
       }
 
-      // ── Readiness adjustment on top of duration preference ────────────
       if (readiness < 0.5) {
         if (exerciseCount <= 4) score += 15.0;
         if (exerciseCount >= 8) score -= 15.0;
