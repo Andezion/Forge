@@ -32,7 +32,7 @@ class SettingsService extends ChangeNotifier {
         final map = json.decode(settingsJson) as Map<String, dynamic>;
         _settings = AppSettings.fromJson(map);
         notifyListeners();
-      } catch (e) {}
+      } catch (_) {}
     }
 
     await _loadNicknameFromFirebase();
