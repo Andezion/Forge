@@ -42,7 +42,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
   }
 
   void _onDataChanged() {
-    print('[PROGRESSION_INSIGHTS] Data changed, reloading suggestions...');
+    debugPrint('[PROGRESSION_INSIGHTS] Data changed, reloading suggestions...');
     _loadSuggestions();
   }
 
