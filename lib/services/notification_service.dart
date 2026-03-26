@@ -44,8 +44,6 @@ class NotificationService {
     debugPrint('[Notifications] initialized');
   }
 
-  // ── Permissions ──────────────────────────────────────────────────────────
-
   Future<bool> requestPermission() async {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
@@ -66,10 +64,6 @@ class NotificationService {
     return true;
   }
 
-  // ── Meal reminders ───────────────────────────────────────────────────────
-
-  /// Schedules a daily notification for each [MealSlot] in [meals].
-  /// Cancels any previously scheduled meal notifications first.
   Future<void> scheduleMealReminders(List<MealSlot> meals) async {
     if (!_initialized) await init();
     await _cancelGroup(_groupMeals, _mealBaseId, 10);
@@ -98,9 +92,6 @@ class NotificationService {
     await _cancelGroup(_groupMeals, _mealBaseId, 10);
   }
 
-  // ── Water reminders ──────────────────────────────────────────────────────
-
-  /// Schedules water reminders every [intervalMinutes] from 8:00 to 22:00.
   Future<void> scheduleWaterReminders(int intervalMinutes) async {
     if (!_initialized) await init();
     await _cancelGroup(_groupWater, _waterBaseId, 20);
