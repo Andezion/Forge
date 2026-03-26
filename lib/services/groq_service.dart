@@ -134,7 +134,8 @@ class GroqService {
     }
   }
 
-  String _buildPrompt(List<WorkoutHistory> history, List<Exercise> exercises, TrainingDirection direction) {
+  String _buildPrompt(List<WorkoutHistory> history, List<Exercise> exercises,
+      TrainingDirection direction) {
     final recentHistory = history.reversed.take(10).toList();
     final historySummary = recentHistory.map((h) {
       final date = '${h.date.day}.${h.date.month}.${h.date.year}';
@@ -210,10 +211,6 @@ Rules:
 ''';
   }
 
-  // ── Nutrition: estimate workout calories burned ────────────────────────
-
-  /// Sends a workout summary to Groq and returns estimated kcal burned.
-  /// Falls back to [null] on any error so the algorithm can proceed without AI.
   Future<double?> estimateWorkoutCalories({
     required WorkoutSession session,
     required double bodyWeightKg,
@@ -284,13 +281,12 @@ Return ONLY a JSON object (no markdown, no extra text):
     }
   }
 
-  // ── Nutrition: AI macro & meal recommendation ──────────────────────────
-
-  /// Asks Groq to independently calculate daily macros and suggest a meal
-  /// schedule based on the user's profile and nutrition goal.
-  /// Returns a map with keys: `targets` ([MacroTargets]) and `mealSchedule`
-  /// ([List<MealSlot>]) and `reasoning` ([String]).
-  Future<({MacroTargets targets, List<MealSlot> mealSchedule, String reasoning})?> generateNutritionPlan({
+  Future<
+      ({
+        MacroTargets targets,
+        List<MealSlot> mealSchedule,
+        String reasoning
+      })?> generateNutritionPlan({
     required double weightKg,
     required double heightCm,
     required int age,
