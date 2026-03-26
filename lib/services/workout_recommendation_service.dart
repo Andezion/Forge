@@ -69,6 +69,17 @@ class WorkoutRecommendationService extends ChangeNotifier {
             orElse: () => TrainingIntensity.moderate)
         : TrainingIntensity.moderate;
 
+    final gender = _profileService.gender != null
+        ? Gender.values.firstWhere(
+            (e) => e.name == _profileService.gender,
+            orElse: () => Gender.other)
+        : null;
+    final sessionDuration = _profileService.sessionDuration != null
+        ? SessionDuration.values.firstWhere(
+            (e) => e.name == _profileService.sessionDuration,
+            orElse: () => SessionDuration.sixtyMin)
+        : null;
+
     final profile = UserProfile(
       goals: goals,
       experienceLevel: experience,
@@ -77,6 +88,10 @@ class WorkoutRecommendationService extends ChangeNotifier {
       age: _profileService.age,
       weightKg: _profileService.weightKg,
       yearsTraining: _profileService.yearsTraining,
+      gender: gender,
+      trainingDaysPerWeek: _profileService.trainingDaysPerWeek,
+      sessionDuration: sessionDuration,
+      injuries: _profileService.injuries,
     );
 
     final factors = _analyzeFactors(histories, recentWellness, profile);
@@ -215,6 +230,26 @@ class WorkoutRecommendationService extends ChangeNotifier {
     factors['preferredIntensity'] = profile.preferredIntensity.name;
     factors['age'] = profile.age ?? 30;
     factors['trainingFocus'] = profile.trainingFocus;
+    factors['gender'] = profile.gender?.name;
+    factors['injuries'] = profile.injuries;
+    factors['sessionDuration'] = profile.sessionDuration;
+    factors['trainingDaysPerWeek'] = profile.trainingDaysPerWeek ?? 3;
+
+    // Determine if today is a scheduled training day based on target frequency.
+    // Uses workouts in the last 7 days vs target days/week.
+    if (histories.isNotEmpty) {
+      final last7Days = histories.where((h) {
+        return DateTime.now().difference(h.date).inDays <= 7;
+      }).length;
+      final targetDays = profile.trainingDaysPerWeek ?? 3;
+      factors['workoutsLast7Days'] = last7Days;
+      // Positive = still has sessions to fill this week; negative = over target
+      factors['remainingSessionsThisWeek'] = targetDays - last7Days;
+    } else {
+      factors['workoutsLast7Days'] = 0;
+      factors['remainingSessionsThisWeek'] =
+          (profile.trainingDaysPerWeek ?? 3);
+    }
 
     return factors;
   }
@@ -280,29 +315,68 @@ class WorkoutRecommendationService extends ChangeNotifier {
       final readiness = factors['readiness'] as double;
       final exerciseCount = workout.exercises.length;
 
-      if (exerciseCount >= 8) {
-        score += 30.0;
-      } else if (exerciseCount >= 6) {
-        score += 15.0;
-      } else if (exerciseCount >= 4) {
-        score += 5.0;
+      // ── Session duration scoring ──────────────────────────────────────
+      // Prefer workouts whose exercise count fits the user's available time.
+      final sessionDuration =
+          factors['sessionDuration'] as SessionDuration?;
+      if (sessionDuration != null) {
+        final (minEx, maxEx) = sessionDuration.exerciseRange;
+        if (exerciseCount >= minEx && exerciseCount <= maxEx) {
+          score += 30.0; // perfect fit
+        } else if (exerciseCount >= minEx - 1 &&
+            exerciseCount <= maxEx + 1) {
+          score += 15.0; // close fit
+        } else if (exerciseCount > maxEx) {
+          // Too many exercises for available time
+          score -= (exerciseCount - maxEx) * 8.0;
+        } else {
+          // Too few exercises — under-utilising the time
+          score -= (minEx - exerciseCount) * 4.0;
+        }
+      } else {
+        // Fallback: same logic as before when no preference is set
+        if (exerciseCount >= 8) {
+          score += 30.0;
+        } else if (exerciseCount >= 6) {
+          score += 15.0;
+        } else if (exerciseCount >= 4) {
+          score += 5.0;
+        }
       }
 
+      // ── Readiness adjustment on top of duration preference ────────────
       if (readiness < 0.5) {
-        if (exerciseCount <= 4) {
-          score += 25.0;
-        }
-        if (exerciseCount >= 8) {
-          score -= 20.0;
-        }
+        if (exerciseCount <= 4) score += 15.0;
+        if (exerciseCount >= 8) score -= 15.0;
       } else if (readiness >= 0.7) {
         if (exerciseCount >= 8) {
-          score += 20.0;
-        } else if (exerciseCount >= 6) {
           score += 10.0;
+        } else if (exerciseCount >= 6) {
+          score += 5.0;
         }
       }
 
+      // ── Injury penalty ────────────────────────────────────────────────
+      // Heavily penalise workouts that stress injured body parts.
+      final injuries = factors['injuries'] as List<String>? ?? [];
+      if (injuries.isNotEmpty) {
+        final injuryMuscles =
+            _muscleBalanceService.getMuscleGroupPriorities(injuries);
+        for (var exercise in workout.exercises) {
+          for (var mg in exercise.exercise.muscleGroups) {
+            if (injuryMuscles.containsKey(mg.group)) {
+              final penalty = switch (mg.intensity) {
+                MuscleGroupIntensity.primary => 25.0,
+                MuscleGroupIntensity.secondary => 12.0,
+                MuscleGroupIntensity.stabilizer => 5.0,
+              };
+              score -= penalty;
+            }
+          }
+        }
+      }
+
+      // ── Training focus ────────────────────────────────────────────────
       final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
       if (trainingFocus.isNotEmpty) {
         final focusPriorities =
@@ -355,9 +429,15 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return RecommendationLevel.rest;
     }
 
+    // If user hasn't filled their weekly quota and readiness is borderline,
+    // prefer moderate over rest so they stay on schedule.
+    final remaining =
+        factors['remainingSessionsThisWeek'] as int? ?? 0;
+    final onSchedule = remaining > 0;
+
     if (readiness >= 0.75 && daysSince >= 2) {
       return RecommendationLevel.intense;
-    } else if (readiness >= 0.6) {
+    } else if (readiness >= 0.6 || (onSchedule && readiness >= 0.5)) {
       return RecommendationLevel.moderate;
     } else {
       return RecommendationLevel.light;
@@ -547,6 +627,16 @@ class WorkoutRecommendationService extends ChangeNotifier {
             (e) => e.name == _profileService.preferredIntensity,
             orElse: () => TrainingIntensity.moderate)
         : TrainingIntensity.moderate;
+    final gender2 = _profileService.gender != null
+        ? Gender.values.firstWhere(
+            (e) => e.name == _profileService.gender,
+            orElse: () => Gender.other)
+        : null;
+    final sessionDuration2 = _profileService.sessionDuration != null
+        ? SessionDuration.values.firstWhere(
+            (e) => e.name == _profileService.sessionDuration,
+            orElse: () => SessionDuration.sixtyMin)
+        : null;
     final profile = UserProfile(
       goals: goals,
       experienceLevel: experience,
@@ -555,6 +645,10 @@ class WorkoutRecommendationService extends ChangeNotifier {
       age: _profileService.age,
       weightKg: _profileService.weightKg,
       yearsTraining: _profileService.yearsTraining,
+      gender: gender2,
+      trainingDaysPerWeek: _profileService.trainingDaysPerWeek,
+      sessionDuration: sessionDuration2,
+      injuries: _profileService.injuries,
     );
 
     final todayWellness = _wellnessService.entries.isNotEmpty
