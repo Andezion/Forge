@@ -110,12 +110,12 @@ class CustomizationScreen extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () async {
+                        final profile = Provider.of<ProfileService>(context,
+                            listen: false);
                         final picker = ImagePicker();
                         final file = await picker.pickImage(
                             source: ImageSource.gallery, maxWidth: 1200);
                         if (file != null) {
-                          final profile = Provider.of<ProfileService>(context,
-                              listen: false);
                           await profile.setImagePath(file.path);
                         }
                       },
@@ -149,13 +149,13 @@ class CustomizationScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           ElevatedButton(
                             onPressed: () async {
+                              final profile = Provider.of<ProfileService>(
+                                  context,
+                                  listen: false);
                               final picker = ImagePicker();
                               final file = await picker.pickImage(
                                   source: ImageSource.gallery, maxWidth: 1200);
                               if (file != null) {
-                                final profile = Provider.of<ProfileService>(
-                                    context,
-                                    listen: false);
                                 await profile.setImagePath(file.path);
                               }
                             },
