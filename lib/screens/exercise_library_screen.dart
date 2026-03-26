@@ -22,6 +22,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   final TextEditingController _searchController = TextEditingController();
   final _dataManager = DataManager();
   List<Exercise> _filteredExercises = [];
+  MuscleGroup? _primaryFilter;
+  MuscleGroup? _secondaryFilter;
+  MuscleGroup? _stabilizerFilter;
 
   @override
   void initState() {
@@ -39,18 +42,38 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     _filteredExercises = List.from(_dataManager.exercises);
   }
 
-  void _filterExercises(String query) {
+  void _applyFilters() {
+    final query = _searchController.text;
     setState(() {
-      if (query.isEmpty) {
-        _filteredExercises = List.from(_dataManager.exercises);
-      } else {
-        _filteredExercises = _dataManager.exercises
-            .where((exercise) =>
-                exercise.name.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
+      _filteredExercises = _dataManager.exercises.where((exercise) {
+        if (query.isNotEmpty &&
+            !exercise.name.toLowerCase().contains(query.toLowerCase())) {
+          return false;
+        }
+        if (_primaryFilter != null) {
+          final hasPrimary = exercise.muscleGroups.any((mg) =>
+              mg.intensity == MuscleGroupIntensity.primary &&
+              mg.group == _primaryFilter);
+          if (!hasPrimary) return false;
+        }
+        if (_secondaryFilter != null) {
+          final hasSecondary = exercise.muscleGroups.any((mg) =>
+              mg.intensity == MuscleGroupIntensity.secondary &&
+              mg.group == _secondaryFilter);
+          if (!hasSecondary) return false;
+        }
+        if (_stabilizerFilter != null) {
+          final hasStabilizer = exercise.muscleGroups.any((mg) =>
+              mg.intensity == MuscleGroupIntensity.stabilizer &&
+              mg.group == _stabilizerFilter);
+          if (!hasStabilizer) return false;
+        }
+        return true;
+      }).toList();
     });
   }
+
+  void _filterExercises(String query) => _applyFilters();
 
   void _showCreateExerciseDialog() {
     showDialog(
@@ -63,6 +86,109 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           });
         },
       ),
+    );
+  }
+
+  Widget _buildMuscleGroupFilters() {
+    final items = [
+      const DropdownMenuItem<MuscleGroup>(
+        value: null,
+        child: Text('Any'),
+      ),
+      ...MuscleGroup.values.map((g) => DropdownMenuItem<MuscleGroup>(
+            value: g,
+            child: Text(MuscleGroupUtils.getLabel(g)),
+          )),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      color: AppColors.surface,
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildFilterDropdown(
+              label: 'Primary',
+              value: _primaryFilter,
+              items: items,
+              color: AppColors.primary,
+              onChanged: (v) {
+                _primaryFilter = v;
+                _applyFilters();
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildFilterDropdown(
+              label: 'Secondary',
+              value: _secondaryFilter,
+              items: items,
+              color: AppColors.warning,
+              onChanged: (v) {
+                _secondaryFilter = v;
+                _applyFilters();
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildFilterDropdown(
+              label: 'Stabilizer',
+              value: _stabilizerFilter,
+              items: items,
+              color: AppColors.textSecondary,
+              onChanged: (v) {
+                _stabilizerFilter = v;
+                _applyFilters();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterDropdown({
+    required String label,
+    required MuscleGroup? value,
+    required List<DropdownMenuItem<MuscleGroup>> items,
+    required Color color,
+    required ValueChanged<MuscleGroup?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.caption.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: value != null ? color : AppColors.background,
+              width: value != null ? 1.5 : 1,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<MuscleGroup>(
+              value: value,
+              isExpanded: true,
+              isDense: true,
+              style: AppTextStyles.caption,
+              items: items,
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -104,7 +230,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         children: [
           _buildCreateExerciseButton(),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             color: AppColors.surface,
             child: TextField(
               controller: _searchController,
@@ -123,6 +249,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               ),
             ),
           ),
+          _buildMuscleGroupFilters(),
           Expanded(
             child: _filteredExercises.isEmpty
                 ? Center(
