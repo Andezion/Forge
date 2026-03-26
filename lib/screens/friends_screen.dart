@@ -543,22 +543,23 @@ class _FriendsScreenState extends State<FriendsScreen>
                 return;
               }
 
-              Navigator.of(context).pop();
-
+              final messenger = ScaffoldMessenger.of(context);
               final friendsService =
                   Provider.of<FriendsService>(context, listen: false);
+              Navigator.of(context).pop();
+
               final result = await friendsService.sendFriendRequest(email);
 
               if (mounted) {
                 if (result == 'success') {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     const SnackBar(
                       content: Text('Friend request sent!'),
                       backgroundColor: AppColors.success,
                     ),
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(result),
                       backgroundColor: AppColors.error,
