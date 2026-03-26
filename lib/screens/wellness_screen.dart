@@ -67,14 +67,14 @@ class _WellnessScreenState extends State<WellnessScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final _questionKeys = [
+    final questionKeys = [
       'energy',
       'mood',
       'tiredness',
       'stress',
       'muscleSoreness',
     ];
-    final _questionLabels = {
+    final questionLabels = {
       'energy': l10n.energy,
       'mood': l10n.mood,
       'tiredness': l10n.tiredness,
@@ -136,8 +136,8 @@ class _WellnessScreenState extends State<WellnessScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  for (var key in _questionKeys) ...[
-                    Text(_questionLabels[key]!,
+                  for (var key in questionKeys) ...[
+                    Text(questionLabels[key]!,
                         style: AppTextStyles.body1.copyWith(
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         )),
@@ -185,7 +185,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
 
                             await _loadRecommendation();
 
-                            if (mounted) {
+                            if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(l10n.saved)),
                               );
