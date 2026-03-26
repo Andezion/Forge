@@ -264,8 +264,6 @@ class _MealsTab extends StatelessWidget {
   }
 }
 
-// ── Tab: Settings ─────────────────────────────────────────────────────────────
-
 class _SettingsTab extends StatelessWidget {
   final NutritionProfile profile;
   final Color appColor;
@@ -290,7 +288,6 @@ class _SettingsTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Goal
         Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -307,8 +304,6 @@ class _SettingsTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-
-        // Notifications toggle
         Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -327,8 +322,6 @@ class _SettingsTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-
-        // Water reminder interval
         Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -389,8 +382,6 @@ class _SettingsTab extends StatelessWidget {
     );
   }
 }
-
-// ── Reusable widgets ──────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   final String message;
