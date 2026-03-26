@@ -125,8 +125,9 @@ class ProfileService extends ChangeNotifier {
         await prefs.setStringList(_keyWeightHistory, hist);
         _weightHistory.insert(
             0, ChartDataPoint(date: DateTime.now(), value: kg));
-        if (_weightHistory.length > 365)
+        if (_weightHistory.length > 365) {
           _weightHistory.removeRange(365, _weightHistory.length);
+        }
       } catch (_) {}
     }
     notifyListeners();
