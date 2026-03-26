@@ -6,6 +6,9 @@ import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/ai_suggested_workout.dart';
+import '../models/nutrition_profile.dart';
+import '../models/user.dart';
+import '../models/workout_session.dart';
 
 const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 const String _model = 'llama-3.3-70b-versatile';
@@ -205,6 +208,195 @@ Rules:
 - Set realistic weights based on history (slightly progressive — about 2-5% more than last session)
 - weight: 0.0 for bodyweight exercises
 ''';
+  }
+
+  // ── Nutrition: estimate workout calories burned ────────────────────────
+
+  /// Sends a workout summary to Groq and returns estimated kcal burned.
+  /// Falls back to [null] on any error so the algorithm can proceed without AI.
+  Future<double?> estimateWorkoutCalories({
+    required WorkoutSession session,
+    required double bodyWeightKg,
+  }) async {
+    try {
+      final summary = session.exerciseResults.map((er) {
+        final sets = er.setResults;
+        if (sets.isEmpty) {
+          return '${er.exercise.name}: ${er.targetSets}x${er.targetReps} @ ${er.targetWeight}kg';
+        }
+        final totalReps = sets.map((s) => s.actualReps).reduce((a, b) => a + b);
+        final avgWeight =
+            sets.map((s) => s.weight).reduce((a, b) => a + b) / sets.length;
+        return '${er.exercise.name}: ${sets.length}x$totalReps total reps @ ${avgWeight.toStringAsFixed(1)}kg';
+      }).join('\n');
+
+      final durationMin = session.totalDurationSeconds ~/ 60;
+
+      final prompt = '''
+Estimate the total calories burned during the following strength training workout.
+Athlete body weight: ${bodyWeightKg.toStringAsFixed(1)} kg
+Workout duration: $durationMin minutes
+
+Exercises performed:
+$summary
+
+Return ONLY a JSON object (no markdown, no extra text):
+{"caloriesBurned": 320, "reasoning": "Brief 1-sentence explanation"}
+''';
+
+      final response = await http.post(
+        Uri.parse(_groqApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${dotenv.env['key'] ?? ''}',
+        },
+        body: jsonEncode({
+          'model': _model,
+          'temperature': 0.3,
+          'max_tokens': 200,
+          'messages': [
+            {
+              'role': 'system',
+              'content':
+                  'You are a sports science expert. Estimate calorie expenditure accurately. Respond with valid JSON only.',
+            },
+            {'role': 'user', 'content': prompt},
+          ],
+        }),
+      );
+
+      if (response.statusCode != 200) return null;
+
+      final data = jsonDecode(response.body);
+      final content = data['choices'][0]['message']['content'] as String;
+      var jsonStr = content.trim();
+      if (jsonStr.startsWith('```')) {
+        jsonStr = jsonStr
+            .replaceFirst(RegExp(r'^```[a-z]*\n?'), '')
+            .replaceFirst(RegExp(r'\n?```$'), '')
+            .trim();
+      }
+      final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return (parsed['caloriesBurned'] as num).toDouble();
+    } catch (e) {
+      debugPrint('[GROQ] estimateWorkoutCalories error: $e');
+      return null;
+    }
+  }
+
+  // ── Nutrition: AI macro & meal recommendation ──────────────────────────
+
+  /// Asks Groq to independently calculate daily macros and suggest a meal
+  /// schedule based on the user's profile and nutrition goal.
+  /// Returns a map with keys: `targets` ([MacroTargets]) and `mealSchedule`
+  /// ([List<MealSlot>]) and `reasoning` ([String]).
+  Future<({MacroTargets targets, List<MealSlot> mealSchedule, String reasoning})?> generateNutritionPlan({
+    required double weightKg,
+    required double heightCm,
+    required int age,
+    required Gender gender,
+    required int trainingDaysPerWeek,
+    required NutritionGoal goal,
+    double workoutCaloriesBurned = 0,
+  }) async {
+    try {
+      final genderStr = gender.name;
+      final prompt = '''
+You are a certified sports nutritionist. Create a personalized daily nutrition plan.
+
+ATHLETE PROFILE:
+- Weight: ${weightKg.toStringAsFixed(1)} kg
+- Height: ${heightCm.toStringAsFixed(0)} cm
+- Age: $age years
+- Gender: $genderStr
+- Training days per week: $trainingDaysPerWeek
+- Nutrition goal: ${goal.displayName} (calorie adjustment: ${goal.calorieAdjustment > 0 ? '+' : ''}${goal.calorieAdjustment} kcal/day)
+- Calories burned in today's workout: ${workoutCaloriesBurned.toStringAsFixed(0)} kcal
+
+Calculate:
+1. Daily calorie target (TDEE-based with goal adjustment)
+2. Protein, carbs, fat in grams
+3. Daily water intake in ml
+4. A meal schedule (3-5 meals) that distributes the macros throughout the day
+
+Return ONLY a JSON object (no markdown, no extra text):
+{
+  "calories": 2200,
+  "proteinG": 175,
+  "carbsG": 230,
+  "fatG": 70,
+  "waterMl": 2800,
+  "mealSchedule": [
+    {"name": "Breakfast", "hour": 8, "minute": 0, "calories": 550, "proteinG": 44, "carbsG": 58, "fatG": 18},
+    {"name": "Lunch", "hour": 13, "minute": 0, "calories": 770, "proteinG": 61, "carbsG": 80, "fatG": 24},
+    {"name": "Dinner", "hour": 19, "minute": 0, "calories": 660, "proteinG": 53, "carbsG": 69, "fatG": 21},
+    {"name": "Evening Snack", "hour": 21, "minute": 30, "calories": 220, "proteinG": 17, "carbsG": 23, "fatG": 7}
+  ],
+  "reasoning": "2-3 sentences explaining the rationale for these targets and meal timing"
+}
+''';
+
+      final response = await http.post(
+        Uri.parse(_groqApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${dotenv.env['key'] ?? ''}',
+        },
+        body: jsonEncode({
+          'model': _model,
+          'temperature': 0.4,
+          'max_tokens': 1000,
+          'messages': [
+            {
+              'role': 'system',
+              'content':
+                  'You are a certified sports nutritionist. Respond with valid JSON only, no extra text.',
+            },
+            {'role': 'user', 'content': prompt},
+          ],
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('[GROQ] nutrition plan error ${response.statusCode}');
+        return null;
+      }
+
+      final data = jsonDecode(response.body);
+      final content = data['choices'][0]['message']['content'] as String;
+      var jsonStr = content.trim();
+      if (jsonStr.startsWith('```')) {
+        jsonStr = jsonStr
+            .replaceFirst(RegExp(r'^```[a-z]*\n?'), '')
+            .replaceFirst(RegExp(r'\n?```$'), '')
+            .trim();
+      }
+
+      final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
+
+      final targets = MacroTargets(
+        calories: (parsed['calories'] as num).toDouble(),
+        proteinG: (parsed['proteinG'] as num).toDouble(),
+        carbsG: (parsed['carbsG'] as num).toDouble(),
+        fatG: (parsed['fatG'] as num).toDouble(),
+        waterMl: (parsed['waterMl'] as num).toDouble(),
+      );
+
+      final mealSchedule = (parsed['mealSchedule'] as List)
+          .map((m) => MealSlot.fromJson(m as Map<String, dynamic>))
+          .toList();
+
+      final reasoning = parsed['reasoning'] as String? ?? '';
+
+      return (
+        targets: targets,
+        mealSchedule: mealSchedule,
+        reasoning: reasoning,
+      );
+    } catch (e) {
+      debugPrint('[GROQ] generateNutritionPlan error: $e');
+      return null;
+    }
   }
 
   AiSuggestedWorkout? _parseResponse(String content, List<Exercise> exercises) {
