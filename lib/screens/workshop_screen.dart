@@ -21,20 +21,20 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   final _dataManager = DataManager();
 
   void _navigateToCreateWorkout() async {
-    print('[WORKSHOP_SCREEN] Navigating to CreateWorkoutScreen...');
+    debugPrint('[WORKSHOP_SCREEN] Navigating to CreateWorkoutScreen...');
     final result = await Navigator.of(context).push<Workout>(
       MaterialPageRoute(
         builder: (context) => const CreateWorkoutScreen(),
       ),
     );
 
-    print('[WORKSHOP_SCREEN] Returned from CreateWorkoutScreen with: '
+    debugPrint('[WORKSHOP_SCREEN] Returned from CreateWorkoutScreen with: '
         '${result != null ? result.name : 'null'}');
     if (result != null) {
       setState(() {
-        print('[WORKSHOP_SCREEN] Calling addWorkout for: ${result.name}');
+        debugPrint('[WORKSHOP_SCREEN] Calling addWorkout for: ${result.name}');
         _dataManager.addWorkout(result);
-        print('[WORKSHOP_SCREEN] Workouts after add: '
+        debugPrint('[WORKSHOP_SCREEN] Workouts after add: '
             '${_dataManager.workouts.map((w) => w.name).toList()}');
       });
 
@@ -51,7 +51,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   }
 
   void _navigateToEditWorkout(Workout workout, int index) async {
-    print(
+    debugPrint(
         '[WORKSHOP_SCREEN] Navigating to edit workout: ${workout.name} (index: $index)');
     final result = await Navigator.of(context).push<Workout>(
       MaterialPageRoute(
@@ -59,20 +59,20 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       ),
     );
 
-    print(
+    debugPrint(
         '[WORKSHOP_SCREEN] Returned from edit with: ${result != null ? result.name : 'null'}');
     if (result != null) {
       setState(() {
-        print('[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}');
+        debugPrint('[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}');
         _dataManager.updateWorkout(index, result);
-        print('[WORKSHOP_SCREEN] Workouts after update: '
+        debugPrint('[WORKSHOP_SCREEN] Workouts after update: '
             '${_dataManager.workouts.map((w) => w.name).toList()}');
       });
     }
   }
 
   void _deleteWorkout(int index) {
-    print(
+    debugPrint(
         '[WORKSHOP_SCREEN] Request to delete workout at index $index: ${_dataManager.workouts[index].name}');
     final l10n = AppLocalizations.of(context)!;
     showDialog(
@@ -89,10 +89,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           TextButton(
             onPressed: () {
               setState(() {
-                print(
+                debugPrint(
                     '[WORKSHOP_SCREEN] Calling removeWorkout for: ${_dataManager.workouts[index].name}');
                 _dataManager.removeWorkout(index);
-                print('[WORKSHOP_SCREEN] Workouts after remove: '
+                debugPrint('[WORKSHOP_SCREEN] Workouts after remove: '
                     '${_dataManager.workouts.map((w) => w.name).toList()}');
               });
               Navigator.of(context).pop();
@@ -120,6 +120,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     );
 
     if (result != null) {
+      if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
