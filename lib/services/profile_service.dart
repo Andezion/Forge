@@ -15,6 +15,10 @@ class ProfileService extends ChangeNotifier {
   static const _keyHeight = 'profile_height';
   static const _keyYearsTraining = 'profile_years_training';
   static const _keyWeightHistory = 'profile_weight_history';
+  static const _keyGender = 'profile_gender';
+  static const _keyTrainingDays = 'profile_training_days';
+  static const _keySessionDuration = 'profile_session_duration';
+  static const _keyInjuries = 'profile_injuries';
 
   String? _imagePath;
   int _frameIndex = 0;
@@ -27,6 +31,10 @@ class ProfileService extends ChangeNotifier {
   int? _age;
   double? _heightCm;
   double? _yearsTraining;
+  String? _gender;
+  int? _trainingDaysPerWeek;
+  String? _sessionDuration;
+  List<String> _injuries = [];
 
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
@@ -39,6 +47,10 @@ class ProfileService extends ChangeNotifier {
   int? get age => _age;
   double? get heightCm => _heightCm;
   double? get yearsTraining => _yearsTraining;
+  String? get gender => _gender;
+  int? get trainingDaysPerWeek => _trainingDaysPerWeek;
+  String? get sessionDuration => _sessionDuration;
+  List<String> get injuries => _injuries;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -56,6 +68,12 @@ class ProfileService extends ChangeNotifier {
     _yearsTraining = prefs.containsKey(_keyYearsTraining)
         ? prefs.getDouble(_keyYearsTraining)
         : null;
+    _gender = prefs.getString(_keyGender);
+    _trainingDaysPerWeek = prefs.containsKey(_keyTrainingDays)
+        ? prefs.getInt(_keyTrainingDays)
+        : null;
+    _sessionDuration = prefs.getString(_keySessionDuration);
+    _injuries = prefs.getStringList(_keyInjuries) ?? [];
     try {
       final hist = prefs.getStringList(_keyWeightHistory) ?? [];
       _weightHistory.clear();
@@ -181,5 +199,45 @@ class ProfileService extends ChangeNotifier {
     } else {
       await prefs.setDouble(_keyYearsTraining, years);
     }
+  }
+
+  Future<void> setGender(String? gender) async {
+    _gender = gender;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (gender == null) {
+      await prefs.remove(_keyGender);
+    } else {
+      await prefs.setString(_keyGender, gender);
+    }
+  }
+
+  Future<void> setTrainingDaysPerWeek(int? days) async {
+    _trainingDaysPerWeek = days;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (days == null) {
+      await prefs.remove(_keyTrainingDays);
+    } else {
+      await prefs.setInt(_keyTrainingDays, days);
+    }
+  }
+
+  Future<void> setSessionDuration(String? duration) async {
+    _sessionDuration = duration;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (duration == null) {
+      await prefs.remove(_keySessionDuration);
+    } else {
+      await prefs.setString(_keySessionDuration, duration);
+    }
+  }
+
+  Future<void> setInjuries(List<String> injuries) async {
+    _injuries = injuries;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_keyInjuries, injuries);
   }
 }
