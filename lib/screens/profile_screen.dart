@@ -21,6 +21,7 @@ import 'progress_charts_screen.dart';
 import 'personal_records_screen.dart';
 import 'achievements_screen.dart';
 import 'settings_screen.dart';
+import 'nutrition_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -261,6 +262,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         );
                       },
                     ),
+                    _buildMenuItem(
+                      context,
+                      'Nutrition',
+                      Icons.restaurant_menu,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const NutritionScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
@@ -269,6 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           final authService =
                               Provider.of<AuthService>(context, listen: false);
                           await authService.signOut();
+                          if (!context.mounted) return;
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => const LoginScreen(),
