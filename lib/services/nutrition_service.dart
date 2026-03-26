@@ -21,15 +21,13 @@ class NutritionService extends ChangeNotifier {
   bool get isCalculating => _isCalculating;
   String? get error => _error;
 
-  // ── Persistence ──────────────────────────────────────────────────────────
-
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_keyProfile);
     if (raw != null) {
       try {
-        _profile = NutritionProfile.fromJson(
-            jsonDecode(raw) as Map<String, dynamic>);
+        _profile =
+            NutritionProfile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
       } catch (_) {
         _profile = const NutritionProfile();
       }
@@ -41,8 +39,6 @@ class NutritionService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyProfile, jsonEncode(_profile.toJson()));
   }
-
-  // ── Goal ─────────────────────────────────────────────────────────────────
 
   Future<void> setGoal(NutritionGoal goal) async {
     _profile = _profile.copyWith(goal: goal);
@@ -56,11 +52,6 @@ class NutritionService extends ChangeNotifier {
     await _save();
   }
 
-  // ── Full recalculation ───────────────────────────────────────────────────
-
-  /// Runs both the algorithm and AI in parallel, stores both results.
-  /// [workoutSession] is optional — pass the last completed session for
-  /// accurate calorie-burn estimation.
   Future<void> recalculate({
     required double weightKg,
     required double heightCm,
@@ -76,7 +67,6 @@ class NutritionService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Step 1: AI estimates calories burned from the workout (if any)
       double workoutCalories = 0;
       if (workoutSession != null) {
         workoutCalories = await _groq.estimateWorkoutCalories(
