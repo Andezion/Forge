@@ -89,7 +89,8 @@ class ProgressionService {
     return false;
   }
 
-  double getRecoveryModifier(int daysSinceLastWorkout, int userAge) {
+  double getRecoveryModifier(int daysSinceLastWorkout, int userAge,
+      {String? gender}) {
     const optimalRecoveryDays = 2.5;
 
     double ageModifier = 1.0;
@@ -101,7 +102,12 @@ class ProgressionService {
       ageModifier = 1.2;
     }
 
-    final optimalWithAge = optimalRecoveryDays * ageModifier;
+    // Females generally have a slight hormonal recovery advantage for
+    // high-rep / moderate-load work; males may recover faster from very
+    // heavy strength sessions. Represented as a subtle ±5% modifier.
+    final genderModifier = gender == 'female' ? 0.95 : 1.0;
+
+    final optimalWithAge = optimalRecoveryDays * ageModifier * genderModifier;
 
     if (daysSinceLastWorkout < optimalWithAge) {
       return 0.90 + (daysSinceLastWorkout / optimalWithAge) * 0.10;
@@ -326,6 +332,7 @@ class ProgressionService {
         final recoveryModifier = getRecoveryModifier(
           metrics.daysSinceLastSession,
           userAge,
+          gender: prof.gender?.name,
         );
 
         if (needsDeload) {
