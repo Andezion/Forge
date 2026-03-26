@@ -112,7 +112,8 @@ class _WeightScreenState extends State<WeightScreen> {
                       onPressed: () async {
                         final weight = _composeWeight();
                         await profile.setWeightKg(weight);
-                        if (mounted) Navigator.of(context).pop();
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
