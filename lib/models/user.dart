@@ -142,6 +142,53 @@ enum TrainingGoal { strength, hypertrophy, endurance, fatLoss, generalFitness }
 
 enum TrainingIntensity { light, moderate, intense }
 
+enum Gender { male, female, other }
+
+/// Preferred workout session duration in minutes.
+enum SessionDuration { thirtyMin, fortyFiveMin, sixtyMin, ninetyMin }
+
+extension SessionDurationExt on SessionDuration {
+  int get minutes {
+    switch (this) {
+      case SessionDuration.thirtyMin:
+        return 30;
+      case SessionDuration.fortyFiveMin:
+        return 45;
+      case SessionDuration.sixtyMin:
+        return 60;
+      case SessionDuration.ninetyMin:
+        return 90;
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case SessionDuration.thirtyMin:
+        return '30 min';
+      case SessionDuration.fortyFiveMin:
+        return '45 min';
+      case SessionDuration.sixtyMin:
+        return '60 min';
+      case SessionDuration.ninetyMin:
+        return '90 min';
+    }
+  }
+
+  /// Ideal exercise count range for this duration.
+  (int, int) get exerciseRange {
+    switch (this) {
+      case SessionDuration.thirtyMin:
+        return (3, 4);
+      case SessionDuration.fortyFiveMin:
+        return (4, 6);
+      case SessionDuration.sixtyMin:
+        return (6, 8);
+      case SessionDuration.ninetyMin:
+        return (8, 12);
+    }
+  }
+}
+
 class UserProfile {
   final List<TrainingGoal> goals;
   final ExperienceLevel experienceLevel;
@@ -150,6 +197,10 @@ class UserProfile {
   final int? age;
   final double? weightKg;
   final double? yearsTraining;
+  final Gender? gender;
+  final int? trainingDaysPerWeek;
+  final SessionDuration? sessionDuration;
+  final List<String> injuries;
 
   UserProfile({
     required this.goals,
@@ -159,6 +210,10 @@ class UserProfile {
     this.age,
     this.weightKg,
     this.yearsTraining,
+    this.gender,
+    this.trainingDaysPerWeek,
+    this.sessionDuration,
+    this.injuries = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -170,6 +225,10 @@ class UserProfile {
       'age': age,
       'weightKg': weightKg,
       'yearsTraining': yearsTraining,
+      'gender': gender?.name,
+      'trainingDaysPerWeek': trainingDaysPerWeek,
+      'sessionDuration': sessionDuration?.name,
+      'injuries': injuries,
     };
   }
 
@@ -194,6 +253,19 @@ class UserProfile {
       yearsTraining: json['yearsTraining'] != null
           ? (json['yearsTraining'] as num).toDouble()
           : null,
+      gender: json['gender'] != null
+          ? Gender.values.firstWhere((e) => e.name == json['gender'],
+              orElse: () => Gender.other)
+          : null,
+      trainingDaysPerWeek: json['trainingDaysPerWeek'],
+      sessionDuration: json['sessionDuration'] != null
+          ? SessionDuration.values.firstWhere(
+              (e) => e.name == json['sessionDuration'],
+              orElse: () => SessionDuration.sixtyMin)
+          : null,
+      injuries: json['injuries'] != null
+          ? (json['injuries'] as List).map((e) => e.toString()).toList()
+          : [],
     );
   }
 
@@ -205,6 +277,10 @@ class UserProfile {
     int? age,
     double? weightKg,
     double? yearsTraining,
+    Gender? gender,
+    int? trainingDaysPerWeek,
+    SessionDuration? sessionDuration,
+    List<String>? injuries,
   }) {
     return UserProfile(
       goals: goals ?? this.goals,
@@ -214,6 +290,10 @@ class UserProfile {
       age: age ?? this.age,
       weightKg: weightKg ?? this.weightKg,
       yearsTraining: yearsTraining ?? this.yearsTraining,
+      gender: gender ?? this.gender,
+      trainingDaysPerWeek: trainingDaysPerWeek ?? this.trainingDaysPerWeek,
+      sessionDuration: sessionDuration ?? this.sessionDuration,
+      injuries: injuries ?? this.injuries,
     );
   }
 }
