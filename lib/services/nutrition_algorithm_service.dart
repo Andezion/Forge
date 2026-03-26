@@ -41,14 +41,13 @@ class NutritionAlgorithmService {
 
     final double tdee = bmr * activityMultiplier + workoutCaloriesBurned;
     double targetCalories = tdee + goal.calorieAdjustment;
-    // Safety floor / ceiling
+
     targetCalories = targetCalories.clamp(1200.0, 6000.0);
 
-    // ── Macros by goal (g per kg of body weight) ───────────────────────────
     double proteinG, fatG;
     switch (goal) {
       case NutritionGoal.aggressiveFatLoss:
-        proteinG = weightKg * 2.4; // high protein to preserve lean mass
+        proteinG = weightKg * 2.4;
         fatG = weightKg * 0.7;
         break;
       case NutritionGoal.fatLoss:
@@ -69,9 +68,8 @@ class NutritionAlgorithmService {
         break;
     }
 
-    // Remaining calories → carbs (protein & carbs = 4 kcal/g, fat = 9 kcal/g)
     final carbCals = targetCalories - (proteinG * 4) - (fatG * 9);
-    // Ensure minimum 50 g carbs; redistribute if needed
+
     double carbsG;
     if (carbCals < 50 * 4) {
       carbsG = 50;
@@ -83,7 +81,6 @@ class NutritionAlgorithmService {
       carbsG = carbCals / 4;
     }
 
-    // ── Daily water (ml): 35 ml/kg + 500 ml on training days ─────────────
     final waterMl = (weightKg * 35) +
         (trainingDaysPerWeek > 0 ? (500.0 / 7 * trainingDaysPerWeek) : 0);
 
@@ -96,12 +93,10 @@ class NutritionAlgorithmService {
     );
   }
 
-  /// Generates a meal schedule that distributes [targets] across meals.
   List<MealSlot> generateMealSchedule({
     required MacroTargets targets,
     required NutritionGoal goal,
   }) {
-    // Number of meals per goal
     final int mealCount;
     switch (goal) {
       case NutritionGoal.aggressiveFatLoss:
