@@ -163,7 +163,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
             _buildSectionCard(
               title: 'Training Goals',
               icon: Icons.flag,
@@ -191,7 +190,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
             _buildSectionCard(
               title: 'Training Schedule',
               icon: Icons.calendar_month,
@@ -229,7 +227,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
             _buildSectionCard(
               title: 'Training Preferences',
               icon: Icons.fitness_center,
@@ -274,8 +271,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
-            // ── Training Focus ─────────────────────────────────────────
             _buildSectionCard(
               title: 'Training Focus',
               icon: Icons.track_changes,
@@ -310,8 +305,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-
-            // ── Injuries & Limitations ─────────────────────────────────
             _buildSectionCard(
               title: 'Injuries & Limitations',
               icon: Icons.healing,
@@ -350,7 +343,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 24),
-
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -375,8 +367,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
       ),
     );
   }
-
-  // ── Builders ─────────────────────────────────────────────────────────────
 
   Widget _buildGenderSelector() {
     return Row(
@@ -624,8 +614,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
   String _genderLabel(Gender g) {
     switch (g) {
       case Gender.male:
@@ -662,8 +650,6 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         return 'Challenging workouts, push limits';
     }
   }
-
-  // ── Save ──────────────────────────────────────────────────────────────────
 
   void _save() async {
     final profile = Provider.of<ProfileService>(context, listen: false);
