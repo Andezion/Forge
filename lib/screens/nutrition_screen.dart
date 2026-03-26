@@ -34,8 +34,6 @@ class _NutritionScreenState extends State<NutritionScreen>
     super.dispose();
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
-
   Future<void> _recalculate() async {
     final profile = context.read<ProfileService>();
     final nutrition = context.read<NutritionService>();
@@ -47,7 +45,8 @@ class _NutritionScreenState extends State<NutritionScreen>
     final d = profile.trainingDaysPerWeek;
 
     if (w == null || h == null || a == null || g == null) {
-      _showSnack('Please complete your profile first (weight, height, age, gender).');
+      _showSnack(
+          'Please complete your profile first (weight, height, age, gender).');
       return;
     }
 
@@ -69,7 +68,8 @@ class _NutritionScreenState extends State<NutritionScreen>
     }
   }
 
-  Future<void> _toggleNotifications(bool value, List<MealSlot> meals, int waterInterval) async {
+  Future<void> _toggleNotifications(
+      bool value, List<MealSlot> meals, int waterInterval) async {
     final ns = NotificationService();
     await ns.init();
     final granted = await ns.requestPermission();
@@ -89,11 +89,8 @@ class _NutritionScreenState extends State<NutritionScreen>
   }
 
   void _showSnack(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
-
-  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +117,8 @@ class _NutritionScreenState extends State<NutritionScreen>
               controller: _tabs,
               indicatorColor: AppColors.textOnPrimary,
               labelColor: AppColors.textOnPrimary,
-              unselectedLabelColor: AppColors.textOnPrimary.withValues(alpha: 0.6),
+              unselectedLabelColor:
+                  AppColors.textOnPrimary.withValues(alpha: 0.6),
               tabs: const [
                 Tab(text: 'Targets'),
                 Tab(text: 'Meals'),
@@ -155,8 +153,7 @@ class _NutritionScreenState extends State<NutritionScreen>
                       onWaterIntervalChanged: (v) async {
                         await nutrition.setWaterReminderInterval(v);
                         if (_notificationsEnabled) {
-                          await NotificationService()
-                              .scheduleWaterReminders(v);
+                          await NotificationService().scheduleWaterReminders(v);
                         }
                       },
                     ),
@@ -167,8 +164,6 @@ class _NutritionScreenState extends State<NutritionScreen>
     );
   }
 }
-
-// ── Tab: Targets ─────────────────────────────────────────────────────────────
 
 class _TargetsTab extends StatelessWidget {
   final NutritionProfile profile;
@@ -197,14 +192,17 @@ class _TargetsTab extends StatelessWidget {
           _GoalBadge(goal: profile.goal!, appColor: appColor),
         const SizedBox(height: 16),
         if (algo != null) ...[
-          _SectionHeader(title: 'Algorithm', subtitle: 'Mifflin-St Jeor formula'),
+          _SectionHeader(
+              title: 'Algorithm', subtitle: 'Mifflin-St Jeor formula'),
           _MacroCard(targets: algo, color: appColor),
           const SizedBox(height: 16),
         ],
         if (ai != null) ...[
-          _SectionHeader(title: 'AI Recommendation', subtitle: 'Groq · Llama 3.3 70B'),
+          _SectionHeader(
+              title: 'AI Recommendation', subtitle: 'Groq · Llama 3.3 70B'),
           _MacroCard(targets: ai, color: const Color(0xFF9C27B0)),
-          if (profile.aiReasoning != null && profile.aiReasoning!.isNotEmpty) ...[
+          if (profile.aiReasoning != null &&
+              profile.aiReasoning!.isNotEmpty) ...[
             const SizedBox(height: 8),
             _ReasoningCard(text: profile.aiReasoning!),
           ],
@@ -229,8 +227,6 @@ class _TargetsTab extends StatelessWidget {
   }
 }
 
-// ── Tab: Meals ────────────────────────────────────────────────────────────────
-
 class _MealsTab extends StatelessWidget {
   final NutritionProfile profile;
   final Color appColor;
@@ -254,7 +250,8 @@ class _MealsTab extends StatelessWidget {
           subtitle: '${profile.mealSchedule.length} meals per day',
         ),
         const SizedBox(height: 8),
-        ...profile.mealSchedule.map((meal) => _MealCard(meal: meal, appColor: appColor)),
+        ...profile.mealSchedule
+            .map((meal) => _MealCard(meal: meal, appColor: appColor)),
         const SizedBox(height: 16),
         _WaterCard(
           waterMl: profile.algorithmTargets?.waterMl ??
@@ -295,13 +292,15 @@ class _SettingsTab extends StatelessWidget {
       children: [
         // Goal
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             leading: Icon(Icons.flag, color: appColor),
             title: Text('Nutrition Goal', style: AppTextStyles.body1),
             subtitle: Text(
               profile.goal?.displayName ?? 'Not set',
-              style: AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: onGoalTap,
@@ -311,26 +310,28 @@ class _SettingsTab extends StatelessWidget {
 
         // Notifications toggle
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: SwitchListTile(
             secondary: Icon(Icons.notifications, color: appColor),
             title: Text('Meal & Water Reminders', style: AppTextStyles.body1),
             subtitle: Text(
               notificationsEnabled ? 'Active' : 'Inactive',
-              style: AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
             value: notificationsEnabled,
             activeColor: appColor,
-            onChanged: profile.mealSchedule.isNotEmpty
-                ? onToggleNotifications
-                : null,
+            onChanged:
+                profile.mealSchedule.isNotEmpty ? onToggleNotifications : null,
           ),
         ),
         const SizedBox(height: 8),
 
         // Water reminder interval
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -346,7 +347,8 @@ class _SettingsTab extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: intervals.map((min) {
-                    final selected = profile.waterReminderIntervalMinutes == min;
+                    final selected =
+                        profile.waterReminderIntervalMinutes == min;
                     return Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -367,8 +369,11 @@ class _SettingsTab extends StatelessWidget {
                           child: Text(
                             '${min}m',
                             style: AppTextStyles.body2.copyWith(
-                              color: selected ? appColor : AppColors.textSecondary,
-                              fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                              color:
+                                  selected ? appColor : AppColors.textSecondary,
+                              fontWeight: selected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
                           ),
                         ),
@@ -401,12 +406,14 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.restaurant_menu, size: 64, color: appColor.withValues(alpha: 0.4)),
+            Icon(Icons.restaurant_menu,
+                size: 64, color: appColor.withValues(alpha: 0.4)),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.body1.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body1.copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -733,7 +740,9 @@ class _WaterCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Daily Water', style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600)),
+                Text('Daily Water',
+                    style: AppTextStyles.body1
+                        .copyWith(fontWeight: FontWeight.w600)),
                 Text(
                   '${(waterMl / 1000).toStringAsFixed(1)} L  (${waterMl.toStringAsFixed(0)} ml)',
                   style: AppTextStyles.body2.copyWith(
