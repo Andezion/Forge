@@ -4,7 +4,6 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../models/nutrition_profile.dart';
 
-/// Manages all scheduled local notifications for meals and water reminders.
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
   factory NotificationService() => _instance;
@@ -15,13 +14,11 @@ class NotificationService {
 
   bool _initialized = false;
 
-  // Notification channel / category IDs
   static const _channelMeals = 'forge_meals';
   static const _channelWater = 'forge_water';
   static const _groupMeals = 'meals';
   static const _groupWater = 'water';
 
-  // ID ranges so meals and water don't collide
   static const _mealBaseId = 100;
   static const _waterBaseId = 200;
 
@@ -50,16 +47,14 @@ class NotificationService {
   // ── Permissions ──────────────────────────────────────────────────────────
 
   Future<bool> requestPermission() async {
-    final android = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
       final granted = await android.requestNotificationsPermission();
       return granted ?? false;
     }
-    final ios = _plugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
     if (ios != null) {
       final granted = await ios.requestPermissions(
         alert: true,
@@ -134,7 +129,8 @@ class NotificationService {
 
       currentMinute += intervalMinutes;
     }
-    debugPrint('[Notifications] scheduled water reminders every $intervalMinutes min');
+    debugPrint(
+        '[Notifications] scheduled water reminders every $intervalMinutes min');
   }
 
   Future<void> cancelWaterReminders() async {
