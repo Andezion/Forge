@@ -15,11 +15,15 @@ class AboutMeScreen extends StatefulWidget {
 
 class _AboutMeScreenState extends State<AboutMeScreen> {
   final _focusController = TextEditingController();
+  final _injuryController = TextEditingController();
   final _ageController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   final _yearsTrainingController = TextEditingController();
+
   final List<String> _focusList = [];
+  final List<String> _injuryList = [];
+
   static const List<String> _suggestedFocus = [
     'legs',
     'upper body',
@@ -31,9 +35,26 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     'arms',
     'cardio',
   ];
+
+  static const List<String> _suggestedInjuries = [
+    'knee',
+    'lower back',
+    'shoulder',
+    'wrist',
+    'elbow',
+    'ankle',
+    'hip',
+    'neck',
+    'hamstring',
+    'groin',
+  ];
+
   final Map<TrainingGoal, bool> _selectedGoals = {};
   ExperienceLevel? _experience;
   TrainingIntensity? _intensity;
+  Gender? _gender;
+  int _trainingDaysPerWeek = 3;
+  SessionDuration? _sessionDuration;
 
   @override
   void initState() {
@@ -54,7 +75,18 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             orElse: () => TrainingIntensity.moderate)
         : TrainingIntensity.moderate;
     _focusList.addAll(profile.trainingFocus);
-    _focusController.text = profile.trainingFocus.join(', ');
+    _injuryList.addAll(profile.injuries);
+
+    _gender = profile.gender != null
+        ? Gender.values.firstWhere((e) => e.name == profile.gender,
+            orElse: () => Gender.other)
+        : null;
+    _trainingDaysPerWeek = profile.trainingDaysPerWeek ?? 3;
+    _sessionDuration = profile.sessionDuration != null
+        ? SessionDuration.values.firstWhere(
+            (e) => e.name == profile.sessionDuration,
+            orElse: () => SessionDuration.sixtyMin)
+        : SessionDuration.sixtyMin;
 
     if (profile.age != null) {
       _ageController.text = profile.age.toString();
@@ -73,6 +105,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   @override
   void dispose() {
     _focusController.dispose();
+    _injuryController.dispose();
     _ageController.dispose();
     _heightController.dispose();
     _weightController.dispose();
@@ -95,6 +128,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Basic Information ──────────────────────────────────────
             _buildSectionCard(
               title: 'Basic Information',
               icon: Icons.person,
@@ -123,27 +157,23 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                       const TextInputType.numberWithOptions(decimal: true),
                   suffixText: 'kg',
                 ),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  controller: _yearsTrainingController,
-                  label: 'Training Experience',
-                  hint: 'e.g. 2.5',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  suffixText: 'years',
-                ),
+                const SizedBox(height: 16),
+                Text('Gender', style: AppTextStyles.body1),
+                const SizedBox(height: 8),
+                _buildGenderSelector(),
               ],
             ),
             const SizedBox(height: 16),
+
+            // ── Training Goals ─────────────────────────────────────────
             _buildSectionCard(
               title: 'Training Goals',
               icon: Icons.flag,
               children: [
                 Text(
                   'What are you trying to achieve?',
-                  style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -152,10 +182,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   children: TrainingGoal.values.map((g) {
                     final selected = _selectedGoals[g] ?? false;
                     return FilterChip(
-                      label: Text(g.name.replaceAll('_', ' ')),
+                      label: Text(_goalLabel(g)),
                       selected: selected,
-                      onSelected: (v) => setState(() => _selectedGoals[g] = v),
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      onSelected: (v) =>
+                          setState(() => _selectedGoals[g] = v),
+                      selectedColor:
+                          AppColors.primary.withValues(alpha: 0.2),
                       checkmarkColor: AppColors.primary,
                     );
                   }).toList(),
@@ -163,6 +195,48 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
+
+            // ── Training Schedule ──────────────────────────────────────
+            _buildSectionCard(
+              title: 'Training Schedule',
+              icon: Icons.calendar_month,
+              children: [
+                Text('Training Experience', style: AppTextStyles.body1),
+                const SizedBox(height: 4),
+                _buildTextField(
+                  controller: _yearsTrainingController,
+                  label: '',
+                  hint: 'e.g. 2.5',
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  suffixText: 'years',
+                ),
+                const SizedBox(height: 16),
+                Text('Days per week you can train',
+                    style: AppTextStyles.body1),
+                const SizedBox(height: 4),
+                Text(
+                  'Used to determine how often workouts are recommended',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                _buildDaysPicker(),
+                const SizedBox(height: 16),
+                Text('Typical session duration', style: AppTextStyles.body1),
+                const SizedBox(height: 4),
+                Text(
+                  'Affects how many exercises are included per workout',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                _buildSessionDurationSelector(),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Training Preferences ───────────────────────────────────
             _buildSectionCard(
               title: 'Training Preferences',
               icon: Icons.fitness_center,
@@ -170,11 +244,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 Text('Experience Level', style: AppTextStyles.body1),
                 const SizedBox(height: 8),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: AppColors.textSecondary.withValues(alpha: 0.3)),
+                        color: AppColors.textSecondary
+                            .withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<ExperienceLevel>(
@@ -207,15 +282,16 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
               ],
             ),
             const SizedBox(height: 16),
+
+            // ── Training Focus ─────────────────────────────────────────
             _buildSectionCard(
               title: 'Training Focus',
               icon: Icons.track_changes,
               children: [
                 Text(
-                  'What muscle groups or areas do you want to focus on?',
-                  style: AppTextStyles.body2.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  'What muscle groups or areas do you want to prioritise?',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 if (_focusList.isNotEmpty)
@@ -232,59 +308,57 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                         .toList(),
                   ),
                 const SizedBox(height: 8),
-                Autocomplete<String>(
-                  optionsBuilder: (textEditingValue) {
-                    final input = textEditingValue.text.toLowerCase();
-                    if (input.isEmpty) return const Iterable<String>.empty();
-                    return _suggestedFocus.where((s) =>
-                        s.toLowerCase().contains(input) &&
-                        !_focusList.contains(s));
-                  },
-                  fieldViewBuilder:
-                      (context, controller, focusNode, onFieldSubmitted) {
-                    controller.text = _focusController.text;
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        hintText: 'e.g. legs, upper body, core',
-                        hintStyle: AppTextStyles.body2.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            final val = controller.text.trim();
-                            if (val.isNotEmpty && !_focusList.contains(val)) {
-                              setState(() {
-                                _focusList.add(val);
-                                controller.clear();
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      onSubmitted: (v) {
-                        final val = v.trim();
-                        if (val.isNotEmpty && !_focusList.contains(val)) {
-                          setState(() {
-                            _focusList.add(val);
-                            controller.clear();
-                          });
-                        }
-                      },
-                    );
-                  },
-                  onSelected: (selection) {
-                    if (!_focusList.contains(selection)) {
-                      setState(() => _focusList.add(selection));
-                    }
-                  },
+                _buildAutocompleteChipInput(
+                  controller: _focusController,
+                  suggestions: _suggestedFocus,
+                  currentList: _focusList,
+                  hint: 'e.g. legs, upper body, core',
+                  onAdd: (val) => setState(() => _focusList.add(val)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Injuries & Limitations ─────────────────────────────────
+            _buildSectionCard(
+              title: 'Injuries & Limitations',
+              icon: Icons.healing,
+              children: [
+                Text(
+                  'Any injuries or areas to avoid? Workouts will be scored away from these.',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                if (_injuryList.isNotEmpty)
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: _injuryList
+                        .map((f) => Chip(
+                              label: Text(f),
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.1),
+                              side: BorderSide(
+                                  color: Colors.red.withValues(alpha: 0.4)),
+                              onDeleted: () =>
+                                  setState(() => _injuryList.remove(f)),
+                              deleteIconColor: Colors.red,
+                            ))
+                        .toList(),
+                  ),
+                const SizedBox(height: 8),
+                _buildAutocompleteChipInput(
+                  controller: _injuryController,
+                  suggestions: _suggestedInjuries,
+                  currentList: _injuryList,
+                  hint: 'e.g. knee, lower back, shoulder',
+                  onAdd: (val) => setState(() => _injuryList.add(val)),
                 ),
               ],
             ),
             const SizedBox(height: 24),
+
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -307,6 +381,192 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // ── Builders ─────────────────────────────────────────────────────────────
+
+  Widget _buildGenderSelector() {
+    return Row(
+      children: Gender.values.map((g) {
+        final selected = _gender == g;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () => setState(() => _gender = g),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                    width: selected ? 1.5 : 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    _genderLabel(g),
+                    style: AppTextStyles.body2.copyWith(
+                      color: selected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: selected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDaysPicker() {
+    return Row(
+      children: List.generate(6, (i) {
+        final days = i + 2; // 2–7
+        final selected = _trainingDaysPerWeek == days;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () =>
+                  setState(() => _trainingDaysPerWeek = days),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                    width: selected ? 1.5 : 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    '$days',
+                    style: AppTextStyles.body1.copyWith(
+                      color: selected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: selected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildSessionDurationSelector() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: SessionDuration.values.map((d) {
+        final selected = _sessionDuration == d;
+        return GestureDetector(
+          onTap: () => setState(() => _sessionDuration = d),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              border: Border.all(
+                color: selected
+                    ? AppColors.primary
+                    : AppColors.textSecondary.withValues(alpha: 0.3),
+                width: selected ? 1.5 : 1.0,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              d.label,
+              style: AppTextStyles.body2.copyWith(
+                color: selected
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                fontWeight:
+                    selected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildAutocompleteChipInput({
+    required TextEditingController controller,
+    required List<String> suggestions,
+    required List<String> currentList,
+    required String hint,
+    required void Function(String) onAdd,
+  }) {
+    return Autocomplete<String>(
+      optionsBuilder: (textEditingValue) {
+        final input = textEditingValue.text.toLowerCase();
+        if (input.isEmpty) return const Iterable<String>.empty();
+        return suggestions.where((s) =>
+            s.toLowerCase().contains(input) && !currentList.contains(s));
+      },
+      fieldViewBuilder:
+          (context, fieldController, focusNode, onFieldSubmitted) {
+        return TextField(
+          controller: fieldController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: hint,
+            hintStyle: AppTextStyles.body2
+                .copyWith(color: AppColors.textSecondary),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                final val = fieldController.text.trim().toLowerCase();
+                if (val.isNotEmpty && !currentList.contains(val)) {
+                  onAdd(val);
+                  fieldController.clear();
+                }
+              },
+            ),
+          ),
+          onSubmitted: (v) {
+            final val = v.trim().toLowerCase();
+            if (val.isNotEmpty && !currentList.contains(val)) {
+              onAdd(val);
+              fieldController.clear();
+            }
+          },
+        );
+      },
+      onSelected: (selection) {
+        if (!currentList.contains(selection)) {
+          onAdd(selection);
+        }
+      },
     );
   }
 
@@ -356,17 +616,18 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.body1),
-        const SizedBox(height: 4),
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppTextStyles.body1),
+          const SizedBox(height: 4),
+        ],
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: hint,
-            hintStyle: AppTextStyles.body2.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            hintStyle: AppTextStyles.body2
+                .copyWith(color: AppColors.textSecondary),
             suffixText: suffixText,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -376,6 +637,34 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         ),
       ],
     );
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  String _genderLabel(Gender g) {
+    switch (g) {
+      case Gender.male:
+        return 'Male';
+      case Gender.female:
+        return 'Female';
+      case Gender.other:
+        return 'Other';
+    }
+  }
+
+  String _goalLabel(TrainingGoal g) {
+    switch (g) {
+      case TrainingGoal.strength:
+        return 'Strength';
+      case TrainingGoal.hypertrophy:
+        return 'Hypertrophy';
+      case TrainingGoal.endurance:
+        return 'Endurance';
+      case TrainingGoal.fatLoss:
+        return 'Fat Loss';
+      case TrainingGoal.generalFitness:
+        return 'General Fitness';
+    }
   }
 
   String _getIntensityDescription(TrainingIntensity intensity) {
@@ -388,6 +677,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
         return 'Challenging workouts, push limits';
     }
   }
+
+  // ── Save ──────────────────────────────────────────────────────────────────
 
   void _save() async {
     final profile = Provider.of<ProfileService>(context, listen: false);
@@ -407,6 +698,10 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     await profile.setExperienceLevel(_experience?.name);
     await profile.setTrainingFocus(_focusList);
     await profile.setPreferredIntensity(_intensity?.name);
+    await profile.setGender(_gender?.name);
+    await profile.setTrainingDaysPerWeek(_trainingDaysPerWeek);
+    await profile.setSessionDuration(_sessionDuration?.name);
+    await profile.setInjuries(_injuryList);
 
     final age = int.tryParse(_ageController.text.trim());
     await profile.setAge(age);
@@ -417,7 +712,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     final weight = double.tryParse(_weightController.text.trim());
     await profile.setWeightKg(weight);
 
-    final yearsTraining = double.tryParse(_yearsTrainingController.text.trim());
+    final yearsTraining =
+        double.tryParse(_yearsTrainingController.text.trim());
     await profile.setYearsTraining(yearsTraining);
 
     if (mounted) {
