@@ -128,6 +128,23 @@ class SettingsService extends ChangeNotifier {
     _settings = _settings.copyWith(isProfilePublic: isPublic);
     notifyListeners();
     await _save();
+    await _updateProfilePublicInFirebase(isPublic);
+  }
+
+  Future<void> _updateProfilePublicInFirebase(bool isPublic) async {
+    try {
+      final fb_auth.FirebaseAuth auth = fb_auth.FirebaseAuth.instance;
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final userId = auth.currentUser?.uid;
+      if (userId != null) {
+        await db.collection('user_stats').doc(userId).update({
+          'isProfilePublic': isPublic,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      debugPrint('Error updating profile public in Firebase: $e');
+    }
   }
 
   Future<void> setShowWorkoutHistory(bool show) async {
