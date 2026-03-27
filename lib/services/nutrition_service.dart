@@ -11,7 +11,11 @@ class NutritionService extends ChangeNotifier {
   static const _keyProfile = 'nutrition_profile';
 
   final _algorithm = NutritionAlgorithmService();
-  final _groq = GroqService();
+  GroqService _groq = GroqService();
+
+  void updateApiKey(String? key) {
+    _groq = GroqService(apiKey: key);
+  }
 
   NutritionProfile _profile = const NutritionProfile();
   bool _isCalculating = false;
