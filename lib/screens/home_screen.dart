@@ -270,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.play_arrow),
+                          const Icon(Icons.play_arrow, color: Colors.white),
                           const SizedBox(width: 8),
                           Text(
                             AppStrings.startWorkout,
