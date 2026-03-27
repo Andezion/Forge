@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import '../models/friend.dart';
+import '../models/user_stats.dart';
 
 class FriendsService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -317,6 +318,18 @@ class FriendsService extends ChangeNotifier {
       debugPrint('Error canceling request: $e');
       return 'Failed to cancel request. Please try again.';
     }
+  }
+
+  Future<UserStats?> fetchFriendProfile(String userId) async {
+    try {
+      final doc = await _db.collection('user_stats').doc(userId).get();
+      if (doc.exists) {
+        return UserStats.fromJson(doc.data()!);
+      }
+    } catch (e) {
+      debugPrint('Error fetching friend profile: $e');
+    }
+    return null;
   }
 
   Future<List<Friend>> searchUsers(String query) async {
