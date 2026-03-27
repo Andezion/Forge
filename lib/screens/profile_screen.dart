@@ -22,6 +22,7 @@ import 'personal_records_screen.dart';
 import 'achievements_screen.dart';
 import 'settings_screen.dart';
 import 'nutrition_screen.dart';
+import 'ai_config_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -270,6 +271,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const NutritionScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'AI Config',
+                      Icons.smart_toy,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AiConfigScreen(),
                           ),
                         );
                       },
