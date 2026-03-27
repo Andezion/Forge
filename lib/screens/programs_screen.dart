@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import '../services/data_manager.dart';
 import '../services/groq_service.dart';
+import '../services/settings_service.dart';
 import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/ai_suggested_workout.dart';
@@ -18,7 +19,6 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class _ProgramsScreenState extends State<ProgramsScreen> {
-  final GroqService _groqService = GroqService();
   bool _isGenerating = false;
 
   Future<void> _generateAiProgram() async {
@@ -29,10 +29,12 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
     if (!mounted) return;
     final dataManager = Provider.of<DataManager>(context, listen: false);
+    final apiKey = Provider.of<SettingsService>(context, listen: false).groqApiKey;
+    final groqService = GroqService(apiKey: apiKey);
 
     setState(() => _isGenerating = true);
 
-    final suggestion = await _groqService.generateProgram(
+    final suggestion = await groqService.generateProgram(
       history: dataManager.workoutHistory,
       exercises: dataManager.exercises,
       direction: direction,
