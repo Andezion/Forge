@@ -62,8 +62,6 @@ class SettingsService extends ChangeNotifier {
               await _save();
             }
           }
-
-          // groqApiKey is stored in private_data collection, not here
         }
       }
     } catch (e) {
