@@ -87,6 +87,14 @@ Rules:
 }
 
 class GroqService {
+  final String? _apiKey;
+
+  GroqService({String? apiKey}) : _apiKey = apiKey;
+
+  String get _resolvedKey => _apiKey?.isNotEmpty == true
+      ? _apiKey!
+      : (dotenv.env['key'] ?? '');
+
   Future<AiSuggestedWorkout?> generateProgram({
     required List<WorkoutHistory> history,
     required List<Exercise> exercises,
@@ -99,7 +107,7 @@ class GroqService {
         Uri.parse(_groqApiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${dotenv.env['key'] ?? ''}',
+          'Authorization': 'Bearer $_resolvedKey',
         },
         body: jsonEncode({
           'model': _model,
@@ -245,7 +253,7 @@ Return ONLY a JSON object (no markdown, no extra text):
         Uri.parse(_groqApiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${dotenv.env['key'] ?? ''}',
+          'Authorization': 'Bearer $_resolvedKey',
         },
         body: jsonEncode({
           'model': _model,
@@ -336,7 +344,7 @@ Return ONLY a JSON object (no markdown, no extra text):
         Uri.parse(_groqApiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${dotenv.env['key'] ?? ''}',
+          'Authorization': 'Bearer $_resolvedKey',
         },
         body: jsonEncode({
           'model': _model,
