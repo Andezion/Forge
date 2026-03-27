@@ -7,6 +7,7 @@ import '../services/leaderboard_service.dart';
 import '../services/data_manager.dart';
 import '../models/user_stats.dart';
 import '../models/exercise.dart';
+import '../models/friend.dart';
 import 'user_profile_screen.dart';
 
 class CommunityLeaderboardScreen extends StatefulWidget {
@@ -416,8 +417,12 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => UserProfileScreen(
-                          userId: user.userId,
-                          userName: user.displayName,
+                          friend: Friend(
+                            userId: user.userId,
+                            name: user.displayName,
+                            email: '',
+                            friendsSince: DateTime.now(),
+                          ),
                         ),
                       ),
                     );
