@@ -59,6 +59,10 @@ void main() async {
 
   final nutritionService = NutritionService();
   await nutritionService.load();
+  nutritionService.updateApiKey(settingsService.groqApiKey);
+  settingsService.addListener(() {
+    nutritionService.updateApiKey(settingsService.groqApiKey);
+  });
 
   runApp(
     MultiProvider(
