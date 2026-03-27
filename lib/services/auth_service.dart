@@ -50,7 +50,7 @@ class AuthService extends ChangeNotifier {
           'id': _firebaseUser!.uid,
           'name': name,
           'nickname': name,
-          'email': email,
+          'email': email.trim().toLowerCase(),
           'height': 0.0,
           'weight': 0.0,
           'exerciseMaxes': [],
@@ -94,6 +94,24 @@ class AuthService extends ChangeNotifier {
         password: password,
       );
       _firebaseUser = cred.user;
+
+      if (_firebaseUser != null) {
+        final doc = await _db.collection('users').doc(_firebaseUser!.uid).get();
+        if (!doc.exists) {
+          await _db.collection('users').doc(_firebaseUser!.uid).set({
+            'id': _firebaseUser!.uid,
+            'name': _firebaseUser!.displayName ?? '',
+            'nickname': _firebaseUser!.displayName ?? '',
+            'email': email.trim().toLowerCase(),
+            'height': 0.0,
+            'weight': 0.0,
+            'exerciseMaxes': [],
+            'overallRating': 0.0,
+            'createdAt': DateTime.now().toIso8601String(),
+            'lastWorkoutDate': null,
+          });
+        }
+      }
 
       if (remember) {
         final prefs = await SharedPreferences.getInstance();
