@@ -41,6 +41,7 @@ class SettingsService extends ChangeNotifier {
     _groqApiKey = prefs.getString(_groqApiKeyPref);
 
     await _loadNicknameFromFirebase();
+    await _loadGroqApiKeyFromFirebase();
   }
 
   Future<void> _loadNicknameFromFirebase() async {
@@ -62,17 +63,33 @@ class SettingsService extends ChangeNotifier {
             }
           }
 
-          final firebaseGroqKey = data?['groqApiKey'] as String?;
-          if (firebaseGroqKey != null && firebaseGroqKey.isNotEmpty) {
-            _groqApiKey = firebaseGroqKey;
+          // groqApiKey is stored in private_data collection, not here
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading nickname from Firebase: $e');
+    }
+  }
+
+  Future<void> _loadGroqApiKeyFromFirebase() async {
+    try {
+      final fb_auth.FirebaseAuth auth = fb_auth.FirebaseAuth.instance;
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final userId = auth.currentUser?.uid;
+      if (userId != null) {
+        final doc = await db.collection('private_data').doc(userId).get();
+        if (doc.exists) {
+          final key = doc.data()?['groqApiKey'] as String?;
+          if (key != null && key.isNotEmpty) {
+            _groqApiKey = key;
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setString(_groqApiKeyPref, firebaseGroqKey);
+            await prefs.setString(_groqApiKeyPref, key);
             notifyListeners();
           }
         }
       }
     } catch (e) {
-      debugPrint('Error loading nickname from Firebase: $e');
+      debugPrint('Error loading groqApiKey from Firebase: $e');
     }
   }
 
@@ -92,10 +109,10 @@ class SettingsService extends ChangeNotifier {
       final FirebaseFirestore db = FirebaseFirestore.instance;
       final userId = auth.currentUser?.uid;
       if (userId != null) {
-        await db.collection('users').doc(userId).update({
+        await db.collection('private_data').doc(userId).set({
           'groqApiKey': _groqApiKey ?? '',
           'updatedAt': FieldValue.serverTimestamp(),
-        });
+        }, SetOptions(merge: true));
       }
     } catch (e) {
       debugPrint('Error saving groqApiKey to Firebase: $e');
