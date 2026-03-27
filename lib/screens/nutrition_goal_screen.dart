@@ -105,21 +105,24 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _selected != null ? _confirm : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: appColor.color,
-                    foregroundColor: AppColors.textOnPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _selected != null ? _confirm : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: appColor.color,
+                      foregroundColor: AppColors.textOnPrimary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: Text('Confirm Goal', style: AppTextStyles.button),
                   ),
-                  child: Text('Confirm Goal', style: AppTextStyles.button),
                 ),
               ),
             ),
