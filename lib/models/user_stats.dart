@@ -7,6 +7,7 @@ class UserStats {
   final DateTime lastWorkoutDate;
   final Map<String, double> exerciseRecords;
   final bool isProfileHidden;
+  final bool isProfilePublic;
   final DateTime updatedAt;
   final double weeklyProgressPercentage;
 
@@ -19,6 +20,7 @@ class UserStats {
     required this.lastWorkoutDate,
     required this.exerciseRecords,
     this.isProfileHidden = false,
+    this.isProfilePublic = true,
     required this.updatedAt,
     this.weeklyProgressPercentage = 0.0,
   });
@@ -33,6 +35,7 @@ class UserStats {
       'lastWorkoutDate': lastWorkoutDate.toIso8601String(),
       'exerciseRecords': exerciseRecords,
       'isProfileHidden': isProfileHidden,
+      'isProfilePublic': isProfilePublic,
       'updatedAt': updatedAt.toIso8601String(),
       'weeklyProgressPercentage': weeklyProgressPercentage,
     };
@@ -52,6 +55,7 @@ class UserStats {
         ),
       ),
       isProfileHidden: json['isProfileHidden'] as bool? ?? false,
+      isProfilePublic: json['isProfilePublic'] as bool? ?? true,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       weeklyProgressPercentage:
           (json['weeklyProgressPercentage'] as num?)?.toDouble() ?? 0.0,
@@ -67,6 +71,7 @@ class UserStats {
     DateTime? lastWorkoutDate,
     Map<String, double>? exerciseRecords,
     bool? isProfileHidden,
+    bool? isProfilePublic,
     DateTime? updatedAt,
     double? weeklyProgressPercentage,
   }) {
@@ -79,6 +84,7 @@ class UserStats {
       lastWorkoutDate: lastWorkoutDate ?? this.lastWorkoutDate,
       exerciseRecords: exerciseRecords ?? this.exerciseRecords,
       isProfileHidden: isProfileHidden ?? this.isProfileHidden,
+      isProfilePublic: isProfilePublic ?? this.isProfilePublic,
       updatedAt: updatedAt ?? this.updatedAt,
       weeklyProgressPercentage:
           weeklyProgressPercentage ?? this.weeklyProgressPercentage,
