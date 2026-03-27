@@ -126,7 +126,9 @@ class _NutritionScreenState extends State<NutritionScreen>
               ],
             ),
           ),
-          body: nutrition.isCalculating
+          body: SafeArea(
+            top: false,
+            child: nutrition.isCalculating
               ? const Center(child: CircularProgressIndicator())
               : TabBarView(
                   controller: _tabs,
@@ -159,6 +161,7 @@ class _NutritionScreenState extends State<NutritionScreen>
                     ),
                   ],
                 ),
+          ),
         );
       },
     );
