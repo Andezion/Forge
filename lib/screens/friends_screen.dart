@@ -7,6 +7,7 @@ import '../services/friends_service.dart';
 import '../models/friend.dart';
 import 'community_leaderboard_screen.dart';
 import 'challenges_screen.dart';
+import 'user_profile_screen.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -337,7 +338,12 @@ class _FriendsScreenState extends State<FriendsScreen>
           ],
         ),
         onTap: () {
-          // TODO: Navigate to friend profile
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfileScreen(friend: friend),
+            ),
+          );
         },
       ),
     );
