@@ -78,7 +78,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         '[WORKSHOP_SCREEN] Returned from edit with: ${result != null ? result.name : 'null'}');
     if (result != null) {
       setState(() {
-        debugPrint('[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}');
+        debugPrint(
+            '[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}');
         _dataManager.updateWorkout(index, result);
         debugPrint('[WORKSHOP_SCREEN] Workouts after update: '
             '${_dataManager.workouts.map((w) => w.name).toList()}');
@@ -125,7 +126,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       context,
       listen: false,
     );
-    final adjustedWorkout = await recommendationService.getAdjustedWorkout(workout);
+    final adjustedWorkout =
+        await recommendationService.getAdjustedWorkout(workout);
 
     if (!mounted) return;
     final result = await Navigator.of(context).push(
@@ -271,15 +273,15 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   Color _getIntensityColor(int level) {
     switch (level) {
       case 1:
-        return const Color(0xFF4CAF50); // green
+        return const Color(0xFF4CAF50);
       case 2:
-        return const Color(0xFFFFEB3B); // yellow
+        return const Color(0xFFFFEB3B);
       case 3:
-        return const Color(0xFFFF9800); // orange
+        return const Color(0xFFFF9800);
       case 4:
-        return const Color(0xFFF44336); // red
+        return const Color(0xFFF44336);
       case 5:
-        return const Color(0xFF212121); // near-black
+        return const Color(0xFF212121);
       default:
         return Colors.grey;
     }
@@ -342,17 +344,21 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   const SizedBox(width: 6),
                   Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: List.generate(5, (i) => Container(
-                      width: 18,
-                      height: 9,
-                      margin: const EdgeInsets.only(right: 2),
-                      decoration: BoxDecoration(
-                        color: i < level
-                            ? color
-                            : Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    )),
+                    children: List.generate(
+                        5,
+                        (i) => Container(
+                              width: 18,
+                              height: 9,
+                              margin: const EdgeInsets.only(right: 2),
+                              decoration: BoxDecoration(
+                                color: i < level
+                                    ? color
+                                    : Theme.of(context)
+                                        .dividerColor
+                                        .withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            )),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -419,8 +425,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           AppLocalizations.of(context)!
                               .exercisesCount(workout.exercises.length),
                           style: AppTextStyles.caption.copyWith(
-                            color:
-                                Theme.of(context).textTheme.bodySmall?.color,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
                       ],
@@ -451,8 +456,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           ],
                         ),
                         onTap: () {
-                          Future.delayed(
-                              Duration.zero,
+                          Future.delayed(Duration.zero,
                               () => _navigateToEditWorkout(workout, index));
                         },
                       ),
@@ -463,8 +467,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                                 size: 20, color: AppColors.error),
                             const SizedBox(width: 8),
                             Text(AppStrings.delete,
-                                style:
-                                    const TextStyle(color: AppColors.error)),
+                                style: const TextStyle(color: AppColors.error)),
                           ],
                         ),
                         onTap: () {
