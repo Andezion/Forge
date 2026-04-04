@@ -559,13 +559,14 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   Widget _buildCreateChallengeSheet(List<Friend> friends) {
     final templates = ChallengeTemplate.getTemplates();
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
