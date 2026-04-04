@@ -292,7 +292,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
         child: Text(
-          'Нет данных о мышцах',
+          'No muscle data available',
           style: AppTextStyles.caption.copyWith(
             color: Theme.of(context).textTheme.bodySmall?.color,
           ),
@@ -317,7 +317,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Нагрузка на мышцы',
+            'Muscle Load',
             style: AppTextStyles.caption.copyWith(
               fontWeight: FontWeight.w600,
               color: Theme.of(context).textTheme.bodySmall?.color,
@@ -362,7 +362,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '${stats.setsCount} подх.',
+                    '${stats.setsCount} sets',
                     style: AppTextStyles.caption.copyWith(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
