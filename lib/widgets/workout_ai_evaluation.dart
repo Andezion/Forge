@@ -44,7 +44,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
       );
     }
 
-    // --- calculate muscle load data ---
     final muscleLoad = <MuscleGroup, double>{};
     final muscleSets = <MuscleGroup, int>{};
     int totalSets = 0;
@@ -62,10 +61,8 @@ class WorkoutAiEvaluation extends StatelessWidget {
     final groupCount = muscleLoad.length;
     final exerciseCount = exercises.length;
 
-    // --- scoring (0–10) ---
     double score = 0;
 
-    // 1. Exercise count (0–3)
     if (exerciseCount >= 3 && exerciseCount <= 7) {
       score += 3;
     } else if (exerciseCount == 2 || exerciseCount == 8) {
@@ -74,7 +71,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
       score += 1;
     }
 
-    // 2. Total sets (0–3)
     if (totalSets >= 9 && totalSets <= 25) {
       score += 3;
     } else if (totalSets >= 6 && totalSets <= 30) {
@@ -83,17 +79,15 @@ class WorkoutAiEvaluation extends StatelessWidget {
       score += 1;
     }
 
-    // 3. Muscle variety (0–2)
     if (groupCount >= 4) {
       score += 2;
     } else if (groupCount >= 2) {
       score += 1;
     }
 
-    // 4. Balance: dominant group share (0–2)
     if (totalLoad > 0) {
-      final maxLoad = muscleLoad.values
-          .fold(0.0, (prev, v) => v > prev ? v : prev);
+      final maxLoad =
+          muscleLoad.values.fold(0.0, (prev, v) => v > prev ? v : prev);
       final dominance = maxLoad / totalLoad;
       if (dominance <= 0.40) {
         score += 2;
@@ -102,7 +96,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
       }
     }
 
-    // --- recovery ---
     int recoveryDays;
     if (totalLoad < 10) {
       recoveryDays = 1;
@@ -112,7 +105,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
       recoveryDays = 3;
     }
 
-    // --- grade & messages ---
     String grade;
     Color gradeColor;
     Color gradeBgColor;
@@ -122,8 +114,8 @@ class WorkoutAiEvaluation extends StatelessWidget {
     // identify dominant group name for messages
     String? topGroup;
     if (muscleLoad.isNotEmpty) {
-      final top = muscleLoad.entries
-          .reduce((a, b) => a.value > b.value ? a : b);
+      final top =
+          muscleLoad.entries.reduce((a, b) => a.value > b.value ? a : b);
       topGroup = MuscleGroupUtils.getLabel(top.key);
     }
 
