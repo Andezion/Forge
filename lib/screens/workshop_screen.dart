@@ -4,11 +4,25 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
+import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
 import '../services/workout_recommendation_service.dart';
+import '../utils/muscle_group_utils.dart';
 import 'create_workout_screen.dart';
 import 'workout_execution_screen.dart';
+
+class _MuscleStats {
+  final int exerciseCount;
+  final int setsCount;
+  final double loadScore;
+
+  const _MuscleStats({
+    required this.exerciseCount,
+    required this.setsCount,
+    required this.loadScore,
+  });
+}
 
 class WorkshopScreen extends StatefulWidget {
   const WorkshopScreen({super.key});
@@ -19,6 +33,7 @@ class WorkshopScreen extends StatefulWidget {
 
 class _WorkshopScreenState extends State<WorkshopScreen> {
   final _dataManager = DataManager();
+  final _expandedWorkouts = <String>{};
 
   void _navigateToCreateWorkout() async {
     debugPrint('[WORKSHOP_SCREEN] Navigating to CreateWorkoutScreen...');
@@ -230,84 +245,256 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     );
   }
 
+  Map<MuscleGroup, _MuscleStats> _calculateMuscleData(Workout workout) {
+    final result = <MuscleGroup, _MuscleStats>{};
+    for (final we in workout.exercises) {
+      for (final tag in we.exercise.muscleGroups) {
+        final existing = result[tag.group];
+        result[tag.group] = _MuscleStats(
+          exerciseCount: (existing?.exerciseCount ?? 0) + 1,
+          setsCount: (existing?.setsCount ?? 0) + we.sets,
+          loadScore: (existing?.loadScore ?? 0.0) + tag.score * we.sets,
+        );
+      }
+    }
+    return result;
+  }
+
+  int _getIntensityLevel(double score) {
+    if (score <= 3) return 1;
+    if (score <= 8) return 2;
+    if (score <= 15) return 3;
+    if (score <= 24) return 4;
+    return 5;
+  }
+
+  Color _getIntensityColor(int level) {
+    switch (level) {
+      case 1:
+        return const Color(0xFF4CAF50); // green
+      case 2:
+        return const Color(0xFFFFEB3B); // yellow
+      case 3:
+        return const Color(0xFFFF9800); // orange
+      case 4:
+        return const Color(0xFFF44336); // red
+      case 5:
+        return const Color(0xFF212121); // near-black
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildMusclePanel(Map<MuscleGroup, _MuscleStats> muscleData) {
+    if (muscleData.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        child: Text(
+          'Нет данных о мышцах',
+          style: AppTextStyles.caption.copyWith(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+        ),
+      );
+    }
+
+    final sorted = muscleData.entries.toList()
+      ..sort((a, b) => b.value.loadScore.compareTo(a.value.loadScore));
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 1,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Нагрузка на мышцы',
+            style: AppTextStyles.caption.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).textTheme.bodySmall?.color,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...sorted.map((entry) {
+            final stats = entry.value;
+            final level = _getIntensityLevel(stats.loadScore);
+            final color = _getIntensityColor(level);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 88,
+                    child: Text(
+                      MuscleGroupUtils.getLabel(entry.key),
+                      style: AppTextStyles.caption,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(5, (i) => Container(
+                      width: 18,
+                      height: 9,
+                      margin: const EdgeInsets.only(right: 2),
+                      decoration: BoxDecoration(
+                        color: i < level
+                            ? color
+                            : Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    )),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${stats.setsCount} подх.',
+                    style: AppTextStyles.caption.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
   Widget _buildWorkoutCard(Workout workout, int index) {
+    final isExpanded = _expandedWorkouts.contains(workout.id);
+    final muscleData = _calculateMuscleData(workout);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => setState(() {
+              if (isExpanded) {
+                _expandedWorkouts.remove(workout.id);
+              } else {
+                _expandedWorkouts.add(workout.id);
+              }
+            }),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.fitness_center,
+                        color: AppColors.primary, size: 28),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          workout.name,
+                          style: AppTextStyles.body1
+                              .copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!
+                              .exercisesCount(workout.exercises.length),
+                          style: AppTextStyles.caption.copyWith(
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton(
+                    icon: const Icon(Icons.more_vert),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.play_arrow, size: 20),
+                            const SizedBox(width: 8),
+                            Text(AppStrings.start),
+                          ],
+                        ),
+                        onTap: () {
+                          Future.delayed(
+                              Duration.zero, () => _startWorkout(workout));
+                        },
+                      ),
+                      PopupMenuItem(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit, size: 20),
+                            const SizedBox(width: 8),
+                            Text(AppStrings.edit),
+                          ],
+                        ),
+                        onTap: () {
+                          Future.delayed(
+                              Duration.zero,
+                              () => _navigateToEditWorkout(workout, index));
+                        },
+                      ),
+                      PopupMenuItem(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.delete,
+                                size: 20, color: AppColors.error),
+                            const SizedBox(width: 8),
+                            Text(AppStrings.delete,
+                                style:
+                                    const TextStyle(color: AppColors.error)),
+                          ],
+                        ),
+                        onTap: () {
+                          Future.delayed(
+                              Duration.zero, () => _deleteWorkout(index));
+                        },
+                      ),
+                    ],
+                  ),
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.expand_more,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Icon(Icons.fitness_center, color: AppColors.primary, size: 28),
-        ),
-        title: Text(
-          workout.name,
-          style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              AppLocalizations.of(context)!
-                  .exercisesCount(workout.exercises.length),
-              style: AppTextStyles.caption.copyWith(
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
-            ),
-          ],
-        ),
-        trailing: PopupMenuButton(
-          icon: const Icon(Icons.more_vert),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              child: Row(
-                children: [
-                  const Icon(Icons.play_arrow, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.start),
-                ],
-              ),
-              onTap: () {
-                Future.delayed(Duration.zero, () => _startWorkout(workout));
-              },
-            ),
-            PopupMenuItem(
-              child: Row(
-                children: [
-                  const Icon(Icons.edit, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.edit),
-                ],
-              ),
-              onTap: () {
-                Future.delayed(Duration.zero,
-                    () => _navigateToEditWorkout(workout, index));
-              },
-            ),
-            PopupMenuItem(
-              child: Row(
-                children: [
-                  const Icon(Icons.delete, size: 20, color: AppColors.error),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.delete,
-                      style: const TextStyle(color: AppColors.error)),
-                ],
-              ),
-              onTap: () {
-                Future.delayed(Duration.zero, () => _deleteWorkout(index));
-              },
-            ),
-          ],
-        ),
-        onTap: () => _startWorkout(workout),
+          AnimatedCrossFade(
+            firstChild: const SizedBox(width: double.infinity, height: 0),
+            secondChild: _buildMusclePanel(muscleData),
+            crossFadeState: isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 220),
+          ),
+        ],
       ),
     );
   }
