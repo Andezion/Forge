@@ -9,6 +9,7 @@ import '../models/workout.dart';
 import '../services/data_manager.dart';
 import '../services/workout_recommendation_service.dart';
 import '../utils/muscle_group_utils.dart';
+import '../widgets/workout_ai_evaluation.dart';
 import 'create_workout_screen.dart';
 import 'workout_execution_screen.dart';
 
@@ -491,7 +492,13 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           ),
           AnimatedCrossFade(
             firstChild: const SizedBox(width: double.infinity, height: 0),
-            secondChild: _buildMusclePanel(muscleData),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildMusclePanel(muscleData),
+                WorkoutAiEvaluation(workout: workout),
+              ],
+            ),
             crossFadeState: isExpanded
                 ? CrossFadeState.showSecond
                 : CrossFadeState.showFirst,
