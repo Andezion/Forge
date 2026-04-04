@@ -111,7 +111,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
     String summary;
     String detail;
 
-    // identify dominant group name for messages
     String? topGroup;
     if (muscleLoad.isNotEmpty) {
       final top =
@@ -192,7 +191,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Grade badge
           Container(
             width: 40,
             height: 40,
@@ -210,7 +208,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Text block
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,7 +251,6 @@ class WorkoutAiEvaluation extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Recovery badge
           if (result.recoveryDays > 0)
             Column(
               children: [
