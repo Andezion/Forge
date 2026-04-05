@@ -6,6 +6,7 @@ import '../services/data_manager.dart';
 import 'package:provider/provider.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
+import 'workout_execution_screen.dart';
 
 class FullCalendarScreen extends StatefulWidget {
   const FullCalendarScreen({super.key});
@@ -35,6 +36,15 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
         foregroundColor: AppColors.textOnPrimary,
         elevation: 0,
       ),
+      floatingActionButton: _selectedDay.isAfter(DateTime.now())
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _showAddWorkoutForDay,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+              icon: const Icon(Icons.add),
+              label: const Text('Log Workout'),
+            ),
       body: Column(
         children: [
           Container(
@@ -119,6 +129,79 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
         ],
       ),
     );
+  }
+
+  void _showAddWorkoutForDay() {
+    final dataManager = Provider.of<DataManager>(context, listen: false);
+    final workouts = dataManager.workouts;
+
+    if (workouts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No workouts available. Create one first.')),
+      );
+      return;
+    }
+
+    final dayLabel =
+        isSameDay(_selectedDay, DateTime.now()) ? 'today' : _formatDate(_selectedDay);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+            child: Text(
+              'Log workout for $dayLabel',
+              style: AppTextStyles.h4,
+            ),
+          ),
+          const Divider(),
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: workouts.length,
+              itemBuilder: (ctx, index) {
+                final workout = workouts[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                    child: Icon(Icons.fitness_center, color: AppColors.primary, size: 20),
+                  ),
+                  title: Text(workout.name, style: AppTextStyles.body1),
+                  subtitle: Text(
+                    '${workout.exercises.length} exercises',
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => WorkoutExecutionScreen(
+                          workout: workout,
+                          targetDate: _selectedDay,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
   }
 
   Widget _buildSelectedDayWorkouts() {
