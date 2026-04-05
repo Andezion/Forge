@@ -274,7 +274,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () =>
                         dataManager.rejectAiSuggestedWorkout(suggestion.id),
-                    icon: const Icon(Icons.close, size: 16),
+                    icon: const Icon(Icons.close, size: 16, color: Colors.red),
                     label: const Text('Decline'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
@@ -298,7 +298,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.check, size: 16),
+                    icon: const Icon(Icons.check, size: 16, color: Colors.white),
                     label: const Text('Approve'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color,
