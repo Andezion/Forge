@@ -668,6 +668,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: color,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
