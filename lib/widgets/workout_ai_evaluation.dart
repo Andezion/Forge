@@ -97,12 +97,20 @@ class WorkoutAiEvaluation extends StatelessWidget {
     }
 
     int recoveryDays;
-    if (totalLoad < 10) {
+    if (totalLoad < 30) {
       recoveryDays = 1;
-    } else if (totalLoad < 22) {
+    } else if (totalLoad < 60) {
       recoveryDays = 2;
-    } else {
+    } else if (totalLoad < 100) {
       recoveryDays = 3;
+    } else if (totalLoad < 150) {
+      recoveryDays = 4;
+    } else if (totalLoad < 210) {
+      recoveryDays = 5;
+    } else if (totalLoad < 280) {
+      recoveryDays = 6;
+    } else {
+      recoveryDays = 7;
     }
 
     String grade;
