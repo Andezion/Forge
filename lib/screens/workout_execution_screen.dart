@@ -16,10 +16,12 @@ import '../services/progression_service.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
   final Workout workout;
+  final DateTime? targetDate;
 
   const WorkoutExecutionScreen({
     super.key,
     required this.workout,
+    this.targetDate,
   });
 
   @override
@@ -497,9 +499,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       totalDurationSeconds: _totalDurationSeconds,
     );
 
+    final historyDate = widget.targetDate ?? DateTime.now();
     final history = WorkoutHistory(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      date: DateTime.now(),
+      date: historyDate,
       session: completedSession,
     );
     DataManager().addWorkoutHistory(history);
