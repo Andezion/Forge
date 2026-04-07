@@ -321,7 +321,6 @@ class ProgressionService {
           params: trainingParams,
           wellnessModifiers: wellnessModifiers,
         );
-        // Respect user-defined minimums even for new exercises.
         newReps = suggestedReps > we.targetReps ? suggestedReps : we.targetReps;
         newSets = suggestedSets > we.sets ? suggestedSets : we.sets;
         reason = 'New exercise - parameters tailored to your goals';
@@ -337,12 +336,11 @@ class ProgressionService {
         );
 
         if (needsDeload) {
-          // Weight, sets and reps are user-defined minimums — never go below them.
-          // During deload we keep exactly the programmed values (no increase either).
           newWeight = we.weight;
           newSets = we.sets;
           newReps = we.targetReps;
-          reason = 'Week deload - maintaining programmed parameters for recovery';
+          reason =
+              'Week deload - maintaining programmed parameters for recovery';
         } else if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
             final actualReps = metrics.avgRepsPerSet > 0
@@ -359,9 +357,9 @@ class ProgressionService {
             newSets = (we.sets + 1).clamp(1, 10);
             reason = 'Good progress - adding a set';
           } else if (c < 0.70 || wasHard) {
-            // Reps are a user-defined minimum — keep at programmed value.
             newReps = we.targetReps;
-            reason = 'Difficult performance - maintaining programmed repetitions';
+            reason =
+                'Difficult performance - maintaining programmed repetitions';
           } else {
             reason = 'Bodyweight exercise - maintaining level';
           }
@@ -402,14 +400,12 @@ class ProgressionService {
           if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
             baseSets += 1;
           }
-          // Sets are user-defined — never reduce below the programmed amount.
           newSets = (baseSets * wellnessModifiers.volumeMultiplier)
               .round()
               .clamp(we.sets, 10);
 
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
-            // Weight is a user-defined minimum — clamp back up if needed.
             if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
             reason = 'Insufficient recovery - weight adjusted';
           } else if (c >= 0.95 && !wasHard && metrics.performanceTrend >= 0) {
