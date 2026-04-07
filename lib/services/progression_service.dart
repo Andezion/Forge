@@ -313,14 +313,17 @@ class ProgressionService {
       String reason = 'No history — using current parameters';
 
       if (metrics.sessionsCount == 0) {
-        newReps = _goalService.calculateTargetReps(
+        final suggestedReps = _goalService.calculateTargetReps(
           params: trainingParams,
           wellnessModifiers: wellnessModifiers,
         );
-        newSets = _goalService.calculateTargetSets(
+        final suggestedSets = _goalService.calculateTargetSets(
           params: trainingParams,
           wellnessModifiers: wellnessModifiers,
         );
+        // Respect user-defined minimums even for new exercises.
+        newReps = suggestedReps > we.targetReps ? suggestedReps : we.targetReps;
+        newSets = suggestedSets > we.sets ? suggestedSets : we.sets;
         reason = 'New exercise - parameters tailored to your goals';
       } else {
         final c = metrics.completionRate;
@@ -334,14 +337,12 @@ class ProgressionService {
         );
 
         if (needsDeload) {
-          if (we.weight > 0) {
-            newWeight = we.weight * 0.70 * wellnessModifiers.weightMultiplier;
-          }
-          newSets = (we.sets * 0.75 * wellnessModifiers.volumeMultiplier)
-              .round()
-              .clamp(1, we.sets);
-          newReps = (we.targetReps * 0.9).round().clamp(1, we.targetReps);
-          reason = 'Week deload - reducing intensity for recovery';
+          // Weight, sets and reps are user-defined minimums — never go below them.
+          // During deload we keep exactly the programmed values (no increase either).
+          newWeight = we.weight;
+          newSets = we.sets;
+          newReps = we.targetReps;
+          reason = 'Week deload - maintaining programmed parameters for recovery';
         } else if (we.weight <= 0.0) {
           if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
             final actualReps = metrics.avgRepsPerSet > 0
@@ -358,8 +359,9 @@ class ProgressionService {
             newSets = (we.sets + 1).clamp(1, 10);
             reason = 'Good progress - adding a set';
           } else if (c < 0.70 || wasHard) {
-            newReps = (we.targetReps * 0.85).round().clamp(1, we.targetReps);
-            reason = 'Difficult performance - reducing repetitions';
+            // Reps are a user-defined minimum — keep at programmed value.
+            newReps = we.targetReps;
+            reason = 'Difficult performance - maintaining programmed repetitions';
           } else {
             reason = 'Bodyweight exercise - maintaining level';
           }
@@ -399,23 +401,24 @@ class ProgressionService {
           int baseSets = we.sets;
           if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
             baseSets += 1;
-          } else if (c < 0.70 || wasHard) {
-            baseSets = (baseSets - 1).clamp(1, baseSets);
           }
+          // Sets are user-defined — never reduce below the programmed amount.
           newSets = (baseSets * wellnessModifiers.volumeMultiplier)
               .round()
-              .clamp(1, 10);
+              .clamp(we.sets, 10);
 
           if (recoveryModifier < 0.95) {
             newWeight *= recoveryModifier;
-            reason = 'Insufficient recovery - weight adjusted down';
+            // Weight is a user-defined minimum — clamp back up if needed.
+            if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
+            reason = 'Insufficient recovery - weight adjusted';
           } else if (c >= 0.95 && !wasHard && metrics.performanceTrend >= 0) {
             reason =
                 'Excellent performance - weight progression by ${((newWeight - we.weight) / we.weight * 100).toStringAsFixed(1)}%';
           } else if (c >= 0.85) {
             reason = 'Stable progress - moderate load increase';
           } else if (c < 0.75 || wasHard) {
-            reason = 'Difficult workout - reducing intensity';
+            reason = 'Difficult workout - maintaining programmed weight';
           } else if (metrics.performanceTrend < -5.0) {
             reason = 'Negative trend - adjusting load for recovery';
           } else {
@@ -429,9 +432,10 @@ class ProgressionService {
       }
 
       newWeight = (newWeight * 2).round() / 2.0;
-
-      newReps = newReps.clamp(1, 50);
-      newSets = newSets.clamp(1, 10);
+      // Hard floors: user-specified values are absolute minimums.
+      if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
+      newReps = newReps.clamp(we.targetReps, 50);
+      newSets = newSets.clamp(we.sets, 10);
 
       adjustedExercises.add(
         we.copyWith(sets: newSets, targetReps: newReps, weight: newWeight),
