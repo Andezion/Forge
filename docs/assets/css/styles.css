@@ -1,7 +1,3 @@
-/* ============================================
-   FORGE — Frutiger Cybercore Design System
-   ============================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Exo+2:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -29,10 +25,8 @@
   --gradient-cyber: linear-gradient(135deg, var(--cyan) 0%, var(--aqua) 100%);
 }
 
-/* ── Reset ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ── Base ── */
 body {
   font-family: 'Inter', 'Exo 2', sans-serif;
   background: var(--bg-void);
@@ -42,7 +36,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Ambient background glow */
 body::before {
   content: '';
   position: fixed; inset: 0;
