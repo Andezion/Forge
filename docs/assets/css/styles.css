@@ -47,7 +47,6 @@ body::before {
   z-index: 0;
 }
 
-/* Subtle grid overlay */
 body::after {
   content: '';
   position: fixed; inset: 0;
@@ -59,7 +58,6 @@ body::after {
   z-index: 0;
 }
 
-/* ── Nav ── */
 nav {
   background: rgba(2, 9, 18, 0.88);
   padding: 1.1rem 2rem;
@@ -110,7 +108,6 @@ nav .container {
   border-color: var(--border-cyber);
 }
 
-/* ── Container ── */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -119,7 +116,6 @@ nav .container {
   z-index: 1;
 }
 
-/* ── Hero ── */
 .hero {
   text-align: center;
   padding: 8rem 2rem 6rem;
