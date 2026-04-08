@@ -498,7 +498,6 @@ pre, code {
 
 code { padding: .2rem .5rem; font-size: .88rem; }
 
-/* ── Formula blocks ── */
 .formula {
   background: rgba(8,20,40,.8);
   border-left: 3px solid var(--aqua);
@@ -529,7 +528,6 @@ code { padding: .2rem .5rem; font-size: .88rem; }
 
 .formula-explanation { color: var(--gray); font-size: .93rem; margin-top: .5rem; line-height: 1.65; }
 
-/* ── Lists (content) ── */
 ul:not(.nav-links):not(.program-list):not(.why-list),
 ol { margin-left: 1.5rem; margin-bottom: 1rem; }
 
@@ -539,7 +537,6 @@ ol li { margin: .5rem 0; color: var(--gray-light); }
 ul:not(.nav-links):not(.program-list):not(.why-list) li strong,
 ol li strong { color: var(--cyan); }
 
-/* ── Links ── */
 a:not(.cta-button):not(.logo):not(.nav-links a):not(.footer-links a) {
   color: var(--cyan);
   text-decoration: none;
@@ -550,7 +547,6 @@ a:not(.cta-button):not(.logo):not(.nav-links a):not(.footer-links a):hover {
   text-decoration: underline;
 }
 
-/* ── Table ── */
 table {
   width: 100%;
   border-collapse: collapse;
