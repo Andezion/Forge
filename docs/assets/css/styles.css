@@ -181,7 +181,6 @@ nav .container {
 
 .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
-/* ── Buttons ── */
 .cta-button {
   display: inline-block;
   padding: .85rem 2.2rem;
@@ -228,7 +227,6 @@ nav .container {
   color: var(--cyan);
 }
 
-/* ── Stats Bar ── */
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -266,7 +264,6 @@ nav .container {
   margin-top: .3rem;
 }
 
-/* ── Section ── */
 section {
   margin: 5rem 0;
   padding: 2rem 0;
@@ -323,7 +320,6 @@ section h4 {
   color: var(--aqua);
 }
 
-/* ── Cards ── */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
@@ -372,7 +368,6 @@ section h4 {
 
 .card p { color: var(--gray-light); line-height: 1.75; font-size: .93rem; }
 
-/* Feature tags */
 .feature-tag {
   display: inline-block;
   padding: .2rem .6rem;
@@ -387,7 +382,6 @@ section h4 {
 .tag-new    { background: rgba(0,212,255,.08); color: var(--cyan);       border: 1px solid rgba(0,212,255,.3); }
 .tag-social { background: rgba(79,168,255,.08); color: var(--blue-light); border: 1px solid rgba(79,168,255,.3); }
 
-/* ── Highlight section ── */
 .highlight-section {
   background: var(--bg-card);
   border: 1px solid var(--border-cyber);
@@ -417,7 +411,6 @@ section h4 {
 
 .highlight-section p { color: var(--gray-light); line-height: 1.85; max-width: 720px; }
 
-/* ── Programs grid ── */
 .programs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -461,7 +454,6 @@ section h4 {
 .program-list li:last-child { border-bottom: none; }
 .program-list li::before { content: '▹'; color: var(--aqua); flex-shrink: 0; }
 
-/* ── Why choose list ── */
 .why-list {
   list-style: none;
   margin: 0; padding: 0;
@@ -494,7 +486,6 @@ section h4 {
 
 .why-icon { font-size: 1.5rem; flex-shrink: 0; }
 
-/* ── Code / Pre ── */
 pre, code {
   background: rgba(2,9,18,.9);
   border: 1px solid var(--border-cyber);
