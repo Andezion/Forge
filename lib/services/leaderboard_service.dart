@@ -223,7 +223,6 @@ class LeaderboardService extends ChangeNotifier {
   }) {
     return _db
         .collection('user_stats')
-        .where('isProfileHidden', isEqualTo: false)
         .where('exerciseRecords.$exerciseId', isGreaterThan: 0)
         .limit(limit * 2)
         .snapshots()
@@ -238,6 +237,7 @@ class LeaderboardService extends ChangeNotifier {
             }
           })
           .whereType<UserStats>()
+          .where((u) => !u.isProfileHidden)
           .toList();
 
       users.sort((a, b) {
@@ -288,7 +288,6 @@ class LeaderboardService extends ChangeNotifier {
   }) {
     return _db
         .collection('user_stats')
-        .where('isProfileHidden', isEqualTo: false)
         .where('weeklyProgressPercentage', isGreaterThan: 0)
         .orderBy('weeklyProgressPercentage', descending: true)
         .limit(limit)
@@ -304,6 +303,7 @@ class LeaderboardService extends ChangeNotifier {
             }
           })
           .whereType<UserStats>()
+          .where((u) => !u.isProfileHidden)
           .toList();
     });
   }
