@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forge - Your Ultimate Workout Companion</title>
-    <meta name="description" content="Forge is a powerful workout tracking app designed for powerlifters, street lifters, and armwrestlers. Track your progress, analyze your strength, and forge your path to greatness.">
+    <title>FORGE — Advanced Strength Training System</title>
+    <meta name="description" content="FORGE is an AI-powered workout tracking app for powerlifters, street lifters, and armwrestlers. Advanced analytics, AI workout generation, social features, and nutrition planning.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+
     <nav>
         <div class="container">
             <a href="index.html" class="logo">FORGE</a>
@@ -21,146 +25,321 @@
     </nav>
 
     <div class="hero">
+        <div class="hero-glow"></div>
         <div class="container">
-            <h1>🔥 FORGE 🔥</h1>
-            <p>Your Ultimate Workout Companion for Strength Training</p>
-            <a href="#features" class="cta-button glow-effect">Discover More</a>
+            <div class="hero-badge">Flutter &middot; Firebase &middot; Groq AI &middot; Open Source</div>
+            <h1>FORGE</h1>
+            <div class="hero-subtitle">Advanced Strength Training System</div>
+            <p>An intelligent workout companion for powerlifters, street lifters, and armwrestlers. Track progress, analyze performance, and train smarter with AI-powered guidance.</p>
+            <div class="hero-actions">
+                <a href="#features" class="cta-button glow-effect">Explore Features</a>
+                <a href="https://github.com/Andezion/Forge" class="cta-button secondary">View on GitHub</a>
+            </div>
         </div>
     </div>
 
     <div class="container">
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number">30+</span>
+                <span class="stat-label">UI Screens</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">9</span>
+                <span class="stat-label">Training Programs</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">AI</span>
+                <span class="stat-label">LLaMA 3.3-70B</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">EN/RU</span>
+                <span class="stat-label">Languages</span>
+            </div>
+        </div>
+
+        <!-- FEATURES -->
         <section id="features">
-            <h2>Features</h2>
+            <div class="section-label">// core features</div>
+            <h2>What FORGE Offers</h2>
+            <div class="section-divider"></div>
             <div class="cards">
+
                 <div class="card">
+                    <span class="card-icon">📊</span>
                     <h3>Advanced Analytics</h3>
-                    <p>Track your progress with sophisticated analytics including strength coefficient, volume analysis, workout frequency, and consistency metrics. Visualize your gains with beautiful charts powered by proven formulas.</p>
+                    <p>Track progress with sophisticated metrics — strength coefficient, volume analysis, workout frequency, intensity, and consistency. Visualize your gains with interactive charts powered by proven formulas.</p>
                 </div>
+
                 <div class="card">
-                    <h3>Specialized Programs</h3>
-                    <p>Choose from pre-built training programs designed for <strong>Powerlifting</strong>, <strong>Street Lifting</strong>, and <strong>Armwrestling</strong>. Each program is crafted by experts to maximize your gains.</p>
+                    <span class="card-icon">🤖</span>
+                    <span class="feature-tag tag-ai">AI-Powered</span>
+                    <h3>AI Workout Generation</h3>
+                    <p>Generate personalized workouts using LLaMA 3.3-70B via Groq. The AI adapts to your training direction — powerlifting, street lifting, armwrestling, or full body — and fits your exercise library.</p>
                 </div>
+
                 <div class="card">
+                    <span class="card-icon">🍎</span>
+                    <span class="feature-tag tag-new">New</span>
+                    <h3>Nutrition Planning</h3>
+                    <p>AI-driven nutrition algorithms tailored to your goals. Get macronutrient breakdowns, calorie targets, and meal timing recommendations based on your training profile and body weight history.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">🏆</span>
+                    <span class="feature-tag tag-social">Social</span>
+                    <h3>Leaderboards &amp; Challenges</h3>
+                    <p>Compete with the global community through real-time leaderboards. Create and join challenges, track your rank, and push your limits against other serious athletes.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">🧠</span>
+                    <h3>Muscle Recovery Tracker</h3>
+                    <p>Know exactly which muscle groups are ready to train. The tracker analyzes your full workout history and muscle group assignments to show optimal recovery status and timing for every muscle.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">📅</span>
                     <h3>Smart Calendar</h3>
-                    <p>Never miss a workout with our intuitive calendar system. Track your workout history, see your streaks, and stay consistent with visual indicators for every training day.</p>
+                    <p>Visual workout history with streak tracking. Exercises with fewer reps than last time are highlighted in orange — spot regression instantly. Skipped exercises shown in red so nothing falls through the cracks.</p>
                 </div>
+
                 <div class="card">
-                    <h3>Body Weight Tracking</h3>
-                    <p>Monitor your body weight over time with precision. The app stores your complete weight history and integrates it into your progress analytics for comprehensive insights.</p>
-                </div>
-                <div class="card">
+                    <span class="card-icon">💪</span>
                     <h3>Personal Records</h3>
-                    <p>Track your one-rep max (1RM) for every exercise. Compare your lifts against world records and see how you stack up against the best in the world.</p>
+                    <p>Track your 1RM for every exercise and compare against world records. See exactly how your lifts stack up against the best in the world, updated from a curated world records database.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">🫀</span>
+                    <span class="feature-tag tag-new">New</span>
+                    <h3>Wellness Tracking</h3>
+                    <p>Log sleep quality, stress levels, and energy. Correlate wellness data with workout performance for a complete picture of your recovery and readiness to train.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">👥</span>
+                    <span class="feature-tag tag-social">Social</span>
+                    <h3>Friends &amp; Community</h3>
+                    <p>Add friends, view their training profiles and stats, and stay connected. The social layer keeps you accountable and motivated through community engagement and friendly competition.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">🎯</span>
+                    <h3>Progression Insights</h3>
+                    <p>Data-driven analysis of your long-term progression. Identify plateaus, detect imbalances, optimize training load, and get actionable insights based on your actual performance data.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">⚖️</span>
+                    <h3>Body Weight History</h3>
+                    <p>Complete weight tracking history integrated with analytics. Correlate body composition changes with strength progression to understand your body's response to training over time.</p>
+                </div>
+
+                <div class="card">
+                    <span class="card-icon">🎨</span>
+                    <h3>Full Customization</h3>
+                    <p>Personalize your profile with custom avatars, animated frames, and theme colors. Build your unique training identity. Achievements and badges unlock as you hit milestones.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- AI SECTION -->
+        <section id="ai-features">
+            <div class="section-label">// artificial intelligence</div>
+            <h2>AI Integration</h2>
+            <div class="section-divider"></div>
+
+            <div class="highlight-section">
+                <span class="section-icon">🤖</span>
+                <h3>Powered by LLaMA 3.3-70B via Groq</h3>
+                <p>FORGE integrates Groq's ultra-fast inference API to run Meta's LLaMA 3.3-70B model. The AI layer provides workout generation, quality evaluation, nutrition planning, and smart training recommendations — all personalized to your training direction, exercise library, and performance history. Configure your own Groq API key in the app settings.</p>
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <span class="card-icon">⚡</span>
+                    <h3>Instant Generation</h3>
+                    <p>Generate complete, structured workouts in seconds. The AI considers your training direction, available exercises, and fitness profile to create optimal session plans ready to execute.</p>
                 </div>
                 <div class="card">
-                    <h3>Customizable Experience</h3>
-                    <p>Personalize your profile with custom avatars, animated frames, and theme colors. Create your unique training identity with our extensive customization options.</p>
+                    <span class="card-icon">🔍</span>
+                    <h3>Workout Evaluation</h3>
+                    <p>Get AI-powered feedback on your completed workouts. Quality assessments, intensity analysis, and improvement suggestions based on your logged performance and training history.</p>
                 </div>
                 <div class="card">
-                    <h3>Muscle Recovery Tracking</h3>
-                    <p>See which muscle groups are ready to train based on real data. The app calculates days since each muscle group was last trained &mdash; using all historical workouts and current muscle group assignments &mdash; and shows recovery priorities with optimal timing.</p>
-                </div>
-                <div class="card">
-                    <h3>Exercise Completion Indicators</h3>
-                    <p>View your training programs with <strong style="color:#d32f2f;">red highlights</strong> on exercises you skipped last time, so you know exactly what to focus on. In the calendar view, exercises with <strong style="color:#e65100;">fewer reps than last time</strong> are highlighted in orange to spot regression instantly.</p>
-                </div>
-                <div class="card">
-                    <h3>Muscle Group Assignments</h3>
-                    <p>Every exercise is tagged with primary, secondary, and stabilizer muscle groups. This powers the recovery tracker, workout recommendations, and ensures accurate training volume distribution across your entire body.</p>
+                    <span class="card-icon">📈</span>
+                    <h3>Smart Recommendations</h3>
+                    <p>Recovery-aware workout suggestions that factor in muscle fatigue, wellness entries, and training history to recommend the most effective and appropriate next session.</p>
                 </div>
             </div>
         </section>
 
+        <!-- HOW IT WORKS -->
         <section id="how-it-works">
+            <div class="section-label">// getting started</div>
             <h2>How It Works</h2>
+            <div class="section-divider"></div>
             <div class="cards">
                 <div class="card">
-                    <h3>1️⃣ Create Your Profile</h3>
-                    <p>Sign up with Firebase authentication and set up your profile with your body weight, training goals, and experience level.</p>
+                    <span class="card-icon">👤</span>
+                    <h3>1. Create Profile</h3>
+                    <p>Sign up with Firebase authentication. Set your body weight, training direction, experience level, and connect your Groq API key to unlock AI features.</p>
                 </div>
                 <div class="card">
-                    <h3>2️⃣ Choose Your Program</h3>
-                    <p>Select from our curated workout programs or create your own custom routine with exercises from our extensive library.</p>
+                    <span class="card-icon">📋</span>
+                    <h3>2. Choose Program</h3>
+                    <p>Select from curated training programs, build a custom plan, or use AI generation to instantly create a personalized workout tailored to your goals.</p>
                 </div>
                 <div class="card">
-                    <h3>3️⃣ Track Your Workouts</h3>
-                    <p>Log every set, rep, and weight. The app automatically calculates your volume, intensity, and progress metrics in real-time.</p>
+                    <span class="card-icon">🏋️</span>
+                    <h3>3. Track Workouts</h3>
+                    <p>Log every set, rep, and weight in real-time during your session. Analytics, volume, and progress metrics are calculated automatically as you train.</p>
                 </div>
                 <div class="card">
-                    <h3>4️⃣ Analyze & Improve</h3>
-                    <p>Review your progress charts, identify trends, and optimize your training based on data-driven insights.</p>
+                    <span class="card-icon">🔬</span>
+                    <h3>4. Analyze &amp; Improve</h3>
+                    <p>Review progress charts, check AI insights, monitor muscle recovery, track wellness, and optimize your training based on comprehensive data-driven analysis.</p>
                 </div>
             </div>
         </section>
 
-        <section id="why-choose">
-            <h2>Why Choose Forge?</h2>
-            <ul>
-                <li><strong>Scientific Approach:</strong> All metrics are calculated using proven formulas and methodologies used by professional athletes.</li>
-                <li><strong>Comprehensive Tracking:</strong> Track not just weight and reps, but also volume, frequency, consistency, and overall strength development.</li>
-                <li><strong>Multi-Discipline Support:</strong> Whether you're a powerlifter, street lifter, or armwrestler, we have specialized programs for you.</li>
-                <li><strong>Privacy First:</strong> Your data is stored securely with Firebase and stays private. No selling of user data, ever.</li>
-                <li><strong>Cross-Platform:</strong> Built with Flutter, Forge works seamlessly on Android and iOS devices.</li>
-                <li><strong>Open Source:</strong> The project is open for contributions. Help us make it better for everyone!</li>
-            </ul>
-        </section>
-
+        <!-- PROGRAMS -->
         <section id="programs">
-            <h2>Training Programs</h2>
+            <div class="section-label">// training programs</div>
+            <h2>Specialized Programs</h2>
+            <div class="section-divider"></div>
+            <div class="programs-grid">
+                <div class="program-category">
+                    <span class="program-icon">🏋️</span>
+                    <h3>Powerlifting</h3>
+                    <p style="color: var(--gray); font-size: .88rem; margin-bottom: 1.2rem;">Focus on squat, bench press, and deadlift with structured periodization.</p>
+                    <ul class="program-list">
+                        <li>5x5 — Day A &amp; B</li>
+                        <li>Intermediate — 3 Day Split</li>
+                        <li>Competition Prep — Peaking Cycles</li>
+                    </ul>
+                </div>
+                <div class="program-category">
+                    <span class="program-icon">💪</span>
+                    <h3>Street Lifting</h3>
+                    <p style="color: var(--gray); font-size: .88rem; margin-bottom: 1.2rem;">Master calisthenics skills from pull-ups to muscle-ups, planches and levers.</p>
+                    <ul class="program-list">
+                        <li>Beginner — Foundation Building</li>
+                        <li>Advanced — Skill Development</li>
+                        <li>Exit — Maximum Strength</li>
+                    </ul>
+                </div>
+                <div class="program-category">
+                    <span class="program-icon">🤛</span>
+                    <h3>Armwrestling</h3>
+                    <p style="color: var(--gray); font-size: .88rem; margin-bottom: 1.2rem;">Targeted strength development for wrists, forearms, and grip.</p>
+                    <ul class="program-list">
+                        <li>Basic — Technical Foundation</li>
+                        <li>Grip Focus — Crushing Power</li>
+                        <li>Competition — Peak Performance</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-            <h3>Powerlifting Programs</h3>
-            <p>Focus on the big three: squat, bench press, and deadlift. Our programs range from beginner 5x5 routines to advanced competition preparation cycles.</p>
-            <ul>
-                <li>Powerlifting 5x5 - Day A & B</li>
-                <li>Powerlifting Intermediate - 3 Days</li>
-                <li>Powerlifting Competition Prep - Peaking Cycles</li>
-            </ul>
-
-            <h3>Street Lifting Programs</h3>
-            <p>Master bodyweight movements and calisthenics skills. Progress from basic pull-ups to advanced skills like muscle-ups, planches, and levers.</p>
-            <ul>
-                <li>Street Lifting Beginner - Foundation Building</li>
-                <li>Street Lifting Advanced - Skill Development</li>
-                <li>Street Lifting Exit - Maximum Strength</li>
-            </ul>
-
-            <h3>Armwrestling Programs</h3>
-            <p>Develop specialized strength for armwrestling with targeted exercises for wrists, forearms, and grip strength.</p>
-            <ul>
-                <li>Armwrestling Basic - Technical Foundation</li>
-                <li>Armwrestling Grip Focus - Crushing Power</li>
-                <li>Armwrestling Competition - Peak Performance</li>
+        <!-- WHY FORGE -->
+        <section id="why-choose">
+            <div class="section-label">// why forge</div>
+            <h2>Why Choose FORGE</h2>
+            <div class="section-divider"></div>
+            <ul class="why-list">
+                <li>
+                    <span class="why-icon">🔬</span>
+                    <div>
+                        <strong>Scientific Approach</strong>
+                        All metrics use proven formulas and methodologies trusted by professional athletes and strength coaches.
+                    </div>
+                </li>
+                <li>
+                    <span class="why-icon">📱</span>
+                    <div>
+                        <strong>Cross-Platform</strong>
+                        Built with Flutter — runs natively on Android and iOS from a single, high-quality codebase.
+                    </div>
+                </li>
+                <li>
+                    <span class="why-icon">🤖</span>
+                    <div>
+                        <strong>AI-Powered</strong>
+                        Groq's LLaMA 3.3-70B provides intelligent workout generation, evaluation, and nutrition guidance.
+                    </div>
+                </li>
+                <li>
+                    <span class="why-icon">🔒</span>
+                    <div>
+                        <strong>Privacy First</strong>
+                        Your data is stored securely with Firebase. No selling of user data, no ads, ever.
+                    </div>
+                </li>
+                <li>
+                    <span class="why-icon">🎯</span>
+                    <div>
+                        <strong>Multi-Discipline</strong>
+                        Specialized tools for powerlifting, street lifting, and armwrestling — not generic fitness fluff.
+                    </div>
+                </li>
+                <li>
+                    <span class="why-icon">🌐</span>
+                    <div>
+                        <strong>Open Source</strong>
+                        Community-driven development. Contribute, suggest features, and help shape the future of strength training software.
+                    </div>
+                </li>
             </ul>
         </section>
 
+        <!-- GET STARTED -->
         <section id="get-started">
-            <h2>Get Started</h2>
-            <p>Ready to forge your strength? Download Forge and start your journey today!</p>
+            <div class="section-label">// get started</div>
+            <h2>Ready to Train?</h2>
+            <div class="section-divider"></div>
             <div class="cards">
                 <div class="card">
-                    <h3>Download</h3>
-                    <p>Coming soon to Google Play Store and Apple App Store. Currently in development - follow our GitHub for updates!</p>
+                    <span class="card-icon">📲</span>
+                    <h3>Download App</h3>
+                    <p>Coming soon to Google Play Store and Apple App Store. Currently in active development — follow our GitHub for the latest updates and release builds.</p>
+                    <br>
                     <a href="https://github.com/Andezion/Forge" class="cta-button">View on GitHub</a>
                 </div>
                 <div class="card">
+                    <span class="card-icon">📖</span>
                     <h3>Documentation</h3>
-                    <p>Want to learn more about how Forge works? Check out our technical documentation and formula explanations.</p>
-                    <a href="technical.html" class="cta-button">Technical Docs</a>
+                    <p>Dive into the technical documentation, analytics formulas, and architecture overview to understand how FORGE works under the hood.</p>
+                    <br>
+                    <a href="technical.html" class="cta-button secondary">Technical Docs</a>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🤝</span>
+                    <h3>Contribute</h3>
+                    <p>FORGE is open source. Help improve the app, add features, fix bugs, or improve documentation. All contributions — big and small — are welcome.</p>
+                    <br>
+                    <a href="contributing.html" class="cta-button secondary">Contributing Guide</a>
                 </div>
             </div>
         </section>
+
     </div>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Forge. Built with 🔥 using Flutter & Firebase.</p>
-            <p>
-                <a href="https://github.com/Andezion/Forge">GitHub</a> |
-                <a href="formulas.html">Formulas</a> |
-                <a href="technical.html">Docs</a> |
-                <a href="contributing.html">Contribute</a> |
-            </p>
+            <a href="index.html" class="logo">FORGE</a>
+            <div class="footer-links">
+                <a href="https://github.com/Andezion/Forge">GitHub</a>
+                <a href="formulas.html">Formulas</a>
+                <a href="technical.html">Docs</a>
+                <a href="contributing.html">Contribute</a>
+            </div>
+            <p>&copy; 2025 FORGE &mdash; Built with Flutter &amp; Firebase. Powered by Groq AI.</p>
         </div>
     </footer>
+
 </body>
 </html>
