@@ -572,7 +572,6 @@ th {
 td { color: var(--gray-light); }
 tr:hover td { background: rgba(0,212,255,.025); }
 
-/* ── Footer ── */
 footer {
   background: rgba(2,9,18,.95);
   padding: 3rem 2rem;
@@ -609,13 +608,11 @@ footer p { color: var(--gray); font-size: .88rem; margin: .4rem 0; }
 }
 .footer-links a:hover { color: var(--cyan); }
 
-/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 7px; }
 ::-webkit-scrollbar-track { background: var(--bg-void); }
 ::-webkit-scrollbar-thumb { background: rgba(0,212,255,.25); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,.45); }
 
-/* ── Animations ── */
 @keyframes pulse-glow {
   0%, 100% { filter: drop-shadow(0 0 8px rgba(0,212,255,.4)); }
   50%       { filter: drop-shadow(0 0 20px rgba(0,212,255,.75)); }
@@ -623,7 +620,6 @@ footer p { color: var(--gray); font-size: .88rem; margin: .4rem 0; }
 
 .glow-effect { animation: pulse-glow 2.5s ease-in-out infinite; }
 
-/* ── Responsive ── */
 @media (max-width: 900px) {
   .programs-grid { grid-template-columns: 1fr; }
 }
