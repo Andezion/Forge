@@ -197,7 +197,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     final muscles = _getMuscleGroupNames(workout);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       elevation: isRecommended ? 4 : 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -212,43 +212,44 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
           widget.onWorkoutSelected(workout);
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
                       color: isRecommended
                           ? AppColors.primary.withValues(alpha: 0.15)
                           : AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       Icons.fitness_center,
+                      size: 28,
                       color: isRecommended
                           ? AppColors.primary
                           : AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           workout.name,
-                          style: AppTextStyles.body1.copyWith(
+                          style: AppTextStyles.h4.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           '${workout.exercises.length} exercises',
-                          style: AppTextStyles.caption,
+                          style: AppTextStyles.body2,
                         ),
                       ],
                     ),
@@ -257,36 +258,36 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                 ],
               ),
               if (muscles.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 6,
-                  runSpacing: 4,
-                  children: muscles.take(5).map((m) => _buildMuscleChip(m)).toList(),
+                  runSpacing: 6,
+                  children: muscles.take(6).map((m) => _buildMuscleChip(m)).toList(),
                 ),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               _buildMatchBar(matchPercent, color),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     _matchLabel(matchPercent),
-                    style: AppTextStyles.caption.copyWith(color: color),
+                    style: AppTextStyles.body2.copyWith(color: color, fontWeight: FontWeight.w500),
                   ),
                   Row(
                     children: [
                       Text(
                         'Start',
-                        style: AppTextStyles.caption.copyWith(
+                        style: AppTextStyles.body2.copyWith(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(width: 2),
                       Icon(
                         Icons.play_arrow,
-                        size: 14,
+                        size: 18,
                         color: AppColors.primary,
                       ),
                     ],
@@ -326,7 +327,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
         value: percent / 100,
         backgroundColor: color.withValues(alpha: 0.15),
         valueColor: AlwaysStoppedAnimation<Color>(color),
-        minHeight: 6,
+        minHeight: 10,
       ),
     );
   }
