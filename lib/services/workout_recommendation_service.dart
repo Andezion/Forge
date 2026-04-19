@@ -249,6 +249,108 @@ class WorkoutRecommendationService extends ChangeNotifier {
     return factors;
   }
 
+  double _scoreWorkout(Workout workout, Map<String, dynamic> factors) {
+    double score = 0.0;
+
+    final recoveryPriorities =
+        factors['recoveryPriorities'] as Map<MuscleGroup, double>;
+    final musclesToTrain = factors['musclesToTrain'] as List<MuscleGroup>;
+    final musclesToRest = factors['musclesToRest'] as List<MuscleGroup>;
+
+    final allMuscleGroups = <MuscleGroupTag>[];
+    for (var exercise in workout.exercises) {
+      allMuscleGroups.addAll(exercise.exercise.muscleGroups);
+    }
+
+    final recoveryScore = _recoveryTracker.calculateWorkoutPriority(
+      allMuscleGroups,
+      recoveryPriorities,
+    );
+    score += recoveryScore * 100;
+
+    int trainableCount = 0;
+    int restingCount = 0;
+    for (var muscleTag in allMuscleGroups) {
+      if (musclesToTrain.contains(muscleTag.group)) {
+        trainableCount += muscleTag.score;
+      }
+      if (musclesToRest.contains(muscleTag.group)) {
+        restingCount += muscleTag.score;
+      }
+    }
+    score += trainableCount * 5.0;
+    score -= restingCount * 10.0;
+
+    final readiness = factors['readiness'] as double;
+    final exerciseCount = workout.exercises.length;
+
+    final sessionDuration = factors['sessionDuration'] as SessionDuration?;
+    if (sessionDuration != null) {
+      final (minEx, maxEx) = sessionDuration.exerciseRange;
+      if (exerciseCount >= minEx && exerciseCount <= maxEx) {
+        score += 30.0;
+      } else if (exerciseCount >= minEx - 1 && exerciseCount <= maxEx + 1) {
+        score += 15.0;
+      } else if (exerciseCount > maxEx) {
+        score -= (exerciseCount - maxEx) * 8.0;
+      } else {
+        score -= (minEx - exerciseCount) * 4.0;
+      }
+    } else {
+      if (exerciseCount >= 8) {
+        score += 30.0;
+      } else if (exerciseCount >= 6) {
+        score += 15.0;
+      } else if (exerciseCount >= 4) {
+        score += 5.0;
+      }
+    }
+
+    if (readiness < 0.5) {
+      if (exerciseCount <= 4) score += 15.0;
+      if (exerciseCount >= 8) score -= 15.0;
+    } else if (readiness >= 0.7) {
+      if (exerciseCount >= 8) {
+        score += 10.0;
+      } else if (exerciseCount >= 6) {
+        score += 5.0;
+      }
+    }
+
+    final injuries = factors['injuries'] as List<String>? ?? [];
+    if (injuries.isNotEmpty) {
+      final injuryMuscles =
+          _muscleBalanceService.getMuscleGroupPriorities(injuries);
+      for (var exercise in workout.exercises) {
+        for (var mg in exercise.exercise.muscleGroups) {
+          if (injuryMuscles.containsKey(mg.group)) {
+            final penalty = switch (mg.intensity) {
+              MuscleGroupIntensity.primary => 25.0,
+              MuscleGroupIntensity.secondary => 12.0,
+              MuscleGroupIntensity.stabilizer => 5.0,
+            };
+            score -= penalty;
+          }
+        }
+      }
+    }
+
+    final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
+    if (trainingFocus.isNotEmpty) {
+      final focusPriorities =
+          _muscleBalanceService.getMuscleGroupPriorities(trainingFocus);
+      if (focusPriorities.isNotEmpty) {
+        final focusScore = _muscleBalanceService.evaluateWorkoutForGoals(
+          workout,
+          trainingFocus,
+        );
+        score += focusScore * 50.0;
+      }
+    }
+
+    return score;
+  }
+
   Workout _selectBestWorkout(
     List<Workout> workouts,
     List<WorkoutHistory> histories,
@@ -262,11 +364,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
       return workouts.first;
     }
 
-    final recoveryPriorities =
-        factors['recoveryPriorities'] as Map<MuscleGroup, double>;
-    final musclesToTrain = factors['musclesToTrain'] as List<MuscleGroup>;
-    final musclesToRest = factors['musclesToRest'] as List<MuscleGroup>;
-
     final lastWorkoutIds =
         histories.reversed.take(3).map((h) => h.session.workoutId).toList();
 
@@ -277,104 +374,8 @@ class WorkoutRecommendationService extends ChangeNotifier {
         freshWorkouts.isNotEmpty ? freshWorkouts : workouts;
 
     final workoutScores = <Workout, double>{};
-
     for (var workout in workoutsToConsider) {
-      double score = 0.0;
-
-      final allMuscleGroups = <MuscleGroupTag>[];
-      for (var exercise in workout.exercises) {
-        allMuscleGroups.addAll(exercise.exercise.muscleGroups);
-      }
-
-      final recoveryScore = _recoveryTracker.calculateWorkoutPriority(
-        allMuscleGroups,
-        recoveryPriorities,
-      );
-
-      score += recoveryScore * 100;
-
-      int trainableCount = 0;
-      int restingCount = 0;
-      for (var muscleTag in allMuscleGroups) {
-        if (musclesToTrain.contains(muscleTag.group)) {
-          trainableCount += muscleTag.score;
-        }
-        if (musclesToRest.contains(muscleTag.group)) {
-          restingCount += muscleTag.score;
-        }
-      }
-
-      score += trainableCount * 5.0;
-      score -= restingCount * 10.0;
-
-      final readiness = factors['readiness'] as double;
-      final exerciseCount = workout.exercises.length;
-
-      final sessionDuration = factors['sessionDuration'] as SessionDuration?;
-      if (sessionDuration != null) {
-        final (minEx, maxEx) = sessionDuration.exerciseRange;
-        if (exerciseCount >= minEx && exerciseCount <= maxEx) {
-          score += 30.0;
-        } else if (exerciseCount >= minEx - 1 && exerciseCount <= maxEx + 1) {
-          score += 15.0;
-        } else if (exerciseCount > maxEx) {
-          score -= (exerciseCount - maxEx) * 8.0;
-        } else {
-          score -= (minEx - exerciseCount) * 4.0;
-        }
-      } else {
-        if (exerciseCount >= 8) {
-          score += 30.0;
-        } else if (exerciseCount >= 6) {
-          score += 15.0;
-        } else if (exerciseCount >= 4) {
-          score += 5.0;
-        }
-      }
-
-      if (readiness < 0.5) {
-        if (exerciseCount <= 4) score += 15.0;
-        if (exerciseCount >= 8) score -= 15.0;
-      } else if (readiness >= 0.7) {
-        if (exerciseCount >= 8) {
-          score += 10.0;
-        } else if (exerciseCount >= 6) {
-          score += 5.0;
-        }
-      }
-
-      final injuries = factors['injuries'] as List<String>? ?? [];
-      if (injuries.isNotEmpty) {
-        final injuryMuscles =
-            _muscleBalanceService.getMuscleGroupPriorities(injuries);
-        for (var exercise in workout.exercises) {
-          for (var mg in exercise.exercise.muscleGroups) {
-            if (injuryMuscles.containsKey(mg.group)) {
-              final penalty = switch (mg.intensity) {
-                MuscleGroupIntensity.primary => 25.0,
-                MuscleGroupIntensity.secondary => 12.0,
-                MuscleGroupIntensity.stabilizer => 5.0,
-              };
-              score -= penalty;
-            }
-          }
-        }
-      }
-
-      final trainingFocus = factors['trainingFocus'] as List<String>? ?? [];
-      if (trainingFocus.isNotEmpty) {
-        final focusPriorities =
-            _muscleBalanceService.getMuscleGroupPriorities(trainingFocus);
-        if (focusPriorities.isNotEmpty) {
-          final focusScore = _muscleBalanceService.evaluateWorkoutForGoals(
-            workout,
-            trainingFocus,
-          );
-          score += focusScore * 50.0;
-        }
-      }
-
-      workoutScores[workout] = score;
+      workoutScores[workout] = _scoreWorkout(workout, factors);
     }
 
     final sortedWorkouts = workoutScores.entries.toList()
@@ -385,6 +386,82 @@ class WorkoutRecommendationService extends ChangeNotifier {
     }
 
     return sortedWorkouts.first.key;
+  }
+
+  Future<List<(Workout, double)>> scoreAllWorkoutsForToday() async {
+    final workouts = _dataManager.workouts;
+    if (workouts.isEmpty) return [];
+
+    final histories = _dataManager.workoutHistory;
+    final recentWellness = _wellnessService.entries;
+
+    await _profileService.load();
+    final goals = _profileService.goals
+        .map((g) => TrainingGoal.values.firstWhere((e) => e.name == g,
+            orElse: () => TrainingGoal.generalFitness))
+        .toList();
+    final experience = _profileService.experienceLevel != null
+        ? ExperienceLevel.values.firstWhere(
+            (e) => e.name == _profileService.experienceLevel,
+            orElse: () => ExperienceLevel.intermediate)
+        : ExperienceLevel.intermediate;
+    final intensity = _profileService.preferredIntensity != null
+        ? TrainingIntensity.values.firstWhere(
+            (e) => e.name == _profileService.preferredIntensity,
+            orElse: () => TrainingIntensity.moderate)
+        : TrainingIntensity.moderate;
+    final gender = _profileService.gender != null
+        ? Gender.values.firstWhere((e) => e.name == _profileService.gender,
+            orElse: () => Gender.other)
+        : null;
+    final sessionDuration = _profileService.sessionDuration != null
+        ? SessionDuration.values.firstWhere(
+            (e) => e.name == _profileService.sessionDuration,
+            orElse: () => SessionDuration.sixtyMin)
+        : null;
+
+    final profile = UserProfile(
+      goals: goals,
+      experienceLevel: experience,
+      trainingFocus: _profileService.trainingFocus,
+      preferredIntensity: intensity,
+      age: _profileService.age,
+      weightKg: _profileService.weightKg,
+      yearsTraining: _profileService.yearsTraining,
+      gender: gender,
+      trainingDaysPerWeek: _profileService.trainingDaysPerWeek,
+      sessionDuration: sessionDuration,
+      injuries: _profileService.injuries,
+    );
+
+    final factors = _analyzeFactors(histories, recentWellness, profile);
+
+    final rawScores = <Workout, double>{};
+    for (final workout in workouts) {
+      rawScores[workout] = _scoreWorkout(workout, factors);
+    }
+
+    final scores = rawScores.values.toList();
+    final maxScore = scores.reduce((a, b) => a > b ? a : b);
+    final minScore = scores.reduce((a, b) => a < b ? a : b);
+    final range = maxScore - minScore;
+
+    final readiness = factors['readiness'] as double;
+
+    final result = <(Workout, double)>[];
+    for (final workout in workouts) {
+      double normalized;
+      if (range < 0.01) {
+        normalized = 50 + readiness * 30;
+      } else {
+        final position = (rawScores[workout]! - minScore) / range;
+        normalized = 30 + position * 60 + readiness * 10;
+      }
+      result.add((workout, normalized.clamp(0, 100)));
+    }
+
+    result.sort((a, b) => b.$2.compareTo(a.$2));
+    return result;
   }
 
   RecommendationLevel _determineLevel(
