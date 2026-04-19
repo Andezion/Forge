@@ -9,6 +9,7 @@ import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/workout_history.dart';
 import '../services/data_manager.dart';
+import '../services/groq_service.dart';
 import '../services/leaderboard_service.dart';
 import '../services/settings_service.dart';
 import '../services/profile_service.dart';
@@ -516,6 +517,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       debugPrint('[WORKOUT] Error applying progression: $e');
     }
 
+    double? estimatedCalories;
     try {
       if (!mounted) return;
       final leaderboardService =
@@ -530,6 +532,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         workoutHistory: workoutHistory,
         isProfileHidden: settingsService.isProfileHidden,
         userBodyWeight: profileService.weightKg,
+      );
+
+      final groq = GroqService(apiKey: settingsService.groqApiKey);
+      estimatedCalories = await groq.estimateWorkoutCalories(
+        session: completedSession,
+        bodyWeightKg: profileService.weightKg ?? 75.0,
       );
     } catch (e) {
       debugPrint('[WORKOUT] Error syncing stats to Firebase: $e');
@@ -572,6 +580,27 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                 style: AppTextStyles.body2,
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 8),
+              if (estimatedCalories != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.local_fire_department, color: Colors.orange, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        '~${estimatedCalories.round()} kcal burned',
+                        style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
               if (_skippedExercises.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Container(
