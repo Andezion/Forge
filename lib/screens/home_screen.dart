@@ -13,6 +13,7 @@ import '../widgets/muscle_recovery_card.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
 import 'plan_editor_screen.dart';
+import 'workout_selection_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -74,104 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    Workout? recommendedWorkout;
-    if (_todayRecommendation != null) {
-      recommendedWorkout = _dataManager.workouts.firstWhere(
-        (w) => w.id == _todayRecommendation!.workoutId,
-        orElse: () => _dataManager.workouts.first,
-      );
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WorkoutSelectionScreen(
+          onWorkoutSelected: _startWorkout,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.6,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Select Workout',
-                    style: AppTextStyles.h3,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  if (recommendedWorkout != null) ...[
-                    Text(
-                      'Recommended for Today',
-                      style: AppTextStyles.body1.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (_todayRecommendation!.overallReason.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          _todayRecommendation!.overallReason,
-                          style: AppTextStyles.caption.copyWith(
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ),
-                    _buildWorkoutTile(
-                      recommendedWorkout,
-                      isRecommended: true,
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                  Text(
-                    'All Workouts',
-                    style: AppTextStyles.body1.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ..._dataManager.workouts
-                      .where((w) => w.id != recommendedWorkout?.id)
-                      .map((workout) => _buildWorkoutTile(workout)),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWorkoutTile(Workout workout, {bool isRecommended = false}) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: isRecommended
-          ? AppColors.primary.withValues(alpha: 0.1)
-          : AppColors.surface,
-      child: ListTile(
-        leading: Icon(
-          Icons.fitness_center,
-          color: isRecommended ? AppColors.primary : AppColors.textSecondary,
-        ),
-        title: Text(
-          workout.name,
-          style: AppTextStyles.body1.copyWith(
-            fontWeight: isRecommended ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        subtitle: Text('${workout.exercises.length} exercises'),
-        trailing: const Icon(Icons.play_arrow),
-        onTap: () {
-          Navigator.of(context).pop();
-          _startWorkout(workout);
-        },
       ),
     );
   }
