@@ -351,7 +351,8 @@ class ProgressionService {
               wellnessModifiers: wellnessModifiers,
               previousReps: actualReps,
             );
-            newReps = (newReps * 1.1).round().clamp(actualReps + 1, 50);
+            final minReps = actualReps + 1;
+            newReps = (newReps * 1.1).round().clamp(minReps, minReps > 50 ? minReps : 50);
             reason = 'Excellent performance - increasing repetitions';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = (we.sets + 1).clamp(1, 10);
