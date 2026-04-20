@@ -34,7 +34,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   int _currentExerciseIndex = 0;
   late List<WorkoutExercise> _exerciseQueue;
   final Map<String, int> _skipCounts = {};
-  final List<Exercise> _skippedExercises = [];
+  final List<WorkoutExercise> _declinedExercises = [];
   Timer? _timer;
   int _totalDurationSeconds = 0;
   final List<ExerciseResult> _exerciseResults = [];
@@ -296,6 +296,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
   void _showExerciseDifficultyDialog() {
     ExerciseDifficulty? selectedDifficulty;
+    WorkoutExercise? chosenNextExercise;
 
     showDialog(
       context: context,
@@ -360,7 +361,53 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                     });
                   },
                 ),
-                const SizedBox(height: 24),
+                if (_exerciseQueue.length > 1) ...[
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: chosenNextExercise != null
+                            ? Text(
+                                'Next: ${chosenNextExercise!.exercise.name}',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      TextButton.icon(
+                        onPressed: () async {
+                          final picked =
+                              await showModalBottomSheet<WorkoutExercise>(
+                            context: dialogContext,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16)),
+                            ),
+                            builder: (sheetCtx) =>
+                                _buildNextExercisePickerSheet(sheetCtx),
+                          );
+                          if (picked != null) {
+                            setState(() => _moveExerciseToNext(picked));
+                            setDialogState(
+                                () => chosenNextExercise = picked);
+                          }
+                        },
+                        icon: const Icon(Icons.swap_vert, size: 14),
+                        label: const Text('Choose next'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.textSecondary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: selectedDifficulty != null
                       ? () {
@@ -453,17 +500,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     final current = _exerciseQueue[_currentExerciseIndex];
     final id = current.exercise.id;
     _skipCounts[id] = (_skipCounts[id] ?? 0) + 1;
-    final count = _skipCounts[id]!;
 
     setState(() {
       final moved = _exerciseQueue.removeAt(_currentExerciseIndex);
-      if (count == 1) {
-        final insertIndex =
-            (_currentExerciseIndex + 1).clamp(0, _exerciseQueue.length);
-        _exerciseQueue.insert(insertIndex, moved);
-      } else {
-        _exerciseQueue.add(moved);
-      }
+      _exerciseQueue.add(moved);
 
       if (_exerciseQueue.isEmpty) {
         _finishWorkout();
@@ -485,6 +525,126 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
       _loadPreviousPerformance();
     });
+  }
+
+  void _declineCurrentExercise() {
+    final exerciseName = _exerciseQueue[_currentExerciseIndex].exercise.name;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Decline exercise?'),
+        content: Text(
+          '"$exerciseName" will be marked as skipped for this session and won\'t appear again.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _performDecline();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Decline'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _performDecline() {
+    if (_exerciseQueue.isEmpty) return;
+
+    setState(() {
+      final declined = _exerciseQueue.removeAt(_currentExerciseIndex);
+      _declinedExercises.add(declined);
+
+      if (_exerciseQueue.isEmpty) {
+        _finishWorkout();
+        return;
+      }
+
+      if (_currentExerciseIndex >= _exerciseQueue.length) {
+        _currentExerciseIndex = 0;
+      }
+
+      _currentExerciseResult = ExerciseResult(
+        exercise: _exerciseQueue[_currentExerciseIndex].exercise,
+        targetSets: _exerciseQueue[_currentExerciseIndex].sets,
+        targetReps: _exerciseQueue[_currentExerciseIndex].targetReps,
+        targetWeight: _exerciseQueue[_currentExerciseIndex].weight,
+        setResults: [],
+      );
+
+      _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
+      _loadPreviousPerformance();
+    });
+  }
+
+  void _moveExerciseToNext(WorkoutExercise exercise) {
+    final pickedIndex = _exerciseQueue.indexOf(exercise);
+    if (pickedIndex == -1 || pickedIndex == _currentExerciseIndex) return;
+    final targetIndex = _currentExerciseIndex + 1;
+    if (pickedIndex == targetIndex) return;
+    _exerciseQueue.removeAt(pickedIndex);
+    final adjustedTarget = (pickedIndex < targetIndex ? targetIndex - 1 : targetIndex)
+        .clamp(0, _exerciseQueue.length);
+    _exerciseQueue.insert(adjustedTarget, exercise);
+  }
+
+  Widget _buildNextExercisePickerSheet(BuildContext sheetCtx) {
+    final naturalNextIndex = _currentExerciseIndex + 1 < _exerciseQueue.length
+        ? _currentExerciseIndex + 1
+        : -1;
+
+    final entries = <(WorkoutExercise, bool, bool)>[];
+    for (int i = 0; i < _exerciseQueue.length; i++) {
+      if (i == _currentExerciseIndex) continue;
+      final isSkipped = (_skipCounts[_exerciseQueue[i].exercise.id] ?? 0) > 0;
+      final isNaturalNext = i == naturalNextIndex;
+      if (isNaturalNext || isSkipped) {
+        entries.add((_exerciseQueue[i], isNaturalNext, isSkipped));
+      }
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text('Choose next exercise', style: AppTextStyles.h4),
+        ),
+        const Divider(height: 1),
+        ...entries.map((e) {
+          final (exercise, isNaturalNext, isSkipped) = e;
+          return ListTile(
+            title: Text(exercise.exercise.name),
+            subtitle: isNaturalNext
+                ? Text(
+                    'Next by program',
+                    style: TextStyle(color: AppColors.primary, fontSize: 12),
+                  )
+                : isSkipped
+                    ? Text(
+                        'Skipped',
+                        style: TextStyle(color: AppColors.warning, fontSize: 12),
+                      )
+                    : null,
+            trailing: isNaturalNext
+                ? Icon(Icons.arrow_right_alt, color: AppColors.primary)
+                : Icon(Icons.replay, color: AppColors.warning, size: 20),
+            onTap: () => Navigator.of(sheetCtx).pop(exercise),
+          );
+        }),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   void _finishWorkout() async {
@@ -601,15 +761,15 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                     ],
                   ),
                 ),
-              if (_skippedExercises.isNotEmpty) ...[
+              if (_declinedExercises.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
+                    color: AppColors.error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: AppColors.warning,
+                      color: AppColors.error,
                       width: 1,
                     ),
                   ),
@@ -619,25 +779,25 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                       Row(
                         children: [
                           Icon(
-                            Icons.warning_amber_rounded,
-                            color: AppColors.warning,
+                            Icons.cancel_outlined,
+                            color: AppColors.error,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Skipped Exercises:',
+                            'Declined:',
                             style: AppTextStyles.body1.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.warning,
+                              color: AppColors.error,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ..._skippedExercises.map((exercise) => Padding(
+                      ..._declinedExercises.map((we) => Padding(
                             padding: const EdgeInsets.only(top: 4, left: 28),
                             child: Text(
-                              '• ${exercise.name}',
+                              '• ${we.exercise.name}',
                               style: AppTextStyles.body2,
                             ),
                           )),
@@ -1028,8 +1188,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        if ((_skipCounts[currentExercise.exercise.id] ?? 0) ==
-                            1) ...[
+                        if ((_skipCounts[currentExercise.exercise.id] ?? 0) >
+                            0) ...[
                           const SizedBox(width: 8),
                           Container(
                             width: 12,
@@ -1093,6 +1253,22 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                     SizedBox(
                       height: 50,
                       child: OutlinedButton(
+                        onPressed: _declineCurrentExercise,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.error),
+                          foregroundColor: AppColors.error,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
+                        child: const Text('Decline'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 50,
+                      child: OutlinedButton(
                         onPressed: _skipCurrentExercise,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.warning),
@@ -1100,11 +1276,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
                         child: Text(AppStrings.skip),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: SizedBox(
                         height: 50,
