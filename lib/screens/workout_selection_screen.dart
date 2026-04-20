@@ -146,20 +146,23 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     }
 
     final recommendedId = _recommendation?.workoutId;
-    final recommended =
-        recommendedId != null ? scored.where((s) => s.$1.id == recommendedId).firstOrNull : null;
+    final recommended = recommendedId != null
+        ? scored.where((s) => s.$1.id == recommendedId).firstOrNull
+        : null;
     final others = scored.where((s) => s.$1.id != recommendedId).toList();
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 36),
       children: [
         if (recommended != null) ...[
           _buildSectionHeader('Recommended for Today', AppColors.primary),
           const SizedBox(height: 8),
-          _buildWorkoutCard(recommended.$1, recommended.$2, isRecommended: true),
+          _buildWorkoutCard(recommended.$1, recommended.$2,
+              isRecommended: true),
           if (_recommendation?.overallReason.isNotEmpty == true)
             Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 16, left: 4, right: 4),
+              padding:
+                  const EdgeInsets.only(top: 8, bottom: 16, left: 4, right: 4),
               child: Text(
                 _recommendation!.overallReason,
                 style: AppTextStyles.caption.copyWith(
@@ -202,7 +205,8 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: isRecommended
-            ? BorderSide(color: AppColors.primary.withValues(alpha: 0.5), width: 2)
+            ? BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.5), width: 2)
             : BorderSide.none,
       ),
       child: InkWell(
@@ -262,7 +266,8 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
-                  children: muscles.take(6).map((m) => _buildMuscleChip(m)).toList(),
+                  children:
+                      muscles.take(6).map((m) => _buildMuscleChip(m)).toList(),
                 ),
               ],
               const SizedBox(height: 16),
@@ -273,7 +278,8 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                 children: [
                   Text(
                     _matchLabel(matchPercent),
-                    style: AppTextStyles.body2.copyWith(color: color, fontWeight: FontWeight.w500),
+                    style: AppTextStyles.body2
+                        .copyWith(color: color, fontWeight: FontWeight.w500),
                   ),
                   Row(
                     children: [
@@ -327,7 +333,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
         value: percent / 100,
         backgroundColor: color.withValues(alpha: 0.15),
         valueColor: AlwaysStoppedAnimation<Color>(color),
-        minHeight: 10,
+        minHeight: 20,
       ),
     );
   }
