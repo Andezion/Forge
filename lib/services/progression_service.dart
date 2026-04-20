@@ -352,7 +352,9 @@ class ProgressionService {
               previousReps: actualReps,
             );
             final minReps = actualReps + 1;
-            newReps = (newReps * 1.1).round().clamp(minReps, minReps > 50 ? minReps : 50);
+            newReps = (newReps * 1.1)
+                .round()
+                .clamp(minReps, minReps > 50 ? minReps : 50);
             reason = 'Excellent performance - increasing repetitions';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = (we.sets + 1).clamp(1, 10);
@@ -429,10 +431,9 @@ class ProgressionService {
       }
 
       newWeight = (newWeight * 2).round() / 2.0;
-      // Hard floors: user-specified values are absolute minimums.
       if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
-      newReps = newReps.clamp(we.targetReps, 50);
-      newSets = newSets.clamp(we.sets, 10);
+      if (newReps < we.targetReps) newReps = we.targetReps;
+      if (newSets < we.sets) newSets = we.sets;
 
       adjustedExercises.add(
         we.copyWith(sets: newSets, targetReps: newReps, weight: newWeight),
