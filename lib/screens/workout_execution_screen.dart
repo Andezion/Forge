@@ -87,6 +87,13 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
 
     _exerciseQueue = List<WorkoutExercise>.from(widget.workout.exercises);
 
+    if (_exerciseQueue.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).pop();
+      });
+      return;
+    }
+
     _currentExerciseResult = ExerciseResult(
       exercise: _exerciseQueue[0].exercise,
       targetSets: _exerciseQueue[0].sets,

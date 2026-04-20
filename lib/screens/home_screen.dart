@@ -85,6 +85,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startWorkout(Workout workout) async {
+    if (workout.exercises.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This workout has no exercises. Add exercises in Workshop!'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+
     final recommendationService = Provider.of<WorkoutRecommendationService>(
       context,
       listen: false,
