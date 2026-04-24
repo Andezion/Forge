@@ -146,6 +146,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
 
   void _showExerciseConfigDialog(Exercise exercise,
       [WorkoutExercise? existing]) async {
+    final type = exercise.exerciseType;
     final setsController = TextEditingController(
       text: existing?.sets.toString() ?? '3',
     );
@@ -154,6 +155,9 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
     final weightController = TextEditingController(
       text: existing?.weight.toString() ?? '0',
+    );
+    final durationController = TextEditingController(
+      text: existing?.targetDurationMinutes?.toString() ?? '30',
     );
 
     final result = await showDialog<WorkoutExercise>(
@@ -178,46 +182,70 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                           style: AppTextStyles.h4,
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 24),
-                        TextFormField(
-                          controller: setsController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
+                        const SizedBox(height: 8),
+                        Center(
+                          child: _buildExerciseTypeChip(type),
+                        ),
+                        const SizedBox(height: 20),
+                        if (type == ExerciseType.cardio) ...[
+                          TextFormField(
+                            controller: durationController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Duration (minutes)',
+                              prefixIcon: const Icon(Icons.timer_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          TextFormField(
+                            controller: setsController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: AppStrings.sets,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: repsController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: AppStrings.targetReps,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          if (type == ExerciseType.weightAndReps) ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: weightController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              decoration: InputDecoration(
+                                labelText: '${AppStrings.weight} (kg)',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ],
-                          decoration: InputDecoration(
-                            labelText: AppStrings.sets,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: repsController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            labelText: AppStrings.targetReps,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: weightController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          decoration: InputDecoration(
-                            labelText: '${AppStrings.weight} (kg)',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
+                        ],
                         const SizedBox(height: 24),
                         Row(
                           children: [
@@ -241,11 +269,25 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                                 onPressed: () {
                                   final workoutExercise = WorkoutExercise(
                                     exercise: exercise,
-                                    sets: int.parse(setsController.text),
-                                    targetReps: int.parse(repsController.text),
-                                    weight: double.parse(weightController.text),
+                                    sets: type != ExerciseType.cardio
+                                        ? int.tryParse(setsController.text) ?? 0
+                                        : 0,
+                                    targetReps: type != ExerciseType.cardio
+                                        ? int.tryParse(repsController.text) ?? 0
+                                        : 0,
+                                    weight: type == ExerciseType.weightAndReps
+                                        ? double.tryParse(
+                                                weightController.text) ??
+                                            0
+                                        : 0,
+                                    targetDurationMinutes:
+                                        type == ExerciseType.cardio
+                                            ? int.tryParse(
+                                                durationController.text)
+                                            : null,
+                                    alternativeExercises:
+                                        existing?.alternativeExercises ?? [],
                                   );
-
                                   Navigator.of(dialogContext)
                                       .pop(workoutExercise);
                                 },
@@ -296,7 +338,33 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     }
   }
 
-  void _setAlternativeExercise(
+  Widget _buildExerciseTypeChip(ExerciseType type) {
+    switch (type) {
+      case ExerciseType.weightAndReps:
+        return Chip(
+          avatar: const Icon(Icons.fitness_center, size: 16, color: Colors.white),
+          label: const Text('Weight + Reps',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
+          backgroundColor: AppColors.primary,
+        );
+      case ExerciseType.repsOnly:
+        return Chip(
+          avatar: const Icon(Icons.repeat, size: 16, color: Colors.white),
+          label: const Text('Reps Only',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
+          backgroundColor: AppColors.warning,
+        );
+      case ExerciseType.cardio:
+        return Chip(
+          avatar: const Icon(Icons.directions_walk, size: 16, color: Colors.white),
+          label: const Text('Cardio',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
+          backgroundColor: AppColors.success,
+        );
+    }
+  }
+
+  void _addAlternativeExercise(
       WorkoutExercise workoutExercise, int index) async {
     final selectedExercise = await showDialog<Exercise>(
       context: context,
@@ -310,9 +378,28 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
 
     if (selectedExercise != null && mounted) {
+      final alreadyAdded = workoutExercise.alternativeExercises
+          .any((e) => e.id == selectedExercise.id);
+      final isSameAsMain =
+          workoutExercise.exercise.id == selectedExercise.id;
+
+      if (alreadyAdded || isSameAsMain) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This exercise is already in the list'),
+            backgroundColor: AppColors.error,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _workoutExercises[index] = workoutExercise.copyWith(
-          alternativeExercise: selectedExercise,
+          alternativeExercises: [
+            ...workoutExercise.alternativeExercises,
+            selectedExercise,
+          ],
         );
       });
 
@@ -320,9 +407,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Alternative set: ${selectedExercise.name}',
-          ),
+          content: Text('Alternative added: ${selectedExercise.name}'),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -468,6 +553,17 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     );
   }
 
+  String _exerciseSubtitle(WorkoutExercise we) {
+    switch (we.exercise.exerciseType) {
+      case ExerciseType.cardio:
+        return '${we.targetDurationMinutes ?? 0} min';
+      case ExerciseType.repsOnly:
+        return '${we.sets} sets x ${we.targetReps} reps';
+      case ExerciseType.weightAndReps:
+        return '${we.sets} sets x ${we.targetReps} reps, ${we.weight} kg';
+    }
+  }
+
   Widget _buildExerciseCard(WorkoutExercise workoutExercise, int index,
       {required Key key}) {
     Color difficultyColor;
@@ -516,7 +612,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
-              '${workoutExercise.sets} sets x ${workoutExercise.targetReps} reps, ${workoutExercise.weight} kg',
+              _exerciseSubtitle(workoutExercise),
               style: AppTextStyles.body2,
             ),
             trailing: Row(
@@ -541,49 +637,61 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               ],
             ),
           ),
-          if (workoutExercise.alternativeExercise != null)
+          if (workoutExercise.alternativeExercises.isNotEmpty)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.05),
                 border: Border(
                   top: BorderSide(
                     color: AppColors.textSecondary.withValues(alpha: 0.2),
                   ),
                 ),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.swap_horiz,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Alternative: ${workoutExercise.alternativeExercise!.name}',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
+              child: Column(
+                children: workoutExercise.alternativeExercises
+                    .asMap()
+                    .entries
+                    .map((entry) {
+                  final altIndex = entry.key;
+                  final alt = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 6),
+                    child: Row(
+                      children: [
+                        Icon(Icons.swap_horiz,
+                            size: 16, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Alt ${altIndex + 1}: ${alt.name}',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final newList = List<Exercise>.from(
+                                workoutExercise.alternativeExercises)
+                              ..removeAt(altIndex);
+                            setState(() {
+                              _workoutExercises[index] =
+                                  workoutExercise.copyWith(
+                                alternativeExercises: newList,
+                              );
+                            });
+                            _saveDraft();
+                          },
+                          child: Icon(Icons.close,
+                              size: 16,
+                              color: AppColors.textSecondary),
+                        ),
+                      ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 18),
-                    onPressed: () {
-                      setState(() {
-                        _workoutExercises[index] = workoutExercise.copyWith(
-                          clearAlternative: true,
-                        );
-                      });
-                      _saveDraft();
-                    },
-                    tooltip: 'Remove alternative',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
             ),
           Padding(
@@ -592,12 +700,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () =>
-                    _setAlternativeExercise(workoutExercise, index),
-                icon: const Icon(Icons.swap_horiz, size: 18),
+                    _addAlternativeExercise(workoutExercise, index),
+                icon: const Icon(Icons.add, size: 18),
                 label: Text(
-                  workoutExercise.alternativeExercise != null
-                      ? 'Change Alternative'
-                      : 'Add Alternative',
+                  'Add Alternative',
                   style: AppTextStyles.caption,
                 ),
                 style: OutlinedButton.styleFrom(
