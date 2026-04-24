@@ -4,6 +4,12 @@ enum ExerciseDifficulty {
   hard,
 }
 
+enum ExerciseType {
+  weightAndReps,
+  repsOnly,
+  cardio,
+}
+
 enum MuscleGroup {
   chest,
   back,
@@ -69,6 +75,7 @@ class Exercise {
   final String name;
   final String description;
   final ExerciseDifficulty difficulty;
+  final ExerciseType exerciseType;
   final DateTime createdAt;
 
   final List<MuscleGroupTag> muscleGroups;
@@ -78,6 +85,7 @@ class Exercise {
     required this.name,
     required this.description,
     required this.difficulty,
+    this.exerciseType = ExerciseType.weightAndReps,
     required this.createdAt,
     this.muscleGroups = const [],
   });
@@ -88,6 +96,7 @@ class Exercise {
       'name': name,
       'description': description,
       'difficulty': difficulty.name,
+      'exerciseType': exerciseType.name,
       'createdAt': createdAt.toIso8601String(),
       'muscleGroups': muscleGroups.map((mg) => mg.toJson()).toList(),
     };
@@ -101,6 +110,10 @@ class Exercise {
       difficulty: ExerciseDifficulty.values.firstWhere(
         (e) => e.name == json['difficulty'],
         orElse: () => ExerciseDifficulty.medium,
+      ),
+      exerciseType: ExerciseType.values.firstWhere(
+        (e) => e.name == (json['exerciseType'] ?? ''),
+        orElse: () => ExerciseType.weightAndReps,
       ),
       createdAt: DateTime.parse(json['createdAt']),
       muscleGroups: json['muscleGroups'] != null
@@ -116,6 +129,7 @@ class Exercise {
     String? name,
     String? description,
     ExerciseDifficulty? difficulty,
+    ExerciseType? exerciseType,
     DateTime? createdAt,
     List<MuscleGroupTag>? muscleGroups,
   }) {
@@ -124,6 +138,7 @@ class Exercise {
       name: name ?? this.name,
       description: description ?? this.description,
       difficulty: difficulty ?? this.difficulty,
+      exerciseType: exerciseType ?? this.exerciseType,
       createdAt: createdAt ?? this.createdAt,
       muscleGroups: muscleGroups ?? this.muscleGroups,
     );
