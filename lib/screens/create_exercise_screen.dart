@@ -189,13 +189,16 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
           color: isSelected ? color.withValues(alpha: 0.15) : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : AppColors.textSecondary.withValues(alpha: 0.3),
+            color: isSelected
+                ? color
+                : AppColors.textSecondary.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? color : AppColors.textSecondary, size: 28),
+            Icon(icon,
+                color: isSelected ? color : AppColors.textSecondary, size: 28),
             const SizedBox(height: 6),
             Text(
               label,
@@ -263,7 +266,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
             icon: const Icon(Icons.check, color: Colors.white),
             label: Text(
               _isEditing ? AppStrings.save : AppStrings.create,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -275,7 +279,6 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Name
               TextFormField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.sentences,
@@ -294,8 +297,6 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 },
               ),
               const SizedBox(height: 16),
-
-              // Description
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
@@ -319,16 +320,16 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 },
               ),
               const SizedBox(height: 24),
-
-              // Exercise type
               Text(
                 'Exercise Type',
-                style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
+                style:
+                    AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text(
                 'Determines what metrics are tracked during workout',
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.caption
+                    .copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
               Row(
@@ -365,11 +366,10 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // Difficulty
               Text(
                 AppStrings.difficulty,
-                style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
+                style:
+                    AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               Row(
@@ -400,11 +400,10 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // Muscle groups
               Text(
                 AppStrings.muscleGroups,
-                style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
+                style:
+                    AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               if (_selectedMuscleGroups.isEmpty)
@@ -438,7 +437,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                           color: Colors.white,
                         ),
                         onDeleted: () {
-                          setState(() => _selectedMuscleGroups.remove(entry.key));
+                          setState(
+                              () => _selectedMuscleGroups.remove(entry.key));
                         },
                       );
                     }).toList(),
@@ -456,7 +456,6 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-
               ElevatedButton(
                 onPressed: _save,
                 style: ElevatedButton.styleFrom(
@@ -469,7 +468,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ),
                 child: Text(
                   _isEditing ? AppStrings.save : AppStrings.createExercise,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(height: 16),
