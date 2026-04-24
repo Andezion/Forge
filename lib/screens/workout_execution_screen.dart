@@ -206,95 +206,93 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
   }
 
   void _swapExercise(WorkoutExercise currentWorkoutExercise) {
-    if (currentWorkoutExercise.alternativeExercise == null) return;
+    if (currentWorkoutExercise.alternativeExercises.isEmpty) return;
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Swap Exercise'),
+        title: const Text('Switch Exercise'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Current exercise:',
+              'Current: ${currentWorkoutExercise.exercise.name}',
               style: AppTextStyles.body2.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 12),
             Text(
-              currentWorkoutExercise.exercise.name,
-              style: AppTextStyles.body1.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              'Choose alternative:',
+              style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Alternative exercise:',
-              style: AppTextStyles.body2.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              currentWorkoutExercise.alternativeExercise!.name,
-              style: AppTextStyles.body1.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              currentWorkoutExercise.alternativeExercise!.description,
-              style: AppTextStyles.caption,
-            ),
+            const SizedBox(height: 8),
+            ...currentWorkoutExercise.alternativeExercises.map((alt) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      final newAlts = currentWorkoutExercise.alternativeExercises
+                          .where((e) => e.id != alt.id)
+                          .toList()
+                        ..add(currentWorkoutExercise.exercise);
+                      _exerciseQueue[_currentExerciseIndex] =
+                          currentWorkoutExercise.copyWith(
+                        exercise: alt,
+                        alternativeExercises: newAlts,
+                      );
+                      _currentExerciseResult = ExerciseResult(
+                        exercise: alt,
+                        targetSets: currentWorkoutExercise.sets,
+                        targetReps: currentWorkoutExercise.targetReps,
+                        targetWeight: currentWorkoutExercise.weight,
+                        setResults: [],
+                      );
+                      _initSetControllers(
+                          _exerciseQueue[_currentExerciseIndex]);
+                      _loadPreviousPerformance();
+                    });
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Switched to ${alt.name}'),
+                        backgroundColor: AppColors.success,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.swap_horiz, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          alt.name,
+                          style: AppTextStyles.body2.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(AppStrings.cancel),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() {
-                final alternative = currentWorkoutExercise.alternativeExercise!;
-                _exerciseQueue[_currentExerciseIndex] =
-                    currentWorkoutExercise.copyWith(
-                  exercise: alternative,
-                  alternativeExercise: currentWorkoutExercise.exercise,
-                );
-
-                _currentExerciseResult = ExerciseResult(
-                  exercise: alternative,
-                  targetSets: currentWorkoutExercise.sets,
-                  targetReps: currentWorkoutExercise.targetReps,
-                  targetWeight: currentWorkoutExercise.weight,
-                  setResults: [],
-                );
-
-                _initSetControllers(_exerciseQueue[_currentExerciseIndex]);
-                _loadPreviousPerformance();
-              });
-              Navigator.of(dialogContext).pop();
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Switched to ${currentWorkoutExercise.alternativeExercise!.name}',
-                  ),
-                  backgroundColor: AppColors.success,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
-            icon: const Icon(Icons.swap_horiz),
-            label: const Text('Swap'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textOnPrimary,
-            ),
           ),
         ],
       ),
@@ -1217,7 +1215,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    if (currentExercise.alternativeExercise != null) ...[
+                    if (currentExercise.alternativeExercises.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Center(
                         child: OutlinedButton.icon(
