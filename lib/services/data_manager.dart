@@ -1057,6 +1057,12 @@ class DataManager extends ChangeNotifier {
         final workout = _workouts[i];
         bool workoutUpdated = false;
         final updatedExercises = workout.exercises.map((we) {
+          final updatedAlts = we.alternativeExercises
+              .map((alt) => alt.id == exercise.id ? exercise : alt)
+              .toList();
+          final altsChanged = we.alternativeExercises
+              .any((alt) => alt.id == exercise.id);
+
           if (we.exercise.id == exercise.id) {
             workoutUpdated = true;
             return WorkoutExercise(
@@ -1064,17 +1070,19 @@ class DataManager extends ChangeNotifier {
               sets: we.sets,
               targetReps: we.targetReps,
               weight: we.weight,
-              alternativeExercise: we.alternativeExercise,
+              targetDurationMinutes: we.targetDurationMinutes,
+              alternativeExercises: updatedAlts,
             );
           }
-          if (we.alternativeExercise?.id == exercise.id) {
+          if (altsChanged) {
             workoutUpdated = true;
             return WorkoutExercise(
               exercise: we.exercise,
               sets: we.sets,
               targetReps: we.targetReps,
               weight: we.weight,
-              alternativeExercise: exercise,
+              targetDurationMinutes: we.targetDurationMinutes,
+              alternativeExercises: updatedAlts,
             );
           }
           return we;
@@ -1098,12 +1106,9 @@ class DataManager extends ChangeNotifier {
   bool isExerciseUsed(String exerciseId) {
     for (var workout in _workouts) {
       for (var workoutExercise in workout.exercises) {
-        if (workoutExercise.exercise.id == exerciseId) {
-          return true;
-        }
-        if (workoutExercise.alternativeExercise?.id == exerciseId) {
-          return true;
-        }
+        if (workoutExercise.exercise.id == exerciseId) { return true; }
+        if (workoutExercise.alternativeExercises
+            .any((alt) => alt.id == exerciseId)) { return true; }
       }
     }
     return false;
