@@ -5,14 +5,16 @@ class WorkoutExercise {
   final int sets;
   final int targetReps;
   final double weight;
-  final Exercise? alternativeExercise;
+  final int? targetDurationMinutes;
+  final List<Exercise> alternativeExercises;
 
   WorkoutExercise({
     required this.exercise,
     required this.sets,
     required this.targetReps,
     required this.weight,
-    this.alternativeExercise,
+    this.targetDurationMinutes,
+    this.alternativeExercises = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -21,19 +23,26 @@ class WorkoutExercise {
       'sets': sets,
       'targetReps': targetReps,
       'weight': weight,
-      'alternativeExercise': alternativeExercise?.toJson(),
+      'targetDurationMinutes': targetDurationMinutes,
+      'alternativeExercises':
+          alternativeExercises.map((e) => e.toJson()).toList(),
     };
   }
 
   factory WorkoutExercise.fromJson(Map<String, dynamic> json) {
     return WorkoutExercise(
       exercise: Exercise.fromJson(json['exercise']),
-      sets: json['sets'],
-      targetReps: json['targetReps'],
-      weight: (json['weight'] as num).toDouble(),
-      alternativeExercise: json['alternativeExercise'] != null
-          ? Exercise.fromJson(json['alternativeExercise'])
-          : null,
+      sets: json['sets'] ?? 0,
+      targetReps: json['targetReps'] ?? 0,
+      weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
+      targetDurationMinutes: json['targetDurationMinutes'] as int?,
+      alternativeExercises: json['alternativeExercises'] != null
+          ? (json['alternativeExercises'] as List)
+              .map((e) => Exercise.fromJson(e))
+              .toList()
+          : json['alternativeExercise'] != null
+              ? [Exercise.fromJson(json['alternativeExercise'])]
+              : [],
     );
   }
 
@@ -42,17 +51,20 @@ class WorkoutExercise {
     int? sets,
     int? targetReps,
     double? weight,
-    Exercise? alternativeExercise,
-    bool clearAlternative = false,
+    int? targetDurationMinutes,
+    bool clearDuration = false,
+    List<Exercise>? alternativeExercises,
   }) {
     return WorkoutExercise(
       exercise: exercise ?? this.exercise,
       sets: sets ?? this.sets,
       targetReps: targetReps ?? this.targetReps,
       weight: weight ?? this.weight,
-      alternativeExercise: clearAlternative
+      targetDurationMinutes: clearDuration
           ? null
-          : alternativeExercise ?? this.alternativeExercise,
+          : targetDurationMinutes ?? this.targetDurationMinutes,
+      alternativeExercises:
+          alternativeExercises ?? this.alternativeExercises,
     );
   }
 }
