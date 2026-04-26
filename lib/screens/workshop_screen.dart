@@ -35,6 +35,21 @@ class WorkshopScreen extends StatefulWidget {
 class _WorkshopScreenState extends State<WorkshopScreen> {
   final _dataManager = DataManager();
   final _expandedWorkouts = <String>{};
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Workout> get _filteredWorkouts {
+    final query = _searchController.text.toLowerCase();
+    if (query.isEmpty) return _dataManager.workouts;
+    return _dataManager.workouts
+        .where((w) => w.name.toLowerCase().contains(query))
+        .toList();
+  }
 
   void _navigateToCreateWorkout() async {
     debugPrint('[WORKSHOP_SCREEN] Navigating to CreateWorkoutScreen...');
@@ -216,6 +231,20 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: 'Search workouts...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
           const SizedBox(height: 24),
           Text(
             l10n.myWorkouts,
@@ -237,10 +266,22 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                 ),
               ),
             )
+          else if (_filteredWorkouts.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  'No workouts found',
+                  style: AppTextStyles.body2.copyWith(
+                    color: Theme.of(context).textTheme.bodySmall?.color,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
           else
-            ..._dataManager.workouts.asMap().entries.map((entry) {
-              final index = entry.key;
-              final workout = entry.value;
+            ..._filteredWorkouts.map((workout) {
+              final index = _dataManager.workouts.indexOf(workout);
               return _buildWorkoutCard(workout, index);
             }),
         ],
