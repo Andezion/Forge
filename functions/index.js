@@ -109,7 +109,6 @@ async function updateAllRecords() {
   return { updated, errors };
 }
 
-// Scheduled: every Sunday at 03:00 UTC
 exports.updateWorldRecords = onSchedule(
   {
     schedule: "0 3 * * 0",
@@ -124,9 +123,6 @@ exports.updateWorldRecords = onSchedule(
   }
 );
 
-// Manual trigger via HTTP (for initial seed / admin use)
-// Call: POST https://<region>-<project>.cloudfunctions.net/triggerWorldRecordsUpdate
-// Header: x-admin-key: <your secret key from Firebase config>
 exports.triggerWorldRecordsUpdate = onRequest(
   { timeoutSeconds: 540, memory: "256MiB" },
   async (req, res) => {
