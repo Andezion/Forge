@@ -215,9 +215,8 @@ class _RankPainter extends CustomPainter {
     final topH = s.height * 0.3;
     final botH = s.height * 0.6;
 
-    // Gem outline path
     final path = Path()
-      ..moveTo(cx, cy - botH / 2 - topH * 0.6) // top point
+      ..moveTo(cx, cy - botH / 2 - topH * 0.6) 
       ..lineTo(cx - w / 2, cy - botH / 2)
       ..lineTo(cx - w * 0.22, cy - botH / 2 + topH)
       ..lineTo(cx, cy + botH / 2)
@@ -225,7 +224,6 @@ class _RankPainter extends CustomPainter {
       ..lineTo(cx + w / 2, cy - botH / 2)
       ..close();
 
-    // Outer glow
     final glow = Paint()
       ..color = const Color(0xFF67E8F9).withValues(alpha: 0.4)
       ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 6);
