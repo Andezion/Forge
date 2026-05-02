@@ -44,9 +44,6 @@ async function fetchTopRecord(sex, weightClassCode, eventCode) {
 
   const data = await res.json();
 
-  // OPL returns { rows: [[rank, name, fed, date, country, wckg, bwkg, age, equip, ...columns]], total_length }
-  // Column layout for event-specific (S/B/D): ... the relevant best is in a specific column.
-  // For single-event queries, column index 9 = Total (which equals the best lift for single event).
   if (!data.rows || data.rows.length === 0) return null;
 
   const row = data.rows[0];
