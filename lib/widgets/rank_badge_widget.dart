@@ -44,7 +44,6 @@ class _RankPainter extends CustomPainter {
     }
   }
 
-  // ─── WOODEN: circle with wood-grain lines ───────────────────────────────────
   void _drawWooden(Canvas canvas, Size s) {
     final cx = s.width / 2;
     final cy = s.height / 2;
