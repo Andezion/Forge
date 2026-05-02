@@ -167,7 +167,6 @@ class _RankPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, s.width, s.height));
     canvas.drawPath(path, fill);
 
-    // Inner emblem: star for silver, cross for bronze
     if (r == StrengthRank.silver) {
       _drawStar(canvas, s.width / 2, s.height * 0.48, s.width * 0.18,
           const Color(0xFFCBD5E1));
@@ -183,7 +182,6 @@ class _RankPainter extends CustomPainter {
     canvas.drawPath(path, border);
   }
 
-  // ─── GOLD: shield with crown ──────────────────────────────────────────────
   void _drawGold(Canvas canvas, Size s) {
     final shieldPath = _shieldPath(s);
 
@@ -204,14 +202,12 @@ class _RankPainter extends CustomPainter {
       ..strokeWidth = s.width * 0.06;
     canvas.drawPath(shieldPath, border);
 
-    // Glow
     final glow = Paint()
       ..color = const Color(0xFFEAB308).withValues(alpha: 0.25)
       ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 4);
     canvas.drawPath(shieldPath, glow);
   }
 
-  // ─── DIAMOND: gem shape with glow ─────────────────────────────────────────
   void _drawDiamond(Canvas canvas, Size s) {
     final cx = s.width / 2;
     final cy = s.height / 2;
