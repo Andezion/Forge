@@ -876,8 +876,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  // ─── Data helpers ─────────────────────────────────────────────────────────
-
   Map<String, ExerciseSummary> _getPersonalRecords(DataManager dataManager) {
     final thirtyDaysAgo =
         DateTime.now().subtract(const Duration(days: 30));
