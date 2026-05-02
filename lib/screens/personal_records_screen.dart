@@ -232,7 +232,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               ],
             ),
             const SizedBox(height: 10),
-            // Progress bar within current rank
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
