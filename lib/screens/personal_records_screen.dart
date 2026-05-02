@@ -27,9 +27,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   final _worldRecordsService = WorldRecordsService();
   final _groqService = GroqService();
 
-  // exerciseId → matched record key ('squat'|'bench'|'deadlift'|null)
   final Map<String, String?> _exerciseMatches = {};
-  // exerciseId → world record weight
   final Map<String, double?> _worldRecordWeights = {};
   bool _loadingRanks = false;
 
