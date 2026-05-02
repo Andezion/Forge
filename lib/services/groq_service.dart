@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
@@ -399,6 +400,72 @@ Return ONLY a JSON object (no markdown, no extra text):
       );
     } catch (e) {
       debugPrint('[GROQ] generateNutritionPlan error: $e');
+      return null;
+    }
+  }
+
+  // Matches a user exercise name to a standard powerlifting lift via AI.
+  // Returns 'squat', 'bench', 'deadlift', or null if no confident match.
+  // Result is cached in SharedPreferences to avoid repeated API calls.
+  Future<String?> matchExerciseToRecord(String exerciseId, String exerciseName) async {
+    const cachePrefix = 'rankMatch_';
+    final prefs = await SharedPreferences.getInstance();
+    final cached = prefs.getString('$cachePrefix$exerciseId');
+    if (cached != null) return cached == 'none' ? null : cached;
+
+    try {
+      final response = await http.post(
+        Uri.parse(_groqApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_resolvedKey',
+        },
+        body: jsonEncode({
+          'model': _model,
+          'temperature': 0.1,
+          'max_tokens': 60,
+          'messages': [
+            {
+              'role': 'system',
+              'content':
+                  'You are a powerlifting expert. Match exercise names to standard competition lifts. Respond with valid JSON only.',
+            },
+            {
+              'role': 'user',
+              'content': '''
+Does the exercise "$exerciseName" correspond to one of the 3 standard powerlifting competition lifts?
+Rules:
+- "squat" = back squat, low bar squat, high bar squat, competition squat
+- "bench" = flat bench press, competition bench press
+- "deadlift" = conventional deadlift, sumo deadlift, competition deadlift
+- Variations like Romanian Deadlift, Pause Squat, Close Grip Bench are NOT competition lifts → null
+- If unsure or it's a variation → null
+
+Return ONLY JSON: {"match": "squat"|"bench"|"deadlift"|null, "confidence": 0.0-1.0}''',
+            },
+          ],
+        }),
+      );
+
+      if (response.statusCode != 200) return null;
+
+      final data = jsonDecode(response.body);
+      var content = (data['choices'][0]['message']['content'] as String).trim();
+      if (content.startsWith('```')) {
+        content = content
+            .replaceFirst(RegExp(r'^```[a-z]*\n?'), '')
+            .replaceFirst(RegExp(r'\n?```$'), '')
+            .trim();
+      }
+      final parsed = jsonDecode(content) as Map<String, dynamic>;
+      final match = parsed['match'] as String?;
+      final confidence = (parsed['confidence'] as num?)?.toDouble() ?? 0.0;
+
+      final result = (match != null && confidence >= 0.75) ? match : null;
+      await prefs.setString('$cachePrefix$exerciseId', result ?? 'none');
+      return result;
+    } catch (e) {
+      debugPrint('[GROQ] matchExerciseToRecord error: $e');
       return null;
     }
   }
