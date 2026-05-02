@@ -19,7 +19,6 @@ class RankService {
     return ((percent - rank.minPercent) / rangeSize).clamp(0.0, 1.0);
   }
 
-  // Сколько кг нужно добавить для следующего ранга (null = уже максимум)
   static double? kgToNextRank(double userBest, double worldRecord) {
     if (worldRecord <= 0) return null;
     final rank = calculateRank(userBest, worldRecord);
