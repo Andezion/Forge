@@ -97,7 +97,6 @@ async function updateAllRecords() {
           updated++;
           console.log(`[WR] Updated ${docId}: ${result.weight} kg (${result.athleteName})`);
 
-          // Pause between requests to avoid rate-limiting
           await new Promise((r) => setTimeout(r, 500));
         } catch (err) {
           console.error(`[WR] Error updating ${docId}:`, err.message);
