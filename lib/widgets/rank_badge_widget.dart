@@ -92,7 +92,6 @@ class _RankPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r));
     canvas.drawPath(path, fill);
 
-    // Facet lines
     final facet = Paint()
       ..color = const Color(0xFFE5E7EB).withValues(alpha: 0.4)
       ..strokeWidth = s.width * 0.025
@@ -109,7 +108,6 @@ class _RankPainter extends CustomPainter {
     canvas.drawPath(path, border);
   }
 
-  // ─── IRON: gear shape ─────────────────────────────────────────────────────
   void _drawIron(Canvas canvas, Size s) {
     final cx = s.width / 2;
     final cy = s.height / 2;
@@ -128,7 +126,6 @@ class _RankPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, s.width, s.height));
     canvas.drawPath(gearPath, fill);
 
-    // Highlight
     final highlight = Paint()
       ..color = const Color(0xFF9CA3AF).withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
@@ -138,7 +135,6 @@ class _RankPainter extends CustomPainter {
         innerR * 0.4,
         highlight);
 
-    // Center hole
     final hole = Paint()..color = const Color(0xFF111827);
     canvas.drawCircle(Offset(cx, cy), innerR * 0.38, hole);
 
