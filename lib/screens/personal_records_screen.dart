@@ -145,8 +145,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  // ─── Rank Card ────────────────────────────────────────────────────────────
-
   Widget _buildRankCard(Exercise exercise) {
     final records = _getPersonalRecords(
         Provider.of<DataManager>(context, listen: false));
@@ -155,7 +153,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final worldRecord = _worldRecordWeights[exercise.id];
     final match = _exerciseMatches[exercise.id];
 
-    // Still loading matches
     if (_loadingRanks && !_exerciseMatches.containsKey(exercise.id)) {
       return Card(
         elevation: 2,
