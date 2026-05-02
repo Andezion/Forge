@@ -382,8 +382,6 @@ class _CommunityLeaderboardScreenState
     return _buildLeaderboardList(users, getSubtitle, icon);
   }
 
-  // ─── List UI ──────────────────────────────────────────────────────────────
-
   Widget _buildLeaderboardList(
     List<UserStats> users,
     String Function(UserStats) getSubtitle,
