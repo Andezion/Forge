@@ -76,7 +76,6 @@ class WorldRecordsService {
       debugPrint('[WorldRecords] Firestore error for $key: $e');
     }
 
-    // Fallback to local JSON
     return _getLocalRecord(
         exercise: exercise,
         weightClass: weightClass,
@@ -144,7 +143,6 @@ class WorldRecordsService {
     } catch (_) {}
   }
 
-  // Kept for backward compat with World Records tab
   Future<void> loadRecords() async => _ensureLocalLoaded();
 
   List<WorldRecord> getAllRecords() => List.unmodifiable(_localFallback);
