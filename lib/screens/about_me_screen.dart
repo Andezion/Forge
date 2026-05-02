@@ -20,6 +20,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   final _yearsTrainingController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _cityController = TextEditingController();
 
   final List<String> _focusList = [];
   final List<String> _injuryList = [];
@@ -100,6 +102,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     if (profile.yearsTraining != null) {
       _yearsTrainingController.text = profile.yearsTraining!.toStringAsFixed(1);
     }
+    if (profile.country != null) _countryController.text = profile.country!;
+    if (profile.city != null) _cityController.text = profile.city!;
   }
 
   @override
@@ -110,6 +114,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     _heightController.dispose();
     _weightController.dispose();
     _yearsTrainingController.dispose();
+    _countryController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 
@@ -160,6 +166,32 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 Text('Gender', style: AppTextStyles.body1),
                 const SizedBox(height: 8),
                 _buildGenderSelector(),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildSectionCard(
+              title: 'Location',
+              icon: Icons.location_on,
+              children: [
+                Text(
+                  'Used for country & city rankings in the community leaderboard',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _countryController,
+                  label: 'Country',
+                  hint: 'e.g. Russia',
+                  keyboardType: TextInputType.text,
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _cityController,
+                  label: 'City',
+                  hint: 'e.g. Moscow',
+                  keyboardType: TextInputType.text,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -685,6 +717,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
     final yearsTraining = double.tryParse(_yearsTrainingController.text.trim());
     await profile.setYearsTraining(yearsTraining);
+
+    final country = _countryController.text.trim();
+    await profile.setCountry(country.isEmpty ? null : country);
+
+    final city = _cityController.text.trim();
+    await profile.setCity(city.isEmpty ? null : city);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
