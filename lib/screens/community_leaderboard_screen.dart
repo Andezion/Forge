@@ -181,8 +181,6 @@ class _CommunityLeaderboardScreenState
     );
   }
 
-  // ─── Scope helpers ────────────────────────────────────────────────────────
-
   String? get _userCountry =>
       Provider.of<ProfileService>(context, listen: false).country;
   String? get _userCity =>
@@ -221,8 +219,6 @@ class _CommunityLeaderboardScreenState
       ),
     );
   }
-
-  // ─── Tab content ──────────────────────────────────────────────────────────
 
   Widget _buildWorkoutsLeaderboard() {
     final leaderboardService = Provider.of<LeaderboardService>(context);
