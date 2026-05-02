@@ -10,6 +10,8 @@ class UserStats {
   final bool isProfilePublic;
   final DateTime updatedAt;
   final double weeklyProgressPercentage;
+  final String? country;
+  final String? city;
 
   UserStats({
     required this.userId,
@@ -23,6 +25,8 @@ class UserStats {
     this.isProfilePublic = true,
     required this.updatedAt,
     this.weeklyProgressPercentage = 0.0,
+    this.country,
+    this.city,
   });
 
   Map<String, dynamic> toJson() {
@@ -38,6 +42,8 @@ class UserStats {
       'isProfilePublic': isProfilePublic,
       'updatedAt': updatedAt.toIso8601String(),
       'weeklyProgressPercentage': weeklyProgressPercentage,
+      if (country != null) 'country': country,
+      if (city != null) 'city': city,
     };
   }
 
@@ -59,6 +65,8 @@ class UserStats {
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       weeklyProgressPercentage:
           (json['weeklyProgressPercentage'] as num?)?.toDouble() ?? 0.0,
+      country: json['country'] as String?,
+      city: json['city'] as String?,
     );
   }
 
@@ -74,6 +82,8 @@ class UserStats {
     bool? isProfilePublic,
     DateTime? updatedAt,
     double? weeklyProgressPercentage,
+    String? country,
+    String? city,
   }) {
     return UserStats(
       userId: userId ?? this.userId,
@@ -88,6 +98,8 @@ class UserStats {
       updatedAt: updatedAt ?? this.updatedAt,
       weeklyProgressPercentage:
           weeklyProgressPercentage ?? this.weeklyProgressPercentage,
+      country: country ?? this.country,
+      city: city ?? this.city,
     );
   }
 }
