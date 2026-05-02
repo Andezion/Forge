@@ -19,6 +19,8 @@ class ProfileService extends ChangeNotifier {
   static const _keyTrainingDays = 'profile_training_days';
   static const _keySessionDuration = 'profile_session_duration';
   static const _keyInjuries = 'profile_injuries';
+  static const _keyCountry = 'profile_country';
+  static const _keyCity = 'profile_city';
 
   String? _imagePath;
   int _frameIndex = 0;
@@ -35,6 +37,8 @@ class ProfileService extends ChangeNotifier {
   int? _trainingDaysPerWeek;
   String? _sessionDuration;
   List<String> _injuries = [];
+  String? _country;
+  String? _city;
 
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
@@ -51,6 +55,8 @@ class ProfileService extends ChangeNotifier {
   int? get trainingDaysPerWeek => _trainingDaysPerWeek;
   String? get sessionDuration => _sessionDuration;
   List<String> get injuries => _injuries;
+  String? get country => _country;
+  String? get city => _city;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -74,6 +80,8 @@ class ProfileService extends ChangeNotifier {
         : null;
     _sessionDuration = prefs.getString(_keySessionDuration);
     _injuries = prefs.getStringList(_keyInjuries) ?? [];
+    _country = prefs.getString(_keyCountry);
+    _city = prefs.getString(_keyCity);
     try {
       final hist = prefs.getStringList(_keyWeightHistory) ?? [];
       _weightHistory.clear();
@@ -240,5 +248,27 @@ class ProfileService extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_keyInjuries, injuries);
+  }
+
+  Future<void> setCountry(String? country) async {
+    _country = country;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (country == null) {
+      await prefs.remove(_keyCountry);
+    } else {
+      await prefs.setString(_keyCountry, country);
+    }
+  }
+
+  Future<void> setCity(String? city) async {
+    _city = city;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (city == null) {
+      await prefs.remove(_keyCity);
+    } else {
+      await prefs.setString(_keyCity, city);
+    }
   }
 }
