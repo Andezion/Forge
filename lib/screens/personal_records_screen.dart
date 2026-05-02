@@ -60,7 +60,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       final exercise = _getExerciseById(entry.key, dataManager);
       if (exercise == null) continue;
 
-      // AI match exercise → squat/bench/deadlift
       final match = await _groqService.matchExerciseToRecord(
           exercise.id, exercise.name);
       _exerciseMatches[exercise.id] = match;
