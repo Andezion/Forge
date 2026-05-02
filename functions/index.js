@@ -17,7 +17,6 @@ const EVENTS = [
   { code: "D", name: "deadlift" },
 ];
 
-// OpenPowerlifting rankings API — returns top-N lifters for a given filter set
 async function fetchTopRecord(sex, weightClassCode, eventCode) {
   const url =
     `https://www.openpowerlifting.org/api/rankings?` +
