@@ -164,9 +164,6 @@ class LeaderboardService extends ChangeNotifier {
     return records;
   }
 
-  // Builds a base query filtered by scope.
-  // 'My League' requires an async pre-fetch of friend IDs, so it returns null
-  // and callers handle that case with the separate _leagueStream helper.
   Query<Map<String, dynamic>>? _scopedQuery(
     String field, {
     required String scope,
@@ -181,7 +178,6 @@ class LeaderboardService extends ChangeNotifier {
     } else if (scope == 'City' && userCity != null) {
       q = q.where('city', isEqualTo: userCity);
     }
-    // 'Global' and 'My League' — 'My League' handled separately
     return q.orderBy(field, descending: true).limit(limit);
   }
 
@@ -193,7 +189,6 @@ class LeaderboardService extends ChangeNotifier {
     final allIds = [...friendIds, if (_currentUserId != null) _currentUserId!];
     if (allIds.isEmpty) { yield []; return; }
 
-    // Firestore whereIn supports max 30 items
     final ids = allIds.take(30).toList();
     yield* _db
         .collection('user_stats')
