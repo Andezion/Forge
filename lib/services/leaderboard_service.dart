@@ -11,10 +11,28 @@ class LeaderboardService extends ChangeNotifier {
 
   String? get _currentUserId => _auth.currentUser?.uid;
 
+  Future<List<String>> getFriendIds() async {
+    final userId = _currentUserId;
+    if (userId == null) return [];
+    try {
+      final snap = await _db
+          .collection('users')
+          .doc(userId)
+          .collection('friends')
+          .get();
+      return snap.docs.map((d) => d.id).toList();
+    } catch (e) {
+      debugPrint('[LEADERBOARD] getFriendIds error: $e');
+      return [];
+    }
+  }
+
   Future<void> syncUserStats({
     required List<WorkoutHistory> workoutHistory,
     required bool isProfileHidden,
     double? userBodyWeight,
+    String? country,
+    String? city,
   }) async {
     final userId = _currentUserId;
     if (userId == null) return;
@@ -23,7 +41,8 @@ class LeaderboardService extends ChangeNotifier {
       final bodyWeight = userBodyWeight ?? 70.0;
 
       final stats = _calculateStats(
-          workoutHistory, userId, isProfileHidden, bodyWeight);
+          workoutHistory, userId, isProfileHidden, bodyWeight,
+          country: country, city: city);
 
       await _db.collection('user_stats').doc(userId).set(
             stats.toJson(),
@@ -40,8 +59,10 @@ class LeaderboardService extends ChangeNotifier {
     List<WorkoutHistory> workoutHistory,
     String userId,
     bool isProfileHidden,
-    double userBodyWeight,
-  ) {
+    double userBodyWeight, {
+    String? country,
+    String? city,
+  }) {
     final displayName = _auth.currentUser?.displayName ??
         _auth.currentUser?.email?.split('@').first ??
         'User';
@@ -80,6 +101,8 @@ class LeaderboardService extends ChangeNotifier {
       isProfileHidden: isProfileHidden,
       updatedAt: DateTime.now(),
       weeklyProgressPercentage: weeklyProgress,
+      country: country,
+      city: city,
     );
   }
 
@@ -141,111 +164,143 @@ class LeaderboardService extends ChangeNotifier {
     return records;
   }
 
+  // Builds a base query filtered by scope.
+  // 'My League' requires an async pre-fetch of friend IDs, so it returns null
+  // and callers handle that case with the separate _leagueStream helper.
+  Query<Map<String, dynamic>>? _scopedQuery(
+    String field, {
+    required String scope,
+    required String? userCountry,
+    required String? userCity,
+    required int limit,
+  }) {
+    var q = _db.collection('user_stats').where('isProfileHidden', isEqualTo: false);
+
+    if (scope == 'Country' && userCountry != null) {
+      q = q.where('country', isEqualTo: userCountry);
+    } else if (scope == 'City' && userCity != null) {
+      q = q.where('city', isEqualTo: userCity);
+    }
+    // 'Global' and 'My League' — 'My League' handled separately
+    return q.orderBy(field, descending: true).limit(limit);
+  }
+
+  Stream<List<UserStats>> _leagueStream(
+    String orderField, {
+    required int limit,
+  }) async* {
+    final friendIds = await getFriendIds();
+    final allIds = [...friendIds, if (_currentUserId != null) _currentUserId!];
+    if (allIds.isEmpty) { yield []; return; }
+
+    // Firestore whereIn supports max 30 items
+    final ids = allIds.take(30).toList();
+    yield* _db
+        .collection('user_stats')
+        .where('userId', whereIn: ids)
+        .orderBy(orderField, descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((s) => s.docs
+            .map((d) {
+              try { return UserStats.fromJson(d.data()); } catch (_) { return null; }
+            })
+            .whereType<UserStats>()
+            .toList());
+  }
+
+  Stream<List<UserStats>> _buildStream(
+    String orderField, {
+    required String scope,
+    required String? userCountry,
+    required String? userCity,
+    int limit = 100,
+  }) {
+    if (scope == 'My League') {
+      return _leagueStream(orderField, limit: limit);
+    }
+    final query = _scopedQuery(
+      orderField,
+      scope: scope,
+      userCountry: userCountry,
+      userCity: userCity,
+      limit: limit,
+    )!;
+    return query.snapshots().map((s) => s.docs
+        .map((d) {
+          try { return UserStats.fromJson(d.data()); } catch (_) { return null; }
+        })
+        .whereType<UserStats>()
+        .toList());
+  }
+
   Stream<List<UserStats>> getWorkoutCountLeaderboard({
     int limit = 100,
-    String? scope,
-  }) {
-    var query = _db
-        .collection('user_stats')
-        .where('isProfileHidden', isEqualTo: false)
-        .orderBy('workoutCount', descending: true)
-        .limit(limit);
-
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            try {
-              return UserStats.fromJson(doc.data());
-            } catch (e) {
-              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
-              return null;
-            }
-          })
-          .whereType<UserStats>()
-          .toList();
-    });
-  }
+    String scope = 'Global',
+    String? userCountry,
+    String? userCity,
+  }) => _buildStream('workoutCount',
+      scope: scope, userCountry: userCountry, userCity: userCity, limit: limit);
 
   Stream<List<UserStats>> getTotalWeightLeaderboard({
     int limit = 100,
-    String? scope,
-  }) {
-    var query = _db
-        .collection('user_stats')
-        .where('isProfileHidden', isEqualTo: false)
-        .orderBy('totalWeightLifted', descending: true)
-        .limit(limit);
-
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            try {
-              return UserStats.fromJson(doc.data());
-            } catch (e) {
-              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
-              return null;
-            }
-          })
-          .whereType<UserStats>()
-          .toList();
-    });
-  }
+    String scope = 'Global',
+    String? userCountry,
+    String? userCity,
+  }) => _buildStream('totalWeightLifted',
+      scope: scope, userCountry: userCountry, userCity: userCity, limit: limit);
 
   Stream<List<UserStats>> getStreakLeaderboard({
     int limit = 100,
-    String? scope,
-  }) {
-    var query = _db
-        .collection('user_stats')
-        .where('isProfileHidden', isEqualTo: false)
-        .orderBy('currentStreak', descending: true)
-        .limit(limit);
-
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            try {
-              return UserStats.fromJson(doc.data());
-            } catch (e) {
-              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
-              return null;
-            }
-          })
-          .whereType<UserStats>()
-          .toList();
-    });
-  }
+    String scope = 'Global',
+    String? userCountry,
+    String? userCity,
+  }) => _buildStream('currentStreak',
+      scope: scope, userCountry: userCountry, userCity: userCity, limit: limit);
 
   Stream<List<UserStats>> getExerciseRecordLeaderboard({
     required String exerciseId,
     int limit = 100,
-    String? scope,
+    String scope = 'Global',
+    String? userCountry,
+    String? userCity,
   }) {
-    return _db
+    if (scope == 'My League') {
+      return _leagueStream('workoutCount', limit: limit * 2).map((users) {
+        final filtered = users
+            .where((u) => (u.exerciseRecords[exerciseId] ?? 0) > 0)
+            .toList()
+          ..sort((a, b) {
+            final aR = a.exerciseRecords[exerciseId] ?? 0.0;
+            final bR = b.exerciseRecords[exerciseId] ?? 0.0;
+            return bR.compareTo(aR);
+          });
+        return filtered.take(limit).toList();
+      });
+    }
+
+    var q = _db
         .collection('user_stats')
-        .where('exerciseRecords.$exerciseId', isGreaterThan: 0)
-        .limit(limit * 2)
-        .snapshots()
-        .map((snapshot) {
+        .where('exerciseRecords.$exerciseId', isGreaterThan: 0);
+    if (scope == 'Country' && userCountry != null) {
+      q = q.where('country', isEqualTo: userCountry);
+    } else if (scope == 'City' && userCity != null) {
+      q = q.where('city', isEqualTo: userCity);
+    }
+
+    return q.limit(limit * 2).snapshots().map((snapshot) {
       final users = snapshot.docs
           .map((doc) {
-            try {
-              return UserStats.fromJson(doc.data());
-            } catch (e) {
-              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
-              return null;
-            }
+            try { return UserStats.fromJson(doc.data()); } catch (_) { return null; }
           })
           .whereType<UserStats>()
           .where((u) => !u.isProfileHidden)
-          .toList();
-
-      users.sort((a, b) {
-        final aRecord = a.exerciseRecords[exerciseId] ?? 0.0;
-        final bRecord = b.exerciseRecords[exerciseId] ?? 0.0;
-        return bRecord.compareTo(aRecord);
-      });
-
+          .toList()
+        ..sort((a, b) {
+          final aR = a.exerciseRecords[exerciseId] ?? 0.0;
+          final bR = b.exerciseRecords[exerciseId] ?? 0.0;
+          return bR.compareTo(aR);
+        });
       return users.take(limit).toList();
     });
   }
@@ -284,28 +339,32 @@ class LeaderboardService extends ChangeNotifier {
 
   Stream<List<UserStats>> getProgressLeaderboard({
     int limit = 100,
-    String? scope,
+    String scope = 'Global',
+    String? userCountry,
+    String? userCity,
   }) {
-    return _db
+    if (scope == 'My League') {
+      return _leagueStream('weeklyProgressPercentage', limit: limit);
+    }
+    var q = _db
         .collection('user_stats')
-        .where('weeklyProgressPercentage', isGreaterThan: 0)
+        .where('weeklyProgressPercentage', isGreaterThan: 0);
+    if (scope == 'Country' && userCountry != null) {
+      q = q.where('country', isEqualTo: userCountry);
+    } else if (scope == 'City' && userCity != null) {
+      q = q.where('city', isEqualTo: userCity);
+    }
+    return q
         .orderBy('weeklyProgressPercentage', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            try {
-              return UserStats.fromJson(doc.data());
-            } catch (e) {
-              debugPrint('[LEADERBOARD] Error parsing user stats: $e');
-              return null;
-            }
-          })
-          .whereType<UserStats>()
-          .where((u) => !u.isProfileHidden)
-          .toList();
-    });
+        .map((s) => s.docs
+            .map((d) {
+              try { return UserStats.fromJson(d.data()); } catch (_) { return null; }
+            })
+            .whereType<UserStats>()
+            .where((u) => !u.isProfileHidden)
+            .toList());
   }
 
   double _calculateWeeklyProgress(
