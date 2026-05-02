@@ -45,3 +45,5 @@ macos/
 windows/
 web/
 .env
+functions/node_modules/
+functions/package-lock.json
