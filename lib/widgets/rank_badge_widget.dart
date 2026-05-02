@@ -145,7 +145,6 @@ class _RankPainter extends CustomPainter {
     canvas.drawPath(gearPath, border);
   }
 
-  // ─── BRONZE / SILVER: classic shield ─────────────────────────────────────
   void _drawShield(Canvas canvas, Size s, StrengthRank r) {
     final path = _shieldPath(s);
 
