@@ -164,10 +164,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       );
     }
 
-    // No world record match for this exercise
     if (match == null || best == null) return const SizedBox.shrink();
 
-    // No world record data loaded yet
     if (worldRecord == null) return const SizedBox.shrink();
 
     final rank = RankService.calculateRank(best, worldRecord);
