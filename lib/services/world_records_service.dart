@@ -15,14 +15,12 @@ class WorldRecordsService {
   List<WorldRecord> _localFallback = [];
   bool _localLoaded = false;
 
-  // In-memory cache for the session
   final Map<String, WorldRecord?> _sessionCache = {};
 
   static const _prefsCachePrefix = 'wr_fs_';
   static const _prefsTsPrefix = 'wr_fs_ts_';
   static const _cacheTtlSeconds = 24 * 3600;
 
-  // Converts local weight class format ('-83 kg') to Firestore key ('83')
   static String normalizeWeightClass(String wc) {
     if (wc.startsWith('+')) return '120p';
     return wc.replaceAll(' kg', '').replaceAll('-', '').replaceAll('+', 'p');
@@ -46,14 +44,12 @@ class WorldRecordsService {
 
     if (_sessionCache.containsKey(key)) return _sessionCache[key];
 
-    // Try SharedPreferences cache first (24h TTL)
     final cached = await _loadPrefsCache(key);
     if (cached != null) {
       _sessionCache[key] = cached;
       return cached;
     }
 
-    // Fetch from Firestore
     try {
       final doc = await _db.collection('world_records').doc(key).get();
       if (doc.exists && doc.data() != null) {
