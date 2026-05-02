@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../services/auth_service.dart';
 import '../services/leaderboard_service.dart';
 import '../services/data_manager.dart';
+import '../services/profile_service.dart';
 import '../models/user_stats.dart';
 import '../models/exercise.dart';
 import '../models/friend.dart';
@@ -18,15 +19,23 @@ class CommunityLeaderboardScreen extends StatefulWidget {
       _CommunityLeaderboardScreenState();
 }
 
-class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
+class _CommunityLeaderboardScreenState
+    extends State<CommunityLeaderboardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedScope = 'Global';
   String _selectedPeriod = 'All Time';
   Exercise? _selectedExercise;
 
-  final List<String> _scopes = ['Global', 'Friends', 'Country', 'City'];
-  final List<String> _periods = ['All Time', 'This Month', 'This Week'];
+  static const _scopes = ['Global', 'My League', 'Country', 'City'];
+  static const _periods = ['All Time', 'This Month', 'This Week'];
+
+  static const _scopeIcons = {
+    'Global': Icons.public,
+    'My League': Icons.shield,
+    'Country': Icons.flag_outlined,
+    'City': Icons.location_city,
+  };
 
   @override
   void initState() {
@@ -93,15 +102,11 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Expanded(
-            child: _buildFilterChip(_selectedScope, _scopes, (value) {
-              setState(() => _selectedScope = value);
-            }),
-          ),
+          Expanded(child: _buildScopeChip()),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildFilterChip(_selectedPeriod, _periods, (value) {
-              setState(() => _selectedPeriod = value);
+            child: _buildFilterDropdown(_selectedPeriod, _periods, (v) {
+              setState(() => _selectedPeriod = v);
             }),
           ),
         ],
@@ -109,17 +114,14 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
     );
   }
 
-  Widget _buildFilterChip(
-    String value,
-    List<String> options,
-    Function(String) onChanged,
-  ) {
+  Widget _buildScopeChip() {
     return DropdownButtonFormField<String>(
-      value: value,
+      value: _selectedScope,
       dropdownColor: AppColors.primary,
       decoration: InputDecoration(
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: AppColors.textOnPrimary),
@@ -130,70 +132,127 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
         ),
       ),
       style: AppTextStyles.body2.copyWith(color: Colors.black),
-      items: options.map((option) {
+      items: _scopes.map((scope) {
         return DropdownMenuItem<String>(
-          value: option,
-          child: Text(
-            option,
-            style: AppTextStyles.body2.copyWith(color: Colors.black),
+          value: scope,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(_scopeIcons[scope], size: 16, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Text(scope,
+                  style: AppTextStyles.body2.copyWith(color: Colors.black)),
+            ],
           ),
         );
       }).toList(),
-      onChanged: (newValue) {
-        if (newValue != null) onChanged(newValue);
+      onChanged: (v) {
+        if (v != null) setState(() => _selectedScope = v);
       },
     );
   }
 
+  Widget _buildFilterDropdown(
+      String value, List<String> options, void Function(String) onChanged) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      dropdownColor: AppColors.primary,
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: AppColors.textOnPrimary),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: AppColors.textOnPrimary),
+        ),
+      ),
+      style: AppTextStyles.body2.copyWith(color: Colors.black),
+      items: options
+          .map((o) => DropdownMenuItem<String>(
+              value: o,
+              child:
+                  Text(o, style: AppTextStyles.body2.copyWith(color: Colors.black))))
+          .toList(),
+      onChanged: (v) { if (v != null) onChanged(v); },
+    );
+  }
+
+  // ─── Scope helpers ────────────────────────────────────────────────────────
+
+  String? get _userCountry =>
+      Provider.of<ProfileService>(context, listen: false).country;
+  String? get _userCity =>
+      Provider.of<ProfileService>(context, listen: false).city;
+
+  Widget _buildScopeEmptyState() {
+    String message;
+    if (_selectedScope == 'Country' && _userCountry == null) {
+      message = 'Set your country in Profile → About Me to see country rankings';
+    } else if (_selectedScope == 'City' && _userCity == null) {
+      message = 'Set your city in Profile → About Me to see city rankings';
+    } else if (_selectedScope == 'My League') {
+      message = 'Add friends to see your league rankings';
+    } else {
+      message = 'No data available yet';
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _scopeIcons[_selectedScope] ?? Icons.people_outline,
+              size: 64,
+              color: AppColors.textSecondary.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: 16),
+            Text(message,
+                style: AppTextStyles.body1
+                    .copyWith(color: AppColors.textSecondary),
+                textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Tab content ──────────────────────────────────────────────────────────
+
   Widget _buildWorkoutsLeaderboard() {
     final leaderboardService = Provider.of<LeaderboardService>(context);
-
     return StreamBuilder<List<UserStats>>(
       stream: leaderboardService.getWorkoutCountLeaderboard(
         scope: _selectedScope,
+        userCountry: _userCountry,
+        userCity: _userCity,
       ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final users = snapshot.data ?? [];
-        return _buildLeaderboardList(
-          users,
-          (user) => '${user.workoutCount} workouts',
-          Icons.fitness_center,
-        );
-      },
+      builder: (context, snapshot) => _buildStreamBody(
+        snapshot,
+        (user) => '${user.workoutCount} workouts',
+        Icons.fitness_center,
+      ),
     );
   }
 
   Widget _buildTotalWeightLeaderboard() {
     final leaderboardService = Provider.of<LeaderboardService>(context);
-
     return StreamBuilder<List<UserStats>>(
       stream: leaderboardService.getTotalWeightLeaderboard(
         scope: _selectedScope,
+        userCountry: _userCountry,
+        userCity: _userCity,
       ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final users = snapshot.data ?? [];
-        return _buildLeaderboardList(
-          users,
-          (user) => '${user.totalWeightLifted.toStringAsFixed(0)} kg',
-          Icons.bar_chart,
-        );
-      },
+      builder: (context, snapshot) => _buildStreamBody(
+        snapshot,
+        (user) => '${user.totalWeightLifted.toStringAsFixed(0)} kg',
+        Icons.bar_chart,
+      ),
     );
   }
 
@@ -204,9 +263,7 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
 
     if (_selectedExercise == null && exercises.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _selectedExercise = exercises.first;
-        });
+        setState(() => _selectedExercise = exercises.first);
       });
     }
 
@@ -217,13 +274,9 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
           color: AppColors.surface,
           child: Row(
             children: [
-              Text(
-                'Exercise:',
-                style: AppTextStyles.body1.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('Exercise:',
+                  style: AppTextStyles.body1
+                      .copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 12),
               Expanded(
                 child: DropdownButtonFormField<Exercise>(
@@ -232,9 +285,7 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
+                        horizontal: 12, vertical: 8),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(color: AppColors.primary),
@@ -245,22 +296,15 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                     ),
                   ),
                   style: AppTextStyles.body2.copyWith(color: Colors.black),
-                  items: exercises.map((exercise) {
-                    return DropdownMenuItem<Exercise>(
-                      value: exercise,
-                      child: Text(
-                        exercise.name,
-                        style:
-                            AppTextStyles.body2.copyWith(color: Colors.black),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (exercise) {
-                    if (exercise != null) {
-                      setState(() {
-                        _selectedExercise = exercise;
-                      });
-                    }
+                  items: exercises
+                      .map((ex) => DropdownMenuItem<Exercise>(
+                          value: ex,
+                          child: Text(ex.name,
+                              style: AppTextStyles.body2
+                                  .copyWith(color: Colors.black))))
+                      .toList(),
+                  onChanged: (ex) {
+                    if (ex != null) setState(() => _selectedExercise = ex);
                   },
                 ),
               ),
@@ -274,29 +318,20 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                   stream: leaderboardService.getExerciseRecordLeaderboard(
                     exerciseId: _selectedExercise!.id,
                     scope: _selectedScope,
+                    userCountry: _userCountry,
+                    userCity: _userCity,
                   ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-
-                    final users = snapshot.data ?? [];
-                    return _buildLeaderboardList(
-                      users,
-                      (user) {
-                        final record =
-                            user.exerciseRecords[_selectedExercise!.id];
-                        return record != null
-                            ? '${record.toStringAsFixed(1)} kg'
-                            : 'No record';
-                      },
-                      Icons.emoji_events,
-                    );
-                  },
+                  builder: (context, snapshot) => _buildStreamBody(
+                    snapshot,
+                    (user) {
+                      final record =
+                          user.exerciseRecords[_selectedExercise!.id];
+                      return record != null
+                          ? '${record.toStringAsFixed(1)} kg'
+                          : 'No record';
+                    },
+                    Icons.emoji_events,
+                  ),
                 ),
         ),
       ],
@@ -305,55 +340,53 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
 
   Widget _buildStreakLeaderboard() {
     final leaderboardService = Provider.of<LeaderboardService>(context);
-
     return StreamBuilder<List<UserStats>>(
       stream: leaderboardService.getStreakLeaderboard(
         scope: _selectedScope,
+        userCountry: _userCountry,
+        userCity: _userCity,
       ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final users = snapshot.data ?? [];
-        return _buildLeaderboardList(
-          users,
-          (user) => '${user.currentStreak} days',
-          Icons.local_fire_department,
-        );
-      },
+      builder: (context, snapshot) => _buildStreamBody(
+        snapshot,
+        (user) => '${user.currentStreak} days',
+        Icons.local_fire_department,
+      ),
     );
   }
 
   Widget _buildProgressLeaderboard() {
     final leaderboardService = Provider.of<LeaderboardService>(context);
-
     return StreamBuilder<List<UserStats>>(
       stream: leaderboardService.getProgressLeaderboard(
         scope: _selectedScope,
+        userCountry: _userCountry,
+        userCity: _userCity,
       ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final users = snapshot.data ?? [];
-        return _buildLeaderboardList(
-          users,
-          (user) => '+${user.weeklyProgressPercentage.toStringAsFixed(1)}%',
-          Icons.trending_up,
-        );
-      },
+      builder: (context, snapshot) => _buildStreamBody(
+        snapshot,
+        (user) => '+${user.weeklyProgressPercentage.toStringAsFixed(1)}%',
+        Icons.trending_up,
+      ),
     );
   }
+
+  Widget _buildStreamBody(
+    AsyncSnapshot<List<UserStats>> snapshot,
+    String Function(UserStats) getSubtitle,
+    IconData icon,
+  ) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (snapshot.hasError) {
+      return Center(child: Text('Error: ${snapshot.error}'));
+    }
+    final users = snapshot.data ?? [];
+    if (users.isEmpty) return _buildScopeEmptyState();
+    return _buildLeaderboardList(users, getSubtitle, icon);
+  }
+
+  // ─── List UI ──────────────────────────────────────────────────────────────
 
   Widget _buildLeaderboardList(
     List<UserStats> users,
@@ -362,33 +395,6 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
   ) {
     final auth = Provider.of<AuthService>(context);
     final currentUserId = auth.firebaseUser?.uid;
-
-    if (users.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No data available',
-              style: AppTextStyles.h3.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Complete workouts to see rankings',
-              style: AppTextStyles.body2.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -413,24 +419,18 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
           child: ListTile(
             onTap: isCurrentUser
                 ? null
-                : () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => UserProfileScreen(
-                          friend: Friend(
-                            userId: user.userId,
-                            name: user.displayName,
-                            email: '',
-                            friendsSince: DateTime.now(),
-                          ),
+                : () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => UserProfileScreen(
+                        friend: Friend(
+                          userId: user.userId,
+                          name: user.displayName,
+                          email: '',
+                          friendsSince: DateTime.now(),
                         ),
                       ),
-                    );
-                  },
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
+                    )),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -438,11 +438,9 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                 const SizedBox(width: 12),
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: _getRankColor(rank).withValues(alpha: 0.2),
-                  child: Icon(
-                    Icons.person,
-                    color: _getRankColor(rank),
-                  ),
+                  backgroundColor:
+                      _getRankColor(rank).withValues(alpha: 0.2),
+                  child: Icon(Icons.person, color: _getRankColor(rank)),
                 ),
               ],
             ),
@@ -452,17 +450,16 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                   child: Text(
                     user.displayName,
                     style: AppTextStyles.body1.copyWith(
-                      fontWeight:
-                          isCurrentUser ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isCurrentUser
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
                 if (isCurrentUser)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                        horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -470,9 +467,8 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                     child: Text(
                       'You',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textOnPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          color: AppColors.textOnPrimary,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
               ],
@@ -484,15 +480,18 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
                   Icon(icon, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(getSubtitle(user)),
+                  if (user.country != null) ...[
+                    const SizedBox(width: 8),
+                    Text('· ${user.country}',
+                        style: AppTextStyles.caption
+                            .copyWith(color: AppColors.textSecondary)),
+                  ],
                 ],
               ),
             ),
             trailing: rank <= 3
-                ? Icon(
-                    Icons.emoji_events,
-                    color: _getRankColor(rank),
-                    size: 28,
-                  )
+                ? Icon(Icons.emoji_events,
+                    color: _getRankColor(rank), size: 28)
                 : null,
           ),
         );
@@ -504,17 +503,13 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(
-        color: _getRankColor(rank),
-        shape: BoxShape.circle,
-      ),
+      decoration:
+          BoxDecoration(color: _getRankColor(rank), shape: BoxShape.circle),
       child: Center(
         child: Text(
           '$rank',
           style: AppTextStyles.body2.copyWith(
-            color: AppColors.textOnPrimary,
-            fontWeight: FontWeight.bold,
-          ),
+              color: AppColors.textOnPrimary, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -522,14 +517,10 @@ class _CommunityLeaderboardScreenState extends State<CommunityLeaderboardScreen>
 
   Color _getRankColor(int rank) {
     switch (rank) {
-      case 1:
-        return const Color(0xFFFFD700);
-      case 2:
-        return const Color(0xFFC0C0C0);
-      case 3:
-        return const Color(0xFFCD7F32);
-      default:
-        return AppColors.primary;
+      case 1: return const Color(0xFFFFD700);
+      case 2: return const Color(0xFFC0C0C0);
+      case 3: return const Color(0xFFCD7F32);
+      default: return AppColors.primary;
     }
   }
 }
