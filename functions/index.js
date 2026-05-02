@@ -71,7 +71,6 @@ async function updateAllRecords() {
   for (const { sex, gender, classes } of genderConfigs) {
     for (const wc of classes) {
       for (const { code, name: exercise } of EVENTS) {
-        // Firestore doc key: squat_83_male_raw  (120+ → 120p)
         const wcKey = wc.replace("+", "p");
         const docId = `${exercise}_${wcKey}_${gender}_raw`;
 
