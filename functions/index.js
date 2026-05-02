@@ -50,7 +50,6 @@ async function fetchTopRecord(sex, weightClassCode, eventCode) {
   if (!data.rows || data.rows.length === 0) return null;
 
   const row = data.rows[0];
-  // row[1] = FullName, row[4] = Country, row[9] = Total (best lift for single event)
   const athleteName = row[1] || "Unknown";
   const country = row[4] || "";
   const bestWeight = parseFloat(row[9]);
