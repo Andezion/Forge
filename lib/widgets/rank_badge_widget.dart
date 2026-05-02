@@ -358,7 +358,6 @@ class _RankPainter extends CustomPainter {
       ..close();
     canvas.drawPath(path, Paint()..color = color);
 
-    // Crown jewels
     final jewel = Paint()..color = const Color(0xFFF59E0B);
     for (final dx in [-width * 0.22, 0.0, width * 0.22]) {
       canvas.drawCircle(Offset(cx + dx, cy - h * 0.25), width * 0.06, jewel);
