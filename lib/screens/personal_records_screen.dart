@@ -266,8 +266,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     );
   }
 
-  // ─── All records list with rank badge ─────────────────────────────────────
-
   Widget _buildWorldRecordsTab(ProfileService profile) {
     final userWeight = profile.weightKg ?? 75.0;
     final weightClass = _getWeightClass(userWeight);
@@ -533,7 +531,6 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       );
     }
 
-    // Sort by rank descending (diamond first)
     final sorted = records.entries.toList()
       ..sort((a, b) {
         final wrA = _worldRecordWeights[a.key];
