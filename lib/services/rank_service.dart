@@ -10,7 +10,6 @@ class RankService {
     return StrengthRank.wooden;
   }
 
-  // 0.0–1.0 прогресс внутри текущего ранга
   static double progressWithinRank(double userBest, double worldRecord) {
     if (worldRecord <= 0) return 0.0;
     final percent = (userBest / worldRecord * 100).clamp(0.0, 105.0);
