@@ -9,7 +9,6 @@ initializeApp();
 const db = getFirestore();
 
 const MALE_WEIGHT_CLASSES = ["59", "66", "74", "83", "93", "105", "120", "120+"];
-// Weight class codes (female)
 const FEMALE_WEIGHT_CLASSES = ["47", "52", "57", "63", "69", "76", "84", "84+"];
 
 const EVENTS = [
