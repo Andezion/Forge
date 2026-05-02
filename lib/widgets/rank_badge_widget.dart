@@ -56,7 +56,6 @@ class _RankPainter extends CustomPainter {
 
     canvas.drawCircle(Offset(cx, cy), r, fill);
 
-    // Wood grain lines
     final linePaint = Paint()
       ..color = const Color(0xFF4A2B0A).withValues(alpha: 0.35)
       ..strokeWidth = s.width * 0.03
@@ -78,7 +77,6 @@ class _RankPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx, cy), r, border);
   }
 
-  // ─── STONE: irregular polygon ──────────────────────────────────────────────
   void _drawStone(Canvas canvas, Size s) {
     final cx = s.width / 2;
     final cy = s.height / 2;
