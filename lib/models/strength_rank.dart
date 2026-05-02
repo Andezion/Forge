@@ -39,7 +39,6 @@ extension StrengthRankExt on StrengthRank {
     }
   }
 
-  // Минимальный % от мирового рекорда для этого ранга
   double get minPercent {
     switch (this) {
       case StrengthRank.wooden:  return 0.0;
