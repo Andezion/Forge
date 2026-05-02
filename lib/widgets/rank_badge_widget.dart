@@ -237,7 +237,6 @@ class _RankPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, s.width, s.height));
     canvas.drawPath(path, fill);
 
-    // Facets
     final facet = Paint()
       ..color = Colors.white.withValues(alpha: 0.6)
       ..strokeWidth = s.width * 0.025
@@ -258,8 +257,6 @@ class _RankPainter extends CustomPainter {
       ..strokeWidth = s.width * 0.05;
     canvas.drawPath(path, border);
   }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
 
   Path _shieldPath(Size s) {
     final w = s.width;
