@@ -101,7 +101,6 @@ async function updateAllRecords() {
         } catch (err) {
           console.error(`[WR] Error updating ${docId}:`, err.message);
           errors++;
-          // Continue with next record
         }
       }
     }
