@@ -404,9 +404,6 @@ Return ONLY a JSON object (no markdown, no extra text):
     }
   }
 
-  // Matches a user exercise name to a standard powerlifting lift via AI.
-  // Returns 'squat', 'bench', 'deadlift', or null if no confident match.
-  // Result is cached in SharedPreferences to avoid repeated API calls.
   Future<String?> matchExerciseToRecord(String exerciseId, String exerciseName) async {
     const cachePrefix = 'rankMatch_';
     final prefs = await SharedPreferences.getInstance();
