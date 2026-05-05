@@ -140,6 +140,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
             const SizedBox(height: 24),
             _buildAllRecordsList(records, dataManager),
           ],
+          const SizedBox(height: 32),
+          _buildRankLadder(),
         ],
       ),
     );
@@ -164,9 +166,43 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       );
     }
 
-    if (match == null || best == null) return const SizedBox.shrink();
+    if (best == null) return const SizedBox.shrink();
 
-    if (worldRecord == null) return const SizedBox.shrink();
+    if (match == null || worldRecord == null) {
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              RankBadgeWidget(rank: StrengthRank.wooden, size: 56),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your Rank', style: AppTextStyles.caption),
+                    const SizedBox(height: 2),
+                    Text(
+                      StrengthRank.wooden.displayName,
+                      style: AppTextStyles.h2
+                          .copyWith(color: StrengthRank.wooden.color),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'World record data unavailable — rank will update once loaded.',
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final rank = RankService.calculateRank(best, worldRecord);
     final percent = RankService.percentOfWorldRecord(best, worldRecord);
@@ -260,6 +296,72 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 style: AppTextStyles.caption
                     .copyWith(color: rank.color, fontWeight: FontWeight.bold),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRankLadder() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Rank System', style: AppTextStyles.h3),
+            const SizedBox(height: 4),
+            Text(
+              'Based on % of the world record in your weight class',
+              style: AppTextStyles.caption
+                  .copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            ...StrengthRank.values.reversed.map((rank) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    children: [
+                      RankBadgeWidget(rank: rank, size: 36),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              rank.displayName,
+                              style: AppTextStyles.body1.copyWith(
+                                color: rank.color,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${rank.minPercent.toStringAsFixed(0)}% – ${rank.maxPercent.toStringAsFixed(0)}% of world record',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 80,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: rank.minPercent / 105.0,
+                            minHeight: 6,
+                            backgroundColor:
+                                rank.color.withValues(alpha: 0.15),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(rank.color),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
       ),
@@ -563,8 +665,10 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   Widget _buildRecordListItem(Exercise exercise, ExerciseSummary record) {
     final worldRecord = _worldRecordWeights[exercise.id];
     final best = record.estimated1RM ?? record.actualMax;
-    final rank = (worldRecord != null && best != null)
-        ? RankService.calculateRank(best, worldRecord)
+    final rank = best != null
+        ? (worldRecord != null
+            ? RankService.calculateRank(best, worldRecord)
+            : StrengthRank.wooden)
         : null;
 
     return Card(
