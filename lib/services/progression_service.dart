@@ -17,13 +17,10 @@ class ProgressMetrics {
   final int sessionsCount;
   final int avgDurationSeconds;
   final ExerciseDifficulty? lastPerceivedDifficulty;
-  // weightTrend: regression slope in kg per session (positive = gaining weight)
   final double weightTrend;
-  // performanceTrend: regression slope in reps per session (positive = gaining reps)
   final double performanceTrend;
   final double estimated1RM;
   final int daysSinceLastSession;
-  // Most recent session's actual values — used as the base for next suggestion
   final double lastActualWeight;
   final double lastActualReps;
 
@@ -72,7 +69,6 @@ class ProgressionService {
     return oneRM / (1 + targetReps / 30.0);
   }
 
-  // Least-squares linear regression slope for a chronologically ordered series.
   double _linearSlope(List<double> values) {
     final n = values.length;
     if (n < 2) return 0.0;
@@ -143,11 +139,6 @@ class ProgressionService {
     return 1.0;
   }
 
-  /// Analyses an exercise over the last [lookbackDays] days.
-  ///
-  /// [weightTrend] and [performanceTrend] are now linear-regression slopes
-  /// (kg/session and reps/session respectively), computed from actual data
-  /// sorted chronologically oldest-first.
   ProgressMetrics analyzeExerciseHistory(
     String exerciseId,
     List<WorkoutHistory> histories, {
@@ -156,7 +147,6 @@ class ProgressionService {
   }) {
     final cutoff = DateTime.now().subtract(Duration(days: lookbackDays));
 
-    // Collect matching sessions within the window, sorted oldest → newest.
     final sortedHistories = histories.toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
