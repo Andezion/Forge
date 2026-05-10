@@ -53,10 +53,6 @@ class ProgressAnalyticsService {
     final volumePoints = <ChartDataPoint>[];
     final intensityPoints = <ChartDataPoint>[];
 
-    double currentMax = 0;
-    double previousMax = 0;
-    bool foundCurrent = false;
-
     for (var history in relevantHistories) {
       for (var exerciseResult in history.session.exerciseResults) {
         if (exerciseResult.exercise.id == exerciseId) {
@@ -70,13 +66,6 @@ class ProgressAnalyticsService {
               maxWeight = effectiveWeight;
             }
             totalVolume += effectiveWeight * set.actualReps;
-          }
-
-          if (!foundCurrent && maxWeight > 0) {
-            currentMax = maxWeight;
-            foundCurrent = true;
-          } else if (foundCurrent && previousMax == 0 && maxWeight > 0) {
-            previousMax = maxWeight;
           }
 
           maxWeightPoints.add(ChartDataPoint(
@@ -103,10 +92,15 @@ class ProgressAnalyticsService {
       }
     }
 
-    double progressPercentage = 0;
-    if (previousMax > 0) {
-      progressPercentage = ((currentMax - previousMax) / previousMax) * 100;
-    }
+    // Use the most recent session as current, second-most-recent as previous
+    final currentMax =
+        maxWeightPoints.isNotEmpty ? maxWeightPoints.last.value : 0.0;
+    final previousMax = maxWeightPoints.length > 1
+        ? maxWeightPoints[maxWeightPoints.length - 2].value
+        : 0.0;
+    final progressPercentage = previousMax > 0
+        ? ((currentMax - previousMax) / previousMax) * 100
+        : 0.0;
 
     final result = ExerciseProgressData(
       exerciseId: exerciseId,
