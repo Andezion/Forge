@@ -57,7 +57,6 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
       final result = await _progressionService.suggestNextWorkout(
         widget.workout,
         histories,
-        lookback: 5,
       );
 
       final metrics = <String, ProgressMetrics>{};
@@ -66,7 +65,6 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
             _progressionService.analyzeExerciseHistory(
           exercise.exercise.id,
           histories,
-          lookback: 5,
         );
       }
 
