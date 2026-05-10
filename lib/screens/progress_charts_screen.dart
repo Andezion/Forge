@@ -999,10 +999,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               getTitlesWidget: (value, meta) {
                 if (value.toInt() >= 0 && value.toInt() < data.length) {
                   final date = data[value.toInt()].date;
+                  final fmt = _lookbackDays >= 180
+                      ? DateFormat('MMM yy')
+                      : DateFormat('dd/MM');
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      DateFormat('dd/MM').format(date),
+                      fmt.format(date),
                       style: const TextStyle(fontSize: 10),
                     ),
                   );
@@ -1048,6 +1051,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       return Center(child: Text(l10n.noDataToDisplay));
     }
 
+    final barWidth = data.length > 26
+        ? 6.0
+        : data.length > 13
+            ? 10.0
+            : 16.0;
     final barGroups = data
         .asMap()
         .entries
@@ -1057,7 +1065,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                 BarChartRodData(
                   toY: e.value.value,
                   color: AppColors.primary,
-                  width: 16,
+                  width: barWidth,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),
                     topRight: Radius.circular(4),
@@ -1066,6 +1074,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               ],
             ))
         .toList();
+
+    final double barLabelInterval =
+        data.length > 8 ? (data.length / 5).ceilToDouble() : 1.0;
+    final barFmt =
+        _lookbackDays >= 180 ? DateFormat('MMM yy') : DateFormat('dd/MM');
 
     return BarChart(
       BarChartData(
@@ -1096,13 +1109,14 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
+              interval: barLabelInterval,
               getTitlesWidget: (value, meta) {
                 if (value.toInt() >= 0 && value.toInt() < data.length) {
                   final date = data[value.toInt()].date;
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      DateFormat('dd/MM').format(date),
+                      barFmt.format(date),
                       style: const TextStyle(fontSize: 10),
                     ),
                   );
