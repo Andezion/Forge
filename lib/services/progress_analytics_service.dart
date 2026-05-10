@@ -92,7 +92,6 @@ class ProgressAnalyticsService {
       }
     }
 
-    // Use the most recent session as current, second-most-recent as previous
     final currentMax =
         maxWeightPoints.isNotEmpty ? maxWeightPoints.last.value : 0.0;
     final previousMax = maxWeightPoints.length > 1
