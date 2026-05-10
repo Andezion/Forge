@@ -113,8 +113,11 @@ void main() {
 
       expect(metrics.completionRate, equals(1.0));
       expect(metrics.sessionsCount, equals(5));
+      // Weight increases each session → positive slope
       expect(metrics.weightTrend, greaterThan(0));
-      expect(metrics.performanceTrend, greaterThan(0));
+      // Reps are flat across sessions → slope ≈ 0
+      expect(metrics.performanceTrend, closeTo(0.0, 0.5));
+      expect(metrics.lastActualWeight, equals(90.0));
       expect(metrics.estimated1RM, greaterThan(100));
       expect(metrics.daysSinceLastSession, equals(2));
     });
