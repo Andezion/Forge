@@ -17,10 +17,15 @@ class ProgressMetrics {
   final int sessionsCount;
   final int avgDurationSeconds;
   final ExerciseDifficulty? lastPerceivedDifficulty;
+  // weightTrend: regression slope in kg per session (positive = gaining weight)
   final double weightTrend;
+  // performanceTrend: regression slope in reps per session (positive = gaining reps)
   final double performanceTrend;
   final double estimated1RM;
   final int daysSinceLastSession;
+  // Most recent session's actual values — used as the base for next suggestion
+  final double lastActualWeight;
+  final double lastActualReps;
 
   ProgressMetrics({
     required this.completionRate,
@@ -33,6 +38,8 @@ class ProgressMetrics {
     this.performanceTrend = 0.0,
     this.estimated1RM = 0.0,
     this.daysSinceLastSession = 0,
+    this.lastActualWeight = 0.0,
+    this.lastActualReps = 0.0,
   });
 }
 
@@ -52,6 +59,7 @@ class SuggestedExerciseAdjustment {
 
 class ProgressionService {
   final GoalCoefficientsService _goalService = GoalCoefficientsService();
+
   double calculate1RM(double weight, int reps) {
     if (weight <= 0 || reps <= 0) return 0.0;
     if (reps == 1) return weight;
@@ -62,6 +70,21 @@ class ProgressionService {
     if (oneRM <= 0 || targetReps <= 0) return 0.0;
     if (targetReps == 1) return oneRM;
     return oneRM / (1 + targetReps / 30.0);
+  }
+
+  // Least-squares linear regression slope for a chronologically ordered series.
+  double _linearSlope(List<double> values) {
+    final n = values.length;
+    if (n < 2) return 0.0;
+    double xMean = (n - 1) / 2.0;
+    double yMean = values.fold(0.0, (a, b) => a + b) / n;
+    double num = 0.0, den = 0.0;
+    for (var i = 0; i < n; i++) {
+      final dx = i - xMean;
+      num += dx * (values[i] - yMean);
+      den += dx * dx;
+    }
+    return den == 0.0 ? 0.0 : num / den;
   }
 
   bool shouldDeload(
@@ -120,16 +143,28 @@ class ProgressionService {
     return 1.0;
   }
 
+  /// Analyses an exercise over the last [lookbackDays] days.
+  ///
+  /// [weightTrend] and [performanceTrend] are now linear-regression slopes
+  /// (kg/session and reps/session respectively), computed from actual data
+  /// sorted chronologically oldest-first.
   ProgressMetrics analyzeExerciseHistory(
     String exerciseId,
     List<WorkoutHistory> histories, {
-    int lookback = 5,
+    int lookbackDays = 30,
     String? exerciseName,
   }) {
+    final cutoff = DateTime.now().subtract(Duration(days: lookbackDays));
+
+    // Collect matching sessions within the window, sorted oldest → newest.
+    final sortedHistories = histories.toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
     final sessions = <ExerciseResult>[];
     final sessionDates = <DateTime>[];
 
-    for (var h in histories.reversed) {
+    for (var h in sortedHistories) {
+      if (h.date.isBefore(cutoff)) continue;
       for (var er in h.session.exerciseResults) {
         final matchById = er.exercise.id == exerciseId;
         final matchByName = exerciseName != null &&
@@ -139,7 +174,6 @@ class ProgressionService {
           sessionDates.add(h.date);
         }
       }
-      if (sessions.length >= lookback) break;
     }
 
     if (sessions.isEmpty) {
@@ -154,6 +188,8 @@ class ProgressionService {
         performanceTrend: 0.0,
         estimated1RM: 0.0,
         daysSinceLastSession: 0,
+        lastActualWeight: 0.0,
+        lastActualReps: 0.0,
       );
     }
 
@@ -163,8 +199,8 @@ class ProgressionService {
     int totalDuration = 0;
     ExerciseDifficulty? lastPerceived;
 
-    final weights = <double>[];
-    final completionRates = <double>[];
+    final weightPerSession = <double>[];
+    final repsPerSession = <double>[];
     double maxEstimated1RM = 0.0;
 
     for (var er in sessions) {
@@ -201,8 +237,8 @@ class ProgressionService {
       }
 
       totalCompletion += completion;
-      completionRates.add(completion);
-      weights.add(avgWeightThisSession);
+      weightPerSession.add(avgWeightThisSession);
+      repsPerSession.add(repsThisSession);
       totalWeight += avgWeightThisSession;
       totalReps += repsThisSession;
       lastPerceived = er.perceivedDifficulty ?? lastPerceived;
@@ -210,26 +246,11 @@ class ProgressionService {
 
     final count = sessions.length;
 
-    double weightTrend = 0.0;
-    if (weights.length >= 2) {
-      final firstHalf =
-          weights.take(weights.length ~/ 2).fold(0.0, (a, b) => a + b) /
-              (weights.length ~/ 2);
-      final secondHalf =
-          weights.skip(weights.length ~/ 2).fold(0.0, (a, b) => a + b) /
-              (weights.length - weights.length ~/ 2);
-      weightTrend = firstHalf - secondHalf;
-    }
-
-    double performanceTrend = 0.0;
-    if (completionRates.length >= 2 && weights.length >= 2) {
-      final firstPerf = (completionRates[0] * weights[0]);
-      final lastPerf = (completionRates.last * weights.last);
-      performanceTrend = firstPerf - lastPerf;
-    }
+    final weightSlope = _linearSlope(weightPerSession);
+    final repsSlope = _linearSlope(repsPerSession);
 
     final daysSince = sessionDates.isNotEmpty
-        ? DateTime.now().difference(sessionDates.first).inDays
+        ? DateTime.now().difference(sessionDates.last).inDays
         : 0;
 
     return ProgressMetrics(
@@ -239,17 +260,19 @@ class ProgressionService {
       sessionsCount: count,
       avgDurationSeconds: count == 0 ? 0 : (totalDuration ~/ count),
       lastPerceivedDifficulty: lastPerceived,
-      weightTrend: weightTrend,
-      performanceTrend: performanceTrend,
+      weightTrend: weightSlope,
+      performanceTrend: repsSlope,
       estimated1RM: maxEstimated1RM,
       daysSinceLastSession: daysSince,
+      lastActualWeight: weightPerSession.last,
+      lastActualReps: repsPerSession.last,
     );
   }
 
   Future<Map<String, dynamic>> suggestNextWorkout(
     Workout workout,
     List<WorkoutHistory> histories, {
-    int lookback = 5,
+    int lookbackDays = 30,
     UserProfile? profile,
     WellnessEntry? todayWellness,
   }) async {
@@ -303,14 +326,14 @@ class ProgressionService {
       final metrics = analyzeExerciseHistory(
         we.exercise.id,
         histories,
-        lookback: lookback,
+        lookbackDays: lookbackDays,
         exerciseName: we.exercise.name,
       );
 
       double newWeight = we.weight;
       int newReps = we.targetReps;
       int newSets = we.sets;
-      String reason = 'No history — using current parameters';
+      String reason = 'No history — using programmed parameters';
 
       if (metrics.sessionsCount == 0) {
         final suggestedReps = _goalService.calculateTargetReps(
@@ -323,11 +346,11 @@ class ProgressionService {
         );
         newReps = suggestedReps > we.targetReps ? suggestedReps : we.targetReps;
         newSets = suggestedSets > we.sets ? suggestedSets : we.sets;
-        reason = 'New exercise - parameters tailored to your goals';
+        reason = 'New exercise — parameters tailored to your goals';
       } else {
         final c = metrics.completionRate;
-        final perceived = metrics.lastPerceivedDifficulty;
-        final wasHard = perceived == ExerciseDifficulty.hard;
+        final wasHard =
+            metrics.lastPerceivedDifficulty == ExerciseDifficulty.hard;
 
         final recoveryModifier = getRecoveryModifier(
           metrics.daysSinceLastSession,
@@ -336,69 +359,98 @@ class ProgressionService {
         );
 
         if (needsDeload) {
-          newWeight = we.weight;
+          // Deload relative to what the user actually lifted, not program weight.
+          final deloadBase =
+              metrics.lastActualWeight > 0 ? metrics.lastActualWeight : we.weight;
+          newWeight = deloadBase * 0.90;
+          newReps =
+              metrics.lastActualReps > 0 ? metrics.lastActualReps.round() : we.targetReps;
           newSets = we.sets;
-          newReps = we.targetReps;
-          reason =
-              'Week deload - maintaining programmed parameters for recovery';
+          reason = 'Deload week — recovering at 90% of your last weight';
         } else if (we.weight <= 0.0) {
-          if (c >= 0.95 && metrics.avgRepsPerSet >= we.targetReps) {
-            final actualReps = metrics.avgRepsPerSet > 0
-                ? metrics.avgRepsPerSet.round()
-                : we.targetReps;
-            newReps = _goalService.calculateTargetReps(
-              params: trainingParams,
-              wellnessModifiers: wellnessModifiers,
-              previousReps: actualReps,
-            );
-            final minReps = actualReps + 1;
-            newReps = (newReps * 1.1)
+          // Bodyweight exercise: drive reps from actual history.
+          final lastReps = metrics.lastActualReps > 0
+              ? metrics.lastActualReps.round()
+              : we.targetReps;
+          final repsSlope = metrics.performanceTrend.clamp(-2.0, 3.0);
+
+          if (c >= 0.95 && !wasHard) {
+            final increment = repsSlope >= 1.0
+                ? repsSlope
+                : 1.0; // at least +1 rep when excelling
+            newReps = (lastReps + increment * wellnessModifiers.volumeMultiplier)
                 .round()
-                .clamp(minReps, minReps > 50 ? minReps : 50);
-            reason = 'Excellent performance - increasing repetitions';
+                .clamp(1, 200);
+            reason = 'Excellent performance — +${increment.toStringAsFixed(0)} rep target';
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = (we.sets + 1).clamp(1, 10);
-            reason = 'Good progress - adding a set';
+            newReps = lastReps;
+            reason = 'Good progress — adding a set';
           } else if (c < 0.70 || wasHard) {
-            newReps = we.targetReps;
-            reason =
-                'Difficult performance - maintaining programmed repetitions';
+            newReps = lastReps;
+            reason = 'Challenging workout — maintaining last session reps';
           } else {
-            reason = 'Bodyweight exercise - maintaining level';
+            newReps = lastReps;
+            reason = 'Bodyweight exercise — maintaining level';
           }
         } else {
-          newWeight = _goalService.calculateNextWeight(
-            currentWeight: we.weight,
-            completionRate: c,
-            params: trainingParams,
-            wellnessModifiers: wellnessModifiers,
-            wasHard: wasHard,
-          );
-
-          if (newWeight > we.weight) {
-            final focusMultiplier = _getTrainingFocusMultiplier(we, prof);
-            final increase = newWeight - we.weight;
-            newWeight = we.weight + increase * focusMultiplier;
-          }
-
-          if (metrics.weightTrend > 0 &&
-              c >= 0.85 &&
-              !wasHard &&
-              newWeight > we.weight) {
-            final momentumBonus =
-                (metrics.weightTrend / we.weight).clamp(0.0, 0.02);
-            newWeight *= (1.0 + momentumBonus);
-          }
-
-          final actualReps = metrics.avgRepsPerSet > 0
-              ? metrics.avgRepsPerSet.round()
+          // Weighted exercise — core of the new algorithm.
+          final lastWeight =
+              metrics.lastActualWeight > 0 ? metrics.lastActualWeight : we.weight;
+          final lastReps = metrics.lastActualReps > 0
+              ? metrics.lastActualReps.round()
               : we.targetReps;
-          newReps = _goalService.calculateTargetReps(
-            params: trainingParams,
-            wellnessModifiers: wellnessModifiers,
-            previousReps: actualReps,
-          );
 
+          double weightIncrement;
+          int repsChange;
+
+          final hasMeaningfulTrend = metrics.sessionsCount >= 3 &&
+              metrics.weightTrend.abs() > 0.3;
+
+          if (hasMeaningfulTrend) {
+            // Enough history with a real trend: project using regression slope.
+            final maxGainPerSession = (lastWeight * 0.10).clamp(0.5, 5.0);
+            weightIncrement =
+                metrics.weightTrend.clamp(-2.5, maxGainPerSession);
+            repsChange = metrics.performanceTrend.clamp(-3.0, 3.0).round();
+          } else {
+            // Flat trend or sparse data: fall back to completion-rate logic so
+            // new users still see sensible progression.
+            if (c >= 0.95 && !wasHard) {
+              weightIncrement =
+                  lastWeight * trainingParams.weightIncreaseCoefficient;
+            } else if (c >= 0.85) {
+              weightIncrement =
+                  lastWeight * trainingParams.weightIncreaseCoefficient / 2;
+            } else if (c < 0.75 || wasHard) {
+              weightIncrement =
+                  -lastWeight * trainingParams.weightDecreaseCoefficient;
+            } else {
+              weightIncrement = 0.0;
+            }
+            repsChange = 0;
+          }
+
+          // Apply training focus bonus to the increment.
+          if (weightIncrement > 0) {
+            final focusMultiplier = _getTrainingFocusMultiplier(we, prof);
+            weightIncrement *= focusMultiplier;
+          }
+
+          // Scale the increment by wellness and recovery — never reduce the
+          // base (lastWeight), only dampen how much we add or subtract.
+          weightIncrement *=
+              wellnessModifiers.weightMultiplier * recoveryModifier;
+
+          newWeight = lastWeight + weightIncrement;
+          // Floor: never recommend going below what was actually lifted.
+          if (newWeight < lastWeight) newWeight = lastWeight;
+
+          newReps = (lastReps + repsChange * wellnessModifiers.volumeMultiplier)
+              .round()
+              .clamp(1, 200);
+
+          // Sets: add one if consistently completing all reps without struggle.
           int baseSets = we.sets;
           if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
             baseSets += 1;
@@ -407,32 +459,30 @@ class ProgressionService {
               .round()
               .clamp(we.sets, 10);
 
-          if (recoveryModifier < 0.95) {
-            newWeight *= recoveryModifier;
-            if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
-            reason = 'Insufficient recovery - weight adjusted';
-          } else if (c >= 0.95 && !wasHard && metrics.performanceTrend >= 0) {
+          // Build reason string.
+          if (needsDeload) {
+            reason = 'Deload week — recovering at 90% of your last weight';
+          } else if (wellnessModifiers.weightMultiplier < 0.9) {
+            reason = 'Reduced load — wellness adjustment applied';
+          } else if (recoveryModifier < 0.95) {
+            reason = 'Limited recovery — maintaining last session weight';
+          } else if (weightIncrement > 0.25) {
             reason =
-                'Excellent performance - weight progression by ${((newWeight - we.weight) / we.weight * 100).toStringAsFixed(1)}%';
-          } else if (c >= 0.85) {
-            reason = 'Stable progress - moderate load increase';
-          } else if (c < 0.75 || wasHard) {
-            reason = 'Difficult workout - maintaining programmed weight';
-          } else if (metrics.performanceTrend < -5.0) {
-            reason = 'Negative trend - adjusting load for recovery';
+                'Trending up — +${weightIncrement.toStringAsFixed(1)} kg based on your last month';
+          } else if (weightIncrement < -0.25) {
+            reason = 'Load reduced — easing off based on your recent trend';
           } else {
-            reason = 'Maintaining current level considering your goals';
+            reason = 'Stable — maintaining your last session weight';
           }
 
           if (wellnessModifiers.weightMultiplier < 0.9) {
-            reason += ' (Considering wellness)';
+            reason += ' (wellness considered)';
           }
         }
       }
 
+      // Round weight to nearest 0.5 kg.
       newWeight = (newWeight * 2).round() / 2.0;
-      if (we.weight > 0 && newWeight < we.weight) newWeight = we.weight;
-      if (newReps < we.targetReps) newReps = we.targetReps;
       if (newSets < we.sets) newSets = we.sets;
 
       adjustedExercises.add(
@@ -539,7 +589,6 @@ class ProgressionService {
     final result = await suggestNextWorkout(
       workout,
       histories,
-      lookback: 5,
       profile: profile,
       todayWellness: todayWellness,
     );
