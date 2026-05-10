@@ -74,7 +74,6 @@ class ProgressionHelper {
     final metrics = _progressionService.analyzeExerciseHistory(
       exerciseId,
       histories,
-      lookback: 5,
     );
 
     if (metrics.sessionsCount == 0) return;
@@ -83,11 +82,11 @@ class ProgressionHelper {
     IconData icon = Icons.info;
     Color color = Colors.blue;
 
-    if (metrics.performanceTrend > 5.0) {
+    if (metrics.weightTrend > 0.3 || metrics.performanceTrend > 1.0) {
       message = 'Go progress! Performance is improving';
       icon = Icons.trending_up;
       color = Colors.green;
-    } else if (metrics.performanceTrend < -5.0) {
+    } else if (metrics.weightTrend < -0.3 || metrics.performanceTrend < -1.0) {
       message = 'Performance is declining. Maybe you need a rest';
       icon = Icons.trending_down;
       color = Colors.orange;
