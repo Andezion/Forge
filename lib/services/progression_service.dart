@@ -408,14 +408,11 @@ class ProgressionService {
               metrics.weightTrend.abs() > 0.3;
 
           if (hasMeaningfulTrend) {
-            // Enough history with a real trend: project using regression slope.
             final maxGainPerSession = (lastWeight * 0.10).clamp(0.5, 5.0);
             weightIncrement =
                 metrics.weightTrend.clamp(-2.5, maxGainPerSession);
             repsChange = metrics.performanceTrend.clamp(-3.0, 3.0).round();
           } else {
-            // Flat trend or sparse data: fall back to completion-rate logic so
-            // new users still see sensible progression.
             if (c >= 0.95 && !wasHard) {
               weightIncrement =
                   lastWeight * trainingParams.weightIncreaseCoefficient;
@@ -431,7 +428,6 @@ class ProgressionService {
             repsChange = 0;
           }
 
-          // Apply training focus bonus to the increment.
           if (weightIncrement > 0) {
             final focusMultiplier = _getTrainingFocusMultiplier(we, prof);
             weightIncrement *= focusMultiplier;
