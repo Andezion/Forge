@@ -100,7 +100,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final adjustedResult = await _progressionService.suggestNextWorkout(
       selectedWorkout,
       histories,
-      lookback: 5,
       profile: profile,
     );
 
@@ -715,7 +714,6 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final result = await _progressionService.suggestNextWorkout(
       workout,
       histories,
-      lookback: 5,
       profile: profile,
       todayWellness: todayWellness,
     );
