@@ -349,7 +349,6 @@ class ProgressionService {
         );
 
         if (needsDeload) {
-          // Deload relative to what the user actually lifted, not program weight.
           final deloadBase =
               metrics.lastActualWeight > 0 ? metrics.lastActualWeight : we.weight;
           newWeight = deloadBase * 0.90;
@@ -358,7 +357,6 @@ class ProgressionService {
           newSets = we.sets;
           reason = 'Deload week — recovering at 90% of your last weight';
         } else if (we.weight <= 0.0) {
-          // Bodyweight exercise: drive reps from actual history.
           final lastReps = metrics.lastActualReps > 0
               ? metrics.lastActualReps.round()
               : we.targetReps;
@@ -367,7 +365,7 @@ class ProgressionService {
           if (c >= 0.95 && !wasHard) {
             final increment = repsSlope >= 1.0
                 ? repsSlope
-                : 1.0; // at least +1 rep when excelling
+                : 1.0; 
             newReps = (lastReps + increment * wellnessModifiers.volumeMultiplier)
                 .round()
                 .clamp(1, 200);
@@ -384,7 +382,6 @@ class ProgressionService {
             reason = 'Bodyweight exercise — maintaining level';
           }
         } else {
-          // Weighted exercise — core of the new algorithm.
           final lastWeight =
               metrics.lastActualWeight > 0 ? metrics.lastActualWeight : we.weight;
           final lastReps = metrics.lastActualReps > 0
@@ -423,20 +420,16 @@ class ProgressionService {
             weightIncrement *= focusMultiplier;
           }
 
-          // Scale the increment by wellness and recovery — never reduce the
-          // base (lastWeight), only dampen how much we add or subtract.
           weightIncrement *=
               wellnessModifiers.weightMultiplier * recoveryModifier;
 
           newWeight = lastWeight + weightIncrement;
-          // Floor: never recommend going below what was actually lifted.
           if (newWeight < lastWeight) newWeight = lastWeight;
 
           newReps = (lastReps + repsChange * wellnessModifiers.volumeMultiplier)
               .round()
               .clamp(1, 200);
 
-          // Sets: add one if consistently completing all reps without struggle.
           int baseSets = we.sets;
           if (c >= 0.95 && !wasHard && baseSets < trainingParams.targetSets) {
             baseSets += 1;
@@ -445,7 +438,6 @@ class ProgressionService {
               .round()
               .clamp(we.sets, 10);
 
-          // Build reason string.
           if (needsDeload) {
             reason = 'Deload week — recovering at 90% of your last weight';
           } else if (wellnessModifiers.weightMultiplier < 0.9) {
@@ -467,7 +459,6 @@ class ProgressionService {
         }
       }
 
-      // Round weight to nearest 0.5 kg.
       newWeight = (newWeight * 2).round() / 2.0;
       if (newSets < we.sets) newSets = we.sets;
 
