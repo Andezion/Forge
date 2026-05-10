@@ -63,13 +63,12 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
         final metrics = _progressionService.analyzeExerciseHistory(
           exerciseId,
           histories,
-          lookback: 5,
         );
 
         if (metrics.sessionsCount >= 3) {
-          if (metrics.performanceTrend > 2.0) {
+          if (metrics.weightTrend > 0.3 || metrics.performanceTrend > 0.5) {
             improving++;
-          } else if (metrics.performanceTrend < -2.0) {
+          } else if (metrics.weightTrend < -0.3 || metrics.performanceTrend < -0.5) {
             declining++;
           } else {
             stable++;
