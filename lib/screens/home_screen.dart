@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -67,8 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showWorkoutSelectionDialog() {
     if (_dataManager.workouts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No workouts available. Create one in Workshop!'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.noWorkoutsAvailable),
           backgroundColor: AppColors.warning,
         ),
       );
