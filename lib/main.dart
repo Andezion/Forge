@@ -98,7 +98,9 @@ class MyApp extends StatelessWidget {
       theme: appColor.getTheme(),
       locale: settings.language == AppLanguage.russian
           ? const Locale('ru')
-          : const Locale('en'),
+          : settings.language == AppLanguage.polish
+              ? const Locale('pl')
+              : const Locale('en'),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -108,6 +110,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('ru'),
+        Locale('pl'),
       ],
       home: const LoginScreen(),
     );
