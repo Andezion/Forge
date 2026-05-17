@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -367,7 +368,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (currentUserId == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You must be logged in')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.mustBeLoggedIn)),
         );
       }
       return;
