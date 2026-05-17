@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import 'package:provider/provider.dart';
 import '../services/data_manager.dart';
 import '../services/workout_recommendation_service.dart';
@@ -89,8 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (workout.exercises.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('This workout has no exercises. Add exercises in Workshop!'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.noExercisesInWorkout),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -113,8 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result != null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Workout completed!'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.workoutCompleted),
           backgroundColor: AppColors.success,
         ),
       );
@@ -132,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          AppStrings.home,
+          AppLocalizations.of(context)!.home,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         elevation: 0,
@@ -166,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _buildActivePlanBanner(dataManager),
                   Text(
-                    'Today\'s Workout',
+                    AppLocalizations.of(context)!.todaysWorkout,
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 16),
@@ -193,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Icon(Icons.play_arrow, color: Colors.white),
                           const SizedBox(width: 8),
                           Text(
-                            AppStrings.startWorkout,
+                            AppLocalizations.of(context)!.startWorkout,
                             style: AppTextStyles.button,
                           ),
                         ],
@@ -202,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Statistics',
+                    AppLocalizations.of(context)!.statistics,
                     style: AppTextStyles.h4,
                   ),
                   const SizedBox(height: 12),
@@ -210,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: _buildStatCard(
-                          'Workouts this month',
+                          AppLocalizations.of(context)!.workoutsThisMonth,
                           workoutsThisMonth.toString(),
                           Icons.fitness_center,
                           AppColors.primary,
@@ -219,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatCard(
-                          'Day streak',
+                          AppLocalizations.of(context)!.dayStreak,
                           currentStreak.toString(),
                           Icons.local_fire_department,
                           AppColors.warning,
@@ -258,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(Icons.event_available, size: 16, color: AppColors.textSecondary),
             const SizedBox(width: 8),
             Text(
-              '${activePlan.name}: rest day today',
+              '${activePlan.name}: ${AppLocalizations.of(context)!.restDayToday}',
               style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
             ),
           ],
@@ -274,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(Icons.event_note, size: 16, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(
-              AppStrings.todayFromPlan,
+              AppLocalizations.of(context)!.todayFromPlan,
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -293,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
-              'Choose one:',
+              AppLocalizations.of(context)!.chooseOne,
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -318,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
-                          'OR',
+                          AppLocalizations.of(context)!.or,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -343,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: Text(sw.workoutName,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: workout != null
-                      ? Text('${workout.exercises.length} exercises')
+                      ? Text(AppLocalizations.of(context)!.exercisesCount(workout.exercises.length))
                       : null,
                   trailing: workout != null
                       ? ElevatedButton(
@@ -356,8 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: const Text(AppStrings.startWorkout,
-                              style: TextStyle(fontSize: 12)),
+                          child: Text(AppLocalizations.of(context)!.startWorkout,
+                              style: const TextStyle(fontSize: 12)),
                         )
                       : null,
                 ),
@@ -405,14 +404,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'No recommendation available',
+                AppLocalizations.of(context)!.noRecommendationAvailable,
                 style: AppTextStyles.body1.copyWith(
                   color: AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Create workouts in Workshop to get personalized recommendations',
+                AppLocalizations.of(context)!.createWorkoutsForRecommendations,
                 style: AppTextStyles.caption,
                 textAlign: TextAlign.center,
               ),
@@ -431,26 +430,27 @@ class _HomeScreenState extends State<HomeScreen> {
     Color levelColor;
     String levelText;
 
+    final l10n = AppLocalizations.of(context)!;
     switch (_todayRecommendation!.level) {
       case RecommendationLevel.rest:
         levelIcon = Icons.hotel;
         levelColor = AppColors.textSecondary;
-        levelText = 'Rest Day';
+        levelText = l10n.restDayLevel;
         break;
       case RecommendationLevel.light:
         levelIcon = Icons.wb_sunny_outlined;
         levelColor = AppColors.success;
-        levelText = 'Light';
+        levelText = l10n.lightLevel;
         break;
       case RecommendationLevel.moderate:
         levelIcon = Icons.fitness_center;
         levelColor = AppColors.warning;
-        levelText = 'Moderate';
+        levelText = l10n.moderateLevel;
         break;
       case RecommendationLevel.intense:
         levelIcon = Icons.local_fire_department;
         levelColor = AppColors.error;
-        levelText = 'Intense';
+        levelText = l10n.intenseLevel;
         break;
     }
 
@@ -546,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
             const SizedBox(height: 16),
             Text(
-              'Exercises:',
+              l10n.exercisesColonLabel,
               style: AppTextStyles.body2.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -565,7 +565,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  '+ ${_todayRecommendation!.exercises.length - 4} more exercises',
+                  l10n.moreExercises(_todayRecommendation!.exercises.length - 4),
                   style: AppTextStyles.caption.copyWith(
                     fontStyle: FontStyle.italic,
                   ),
@@ -638,14 +638,14 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            Text('Training Plans', style: AppTextStyles.h4),
+            Text(AppLocalizations.of(context)!.trainingPlans, style: AppTextStyles.h4),
             const Spacer(),
             TextButton.icon(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
               ),
               icon: Icon(Icons.add, size: 18, color: AppColors.primary),
-              label: const Text(AppStrings.createPlan),
+              label: Text(AppLocalizations.of(context)!.createPlan),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],
@@ -665,13 +665,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(Icons.calendar_today_outlined,
                     size: 40, color: AppColors.textSecondary),
                 const SizedBox(height: 10),
-                Text(AppStrings.noPlansYet,
+                Text(AppLocalizations.of(context)!.noPlansYet,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary)),
                 const SizedBox(height: 4),
                 Text(
-                  'Create a weekly training plan\nto follow a structured schedule.',
+                  AppLocalizations.of(context)!.createPlanDesc,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: AppColors.textSecondary, fontSize: 13),
@@ -683,7 +683,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (_) => const PlanEditorScreen()),
                   ),
                   icon: const Icon(Icons.add, color: Colors.white),
-                  label: const Text(AppStrings.createPlan),
+                  label: Text(AppLocalizations.of(context)!.createPlan),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
@@ -733,7 +733,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'ACTIVE',
+                      AppLocalizations.of(context)!.activeLabel,
                       style: TextStyle(
                           color: AppColors.textOnPrimary,
                           fontSize: 10,
@@ -760,44 +760,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (v == 'delete') {
                       showDialog(
                         context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Delete plan?'),
-                          content: Text('Delete "${plan.name}"?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(),
-                              child: const Text(AppStrings.cancel),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                dataManager.removeTrainingPlan(plan.id);
-                                Navigator.of(ctx).pop();
-                              },
-                              child: const Text(AppStrings.delete,
-                                  style:
-                                      TextStyle(color: AppColors.error)),
-                            ),
-                          ],
-                        ),
+                        builder: (ctx) {
+                          final dl = AppLocalizations.of(ctx)!;
+                          return AlertDialog(
+                            title: Text(dl.deletePlan),
+                            content: Text(dl.deletePlanConfirm(plan.name)),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(ctx).pop(),
+                                child: Text(dl.cancel),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  dataManager.removeTrainingPlan(plan.id);
+                                  Navigator.of(ctx).pop();
+                                },
+                                child: Text(dl.delete,
+                                    style: const TextStyle(color: AppColors.error)),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     }
                   },
-                  itemBuilder: (_) => [
-                    if (!isActive)
-                      const PopupMenuItem(
-                          value: 'activate',
-                          child: Text(AppStrings.activatePlan)),
-                    if (isActive)
-                      const PopupMenuItem(
-                          value: 'deactivate',
-                          child: Text(AppStrings.deactivatePlan)),
-                    const PopupMenuItem(
-                        value: 'edit', child: Text(AppStrings.edit)),
-                    const PopupMenuItem(
-                        value: 'delete',
-                        child: Text(AppStrings.delete,
-                            style: TextStyle(color: AppColors.error))),
-                  ],
+                  itemBuilder: (_) {
+                    final pm = AppLocalizations.of(context)!;
+                    return [
+                      if (!isActive)
+                        PopupMenuItem(
+                            value: 'activate',
+                            child: Text(pm.activatePlan)),
+                      if (isActive)
+                        PopupMenuItem(
+                            value: 'deactivate',
+                            child: Text(pm.deactivatePlan)),
+                      PopupMenuItem(
+                          value: 'edit', child: Text(pm.edit)),
+                      PopupMenuItem(
+                          value: 'delete',
+                          child: Text(pm.delete,
+                              style: const TextStyle(color: AppColors.error))),
+                    ];
+                  },
                 ),
               ],
             ),
