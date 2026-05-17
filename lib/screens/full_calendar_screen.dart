@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -137,7 +138,7 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
 
     if (workouts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No workouts available. Create one first.')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noWorkoutsAvailableCreate)),
       );
       return;
     }
