@@ -145,6 +145,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         if (value != null) settings.setLanguage(value);
                       },
                     ),
+                    const Divider(height: 1),
+                    _buildRadioTile<AppLanguage>(
+                      title: l10n.polish,
+                      value: AppLanguage.polish,
+                      groupValue: settings.language,
+                      icon: Icons.language,
+                      iconColor: appColor.color,
+                      onChanged: (value) {
+                        if (value != null) settings.setLanguage(value);
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -270,8 +281,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
-                      title: 'Hide from Leaderboards',
-                      subtitle: 'Your stats will not appear in public rankings',
+                      title: l10n.hideFromLeaderboards,
+                      subtitle: l10n.hideFromLeaderboardsDesc,
                       value: settings.isProfileHidden,
                       icon: Icons.visibility_off,
                       iconColor: appColor.color,
