@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -92,10 +93,11 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   }
 
   Widget _buildMuscleGroupFilters() {
+    final l10n = AppLocalizations.of(context)!;
     final items = [
-      const DropdownMenuItem<MuscleGroup>(
+      DropdownMenuItem<MuscleGroup>(
         value: null,
-        child: Text('Any'),
+        child: Text(l10n.any),
       ),
       ...MuscleGroup.values.map((g) => DropdownMenuItem<MuscleGroup>(
             value: g,
@@ -110,7 +112,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         children: [
           Expanded(
             child: _buildFilterDropdown(
-              label: 'Primary',
+              label: l10n.primaryMuscle,
               value: _primaryFilter,
               items: items,
               color: AppColors.primary,
@@ -123,7 +125,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: _buildFilterDropdown(
-              label: 'Secondary',
+              label: l10n.secondaryMuscle,
               value: _secondaryFilter,
               items: items,
               color: AppColors.warning,
@@ -136,7 +138,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: _buildFilterDropdown(
-              label: 'Stabilizer',
+              label: l10n.stabilizerMuscle,
               value: _stabilizerFilter,
               items: items,
               color: AppColors.textSecondary,
@@ -224,7 +226,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Exercise Library',
+          AppLocalizations.of(context)!.exerciseLibrary,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -265,7 +267,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No exercises found',
+                          AppLocalizations.of(context)!.noExercisesFound,
                           style: AppTextStyles.body1.copyWith(
                             color: AppColors.textSecondary,
                           ),
