@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
@@ -46,8 +47,8 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
 
     if (workouts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No workouts available. Create one in Workshop first.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.noWorkoutsAvailableWorkshop),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -496,9 +497,9 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                 value: _weekOffset,
                 isExpanded: true,
                 onChanged: (v) => setState(() => _weekOffset = v!),
-                items: const [
-                  DropdownMenuItem(value: 0, child: Text('Week A (this week)')),
-                  DropdownMenuItem(value: 1, child: Text('Week B (next week)')),
+                items: [
+                  DropdownMenuItem(value: 0, child: Text(AppLocalizations.of(context)!.weekA)),
+                  DropdownMenuItem(value: 1, child: Text(AppLocalizations.of(context)!.weekB)),
                 ],
               ),
             ],
