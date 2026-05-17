@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_strings.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import 'friends_screen.dart';
@@ -42,31 +42,31 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: AppColors.textSecondary,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: AppStrings.home,
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outlined),
-            activeIcon: Icon(Icons.person),
-            label: AppStrings.profile,
+            icon: const Icon(Icons.person_outlined),
+            activeIcon: const Icon(Icons.person),
+            label: AppLocalizations.of(context)!.profile,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_outlined),
-            activeIcon: Icon(Icons.people),
-            label: AppStrings.friends,
+            icon: const Icon(Icons.people_outlined),
+            activeIcon: const Icon(Icons.people),
+            label: AppLocalizations.of(context)!.friends,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center_outlined),
-            activeIcon: Icon(Icons.fitness_center),
-            label: AppStrings.programs,
+            icon: const Icon(Icons.fitness_center_outlined),
+            activeIcon: const Icon(Icons.fitness_center),
+            label: AppLocalizations.of(context)!.programs,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.build_outlined),
-            activeIcon: Icon(Icons.build),
-            label: AppStrings.workshop,
+            icon: const Icon(Icons.build_outlined),
+            activeIcon: const Icon(Icons.build),
+            label: AppLocalizations.of(context)!.workshop,
           ),
         ],
       ),
