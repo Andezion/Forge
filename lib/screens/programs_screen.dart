@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -247,7 +248,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   icon: const Icon(Icons.info_outline, size: 20),
                   onPressed: () =>
                       _showSuggestionDetails(context, suggestion, color),
-                  tooltip: 'View details',
+                  tooltip: AppLocalizations.of(context)!.viewDetails,
                 ),
               ],
             ),
