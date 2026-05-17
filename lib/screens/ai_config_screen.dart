@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/settings_service.dart';
 import '../services/theme_service.dart';
@@ -33,23 +34,25 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
     final settings = Provider.of<SettingsService>(context, listen: false);
     await settings.setGroqApiKey(_keyController.text.trim());
     setState(() => _isSaving = false);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('API key saved')),
+      SnackBar(content: Text(l10n.apiKeySaved)),
     );
   }
 
   Future<void> _remove() async {
+    final l10n = AppLocalizations.of(context)!;
     _keyController.clear();
     final settings = Provider.of<SettingsService>(context, listen: false);
     await settings.setGroqApiKey(null);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('API key removed')),
+      SnackBar(content: Text(l10n.apiKeyRemoved)),
     );
   }
 
@@ -62,7 +65,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
         backgroundColor: appColor.color,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'AI Config',
+          AppLocalizations.of(context)!.aiConfig,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -73,7 +76,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
           children: [
             _buildInfoCard(appColor.color),
             const SizedBox(height: 24),
-            Text('Your Groq API Key', style: AppTextStyles.h4),
+            Text(AppLocalizations.of(context)!.yourGroqApiKey, style: AppTextStyles.h4),
             const SizedBox(height: 8),
             TextField(
               controller: _keyController,
@@ -104,7 +107,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                         Clipboard.setData(
                             ClipboardData(text: _keyController.text));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Copied to clipboard')),
+                          SnackBar(content: Text(AppLocalizations.of(context)!.copiedToClipboard)),
                         );
                       },
                     ),
@@ -133,7 +136,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white),
                           )
-                        : Text('Save', style: AppTextStyles.button),
+                        : Text(AppLocalizations.of(context)!.save, style: AppTextStyles.button),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -148,7 +151,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Remove'),
+                  child: Text(AppLocalizations.of(context)!.remove),
                 ),
               ],
             ),
@@ -232,7 +235,9 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
           color: hasKey ? Colors.green : AppColors.error,
         ),
         title: Text(
-          hasKey ? 'API key is configured' : 'No API key set',
+          hasKey
+              ? AppLocalizations.of(context)!.apiKeyConfigured
+              : AppLocalizations.of(context)!.noApiKeySet,
           style: AppTextStyles.body1,
         ),
         subtitle: hasKey
@@ -242,7 +247,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                     .copyWith(color: AppColors.textSecondary),
               )
             : Text(
-                'AI features will not work without a key',
+                AppLocalizations.of(context)!.aiNoKeyWarning,
                 style: AppTextStyles.caption.copyWith(color: AppColors.error),
               ),
       ),
