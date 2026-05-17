@@ -1290,5 +1290,492 @@
   "aiNoKeyWarning": "AI features will not work without a key",
   "@aiNoKeyWarning": {
     "description": "AI no key warning"
+  },
+  "workshop": "Workshop",
+  "@workshop": {
+    "description": "Workshop bottom nav label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create button"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button"
+  },
+  "or": "OR",
+  "@or": {
+    "description": "Or divider text"
+  },
+  "noExercisesInWorkout": "This workout has no exercises. Add exercises in Workshop!",
+  "@noExercisesInWorkout": {
+    "description": "No exercises in workout snackbar"
+  },
+  "todaysWorkout": "Today's Workout",
+  "@todaysWorkout": {
+    "description": "Today's workout section heading"
+  },
+  "workoutsThisMonth": "Workouts this month",
+  "@workoutsThisMonth": {
+    "description": "Workouts this month stat label"
+  },
+  "dayStreak": "Day streak",
+  "@dayStreak": {
+    "description": "Day streak stat label"
+  },
+  "restDayToday": "rest day today",
+  "@restDayToday": {
+    "description": "Rest day today label in plan banner"
+  },
+  "chooseOne": "Choose one:",
+  "@chooseOne": {
+    "description": "Choose one instruction"
+  },
+  "noRecommendationAvailable": "No recommendation available",
+  "@noRecommendationAvailable": {
+    "description": "No recommendation card title"
+  },
+  "createWorkoutsForRecommendations": "Create workouts in Workshop to get personalized recommendations",
+  "@createWorkoutsForRecommendations": {
+    "description": "No recommendation card subtitle"
+  },
+  "restDayLevel": "Rest Day",
+  "@restDayLevel": {
+    "description": "Rest day recommendation level"
+  },
+  "lightLevel": "Light",
+  "@lightLevel": {
+    "description": "Light recommendation level"
+  },
+  "moderateLevel": "Moderate",
+  "@moderateLevel": {
+    "description": "Moderate recommendation level"
+  },
+  "intenseLevel": "Intense",
+  "@intenseLevel": {
+    "description": "Intense recommendation level"
+  },
+  "exercisesColonLabel": "Exercises:",
+  "@exercisesColonLabel": {
+    "description": "Exercises colon heading"
+  },
+  "createPlanDesc": "Create a weekly training plan\nto follow a structured schedule.",
+  "@createPlanDesc": {
+    "description": "Create plan empty state description"
+  },
+  "noWorkoutsFound": "No workouts found",
+  "@noWorkoutsFound": {
+    "description": "No workouts found in search"
+  },
+  "noMuscleDataAvailable": "No muscle data available",
+  "@noMuscleDataAvailable": {
+    "description": "No muscle data available message"
+  },
+  "muscleLoad": "Muscle Load",
+  "@muscleLoad": {
+    "description": "Muscle load section title"
+  },
+  "setsCount": "{count} sets",
+  "@setsCount": {
+    "description": "Sets count label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectTrainingProgram": "Select a training program",
+  "@selectTrainingProgram": {
+    "description": "Select training program heading"
+  },
+  "aiSuggested": "AI Suggested",
+  "@aiSuggested": {
+    "description": "AI suggested programs section"
+  },
+  "personalizedProgramsDesc": "Personalized programs based on your history",
+  "@personalizedProgramsDesc": {
+    "description": "AI suggested programs description"
+  },
+  "noSuggestionsYet": "No suggestions yet. Generate one based on your workout history!",
+  "@noSuggestionsYet": {
+    "description": "No AI suggestions yet message"
+  },
+  "generating": "Generating...",
+  "@generating": {
+    "description": "Generating button state"
+  },
+  "generateProgram": "Generate Program",
+  "@generateProgram": {
+    "description": "Generate program button"
+  },
+  "workoutAddedToWorkouts": "\"{name}\" added to your workouts",
+  "@workoutAddedToWorkouts": {
+    "description": "Workout added to workouts snackbar",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notCompletedLastTime": "Not completed last time",
+  "@notCompletedLastTime": {
+    "description": "Not completed last time exercise label"
+  },
+  "programSelected": "Program \"{name}\" selected",
+  "@programSelected": {
+    "description": "Program selected snackbar",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "selectProgram": "Select Program",
+  "@selectProgram": {
+    "description": "Select program button"
+  },
+  "progressCharts": "Progress Charts",
+  "@progressCharts": {
+    "description": "Progress charts menu item"
+  },
+  "aboutMe": "About Me",
+  "@aboutMe": {
+    "description": "About me menu item"
+  },
+  "customisation": "Customisation",
+  "@customisation": {
+    "description": "Customisation menu item"
+  },
+  "achievements": "Achievements",
+  "@achievements": {
+    "description": "Achievements menu item"
+  },
+  "logWorkout": "Log Workout",
+  "@logWorkout": {
+    "description": "Log workout FAB label"
+  },
+  "logWorkoutFor": "Log workout for {dayLabel}",
+  "@logWorkoutFor": {
+    "description": "Log workout for day modal header",
+    "placeholders": {
+      "dayLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "noWorkoutsOnDay": "No workouts on this day",
+  "@noWorkoutsOnDay": {
+    "description": "No workouts on selected day"
+  },
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status badge"
+  },
+  "expand": "Expand",
+  "@expand": {
+    "description": "Expand tooltip"
+  },
+  "collapse": "Collapse",
+  "@collapse": {
+    "description": "Collapse tooltip"
+  },
+  "exerciseUpdated": "{name} updated",
+  "@exerciseUpdated": {
+    "description": "Exercise updated snackbar",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseInUse": "Exercise in Use",
+  "@exerciseInUse": {
+    "description": "Exercise in use dialog title"
+  },
+  "exerciseInUseConfirm": "The exercise \"{name}\" is currently used in one or more workout programs. Are you sure you want to delete it?",
+  "@exerciseInUseConfirm": {
+    "description": "Exercise in use delete confirmation",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteExerciseTitle": "Delete Exercise",
+  "@deleteExerciseTitle": {
+    "description": "Delete exercise dialog title"
+  },
+  "deleteExerciseConfirm": "Are you sure you want to delete \"{name}\"?",
+  "@deleteExerciseConfirm": {
+    "description": "Delete exercise confirmation dialog",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseDeleted": "{name} deleted",
+  "@exerciseDeleted": {
+    "description": "Exercise deleted snackbar",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noFriendsYet": "No friends yet",
+  "@noFriendsYet": {
+    "description": "No friends yet heading"
+  },
+  "noFriendsDesc": "Add friends to track their progress",
+  "@noFriendsDesc": {
+    "description": "No friends description"
+  },
+  "noPendingRequests": "No pending requests",
+  "@noPendingRequests": {
+    "description": "No pending friend requests"
+  },
+  "receivedRequests": "Received Requests",
+  "@receivedRequests": {
+    "description": "Received friend requests section"
+  },
+  "sentRequests": "Sent Requests",
+  "@sentRequests": {
+    "description": "Sent friend requests section"
+  },
+  "lastWorkoutDaysAgo": "Last workout: {days} day(s) ago",
+  "@lastWorkoutDaysAgo": {
+    "description": "Last workout days ago label",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "noWorkoutsYetFriend": "No workouts yet",
+  "@noWorkoutsYetFriend": {
+    "description": "No workouts yet for friend"
+  },
+  "weightKgDisplay": "Weight: {weight} kg",
+  "@weightKgDisplay": {
+    "description": "Weight display label",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "nowFriendsWith": "You are now friends with {name}",
+  "@nowFriendsWith": {
+    "description": "Now friends with snackbar",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending status"
+  },
+  "removeFriendConfirm": "Are you sure you want to remove {name} from your friends?",
+  "@removeFriendConfirm": {
+    "description": "Remove friend confirmation dialog",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active tab/status label"
+  },
+  "errorLoadingChallenges": "Error loading challenges",
+  "@errorLoadingChallenges": {
+    "description": "Error loading challenges message"
+  },
+  "noChallengesYet": "No challenges yet",
+  "@noChallengesYet": {
+    "description": "No challenges yet heading"
+  },
+  "createChallengeDesc": "Create a challenge to compete with friends",
+  "@createChallengeDesc": {
+    "description": "No challenges description"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Start label"
+  },
+  "end": "End",
+  "@end": {
+    "description": "End label"
+  },
+  "leaderboard": "Leaderboard",
+  "@leaderboard": {
+    "description": "Leaderboard section heading"
+  },
+  "createChallenge": "Create Challenge",
+  "@createChallenge": {
+    "description": "Create challenge modal title"
+  },
+  "chooseChallengeType": "Choose a challenge type",
+  "@chooseChallengeType": {
+    "description": "Choose challenge type instruction"
+  },
+  "selectFriends": "Select Friends",
+  "@selectFriends": {
+    "description": "Select friends dialog title"
+  },
+  "selectFriendsToChallenge": "Select friends to challenge",
+  "@selectFriendsToChallenge": {
+    "description": "Select friends to challenge description"
+  },
+  "durationDays": "Duration (days)",
+  "@durationDays": {
+    "description": "Duration in days label"
+  },
+  "durationDaysCount": "{count} days",
+  "@durationDaysCount": {
+    "description": "Duration days count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pleaseEnterPlanName": "Please enter a plan name",
+  "@pleaseEnterPlanName": {
+    "description": "Please enter plan name validation"
+  },
+  "weeklySchedule": "Weekly schedule",
+  "@weeklySchedule": {
+    "description": "Weekly schedule section heading"
+  },
+  "chooseOneOnDay": "Choose one on this day:",
+  "@chooseOneOnDay": {
+    "description": "Choose one workout on this day instruction"
+  },
+  "selectWorkout": "Select workout",
+  "@selectWorkout": {
+    "description": "Select workout dialog title"
+  },
+  "startingWeek": "Starting week:",
+  "@startingWeek": {
+    "description": "Starting week dropdown label"
+  },
+  "muscleRecovery": "Muscle Recovery",
+  "@muscleRecovery": {
+    "description": "Muscle recovery card title"
+  },
+  "readyToTrain": "Ready to train",
+  "@readyToTrain": {
+    "description": "Ready to train section heading"
+  },
+  "inRecovery": "In recovery",
+  "@inRecovery": {
+    "description": "In recovery section heading"
+  },
+  "requireRest": "Require rest",
+  "@requireRest": {
+    "description": "Require rest section heading"
+  },
+  "selectWorkoutForAnalytics": "Select a workout to view detailed analytics",
+  "@selectWorkoutForAnalytics": {
+    "description": "Select workout for analytics snackbar"
+  },
+  "workoutProgress": "Workout Progress",
+  "@workoutProgress": {
+    "description": "Workout progress card title"
+  },
+  "recommendedDeloadWeek": "Recommended Deload Week",
+  "@recommendedDeloadWeek": {
+    "description": "Recommended deload week warning"
+  },
+  "completeMoreWorkouts": "Complete more workouts for analysis",
+  "@completeMoreWorkouts": {
+    "description": "Complete more workouts empty state"
+  },
+  "improving": "Improving",
+  "@improving": {
+    "description": "Improving trend label"
+  },
+  "stable": "Stable",
+  "@stable": {
+    "description": "Stable trend label"
+  },
+  "declining": "Declining",
+  "@declining": {
+    "description": "Declining trend label"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+  "startWorkout": "Start Workout",
+  "@startWorkout": {
+    "description": "Start workout button"
+  },
+  "noPlansYet": "No plans yet",
+  "@noPlansYet": {
+    "description": "No training plans yet"
+  },
+  "createPlan": "Create Plan",
+  "@createPlan": {
+    "description": "Create plan button"
+  },
+  "trainingPlans": "Training Plans",
+  "@trainingPlans": {
+    "description": "Training plans section heading"
+  },
+  "todayFromPlan": "Today from plan",
+  "@todayFromPlan": {
+    "description": "Today from plan label"
+  },
+  "activatePlan": "Activate",
+  "@activatePlan": {
+    "description": "Activate plan menu item"
+  },
+  "deactivatePlan": "Deactivate",
+  "@deactivatePlan": {
+    "description": "Deactivate plan menu item"
+  },
+  "activeLabel": "ACTIVE",
+  "@activeLabel": {
+    "description": "Active plan badge label"
+  },
+  "deletePlan": "Delete plan?",
+  "@deletePlan": {
+    "description": "Delete plan dialog title"
+  },
+  "deletePlanConfirm": "Delete \"{name}\"?",
+  "@deletePlanConfirm": {
+    "description": "Delete plan confirmation",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "moreExercises": "+ {count} more exercises",
+  "@moreExercises": {
+    "description": "More exercises indicator",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
