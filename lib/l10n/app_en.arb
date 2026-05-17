@@ -793,5 +793,502 @@
   "selectAnExercise": "Select an exercise to view progress",
   "@selectAnExercise": {
     "description": "Select exercise instruction"
+  },
+  "polish": "Polski",
+  "@polish": {
+    "description": "Polish language"
+  },
+  "hideFromLeaderboards": "Hide from Leaderboards",
+  "@hideFromLeaderboards": {
+    "description": "Hide from leaderboards setting"
+  },
+  "hideFromLeaderboardsDesc": "Your stats will not appear in public rankings",
+  "@hideFromLeaderboardsDesc": {
+    "description": "Hide from leaderboards description"
+  },
+  "basicInformation": "Basic Information",
+  "@basicInformation": {
+    "description": "Basic information section"
+  },
+  "age": "Age",
+  "@age": {
+    "description": "Age field"
+  },
+  "hintAge": "e.g. 25",
+  "@hintAge": {
+    "description": "Age hint"
+  },
+  "years": "years",
+  "@years": {
+    "description": "Years suffix"
+  },
+  "heightLabel": "Height",
+  "@heightLabel": {
+    "description": "Height field"
+  },
+  "hintHeight": "e.g. 175",
+  "@hintHeight": {
+    "description": "Height hint"
+  },
+  "hintWeight": "e.g. 70.5",
+  "@hintWeight": {
+    "description": "Weight hint"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender field"
+  },
+  "male": "Male",
+  "@male": {
+    "description": "Male gender"
+  },
+  "female": "Female",
+  "@female": {
+    "description": "Female gender"
+  },
+  "other": "Other",
+  "@other": {
+    "description": "Other gender"
+  },
+  "location": "Location",
+  "@location": {
+    "description": "Location section"
+  },
+  "locationDesc": "Used for country & city rankings in the community leaderboard",
+  "@locationDesc": {
+    "description": "Location description"
+  },
+  "country": "Country",
+  "@country": {
+    "description": "Country field"
+  },
+  "hintCountry": "e.g. Russia",
+  "@hintCountry": {
+    "description": "Country hint"
+  },
+  "city": "City",
+  "@city": {
+    "description": "City field"
+  },
+  "hintCity": "e.g. Moscow",
+  "@hintCity": {
+    "description": "City hint"
+  },
+  "trainingGoals": "Training Goals",
+  "@trainingGoals": {
+    "description": "Training goals section"
+  },
+  "trainingGoalsDesc": "What are you trying to achieve?",
+  "@trainingGoalsDesc": {
+    "description": "Training goals description"
+  },
+  "strengthGoal": "Strength",
+  "@strengthGoal": {
+    "description": "Strength training goal"
+  },
+  "hypertrophyGoal": "Hypertrophy",
+  "@hypertrophyGoal": {
+    "description": "Hypertrophy training goal"
+  },
+  "enduranceGoal": "Endurance",
+  "@enduranceGoal": {
+    "description": "Endurance training goal"
+  },
+  "fatLossGoal": "Fat Loss",
+  "@fatLossGoal": {
+    "description": "Fat loss training goal"
+  },
+  "generalFitnessGoal": "General Fitness",
+  "@generalFitnessGoal": {
+    "description": "General fitness training goal"
+  },
+  "trainingSchedule": "Training Schedule",
+  "@trainingSchedule": {
+    "description": "Training schedule section"
+  },
+  "trainingExperience": "Training Experience",
+  "@trainingExperience": {
+    "description": "Training experience field"
+  },
+  "hintYearsTraining": "e.g. 2.5",
+  "@hintYearsTraining": {
+    "description": "Years of training hint"
+  },
+  "daysPerWeek": "Days per week you can train",
+  "@daysPerWeek": {
+    "description": "Days per week field"
+  },
+  "daysPerWeekDesc": "Used to determine how often workouts are recommended",
+  "@daysPerWeekDesc": {
+    "description": "Days per week description"
+  },
+  "sessionDurationLabel": "Typical session duration",
+  "@sessionDurationLabel": {
+    "description": "Session duration field"
+  },
+  "sessionDurationDesc": "Affects how many exercises are included per workout",
+  "@sessionDurationDesc": {
+    "description": "Session duration description"
+  },
+  "trainingPreferences": "Training Preferences",
+  "@trainingPreferences": {
+    "description": "Training preferences section"
+  },
+  "experienceLevel": "Experience Level",
+  "@experienceLevel": {
+    "description": "Experience level field"
+  },
+  "preferredIntensity": "Preferred Intensity",
+  "@preferredIntensity": {
+    "description": "Preferred intensity field"
+  },
+  "intensityLight": "Easier workouts, longer recovery",
+  "@intensityLight": {
+    "description": "Light intensity description"
+  },
+  "intensityModerate": "Balanced intensity and volume",
+  "@intensityModerate": {
+    "description": "Moderate intensity description"
+  },
+  "intensityIntense": "Challenging workouts, push limits",
+  "@intensityIntense": {
+    "description": "Intense intensity description"
+  },
+  "trainingFocus": "Training Focus",
+  "@trainingFocus": {
+    "description": "Training focus section"
+  },
+  "trainingFocusDesc": "What muscle groups or areas do you want to prioritise?",
+  "@trainingFocusDesc": {
+    "description": "Training focus description"
+  },
+  "hintFocus": "e.g. legs, upper body, core",
+  "@hintFocus": {
+    "description": "Training focus hint"
+  },
+  "injuriesLimitations": "Injuries & Limitations",
+  "@injuriesLimitations": {
+    "description": "Injuries section"
+  },
+  "injuriesDesc": "Any injuries or areas to avoid? Workouts will be scored away from these.",
+  "@injuriesDesc": {
+    "description": "Injuries description"
+  },
+  "hintInjuries": "e.g. knee, lower back, shoulder",
+  "@hintInjuries": {
+    "description": "Injuries hint"
+  },
+  "pleaseSelectGoal": "Please select at least one goal",
+  "@pleaseSelectGoal": {
+    "description": "Select goal validation message"
+  },
+  "profileSavedSuccessfully": "Profile saved successfully",
+  "@profileSavedSuccessfully": {
+    "description": "Profile saved message"
+  },
+  "nutrition": "Nutrition",
+  "@nutrition": {
+    "description": "Nutrition screen title"
+  },
+  "targets": "Targets",
+  "@targets": {
+    "description": "Targets tab"
+  },
+  "meals": "Meals",
+  "@meals": {
+    "description": "Meals tab"
+  },
+  "recalculate": "Recalculate",
+  "@recalculate": {
+    "description": "Recalculate button tooltip"
+  },
+  "setNutritionGoal": "Set a nutrition goal to get started.",
+  "@setNutritionGoal": {
+    "description": "Empty state: no nutrition goal"
+  },
+  "tapRefreshToCalculate": "Tap the refresh button to calculate your targets.",
+  "@tapRefreshToCalculate": {
+    "description": "Empty state: tap refresh to calculate"
+  },
+  "algorithm": "Algorithm",
+  "@algorithm": {
+    "description": "Algorithm section header"
+  },
+  "mifflinFormula": "Mifflin-St Jeor formula",
+  "@mifflinFormula": {
+    "description": "Mifflin formula subtitle"
+  },
+  "aiRecommendation": "AI Recommendation",
+  "@aiRecommendation": {
+    "description": "AI recommendation section header"
+  },
+  "groqModel": "Groq · Llama 3.3 70B",
+  "@groqModel": {
+    "description": "Groq model subtitle"
+  },
+  "lastUpdated": "Last updated: {date}",
+  "@lastUpdated": {
+    "description": "Last updated label",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "setGoalForMeals": "Set a goal and calculate targets to see your meal schedule.",
+  "@setGoalForMeals": {
+    "description": "Empty meals state message"
+  },
+  "mealSchedule": "Meal Schedule",
+  "@mealSchedule": {
+    "description": "Meal schedule section title"
+  },
+  "mealsPerDay": "{count} meals per day",
+  "@mealsPerDay": {
+    "description": "Meals per day subtitle",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyWater": "Daily Water",
+  "@dailyWater": {
+    "description": "Daily water card title"
+  },
+  "nutritionGoal": "Nutrition Goal",
+  "@nutritionGoal": {
+    "description": "Nutrition goal setting"
+  },
+  "notSet": "Not set",
+  "@notSet": {
+    "description": "Not set value"
+  },
+  "mealWaterReminders": "Meal & Water Reminders",
+  "@mealWaterReminders": {
+    "description": "Meal and water reminders setting"
+  },
+  "activeStatus": "Active",
+  "@activeStatus": {
+    "description": "Active status"
+  },
+  "inactiveStatus": "Inactive",
+  "@inactiveStatus": {
+    "description": "Inactive status"
+  },
+  "waterReminderInterval": "Water Reminder Interval",
+  "@waterReminderInterval": {
+    "description": "Water reminder interval setting"
+  },
+  "kcalPerDay": "kcal / day",
+  "@kcalPerDay": {
+    "description": "Kilocalories per day label"
+  },
+  "protein": "Protein",
+  "@protein": {
+    "description": "Protein macro label"
+  },
+  "carbs": "Carbs",
+  "@carbs": {
+    "description": "Carbs macro label"
+  },
+  "fat": "Fat",
+  "@fat": {
+    "description": "Fat macro label"
+  },
+  "waterMacro": "Water",
+  "@waterMacro": {
+    "description": "Water macro label"
+  },
+  "goalBadge": "Goal: {goal}",
+  "@goalBadge": {
+    "description": "Goal badge label",
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "completeProfileFirst": "Please complete your profile first (weight, height, age, gender).",
+  "@completeProfileFirst": {
+    "description": "Complete profile prompt"
+  },
+  "aiUnavailable": "AI unavailable, using algorithm only.",
+  "@aiUnavailable": {
+    "description": "AI unavailable message"
+  },
+  "notificationDenied": "Notification permission denied.",
+  "@notificationDenied": {
+    "description": "Notification permission denied message"
+  },
+  "remindersScheduled": "Reminders scheduled!",
+  "@remindersScheduled": {
+    "description": "Reminders scheduled message"
+  },
+  "remindersCancelled": "All reminders cancelled.",
+  "@remindersCancelled": {
+    "description": "All reminders cancelled message"
+  },
+  "any": "Any",
+  "@any": {
+    "description": "Any filter option"
+  },
+  "primaryMuscle": "Primary",
+  "@primaryMuscle": {
+    "description": "Primary muscle group filter"
+  },
+  "secondaryMuscle": "Secondary",
+  "@secondaryMuscle": {
+    "description": "Secondary muscle group filter"
+  },
+  "stabilizerMuscle": "Stabilizer",
+  "@stabilizerMuscle": {
+    "description": "Stabilizer muscle group filter"
+  },
+  "configureExercise": "Configure {name}",
+  "@configureExercise": {
+    "description": "Configure exercise dialog title",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "Duration (minutes)",
+  "@durationMinutes": {
+    "description": "Duration in minutes field"
+  },
+  "editExercise": "Edit exercise",
+  "@editExercise": {
+    "description": "Edit exercise tooltip"
+  },
+  "deleteExercise": "Delete exercise",
+  "@deleteExercise": {
+    "description": "Delete exercise tooltip"
+  },
+  "draftRestored": "Draft restored",
+  "@draftRestored": {
+    "description": "Draft restored message"
+  },
+  "exerciseAlreadyInList": "This exercise is already in the list",
+  "@exerciseAlreadyInList": {
+    "description": "Exercise already in list message"
+  },
+  "alternativeAdded": "Alternative added: {name}",
+  "@alternativeAdded": {
+    "description": "Alternative exercise added message",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addAtLeastOneExercise": "Please add at least one exercise",
+  "@addAtLeastOneExercise": {
+    "description": "Validation: add at least one exercise"
+  },
+  "challenges": "Challenges",
+  "@challenges": {
+    "description": "Challenges screen title"
+  },
+  "communityRankings": "Community Rankings",
+  "@communityRankings": {
+    "description": "Community rankings tooltip"
+  },
+  "emailLabel": "Email",
+  "@emailLabel": {
+    "description": "Email field label"
+  },
+  "friendEmailHint": "friend@example.com",
+  "@friendEmailHint": {
+    "description": "Friend email hint"
+  },
+  "addFriendsFirst": "Add friends first to create challenges",
+  "@addFriendsFirst": {
+    "description": "Add friends first message"
+  },
+  "mustBeLoggedIn": "You must be logged in",
+  "@mustBeLoggedIn": {
+    "description": "Must be logged in message"
+  },
+  "challengeCreated": "Challenge created successfully!",
+  "@challengeCreated": {
+    "description": "Challenge created message"
+  },
+  "requests": "Requests",
+  "@requests": {
+    "description": "Requests tab label"
+  },
+  "weekA": "Week A (this week)",
+  "@weekA": {
+    "description": "Week A option"
+  },
+  "weekB": "Week B (next week)",
+  "@weekB": {
+    "description": "Week B option"
+  },
+  "viewDetails": "View details",
+  "@viewDetails": {
+    "description": "View details tooltip"
+  },
+  "searchWorkouts": "Search workouts...",
+  "@searchWorkouts": {
+    "description": "Search workouts hint"
+  },
+  "noWorkoutsAvailableCreate": "No workouts available. Create one first.",
+  "@noWorkoutsAvailableCreate": {
+    "description": "No workouts available create message"
+  },
+  "noWorkoutsAvailableWorkshop": "No workouts available. Create one in Workshop first.",
+  "@noWorkoutsAvailableWorkshop": {
+    "description": "No workouts available workshop message"
+  },
+  "apiKeySaved": "API key saved",
+  "@apiKeySaved": {
+    "description": "API key saved message"
+  },
+  "apiKeyRemoved": "API key removed",
+  "@apiKeyRemoved": {
+    "description": "API key removed message"
+  },
+  "copiedToClipboard": "Copied to clipboard",
+  "@copiedToClipboard": {
+    "description": "Copied to clipboard message"
+  },
+  "aiConfig": "AI Config",
+  "@aiConfig": {
+    "description": "AI Config screen title"
+  },
+  "yourGroqApiKey": "Your Groq API Key",
+  "@yourGroqApiKey": {
+    "description": "Groq API key section title"
+  },
+  "exerciseLibrary": "Exercise Library",
+  "@exerciseLibrary": {
+    "description": "Exercise library screen title"
+  },
+  "noExercisesFound": "No exercises found",
+  "@noExercisesFound": {
+    "description": "No exercises found message"
+  },
+  "addFriendDesc": "Enter the email address of the person you want to add as a friend.",
+  "@addFriendDesc": {
+    "description": "Add friend dialog description"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button"
+  },
+  "apiKeyConfigured": "API key is configured",
+  "@apiKeyConfigured": {
+    "description": "API key configured status"
+  },
+  "noApiKeySet": "No API key set",
+  "@noApiKeySet": {
+    "description": "No API key set status"
+  },
+  "aiNoKeyWarning": "AI features will not work without a key",
+  "@aiNoKeyWarning": {
+    "description": "AI no key warning"
   }
 }
