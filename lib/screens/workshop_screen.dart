@@ -236,7 +236,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             controller: _searchController,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              hintText: 'Search workouts...',
+              hintText: AppLocalizations.of(context)!.searchWorkouts,
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
