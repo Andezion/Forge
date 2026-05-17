@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
 import '../services/theme_service.dart';
@@ -92,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           backgroundColor: appColor.color,
           foregroundColor: AppColors.textOnPrimary,
           title: Text(
-            AppStrings.profile,
+            AppLocalizations.of(context)!.profile,
             style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
           ),
           actions: [
