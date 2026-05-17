@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -82,10 +83,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Draft restored'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.draftRestored),
               backgroundColor: AppColors.success,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -178,7 +179,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Configure ${exercise.name}',
+                          AppLocalizations.of(context)!.configureExercise(exercise.name),
                           style: AppTextStyles.h4,
                           textAlign: TextAlign.center,
                         ),
@@ -195,7 +196,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                               FilteringTextInputFormatter.digitsOnly
                             ],
                             decoration: InputDecoration(
-                              labelText: 'Duration (minutes)',
+                              labelText: AppLocalizations.of(context)!.durationMinutes,
                               prefixIcon: const Icon(Icons.timer_outlined),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -385,10 +386,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
 
       if (alreadyAdded || isSameAsMain) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('This exercise is already in the list'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.exerciseAlreadyInList),
             backgroundColor: AppColors.error,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
         return;
@@ -407,7 +408,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Alternative added: ${selectedExercise.name}'),
+          content: Text(AppLocalizations.of(context)!.alternativeAdded(selectedExercise.name)),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -431,8 +432,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       }
     } else if (_workoutExercises.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add at least one exercise'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.addAtLeastOneExercise),
           backgroundColor: AppColors.error,
         ),
       );
@@ -620,13 +621,13 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit exercise',
+                  tooltip: AppLocalizations.of(context)!.editExercise,
                   onPressed: () => _showExerciseConfigDialog(
                       workoutExercise.exercise, workoutExercise),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete exercise',
+                  tooltip: AppLocalizations.of(context)!.deleteExercise,
                   onPressed: () {
                     setState(() {
                       _workoutExercises.removeAt(index);
