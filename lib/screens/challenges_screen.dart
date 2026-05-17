@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -542,8 +543,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
     if (friends.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Add friends first to create challenges'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.addFriendsFirst),
         ),
       );
       return;
@@ -701,7 +702,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
     if (currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be logged in')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.mustBeLoggedIn)),
       );
       return;
     }
@@ -731,7 +732,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     if (mounted) {
       if (result == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Challenge created successfully!')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.challengeCreated)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
