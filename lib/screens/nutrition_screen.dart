@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../models/nutrition_profile.dart';
 import '../models/user.dart';
@@ -35,6 +36,7 @@ class _NutritionScreenState extends State<NutritionScreen>
   }
 
   Future<void> _recalculate() async {
+    final l10n = AppLocalizations.of(context)!;
     final profile = context.read<ProfileService>();
     final nutrition = context.read<NutritionService>();
 
@@ -45,8 +47,7 @@ class _NutritionScreenState extends State<NutritionScreen>
     final d = profile.trainingDaysPerWeek;
 
     if (w == null || h == null || a == null || g == null) {
-      _showSnack(
-          'Please complete your profile first (weight, height, age, gender).');
+      _showSnack(l10n.completeProfileFirst);
       return;
     }
 
@@ -64,27 +65,28 @@ class _NutritionScreenState extends State<NutritionScreen>
     );
 
     if (nutrition.error != null && mounted) {
-      _showSnack('AI unavailable, using algorithm only.');
+      _showSnack(l10n.aiUnavailable);
     }
   }
 
   Future<void> _toggleNotifications(
       bool value, List<MealSlot> meals, int waterInterval) async {
+    final l10n = AppLocalizations.of(context)!;
     final ns = NotificationService();
     await ns.init();
     final granted = await ns.requestPermission();
     if (!granted) {
-      _showSnack('Notification permission denied.');
+      _showSnack(l10n.notificationDenied);
       return;
     }
     setState(() => _notificationsEnabled = value);
     if (value) {
       await ns.scheduleMealReminders(meals);
       await ns.scheduleWaterReminders(waterInterval);
-      _showSnack('Reminders scheduled!');
+      _showSnack(l10n.remindersScheduled);
     } else {
       await ns.cancelAll();
-      _showSnack('All reminders cancelled.');
+      _showSnack(l10n.remindersCancelled);
     }
   }
 
@@ -94,6 +96,7 @@ class _NutritionScreenState extends State<NutritionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer2<AppColor, NutritionService>(
       builder: (context, appColor, nutrition, _) {
         final prof = nutrition.profile;
@@ -103,13 +106,13 @@ class _NutritionScreenState extends State<NutritionScreen>
             backgroundColor: appColor.color,
             foregroundColor: AppColors.textOnPrimary,
             title: Text(
-              'Nutrition',
+              l10n.nutrition,
               style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
             ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Recalculate',
+                tooltip: l10n.recalculate,
                 onPressed: nutrition.isCalculating ? null : _recalculate,
               ),
             ],
@@ -119,10 +122,10 @@ class _NutritionScreenState extends State<NutritionScreen>
               labelColor: AppColors.textOnPrimary,
               unselectedLabelColor:
                   AppColors.textOnPrimary.withValues(alpha: 0.6),
-              tabs: const [
-                Tab(text: 'Targets'),
-                Tab(text: 'Meals'),
-                Tab(text: 'Settings'),
+              tabs: [
+                Tab(text: l10n.targets),
+                Tab(text: l10n.meals),
+                Tab(text: l10n.settings),
               ],
             ),
           ),
@@ -176,14 +179,15 @@ class _TargetsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final algo = profile.algorithmTargets;
     final ai = profile.aiTargets;
 
     if (algo == null && ai == null) {
       return _EmptyState(
         message: profile.goal == null
-            ? 'Set a nutrition goal to get started.'
-            : 'Tap the refresh button to calculate your targets.',
+            ? l10n.setNutritionGoal
+            : l10n.tapRefreshToCalculate,
         appColor: appColor,
       );
     }
@@ -196,13 +200,13 @@ class _TargetsTab extends StatelessWidget {
         const SizedBox(height: 16),
         if (algo != null) ...[
           _SectionHeader(
-              title: 'Algorithm', subtitle: 'Mifflin-St Jeor formula'),
+              title: l10n.algorithm, subtitle: l10n.mifflinFormula),
           _MacroCard(targets: algo, color: appColor),
           const SizedBox(height: 16),
         ],
         if (ai != null) ...[
           _SectionHeader(
-              title: 'AI Recommendation', subtitle: 'Groq · Llama 3.3 70B'),
+              title: l10n.aiRecommendation, subtitle: l10n.groqModel),
           _MacroCard(targets: ai, color: const Color(0xFF9C27B0)),
           if (profile.aiReasoning != null &&
               profile.aiReasoning!.isNotEmpty) ...[
@@ -214,7 +218,7 @@ class _TargetsTab extends StatelessWidget {
         if (profile.lastCalculated != null)
           Center(
             child: Text(
-              'Last updated: ${_formatDate(profile.lastCalculated!)}',
+              l10n.lastUpdated(_formatDate(profile.lastCalculated!)),
               style: AppTextStyles.caption.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -238,9 +242,10 @@ class _MealsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (profile.mealSchedule.isEmpty) {
       return _EmptyState(
-        message: 'Set a goal and calculate targets to see your meal schedule.',
+        message: l10n.setGoalForMeals,
         appColor: appColor,
       );
     }
@@ -249,8 +254,8 @@ class _MealsTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         _SectionHeader(
-          title: 'Meal Schedule',
-          subtitle: '${profile.mealSchedule.length} meals per day',
+          title: l10n.mealSchedule,
+          subtitle: l10n.mealsPerDay(profile.mealSchedule.length),
         ),
         const SizedBox(height: 8),
         ...profile.mealSchedule
@@ -286,6 +291,7 @@ class _SettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final intervals = [60, 90, 120];
 
     return ListView(
@@ -296,9 +302,9 @@ class _SettingsTab extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             leading: Icon(Icons.flag, color: appColor),
-            title: Text('Nutrition Goal', style: AppTextStyles.body1),
+            title: Text(l10n.nutritionGoal, style: AppTextStyles.body1),
             subtitle: Text(
-              profile.goal?.displayName ?? 'Not set',
+              profile.goal?.displayName ?? l10n.notSet,
               style:
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
@@ -312,9 +318,9 @@ class _SettingsTab extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: SwitchListTile(
             secondary: Icon(Icons.notifications, color: appColor),
-            title: Text('Meal & Water Reminders', style: AppTextStyles.body1),
+            title: Text(l10n.mealWaterReminders, style: AppTextStyles.body1),
             subtitle: Text(
-              notificationsEnabled ? 'Active' : 'Inactive',
+              notificationsEnabled ? l10n.activeStatus : l10n.inactiveStatus,
               style:
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
@@ -337,7 +343,7 @@ class _SettingsTab extends StatelessWidget {
                   children: [
                     Icon(Icons.water_drop, color: appColor),
                     const SizedBox(width: 12),
-                    Text('Water Reminder Interval', style: AppTextStyles.body1),
+                    Text(l10n.waterReminderInterval, style: AppTextStyles.body1),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -447,6 +453,7 @@ class _GoalBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -460,7 +467,7 @@ class _GoalBadge extends StatelessWidget {
           Icon(Icons.flag, color: appColor, size: 18),
           const SizedBox(width: 8),
           Text(
-            'Goal: ${goal.displayName}',
+            l10n.goalBadge(goal.displayName),
             style: AppTextStyles.body1.copyWith(
               color: appColor,
               fontWeight: FontWeight.w600,
@@ -480,6 +487,7 @@ class _MacroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -501,7 +509,7 @@ class _MacroCard extends StatelessWidget {
                     style: AppTextStyles.h2.copyWith(color: color),
                   ),
                   Text(
-                    'kcal / day',
+                    l10n.kcalPerDay,
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -513,25 +521,25 @@ class _MacroCard extends StatelessWidget {
             Row(
               children: [
                 _MacroTile(
-                  label: 'Protein',
+                  label: l10n.protein,
                   value: targets.proteinG,
                   unit: 'g',
                   color: const Color(0xFF2196F3),
                 ),
                 _MacroTile(
-                  label: 'Carbs',
+                  label: l10n.carbs,
                   value: targets.carbsG,
                   unit: 'g',
                   color: const Color(0xFFFF9800),
                 ),
                 _MacroTile(
-                  label: 'Fat',
+                  label: l10n.fat,
                   value: targets.fatG,
                   unit: 'g',
                   color: const Color(0xFFF44336),
                 ),
                 _MacroTile(
-                  label: 'Water',
+                  label: l10n.waterMacro,
                   value: targets.waterMl / 1000,
                   unit: 'L',
                   color: const Color(0xFF00BCD4),
@@ -712,6 +720,7 @@ class _WaterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -733,7 +742,7 @@ class _WaterCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Daily Water',
+                Text(l10n.dailyWater,
                     style: AppTextStyles.body1
                         .copyWith(fontWeight: FontWeight.w600)),
                 Text(
