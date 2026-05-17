@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../services/friends_service.dart';
 import '../models/friend.dart';
 import 'community_leaderboard_screen.dart';
@@ -50,13 +50,13 @@ class _FriendsScreenState extends State<FriendsScreen>
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          AppStrings.friends,
+          AppLocalizations.of(context)!.friends,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.emoji_events),
-            tooltip: 'Challenges',
+            tooltip: AppLocalizations.of(context)!.challenges,
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -67,7 +67,7 @@ class _FriendsScreenState extends State<FriendsScreen>
           ),
           IconButton(
             icon: const Icon(Icons.leaderboard),
-            tooltip: 'Community Rankings',
+            tooltip: AppLocalizations.of(context)!.communityRankings,
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -86,9 +86,9 @@ class _FriendsScreenState extends State<FriendsScreen>
           indicatorColor: AppColors.textOnPrimary,
           labelColor: AppColors.textOnPrimary,
           unselectedLabelColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
-          tabs: const [
-            Tab(text: 'Friends'),
-            Tab(text: 'Requests'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.friends),
+            Tab(text: AppLocalizations.of(context)!.requests),
           ],
         ),
       ),
@@ -504,84 +504,88 @@ class _FriendsScreenState extends State<FriendsScreen>
   void _showAddFriendDialog() {
     final emailController = TextEditingController();
 
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Friend'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Enter the email address of the person you want to add as a friend.',
-              style: AppTextStyles.body2.copyWith(
-                color: AppColors.textSecondary,
+      builder: (context) {
+        final dialogL10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(dialogL10n.addFriend),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dialogL10n.addFriendDesc,
+                style: AppTextStyles.body2.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Email',
-                hintText: 'friend@example.com',
-                prefixIcon: Icon(Icons.email),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: dialogL10n.emailLabel,
+                  hintText: dialogL10n.friendEmailHint,
+                  prefixIcon: const Icon(Icons.email),
+                ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final email = emailController.text.trim();
-              if (email.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter an email address'),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-                return;
-              }
-
-              final messenger = ScaffoldMessenger.of(context);
-              final friendsService =
-                  Provider.of<FriendsService>(context, listen: false);
-              Navigator.of(context).pop();
-
-              final result = await friendsService.sendFriendRequest(email);
-
-              if (mounted) {
-                if (result == 'success') {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Friend request sent!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                } else {
-                  messenger.showSnackBar(
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(dialogL10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = emailController.text.trim();
+                if (email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(result),
+                      content: Text(dialogL10n.pleaseEnterEmail),
                       backgroundColor: AppColors.error,
                     ),
                   );
+                  return;
                 }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textOnPrimary,
+
+                final messenger = ScaffoldMessenger.of(context);
+                final friendsService =
+                    Provider.of<FriendsService>(context, listen: false);
+                Navigator.of(context).pop();
+
+                final result = await friendsService.sendFriendRequest(email);
+
+                if (mounted) {
+                  if (result == 'success') {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.friendRequestSent),
+                        backgroundColor: AppColors.success,
+                      ),
+                    );
+                  } else {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(result),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.textOnPrimary,
+              ),
+              child: Text(dialogL10n.sendRequest),
             ),
-            child: const Text('Send Request'),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
