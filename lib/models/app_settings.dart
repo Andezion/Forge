@@ -2,7 +2,7 @@ enum WeightUnit { kg, lb }
 
 enum DistanceUnit { meters, feet }
 
-enum AppLanguage { english, russian }
+enum AppLanguage { english, russian, polish }
 
 class AppSettings {
   final String? nickname;
