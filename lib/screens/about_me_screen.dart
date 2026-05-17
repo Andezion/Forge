@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
 import '../models/user.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 
 class AboutMeScreen extends StatefulWidget {
   const AboutMeScreen({super.key});
@@ -121,11 +121,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('About Me'),
+        title: Text(l10n.aboutMe),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
       ),
@@ -135,72 +136,72 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionCard(
-              title: 'Basic Information',
+              title: l10n.basicInformation,
               icon: Icons.person,
               children: [
                 _buildTextField(
                   controller: _ageController,
-                  label: 'Age',
-                  hint: 'e.g. 25',
+                  label: l10n.age,
+                  hint: l10n.hintAge,
                   keyboardType: TextInputType.number,
-                  suffixText: 'years',
+                  suffixText: l10n.years,
                 ),
                 const SizedBox(height: 12),
                 _buildTextField(
                   controller: _heightController,
-                  label: 'Height',
-                  hint: 'e.g. 175',
+                  label: l10n.heightLabel,
+                  hint: l10n.hintHeight,
                   keyboardType: TextInputType.number,
                   suffixText: 'cm',
                 ),
                 const SizedBox(height: 12),
                 _buildTextField(
                   controller: _weightController,
-                  label: 'Weight',
-                  hint: 'e.g. 70.5',
+                  label: l10n.weight,
+                  hint: l10n.hintWeight,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   suffixText: 'kg',
                 ),
                 const SizedBox(height: 16),
-                Text('Gender', style: AppTextStyles.body1),
+                Text(l10n.gender, style: AppTextStyles.body1),
                 const SizedBox(height: 8),
-                _buildGenderSelector(),
+                _buildGenderSelector(l10n),
               ],
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Location',
+              title: l10n.location,
               icon: Icons.location_on,
               children: [
                 Text(
-                  'Used for country & city rankings in the community leaderboard',
+                  l10n.locationDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 12),
                 _buildTextField(
                   controller: _countryController,
-                  label: 'Country',
-                  hint: 'e.g. Russia',
+                  label: l10n.country,
+                  hint: l10n.hintCountry,
                   keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 12),
                 _buildTextField(
                   controller: _cityController,
-                  label: 'City',
-                  hint: 'e.g. Moscow',
+                  label: l10n.city,
+                  hint: l10n.hintCity,
                   keyboardType: TextInputType.text,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Training Goals',
+              title: l10n.trainingGoals,
               icon: Icons.flag,
               children: [
                 Text(
-                  'What are you trying to achieve?',
+                  l10n.trainingGoalsDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -211,7 +212,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   children: TrainingGoal.values.map((g) {
                     final selected = _selectedGoals[g] ?? false;
                     return FilterChip(
-                      label: Text(_goalLabel(g)),
+                      label: Text(_goalLabel(g, l10n)),
                       selected: selected,
                       onSelected: (v) => setState(() => _selectedGoals[g] = v),
                       selectedColor: AppColors.primary.withValues(alpha: 0.2),
@@ -223,34 +224,34 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Training Schedule',
+              title: l10n.trainingSchedule,
               icon: Icons.calendar_month,
               children: [
-                Text('Training Experience', style: AppTextStyles.body1),
+                Text(l10n.trainingExperience, style: AppTextStyles.body1),
                 const SizedBox(height: 4),
                 _buildTextField(
                   controller: _yearsTrainingController,
                   label: '',
-                  hint: 'e.g. 2.5',
+                  hint: l10n.hintYearsTraining,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  suffixText: 'years',
+                  suffixText: l10n.years,
                 ),
                 const SizedBox(height: 16),
-                Text('Days per week you can train', style: AppTextStyles.body1),
+                Text(l10n.daysPerWeek, style: AppTextStyles.body1),
                 const SizedBox(height: 4),
                 Text(
-                  'Used to determine how often workouts are recommended',
+                  l10n.daysPerWeekDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 _buildDaysPicker(),
                 const SizedBox(height: 16),
-                Text('Typical session duration', style: AppTextStyles.body1),
+                Text(l10n.sessionDurationLabel, style: AppTextStyles.body1),
                 const SizedBox(height: 4),
                 Text(
-                  'Affects how many exercises are included per workout',
+                  l10n.sessionDurationDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -260,10 +261,10 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Training Preferences',
+              title: l10n.trainingPreferences,
               icon: Icons.fitness_center,
               children: [
-                Text('Experience Level', style: AppTextStyles.body1),
+                Text(l10n.experienceLevel, style: AppTextStyles.body1),
                 const SizedBox(height: 8),
                 Container(
                   padding:
@@ -287,12 +288,12 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Preferred Intensity', style: AppTextStyles.body1),
+                Text(l10n.preferredIntensity, style: AppTextStyles.body1),
                 const SizedBox(height: 8),
                 ...TrainingIntensity.values.map((i) {
                   return RadioListTile<TrainingIntensity>(
                     title: Text(i.name.capitalize()),
-                    subtitle: Text(_getIntensityDescription(i)),
+                    subtitle: Text(_getIntensityDescription(i, l10n)),
                     value: i,
                     groupValue: _intensity,
                     onChanged: (v) => setState(() => _intensity = v),
@@ -304,11 +305,11 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Training Focus',
+              title: l10n.trainingFocus,
               icon: Icons.track_changes,
               children: [
                 Text(
-                  'What muscle groups or areas do you want to prioritise?',
+                  l10n.trainingFocusDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -331,18 +332,18 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   controller: _focusController,
                   suggestions: _suggestedFocus,
                   currentList: _focusList,
-                  hint: 'e.g. legs, upper body, core',
+                  hint: l10n.hintFocus,
                   onAdd: (val) => setState(() => _focusList.add(val)),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
-              title: 'Injuries & Limitations',
+              title: l10n.injuriesLimitations,
               icon: Icons.healing,
               children: [
                 Text(
-                  'Any injuries or areas to avoid? Workouts will be scored away from these.',
+                  l10n.injuriesDesc,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -369,7 +370,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   controller: _injuryController,
                   suggestions: _suggestedInjuries,
                   currentList: _injuryList,
-                  hint: 'e.g. knee, lower back, shoulder',
+                  hint: l10n.hintInjuries,
                   onAdd: (val) => setState(() => _injuryList.add(val)),
                 ),
               ],
@@ -388,7 +389,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   ),
                 ),
                 child: Text(
-                  AppStrings.save,
+                  l10n.save,
                   style: AppTextStyles.button,
                 ),
               ),
@@ -400,7 +401,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     );
   }
 
-  Widget _buildGenderSelector() {
+  Widget _buildGenderSelector(AppLocalizations l10n) {
     return Row(
       children: Gender.values.map((g) {
         final selected = _gender == g;
@@ -426,7 +427,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    _genderLabel(g),
+                    _genderLabel(g, l10n),
                     style: AppTextStyles.body2.copyWith(
                       color: selected
                           ? AppColors.primary
@@ -646,44 +647,45 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     );
   }
 
-  String _genderLabel(Gender g) {
+  String _genderLabel(Gender g, AppLocalizations l10n) {
     switch (g) {
       case Gender.male:
-        return 'Male';
+        return l10n.male;
       case Gender.female:
-        return 'Female';
+        return l10n.female;
       case Gender.other:
-        return 'Other';
+        return l10n.other;
     }
   }
 
-  String _goalLabel(TrainingGoal g) {
+  String _goalLabel(TrainingGoal g, AppLocalizations l10n) {
     switch (g) {
       case TrainingGoal.strength:
-        return 'Strength';
+        return l10n.strengthGoal;
       case TrainingGoal.hypertrophy:
-        return 'Hypertrophy';
+        return l10n.hypertrophyGoal;
       case TrainingGoal.endurance:
-        return 'Endurance';
+        return l10n.enduranceGoal;
       case TrainingGoal.fatLoss:
-        return 'Fat Loss';
+        return l10n.fatLossGoal;
       case TrainingGoal.generalFitness:
-        return 'General Fitness';
+        return l10n.generalFitnessGoal;
     }
   }
 
-  String _getIntensityDescription(TrainingIntensity intensity) {
+  String _getIntensityDescription(TrainingIntensity intensity, AppLocalizations l10n) {
     switch (intensity) {
       case TrainingIntensity.light:
-        return 'Easier workouts, longer recovery';
+        return l10n.intensityLight;
       case TrainingIntensity.moderate:
-        return 'Balanced intensity and volume';
+        return l10n.intensityModerate;
       case TrainingIntensity.intense:
-        return 'Challenging workouts, push limits';
+        return l10n.intensityIntense;
     }
   }
 
   void _save() async {
+    final l10n = AppLocalizations.of(context)!;
     final profile = Provider.of<ProfileService>(context, listen: false);
     final selectedGoals = _selectedGoals.entries
         .where((e) => e.value)
@@ -692,7 +694,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
     if (selectedGoals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one goal')),
+        SnackBar(content: Text(l10n.pleaseSelectGoal)),
       );
       return;
     }
@@ -726,8 +728,8 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile saved successfully'),
+        SnackBar(
+          content: Text(l10n.profileSavedSuccessfully),
           backgroundColor: AppColors.success,
         ),
       );
