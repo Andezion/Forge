@@ -7,6 +7,7 @@ import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
 import 'main_screen.dart';
 import '../services/auth_service.dart';
+import '../services/tour_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -51,9 +52,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
+          await TourService.scheduleForNewUser();
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MainScreen()),
+            );
+          }
         }
       } catch (e) {
         if (mounted) {
