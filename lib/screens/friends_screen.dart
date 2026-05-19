@@ -136,7 +136,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: _showAddFriendDialog,
-                  icon: const Icon(Icons.person_add),
+                  icon: Icon(Icons.person_add, color: AppColors.textOnPrimary),
                   label: const Text('Add Friend'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
