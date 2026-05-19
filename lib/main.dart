@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
 import 'services/auth_service.dart';
+import 'services/tour_service.dart';
 import 'constants/app_strings.dart';
 import 'screens/login_screen.dart';
 import 'services/data_manager.dart';
@@ -57,6 +58,8 @@ void main() async {
 
   final leaderboardService = LeaderboardService();
 
+  final tourService = TourService();
+
   final nutritionService = NutritionService();
   await nutritionService.load();
   nutritionService.updateApiKey(settingsService.groqApiKey);
@@ -77,6 +80,7 @@ void main() async {
         ChangeNotifierProvider.value(value: settingsService),
         ChangeNotifierProvider.value(value: workoutRecommendationService),
         ChangeNotifierProvider.value(value: leaderboardService),
+        ChangeNotifierProvider.value(value: tourService),
         ChangeNotifierProvider.value(value: nutritionService),
       ],
       child: const MyApp(),
