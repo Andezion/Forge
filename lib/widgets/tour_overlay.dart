@@ -19,7 +19,6 @@ class TourOverlay extends StatelessWidget {
 
     return Stack(
       children: [
-        // Backdrop — blocks touches to the underlying screens
         GestureDetector(
           onTap: () {},
           behavior: HitTestBehavior.opaque,
@@ -27,7 +26,6 @@ class TourOverlay extends StatelessWidget {
             color: Colors.black.withValues(alpha: 0.45),
           ),
         ),
-        // Tour card at the bottom of the screen
         Positioned(
           bottom: 0,
           left: 0,
@@ -91,7 +89,6 @@ class _TourCardContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Handle bar
         Center(
           child: Container(
             width: 40,
@@ -103,7 +100,6 @@ class _TourCardContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Header: step counter + skip button
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
