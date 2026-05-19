@@ -8,6 +8,7 @@ import '../services/workout_recommendation_service.dart';
 import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../models/training_plan.dart';
+import '../services/tour_service.dart';
 import '../widgets/compact_calendar.dart';
 import '../widgets/muscle_recovery_card.dart';
 import 'workout_execution_screen.dart';
@@ -135,6 +136,16 @@ class _HomeScreenState extends State<HomeScreen> {
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Provider.of<TourService>(context, listen: false).startTour();
+            },
+            icon: const Icon(Icons.explore_outlined),
+            color: AppColors.textOnPrimary,
+            tooltip: AppLocalizations.of(context)!.tourRestartTooltip,
+          ),
+        ],
       ),
       body: Column(
         children: [
