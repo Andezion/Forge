@@ -66,7 +66,7 @@ class AppColors {
       textPrimary = const Color(0xFFFFFFFF);
       textSecondary = const Color(0xFFB0B0B0);
       textHint = const Color(0xFF757575);
-      textOnPrimary = const Color(0xFF000000);
+      textOnPrimary = const Color(0xFFFFFFFF);
       divider = const Color(0xFF303030);
     } else {
       background = const Color(0xFFF5F5F5);
