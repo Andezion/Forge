@@ -124,7 +124,6 @@ class _TourCardContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        // Progress bar
         ClipRRect(
           borderRadius: BorderRadius.circular(2),
           child: LinearProgressIndicator(
@@ -135,16 +134,13 @@ class _TourCardContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        // Step title
         Text(title, style: AppTextStyles.h4),
         const SizedBox(height: 8),
-        // Step description
         Text(
           description,
           style: AppTextStyles.body2,
         ),
         const SizedBox(height: 24),
-        // Navigation buttons
         Row(
           children: [
             if (!tour.isFirstStep)
