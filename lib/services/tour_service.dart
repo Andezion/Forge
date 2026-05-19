@@ -21,30 +21,30 @@ class TourService extends ChangeNotifier {
   bool get isLastStep => _currentStepIndex == _steps.length - 1;
 
   static const List<TourStep> _steps = [
-    TourStep(tabIndex: 0), // 0  Welcome
-    TourStep(tabIndex: 0), // 1  Calendar
-    TourStep(tabIndex: 0), // 2  Today's workout
-    TourStep(tabIndex: 0), // 3  Muscle recovery
-    TourStep(tabIndex: 0), // 4  Start workout
-    TourStep(tabIndex: 0), // 5  Statistics
-    TourStep(tabIndex: 0), // 6  Training plans
-    TourStep(tabIndex: 1), // 7  Profile tab
-    TourStep(tabIndex: 1), // 8  About me
-    TourStep(tabIndex: 1), // 9  Body weight
-    TourStep(tabIndex: 1), // 10 Wellness
-    TourStep(tabIndex: 1), // 11 Nutrition
-    TourStep(tabIndex: 1), // 12 Achievements
-    TourStep(tabIndex: 1), // 13 Settings
-    TourStep(tabIndex: 2), // 14 Friends tab
-    TourStep(tabIndex: 2), // 15 Leaderboard
-    TourStep(tabIndex: 2), // 16 Challenges
-    TourStep(tabIndex: 3), // 17 Programs tab
-    TourStep(tabIndex: 3), // 18 Create plan
-    TourStep(tabIndex: 4), // 19 Workshop tab
-    TourStep(tabIndex: 4), // 20 Exercise library
-    TourStep(tabIndex: 4), // 21 Create workout
-    TourStep(tabIndex: 4), // 22 AI config
-    TourStep(tabIndex: 0), // 23 Finish
+    TourStep(tabIndex: 0), 
+    TourStep(tabIndex: 0),
+    TourStep(tabIndex: 0), 
+    TourStep(tabIndex: 0),
+    TourStep(tabIndex: 0), 
+    TourStep(tabIndex: 0), 
+    TourStep(tabIndex: 0),
+    TourStep(tabIndex: 1),
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 1), 
+    TourStep(tabIndex: 2),
+    TourStep(tabIndex: 2), 
+    TourStep(tabIndex: 2), 
+    TourStep(tabIndex: 3),
+    TourStep(tabIndex: 3),
+    TourStep(tabIndex: 4), 
+    TourStep(tabIndex: 4), 
+    TourStep(tabIndex: 4),
+    TourStep(tabIndex: 4), 
+    TourStep(tabIndex: 0), 
   ];
 
   static String stepTitle(int index, AppLocalizations l10n) {
