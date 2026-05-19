@@ -154,16 +154,23 @@ class _TourCardContent extends StatelessWidget {
                 ),
               ),
             const Spacer(),
-            ElevatedButton.icon(
+            ElevatedButton(
               onPressed: tour.isLastStep ? tour.closeTour : tour.nextStep,
-              icon: Icon(
-                tour.isLastStep ? Icons.check : Icons.arrow_forward,
-                size: 16,
-              ),
-              label: Text(tour.isLastStep ? l10n.done : l10n.next),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.textOnPrimary,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(tour.isLastStep ? l10n.done : l10n.next),
+                  const SizedBox(width: 8),
+                  Icon(
+                    tour.isLastStep ? Icons.check : Icons.arrow_forward,
+                    size: 16,
+                    color: AppColors.textOnPrimary,
+                  ),
+                ],
               ),
             ),
           ],
