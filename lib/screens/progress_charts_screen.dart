@@ -36,6 +36,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   ExerciseProgressData? _exerciseProgressData;
 
   int _lookbackDays = 90;
+  DateTimeRange? _customDateRange;
 
   @override
   void initState() {
@@ -61,6 +62,33 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   void _onDataChanged() {
     debugPrint('[PROGRESS_CHARTS] Data changed, reloading charts...');
     _loadData();
+  }
+
+  void _onPeriodSelected(int days) async {
+    if (days == -1) {
+      final range = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(2020),
+        lastDate: DateTime.now(),
+        initialDateRange: _customDateRange,
+      );
+      if (range != null && mounted) {
+        final daysDiff = DateTime.now().difference(range.start).inDays + 1;
+        setState(() {
+          _customDateRange = range;
+          _lookbackDays = daysDiff;
+        });
+        _loadData();
+        if (_selectedExercise != null) _loadExerciseData(_selectedExercise!);
+      }
+    } else {
+      setState(() {
+        _lookbackDays = days;
+        _customDateRange = null;
+      });
+      _loadData();
+      if (_selectedExercise != null) _loadExerciseData(_selectedExercise!);
+    }
   }
 
   Future<void> _loadData() async {
@@ -198,18 +226,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         actions: [
           PopupMenuButton<int>(
             icon: const Icon(Icons.calendar_today),
-            onSelected: (days) {
-              setState(() => _lookbackDays = days);
-              _loadData();
-              if (_selectedExercise != null) {
-                _loadExerciseData(_selectedExercise!);
-              }
-            },
+            onSelected: _onPeriodSelected,
             itemBuilder: (context) => [
               PopupMenuItem(value: 30, child: Text(l10n.thirtyDays)),
               PopupMenuItem(value: 90, child: Text(l10n.ninetyDays)),
               PopupMenuItem(value: 180, child: Text(l10n.oneHundredEightyDays)),
               PopupMenuItem(value: 365, child: Text(l10n.oneYear)),
+              PopupMenuItem(value: -1, child: Text(l10n.customRange)),
             ],
           ),
         ],
@@ -498,7 +521,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     }
 
     String periodLabel;
-    if (_lookbackDays <= 7) {
+    if (_customDateRange != null) {
+      final fmt = DateFormat('dd.MM.yy');
+      periodLabel =
+          '${fmt.format(_customDateRange!.start)} – ${fmt.format(_customDateRange!.end)}';
+    } else if (_lookbackDays <= 7) {
       periodLabel = 'This Week';
     } else if (_lookbackDays <= 30) {
       periodLabel = 'Last 30 Days';
