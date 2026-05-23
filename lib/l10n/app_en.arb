@@ -866,7 +866,7 @@
   "@country": {
     "description": "Country field"
   },
-  "hintCountry": "e.g. Russia",
+  "hintCountry": "e.g. Ukraine",
   "@hintCountry": {
     "description": "Country hint"
   },
@@ -874,7 +874,7 @@
   "@city": {
     "description": "City field"
   },
-  "hintCity": "e.g. Moscow",
+  "hintCity": "e.g. Kyiv",
   "@hintCity": {
     "description": "City hint"
   },
