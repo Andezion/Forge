@@ -519,6 +519,10 @@
   "@oneYear": {
     "description": "1 year option"
   },
+  "customRange": "Custom",
+  "@customRange": {
+    "description": "Custom time range option in period selector"
+  },
   "selectATab": "Select a tab",
   "@selectATab": {
     "description": "Select tab message"
