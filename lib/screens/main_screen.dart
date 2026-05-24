@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../constants/app_colors.dart';
 import '../services/tour_service.dart';
+import '../services/leaderboard_service.dart';
+import '../services/data_manager.dart';
+import '../services/settings_service.dart';
+import '../services/profile_service.dart';
 import '../widgets/tour_overlay.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
@@ -37,6 +41,9 @@ class _MainScreenState extends State<MainScreen> {
       final tourService = Provider.of<TourService>(context, listen: false);
       tourService.addListener(_onTourChanged);
       await tourService.checkAndStartTour();
+
+      if (!mounted) return;
+      _syncStatsOnStartup();
     });
   }
 
@@ -45,6 +52,30 @@ class _MainScreenState extends State<MainScreen> {
     final tourService = Provider.of<TourService>(context, listen: false);
     tourService.removeListener(_onTourChanged);
     super.dispose();
+  }
+
+  Future<void> _syncStatsOnStartup() async {
+    if (!mounted) return;
+    try {
+      final leaderboardService =
+          Provider.of<LeaderboardService>(context, listen: false);
+      final settingsService =
+          Provider.of<SettingsService>(context, listen: false);
+      final profileService =
+          Provider.of<ProfileService>(context, listen: false);
+      final dataManager = DataManager();
+
+      await leaderboardService.syncUserStats(
+        workoutHistory: dataManager.workoutHistory,
+        isProfileHidden: settingsService.isProfileHidden,
+        userBodyWeight: profileService.weightKg,
+        country: profileService.country,
+        city: profileService.city,
+        displayName: settingsService.nickname,
+      );
+    } catch (e) {
+      debugPrint('[MAIN] Error syncing stats on startup: $e');
+    }
   }
 
   void _onTourChanged() {
