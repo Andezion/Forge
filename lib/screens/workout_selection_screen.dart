@@ -6,6 +6,7 @@ import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../services/workout_recommendation_service.dart';
 import '../models/exercise.dart';
+import 'quick_workout_screen.dart';
 
 class WorkoutSelectionScreen extends StatefulWidget {
   final void Function(Workout) onWorkoutSelected;
@@ -103,6 +104,77 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     }
   }
 
+  Widget _buildQuickWorkoutCard() {
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: AppColors.primary.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const QuickWorkoutScreen(),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.bolt,
+                  size: 30,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Quick Workout',
+                      style: AppTextStyles.h4.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'No plan? Just go — add exercises as you train',
+                      style: AppTextStyles.body2.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.play_arrow,
+                color: AppColors.primary,
+                size: 28,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,26 +196,6 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
 
   Widget _buildContent() {
     final scored = _scoredWorkouts ?? [];
-    if (scored.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.fitness_center, size: 64, color: AppColors.textHint),
-            const SizedBox(height: 16),
-            Text(
-              'No workouts available',
-              style: AppTextStyles.h4.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Create a workout in Workshop first',
-              style: AppTextStyles.body2,
-            ),
-          ],
-        ),
-      );
-    }
 
     final recommendedId = _recommendation?.workoutId;
     final recommended = recommendedId != null
@@ -154,7 +206,30 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 36),
       children: [
-        if (recommended != null) ...[
+        _buildQuickWorkoutCard(),
+        const SizedBox(height: 8),
+        if (scored.isEmpty) ...[
+          const SizedBox(height: 16),
+          Center(
+            child: Column(
+              children: [
+                Icon(Icons.fitness_center, size: 48, color: AppColors.textHint),
+                const SizedBox(height: 12),
+                Text(
+                  'No saved workouts yet',
+                  style: AppTextStyles.body1
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Create one in Workshop or start a Quick Workout above',
+                  style: AppTextStyles.body2,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ] else if (recommended != null) ...[
           _buildSectionHeader('Recommended for Today', AppColors.primary),
           const SizedBox(height: 8),
           _buildWorkoutCard(recommended.$1, recommended.$2,
