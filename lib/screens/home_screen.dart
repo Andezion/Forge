@@ -66,16 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showWorkoutSelectionDialog() {
-    if (_dataManager.workouts.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.noWorkoutsAvailable),
-          backgroundColor: AppColors.warning,
-        ),
-      );
-      return;
-    }
-
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WorkoutSelectionScreen(
