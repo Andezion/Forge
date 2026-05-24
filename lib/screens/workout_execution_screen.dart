@@ -697,6 +697,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
         workoutHistory: workoutHistory,
         isProfileHidden: settingsService.isProfileHidden,
         userBodyWeight: profileService.weightKg,
+        country: profileService.country,
+        city: profileService.city,
+        displayName: settingsService.nickname,
       );
 
       final groq = GroqService(apiKey: settingsService.groqApiKey);
