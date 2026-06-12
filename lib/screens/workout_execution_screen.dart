@@ -313,10 +313,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Text(
                   'How was this exercise?',
                   style: AppTextStyles.h4,
@@ -431,6 +432,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                   child: Text(AppStrings.next),
                 ),
               ],
+            ),
             ),
           ),
         ),
