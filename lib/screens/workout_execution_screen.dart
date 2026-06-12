@@ -388,6 +388,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                           final picked =
                               await showModalBottomSheet<WorkoutExercise>(
                             context: dialogContext,
+                            isScrollControlled: true,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(16)),
@@ -619,38 +620,50 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       }
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text('Choose next exercise', style: AppTextStyles.h4),
-        ),
-        const Divider(height: 1),
-        ...entries.map((e) {
-          final (exercise, isNaturalNext, isSkipped) = e;
-          return ListTile(
-            title: Text(exercise.exercise.name),
-            subtitle: isNaturalNext
-                ? Text(
-                    'Next by program',
-                    style: TextStyle(color: AppColors.primary, fontSize: 12),
-                  )
-                : isSkipped
-                    ? Text(
-                        'Skipped',
-                        style: TextStyle(color: AppColors.warning, fontSize: 12),
-                      )
-                    : null,
-            trailing: isNaturalNext
-                ? Icon(Icons.arrow_right_alt, color: AppColors.primary)
-                : Icon(Icons.replay, color: AppColors.warning, size: 20),
-            onTap: () => Navigator.of(sheetCtx).pop(exercise),
-          );
-        }),
-        const SizedBox(height: 16),
-      ],
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, scrollController) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text('Choose next exercise', style: AppTextStyles.h4),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView(
+              controller: scrollController,
+              children: [
+                ...entries.map((e) {
+                  final (exercise, isNaturalNext, isSkipped) = e;
+                  return ListTile(
+                    title: Text(exercise.exercise.name),
+                    subtitle: isNaturalNext
+                        ? Text(
+                            'Next by program',
+                            style: TextStyle(color: AppColors.primary, fontSize: 12),
+                          )
+                        : isSkipped
+                            ? Text(
+                                'Skipped',
+                                style: TextStyle(color: AppColors.warning, fontSize: 12),
+                              )
+                            : null,
+                    trailing: isNaturalNext
+                        ? Icon(Icons.arrow_right_alt, color: AppColors.primary)
+                        : Icon(Icons.replay, color: AppColors.warning, size: 20),
+                    onTap: () => Navigator.of(sheetCtx).pop(exercise),
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
