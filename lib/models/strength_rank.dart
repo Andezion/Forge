@@ -69,4 +69,16 @@ extension StrengthRankExt on StrengthRank {
     if (idx >= all.length - 1) return null;
     return all[idx + 1];
   }
+
+  String get assetPath {
+    switch (this) {
+      case StrengthRank.wooden:  return 'assets/images/wooden_rank.png';
+      case StrengthRank.stone:   return 'assets/images/stone_rank.png';
+      case StrengthRank.iron:    return 'assets/images/steel_rank.png';
+      case StrengthRank.bronze:  return 'assets/images/copper_rank.png';
+      case StrengthRank.silver:  return 'assets/images/silver_rank.png';
+      case StrengthRank.gold:    return 'assets/images/golden_rank.png';
+      case StrengthRank.diamond: return 'assets/images/diamond_rank.png';
+    }
+  }
 }
