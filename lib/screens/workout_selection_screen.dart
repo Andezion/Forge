@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -24,11 +25,18 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
   List<(Workout, double)>? _scoredWorkouts;
   WorkoutRecommendation? _recommendation;
   bool _isLoading = true;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadScores();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadScores() async {
@@ -201,7 +209,11 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     final recommended = recommendedId != null
         ? scored.where((s) => s.$1.id == recommendedId).firstOrNull
         : null;
-    final others = scored.where((s) => s.$1.id != recommendedId).toList();
+    final query = _searchController.text.toLowerCase();
+    final others = scored
+        .where((s) => s.$1.id != recommendedId)
+        .where((s) => query.isEmpty || s.$1.name.toLowerCase().contains(query))
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 36),
@@ -229,29 +241,58 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
               ],
             ),
           ),
-        ] else if (recommended != null) ...[
-          _buildSectionHeader('Recommended for Today', AppColors.primary),
+        ] else ...[
+          if (recommended != null) ...[
+            _buildSectionHeader('Recommended for Today', AppColors.primary),
+            const SizedBox(height: 8),
+            _buildWorkoutCard(recommended.$1, recommended.$2,
+                isRecommended: true),
+            if (_recommendation?.overallReason.isNotEmpty == true)
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 8, bottom: 16, left: 4, right: 4),
+                child: Text(
+                  _recommendation!.overallReason,
+                  style: AppTextStyles.caption.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              )
+            else
+              const SizedBox(height: 16),
+          ],
+          _buildSectionHeader('All Workouts', AppColors.textSecondary),
           const SizedBox(height: 8),
-          _buildWorkoutCard(recommended.$1, recommended.$2,
-              isRecommended: true),
-          if (_recommendation?.overallReason.isNotEmpty == true)
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 8, bottom: 16, left: 4, right: 4),
-              child: Text(
-                _recommendation!.overallReason,
-                style: AppTextStyles.caption.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.textSecondary,
+          TextField(
+            controller: _searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.searchWorkouts,
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (others.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  'No workouts found',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                  textAlign: TextAlign.center,
                 ),
               ),
             )
           else
-            const SizedBox(height: 16),
-          _buildSectionHeader('All Workouts', AppColors.textSecondary),
-          const SizedBox(height: 8),
+            ...others.map((entry) => _buildWorkoutCard(entry.$1, entry.$2)),
         ],
-        ...others.map((entry) => _buildWorkoutCard(entry.$1, entry.$2)),
       ],
     );
   }
