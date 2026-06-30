@@ -18,6 +18,7 @@ import 'services/challenge_service.dart';
 import 'services/settings_service.dart';
 import 'services/workout_recommendation_service.dart';
 import 'services/leaderboard_service.dart';
+import 'services/ranking_service.dart';
 import 'services/nutrition_service.dart';
 import 'models/app_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -58,6 +59,8 @@ void main() async {
 
   final leaderboardService = LeaderboardService();
 
+  final rankingService = RankingService();
+
   final tourService = TourService();
 
   final nutritionService = NutritionService();
@@ -80,6 +83,7 @@ void main() async {
         ChangeNotifierProvider.value(value: settingsService),
         ChangeNotifierProvider.value(value: workoutRecommendationService),
         ChangeNotifierProvider.value(value: leaderboardService),
+        ChangeNotifierProvider.value(value: rankingService),
         ChangeNotifierProvider.value(value: tourService),
         ChangeNotifierProvider.value(value: nutritionService),
       ],
