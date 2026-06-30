@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/friend.dart';
+import '../models/strength_rank.dart';
 import '../models/user_stats.dart';
 import '../services/friends_service.dart';
 import '../services/challenge_service.dart';
 import '../services/auth_service.dart';
 import '../models/challenge.dart';
+import '../widgets/rank_badge_widget.dart';
 import 'stats_comparison_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -162,15 +164,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Overall',
-            widget.friend.overallRating?.toStringAsFixed(1) ?? '—',
-            'coeff',
-            Icons.trending_up,
-            AppColors.primary,
-          ),
-        ),
+        Expanded(child: _buildRankStatCard(stats)),
         if (widget.friend.weight != null) ...[
           const SizedBox(width: 12),
           Expanded(
@@ -184,6 +178,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildRankStatCard(UserStats stats) {
+    final rank = StrengthRank.values.firstWhere(
+      (r) => r.name == stats.overallRank,
+      orElse: () => StrengthRank.wooden,
+    );
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Column(
+          children: [
+            RankBadgeWidget(rank: rank, size: 32),
+            const SizedBox(height: 8),
+            Text(rank.displayName,
+                style: AppTextStyles.h3.copyWith(color: rank.color)),
+            const SizedBox(height: 2),
+            Text(
+              'Rank',
+              style: AppTextStyles.caption
+                  .copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
