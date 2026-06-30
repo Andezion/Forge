@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'strength_rank.dart';
 
 enum AchievementCategory { workouts, strength, consistency, social, special }
 
@@ -13,6 +14,8 @@ class Achievement {
   final bool isUnlocked;
   final DateTime? unlockedAt;
   final int currentProgress;
+  
+  final StrengthRank? rankIconOverride;
 
   Achievement({
     required this.id,
@@ -25,6 +28,7 @@ class Achievement {
     this.isUnlocked = false,
     this.unlockedAt,
     this.currentProgress = 0,
+    this.rankIconOverride,
   });
 
   double get progressPercentage {
@@ -76,6 +80,7 @@ class Achievement {
     bool? isUnlocked,
     DateTime? unlockedAt,
     int? currentProgress,
+    StrengthRank? rankIconOverride,
   }) {
     return Achievement(
       id: id ?? this.id,
@@ -88,6 +93,7 @@ class Achievement {
       isUnlocked: isUnlocked ?? this.isUnlocked,
       unlockedAt: unlockedAt ?? this.unlockedAt,
       currentProgress: currentProgress ?? this.currentProgress,
+      rankIconOverride: rankIconOverride ?? this.rankIconOverride,
     );
   }
 }
@@ -130,6 +136,7 @@ class Achievements {
         color: Colors.amber,
         category: AchievementCategory.workouts,
         requiredValue: 100,
+        rankIconOverride: StrengthRank.gold,
       ),
       Achievement(
         id: 'workout_500',
@@ -139,6 +146,7 @@ class Achievements {
         color: Colors.deepOrange,
         category: AchievementCategory.workouts,
         requiredValue: 500,
+        rankIconOverride: StrengthRank.diamond,
       ),
       Achievement(
         id: 'total_weight_1000',
@@ -175,6 +183,7 @@ class Achievements {
         color: Colors.orange,
         category: AchievementCategory.strength,
         requiredValue: 300,
+        rankIconOverride: StrengthRank.silver,
       ),
       Achievement(
         id: 'wilks_400',
@@ -184,6 +193,7 @@ class Achievements {
         color: Colors.amber,
         category: AchievementCategory.strength,
         requiredValue: 400,
+        rankIconOverride: StrengthRank.gold,
       ),
       Achievement(
         id: 'streak_7',
@@ -256,6 +266,7 @@ class Achievements {
         color: Colors.amber,
         category: AchievementCategory.social,
         requiredValue: 1,
+        rankIconOverride: StrengthRank.gold,
       ),
       Achievement(
         id: 'challenge_5',
@@ -265,6 +276,7 @@ class Achievements {
         color: Colors.deepOrange,
         category: AchievementCategory.social,
         requiredValue: 5,
+        rankIconOverride: StrengthRank.diamond,
       ),
       Achievement(
         id: 'new_year',
