@@ -8,11 +8,8 @@ import '../services/profile_service.dart';
 import '../services/theme_service.dart';
 import '../services/settings_service.dart';
 import '../models/user.dart' as app_user;
-import '../models/strength_rank.dart';
 import '../services/auth_service.dart';
 import '../services/data_manager.dart';
-import '../services/ranking_service.dart';
-import '../widgets/rank_badge_widget.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_strings.dart';
@@ -254,12 +251,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                         );
                       },
-                      leadingOverride: RankBadgeWidget(
-                        rank: Provider.of<RankingService>(context).current
-                                ?.rank ??
-                            StrengthRank.wooden,
-                        size: 28,
-                      ),
                     ),
                     _buildMenuItem(
                       context,
@@ -464,9 +455,8 @@ class _ProfileScreenState extends State<ProfileScreen>
     BuildContext context,
     String title,
     IconData icon,
-    VoidCallback onTap, {
-    Widget? leadingOverride,
-  }) {
+    VoidCallback onTap,
+  ) {
     final appColor = Provider.of<AppColor>(context, listen: false);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -475,7 +465,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: leadingOverride ?? Icon(icon, color: appColor.color),
+        leading: Icon(icon, color: appColor.color),
         title: Text(title, style: AppTextStyles.body1),
         trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,

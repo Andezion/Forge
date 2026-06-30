@@ -27,8 +27,7 @@ class RankingAlgorithm {
   static const double majorImprovementThreshold = 8.0;
 
   static bool hasSufficientData(RankSignals s) =>
-      s.workoutCount >= minWorkoutsForHistorical &&
-      s.perExerciseRankPositions.isNotEmpty;
+      s.workoutCount >= minWorkoutsForHistorical;
 
   static OverallRankResult computeOverallRank(RankSignals s, {DateTime? now}) {
     if (!hasSufficientData(s)) {
@@ -77,16 +76,31 @@ class RankingAlgorithm {
     return (weekly * 0.7 + trendPart * 0.3).clamp(0.0, 100.0);
   }
 
+  static const double _strengthWeight = 0.45;
+  static const double _consistencyWeight = 0.20;
+  static const double _achievementWeight = 0.15;
+  static const double _momentumWeight = 0.20;
+
   static double _compositeScore(RankSignals s) {
-    final strength = _strengthSubScore(s);
     final consistency = _consistencySubScore(s);
     final achievements = _achievementSubScore(s);
     final momentum = _momentumSubScore(s);
 
-    final linear = 0.45 * strength +
-        0.20 * consistency +
-        0.15 * achievements +
-        0.20 * momentum;
+    final double linear;
+    if (s.perExerciseRankPositions.isEmpty) {
+      
+      final remaining =
+          _consistencyWeight + _achievementWeight + _momentumWeight;
+      linear = (_consistencyWeight / remaining) * consistency +
+          (_achievementWeight / remaining) * achievements +
+          (_momentumWeight / remaining) * momentum;
+    } else {
+      final strength = _strengthSubScore(s);
+      linear = _strengthWeight * strength +
+          _consistencyWeight * consistency +
+          _achievementWeight * achievements +
+          _momentumWeight * momentum;
+    }
 
     return 100 * math.pow((linear / 100).clamp(0.0, 1.0), 1.35).toDouble();
   }

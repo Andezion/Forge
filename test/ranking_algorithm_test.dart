@@ -60,6 +60,27 @@ void main() {
       expect(result.rank, anyOf(StrengthRank.gold, StrengthRank.diamond));
     });
 
+    test(
+        'consistent training without a matched squat/bench/deadlift still '
+        'scores on historical data, not the damped sparse fallback', () {
+      
+      const signals = RankSignals(
+        perExerciseRankPositions: [],
+        workoutCount: 120,
+        currentStreak: 20,
+        totalWeightLifted: 150000,
+        unlockedAchievementCount: 14,
+        totalAchievementCount: 21,
+        weeklyProgressPercentage: 8,
+      );
+
+      expect(RankingAlgorithm.hasSufficientData(signals), isTrue);
+      final result = RankingAlgorithm.computeOverallRank(signals);
+      expect(result.dataSource, RankDataSource.historical);
+      
+      expect(result.rank.index, greaterThanOrEqualTo(StrengthRank.bronze.index));
+    });
+
     test('rankForScore is monotonic and covers all 7 bands', () {
       final scores = [0.0, 10.0, 20.0, 35.0, 50.0, 65.0, 80.0, 92.0, 100.0];
       StrengthRank? previous;

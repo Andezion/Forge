@@ -3,14 +3,11 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/achievement.dart';
-import '../models/strength_rank.dart';
 import '../services/challenge_service.dart';
 import '../services/data_manager.dart';
 import '../services/friends_service.dart';
 import '../services/profile_service.dart';
-import '../services/ranking_service.dart';
 import '../utils/achievement_progress.dart';
-import '../widgets/rank_badge_widget.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
@@ -51,8 +48,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
     final unlockedCount = achievements.where((a) => a.isUnlocked).length;
     final totalCount = achievements.length;
-    final currentRank =
-        Provider.of<RankingService>(context).current?.rank ?? StrengthRank.wooden;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,7 +66,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    RankBadgeWidget(rank: currentRank, size: 32),
+                    Icon(Icons.emoji_events,
+                        color: AppColors.textOnPrimary, size: 32),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -146,9 +142,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Opacity(
-              opacity: 0.5,
-              child: RankBadgeWidget(rank: StrengthRank.wooden, size: 64),
+            Icon(
+              Icons.emoji_events_outlined,
+              size: 64,
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -203,32 +200,23 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              if (achievement.rankIconOverride != null)
-                Opacity(
-                  opacity: achievement.isUnlocked ? 1.0 : 0.35,
-                  child: RankBadgeWidget(
-                    rank: achievement.rankIconOverride!,
-                    size: 64,
-                  ),
-                )
-              else
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: achievement.isUnlocked
-                        ? achievement.color
-                        : AppColors.textSecondary.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    achievement.icon,
-                    color: achievement.isUnlocked
-                        ? AppColors.textOnPrimary
-                        : AppColors.textSecondary,
-                    size: 32,
-                  ),
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: achievement.isUnlocked
+                      ? achievement.color
+                      : AppColors.textSecondary.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(
+                  achievement.icon,
+                  color: achievement.isUnlocked
+                      ? AppColors.textOnPrimary
+                      : AppColors.textSecondary,
+                  size: 32,
+                ),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
