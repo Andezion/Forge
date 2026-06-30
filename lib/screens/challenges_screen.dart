@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/challenge.dart';
+import '../models/strength_rank.dart';
 import '../services/auth_service.dart';
 import '../services/friends_service.dart';
 import '../services/challenge_service.dart';
 import '../models/friend.dart';
+import '../widgets/rank_badge_widget.dart';
 
 class ChallengesScreen extends StatefulWidget {
   const ChallengesScreen({super.key});
@@ -107,10 +109,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.emoji_events_outlined,
-              size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+            Opacity(
+              opacity: 0.5,
+              child: RankBadgeWidget(rank: StrengthRank.wooden, size: 64),
             ),
             const SizedBox(height: 16),
             Text(
@@ -201,9 +202,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                               ),
                             ),
                             if (isLeading)
-                              Icon(
-                                Icons.emoji_events,
-                                color: AppColors.success,
+                              RankBadgeWidget(
+                                rank: StrengthRank.gold,
                                 size: 20,
                               ),
                           ],
@@ -277,11 +277,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                         if (isWinner)
                           Padding(
                             padding: const EdgeInsets.only(right: 4),
-                            child: Icon(
-                              Icons.emoji_events,
-                              size: 16,
-                              color: Colors.amber,
-                            ),
+                            child:
+                                RankBadgeWidget(rank: StrengthRank.gold, size: 16),
                           ),
                         Text(
                           isCurrentUser ? 'You' : name,
