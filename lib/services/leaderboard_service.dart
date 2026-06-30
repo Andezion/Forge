@@ -34,6 +34,8 @@ class LeaderboardService extends ChangeNotifier {
     String? country,
     String? city,
     String? displayName,
+    String? overallRank,
+    double? overallRankScore,
   }) async {
     final userId = _currentUserId;
     if (userId == null) return;
@@ -43,7 +45,11 @@ class LeaderboardService extends ChangeNotifier {
 
       final stats = _calculateStats(
           workoutHistory, userId, isProfileHidden, bodyWeight,
-          country: country, city: city, overrideDisplayName: displayName);
+          country: country,
+          city: city,
+          overrideDisplayName: displayName,
+          overallRank: overallRank,
+          overallRankScore: overallRankScore);
 
       await _db.collection('user_stats').doc(userId).set(
             stats.toJson(),
@@ -64,6 +70,8 @@ class LeaderboardService extends ChangeNotifier {
     String? country,
     String? city,
     String? overrideDisplayName,
+    String? overallRank,
+    double? overallRankScore,
   }) {
     final displayName = overrideDisplayName ??
         _auth.currentUser?.displayName ??
@@ -106,6 +114,8 @@ class LeaderboardService extends ChangeNotifier {
       weeklyProgressPercentage: weeklyProgress,
       country: country,
       city: city,
+      overallRank: overallRank,
+      overallRankScore: overallRankScore,
     );
   }
 
