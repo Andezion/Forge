@@ -5,6 +5,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/friends_service.dart';
 import '../models/friend.dart';
+import '../widgets/friend_rank_badge.dart';
 import 'community_leaderboard_screen.dart';
 import 'challenges_screen.dart';
 import 'user_profile_screen.dart';
@@ -285,15 +286,8 @@ class _FriendsScreenState extends State<FriendsScreen>
                     'Weight: ${friend.weight!.toStringAsFixed(1)} kg',
                     style: AppTextStyles.caption,
                   ),
-                  if (friend.overallRating != null) ...[
-                    const SizedBox(width: 12),
-                    const Icon(Icons.star, size: 12, color: AppColors.warning),
-                    const SizedBox(width: 4),
-                    Text(
-                      friend.overallRating!.toStringAsFixed(1),
-                      style: AppTextStyles.caption,
-                    ),
-                  ],
+                  const SizedBox(width: 12),
+                  FriendRankBadge(userId: friend.userId, size: 12),
                 ],
               ),
             ],
