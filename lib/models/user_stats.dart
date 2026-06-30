@@ -13,6 +13,9 @@ class UserStats {
   final String? country;
   final String? city;
 
+  final String? overallRank;
+  final double? overallRankScore;
+
   UserStats({
     required this.userId,
     required this.displayName,
@@ -27,6 +30,8 @@ class UserStats {
     this.weeklyProgressPercentage = 0.0,
     this.country,
     this.city,
+    this.overallRank,
+    this.overallRankScore,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +49,8 @@ class UserStats {
       'weeklyProgressPercentage': weeklyProgressPercentage,
       if (country != null) 'country': country,
       if (city != null) 'city': city,
+      if (overallRank != null) 'overallRank': overallRank,
+      if (overallRankScore != null) 'overallRankScore': overallRankScore,
     };
   }
 
@@ -67,6 +74,8 @@ class UserStats {
           (json['weeklyProgressPercentage'] as num?)?.toDouble() ?? 0.0,
       country: json['country'] as String?,
       city: json['city'] as String?,
+      overallRank: json['overallRank'] as String?,
+      overallRankScore: (json['overallRankScore'] as num?)?.toDouble(),
     );
   }
 
@@ -84,6 +93,8 @@ class UserStats {
     double? weeklyProgressPercentage,
     String? country,
     String? city,
+    String? overallRank,
+    double? overallRankScore,
   }) {
     return UserStats(
       userId: userId ?? this.userId,
@@ -100,6 +111,8 @@ class UserStats {
           weeklyProgressPercentage ?? this.weeklyProgressPercentage,
       country: country ?? this.country,
       city: city ?? this.city,
+      overallRank: overallRank ?? this.overallRank,
+      overallRankScore: overallRankScore ?? this.overallRankScore,
     );
   }
 }
