@@ -8,12 +8,19 @@ import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/workout_history.dart';
+import '../models/overall_rank_result.dart';
+import '../models/rank_popup_event.dart';
+import '../services/achievement_popup_service.dart';
+import '../services/challenge_service.dart';
 import '../services/data_manager.dart';
+import '../services/friends_service.dart';
 import '../services/groq_service.dart';
 import '../services/leaderboard_service.dart';
+import '../services/ranking_service.dart';
 import '../services/settings_service.dart';
 import '../services/profile_service.dart';
 import '../services/progression_service.dart';
+import '../widgets/rank_event_popup.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
   final Workout workout;
@@ -698,6 +705,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     }
 
     double? estimatedCalories;
+    OverallRankResult? previousRank;
+    OverallRankResult? freshRank;
+    List<RankPopupEvent> popupEvents = [];
     try {
       if (!mounted) return;
       final leaderboardService =
@@ -721,6 +731,43 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
       estimatedCalories = await groq.estimateWorkoutCalories(
         session: completedSession,
         bodyWeightKg: profileService.weightKg ?? 75.0,
+      );
+
+      if (!mounted) return;
+      final rankingService =
+          Provider.of<RankingService>(context, listen: false);
+      final friendsService =
+          Provider.of<FriendsService>(context, listen: false);
+      final challengeService =
+          Provider.of<ChallengeService>(context, listen: false);
+
+      previousRank = rankingService.current;
+      freshRank = await rankingService.getOrComputeOverallRank(
+        dataManager: DataManager(),
+        profileService: profileService,
+        settingsService: settingsService,
+        leaderboardService: leaderboardService,
+        friendsService: friendsService,
+        challengeService: challengeService,
+        forceRecompute: true,
+      );
+
+      await leaderboardService.syncUserStats(
+        workoutHistory: workoutHistory,
+        isProfileHidden: settingsService.isProfileHidden,
+        userBodyWeight: profileService.weightKg,
+        country: profileService.country,
+        city: profileService.city,
+        displayName: settingsService.nickname,
+        overallRank: freshRank.rank.name,
+        overallRankScore: freshRank.score,
+      );
+
+      popupEvents = await AchievementPopupService().collectPopupEvents(
+        previousRank: previousRank,
+        freshRank: freshRank,
+        completedSession: completedSession,
+        workoutHistory: workoutHistory,
       );
     } catch (e) {
       debugPrint('[WORKOUT] Error syncing stats to Firebase: $e');
@@ -830,9 +877,16 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
               ],
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop(completedSession);
+                onPressed: () async {
+                  final dialogContext = context;
+                  Navigator.of(dialogContext).pop();
+                  for (final event in popupEvents) {
+                    if (!dialogContext.mounted) break;
+                    await RankEventPopup.show(dialogContext, event, freshRank);
+                    await AchievementPopupService().markShown(event);
+                  }
+                  if (!dialogContext.mounted) return;
+                  Navigator.of(dialogContext).pop(completedSession);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
