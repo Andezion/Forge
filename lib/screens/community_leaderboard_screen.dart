@@ -9,6 +9,8 @@ import '../services/profile_service.dart';
 import '../models/user_stats.dart';
 import '../models/exercise.dart';
 import '../models/friend.dart';
+import '../models/strength_rank.dart';
+import '../widgets/rank_badge_widget.dart';
 import 'user_profile_screen.dart';
 
 class CommunityLeaderboardScreen extends StatefulWidget {
@@ -483,10 +485,7 @@ class _CommunityLeaderboardScreenState
                 ],
               ),
             ),
-            trailing: rank <= 3
-                ? Icon(Icons.emoji_events,
-                    color: _getRankColor(rank), size: 28)
-                : null,
+            trailing: RankBadgeWidget(rank: _overallRankOf(user), size: 28),
           ),
         );
       },
@@ -506,6 +505,13 @@ class _CommunityLeaderboardScreenState
               color: AppColors.textOnPrimary, fontWeight: FontWeight.bold),
         ),
       ),
+    );
+  }
+
+  StrengthRank _overallRankOf(UserStats user) {
+    return StrengthRank.values.firstWhere(
+      (r) => r.name == user.overallRank,
+      orElse: () => StrengthRank.wooden,
     );
   }
 
