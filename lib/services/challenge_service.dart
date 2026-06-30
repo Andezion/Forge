@@ -388,6 +388,31 @@ class ChallengeService extends ChangeNotifier {
     }
   }
 
+  Future<({int wins, int completed})> getCurrentUserChallengeStats() async {
+    final userId = _currentUserId;
+    if (userId == null) return (wins: 0, completed: 0);
+    return getChallengeStats(userId);
+  }
+
+  Future<({int wins, int completed})> getChallengeStats(String userId) async {
+    try {
+      final snapshot = await _db
+          .collection('challenges')
+          .where('participantIds', arrayContains: userId)
+          .where('status', isEqualTo: 'completed')
+          .get();
+
+      final completed = snapshot.docs.length;
+      final wins = snapshot.docs
+          .where((doc) => doc.data()['winnerId'] == userId)
+          .length;
+      return (wins: wins, completed: completed);
+    } catch (e) {
+      debugPrint('Error fetching challenge stats: $e');
+      return (wins: 0, completed: 0);
+    }
+  }
+
   Future<String> acceptChallenge(String challengeId) async {
     try {
       await _db.collection('challenges').doc(challengeId).update({
