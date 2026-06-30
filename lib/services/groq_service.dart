@@ -8,8 +8,11 @@ import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/ai_suggested_workout.dart';
 import '../models/nutrition_profile.dart';
+import '../models/overall_rank_result.dart';
+import '../models/strength_rank.dart';
 import '../models/user.dart';
 import '../models/workout_session.dart';
+import 'ranking_service.dart';
 
 const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 const String _model = 'llama-3.3-70b-versatile';
@@ -463,6 +466,92 @@ Return ONLY JSON: {"match": "squat"|"bench"|"deadlift"|null, "confidence": 0.0-1
       return result;
     } catch (e) {
       debugPrint('[GROQ] matchExerciseToRecord error: $e');
+      return null;
+    }
+  }
+
+  Future<OverallRankResult?> estimateRankFromPartialProfile({
+    double? bodyWeightKg,
+    String? gender,
+    String? experienceLevel,
+    required int workoutCount,
+    required Map<String, double> knownLifts,
+  }) async {
+    try {
+      final liftsSummary = knownLifts.isEmpty
+          ? 'none recorded'
+          : knownLifts.entries
+              .map((e) => '${e.key}: ${e.value.toStringAsFixed(1)}kg')
+              .join(', ');
+
+      final prompt = '''
+You are a strength-training coach estimating a coarse overall rank for a user with limited data.
+Ranks (low to high): wooden, stone, iron, bronze, silver, gold, diamond.
+
+ATHLETE PROFILE (partial — some fields may be unknown):
+- Body weight: ${bodyWeightKg?.toStringAsFixed(1) ?? 'unknown'} kg
+- Gender: ${gender ?? 'unknown'}
+- Self-reported experience: ${experienceLevel ?? 'unknown'}
+- Logged workouts: $workoutCount
+- Known lift bests: $liftsSummary
+
+Estimate a conservative overall rank. With this little data, default toward LOWER ranks unless evidence (heavy known lifts, advanced experience) clearly supports higher.
+
+Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"diamond", "confidence": 0.0-1.0, "reason": "one short sentence"}''';
+
+      final response = await http.post(
+        Uri.parse(_groqApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_resolvedKey',
+        },
+        body: jsonEncode({
+          'model': _model,
+          'temperature': 0.2,
+          'max_tokens': 150,
+          'messages': [
+            {
+              'role': 'system',
+              'content':
+                  'You are a conservative strength-training rank estimator. Respond with valid JSON only, no extra text.',
+            },
+            {'role': 'user', 'content': prompt},
+          ],
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode != 200) return null;
+
+      final data = jsonDecode(response.body);
+      var content = (data['choices'][0]['message']['content'] as String).trim();
+      if (content.startsWith('```')) {
+        content = content
+            .replaceFirst(RegExp(r'^```[a-z]*\n?'), '')
+            .replaceFirst(RegExp(r'\n?```$'), '')
+            .trim();
+      }
+      final parsed = jsonDecode(content) as Map<String, dynamic>;
+      final rankStr = parsed['rank'] as String?;
+      final rank = StrengthRank.values.firstWhere(
+        (r) => r.name == rankStr,
+        orElse: () => StrengthRank.wooden,
+      );
+      final confidence =
+          ((parsed['confidence'] as num?)?.toDouble() ?? 0.3).clamp(0.0, 0.6);
+      final reason =
+          parsed['reason'] as String? ?? 'Estimated from limited profile data.';
+
+      return OverallRankResult(
+        rank: rank,
+        score: rank.minPercent,
+        percentile: RankingAlgorithm.percentileForScore(rank.minPercent),
+        dataSource: RankDataSource.aiEstimated,
+        confidence: confidence,
+        reason: reason,
+        computedAt: DateTime.now(),
+      );
+    } catch (e) {
+      debugPrint('[GROQ] estimateRankFromPartialProfile error: $e');
       return null;
     }
   }
