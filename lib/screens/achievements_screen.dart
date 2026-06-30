@@ -3,8 +3,14 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/achievement.dart';
+import '../models/strength_rank.dart';
+import '../services/challenge_service.dart';
 import '../services/data_manager.dart';
 import '../services/friends_service.dart';
+import '../services/profile_service.dart';
+import '../services/ranking_service.dart';
+import '../utils/achievement_progress.dart';
+import '../widgets/rank_badge_widget.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
@@ -16,11 +22,20 @@ class AchievementsScreen extends StatefulWidget {
 class _AchievementsScreenState extends State<AchievementsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  ({int wins, int completed}) _challengeStats = (wins: 0, completed: 0);
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadChallengeStats());
+  }
+
+  Future<void> _loadChallengeStats() async {
+    final challengeService =
+        Provider.of<ChallengeService>(context, listen: false);
+    final stats = await challengeService.getCurrentUserChallengeStats();
+    if (mounted) setState(() => _challengeStats = stats);
   }
 
   @override
@@ -36,6 +51,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
     final unlockedCount = achievements.where((a) => a.isUnlocked).length;
     final totalCount = achievements.length;
+    final currentRank =
+        Provider.of<RankingService>(context).current?.rank ?? StrengthRank.wooden;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -54,8 +71,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(Icons.emoji_events,
-                        color: AppColors.textOnPrimary, size: 32),
+                    RankBadgeWidget(rank: currentRank, size: 32),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -130,10 +146,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.emoji_events_outlined,
-              size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+            Opacity(
+              opacity: 0.5,
+              child: RankBadgeWidget(rank: StrengthRank.wooden, size: 64),
             ),
             const SizedBox(height: 16),
             Text(
@@ -188,23 +203,32 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: achievement.isUnlocked
-                      ? achievement.color
-                      : AppColors.textSecondary.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+              if (achievement.rankIconOverride != null)
+                Opacity(
+                  opacity: achievement.isUnlocked ? 1.0 : 0.35,
+                  child: RankBadgeWidget(
+                    rank: achievement.rankIconOverride!,
+                    size: 64,
+                  ),
+                )
+              else
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: achievement.isUnlocked
+                        ? achievement.color
+                        : AppColors.textSecondary.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    achievement.icon,
+                    color: achievement.isUnlocked
+                        ? AppColors.textOnPrimary
+                        : AppColors.textSecondary,
+                    size: 32,
+                  ),
                 ),
-                child: Icon(
-                  achievement.icon,
-                  color: achievement.isUnlocked
-                      ? AppColors.textOnPrimary
-                      : AppColors.textSecondary,
-                  size: 32,
-                ),
-              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -293,115 +317,22 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   }
 
   List<Achievement> _calculateAchievements(DataManager dataManager) {
-    final achievements = Achievements.getAll();
-    final completedWorkouts = dataManager.workoutHistory;
-    final totalWorkouts = completedWorkouts.length;
+    final friendsService = Provider.of<FriendsService>(context, listen: false);
+    final profileService = Provider.of<ProfileService>(context, listen: false);
 
-    double totalWeight = 0;
-    for (final workout in completedWorkouts) {
-      for (final exercise in workout.session.exerciseResults) {
-        for (final set in exercise.setResults) {
-          if (set.weight > 0 && set.actualReps > 0) {
-            totalWeight += set.weight * set.actualReps;
-          }
-        }
-      }
-    }
-
-    int currentStreak = _calculateStreak(completedWorkouts);
-
-    return achievements.map((achievement) {
-      int progress = 0;
-      bool isUnlocked = false;
-      DateTime? unlockedAt;
-
-      switch (achievement.id) {
-        case 'first_workout':
-        case 'workout_10':
-        case 'workout_50':
-        case 'workout_100':
-        case 'workout_500':
-          progress = totalWorkouts;
-          isUnlocked = totalWorkouts >= achievement.requiredValue;
-          if (isUnlocked && completedWorkouts.isNotEmpty) {
-            unlockedAt =
-                completedWorkouts.take(achievement.requiredValue).last.date;
-          }
-          break;
-
-        case 'total_weight_1000':
-        case 'total_weight_10000':
-        case 'total_weight_100000':
-          progress = totalWeight.toInt();
-          isUnlocked = totalWeight >= achievement.requiredValue;
-          if (isUnlocked && completedWorkouts.isNotEmpty) {
-            unlockedAt = completedWorkouts.last.date;
-          }
-          break;
-
-        case 'streak_7':
-        case 'streak_30':
-        case 'streak_100':
-          progress = currentStreak;
-          isUnlocked = currentStreak >= achievement.requiredValue;
-          break;
-
-        case 'first_friend':
-        case 'friends_10':
-          final friendsService =
-              Provider.of<FriendsService>(context, listen: false);
-          progress = friendsService.friends.length;
-          isUnlocked = progress >= achievement.requiredValue;
-          break;
-
-        default:
-          progress = 0;
-      }
-
-      return achievement.copyWith(
-        currentProgress: progress,
-        isUnlocked: isUnlocked,
-        unlockedAt: unlockedAt,
-      );
-    }).toList();
+    return AchievementProgress.calculateAll(
+      AchievementProgressInput(
+        workoutHistory: dataManager.workoutHistory,
+        friendsCount: friendsService.friends.length,
+        bodyWeightKg: profileService.weightKg ?? 0.0,
+        isMale: profileService.gender != 'female',
+        challengeWinCount: _challengeStats.wins,
+        completedChallengeCount: _challengeStats.completed,
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month}.${date.year}';
-  }
-
-  int _calculateStreak(List<dynamic> workoutHistory) {
-    if (workoutHistory.isEmpty) return 0;
-
-    final sortedDates = workoutHistory
-        .map((h) => DateTime(h.date.year, h.date.month, h.date.day))
-        .toSet()
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
-
-    int streak = 0;
-    DateTime? lastDate;
-
-    for (var date in sortedDates) {
-      if (lastDate == null) {
-        final daysDiff = DateTime.now().difference(date).inDays;
-        if (daysDiff <= 1) {
-          lastDate = date;
-          streak = 1;
-        } else {
-          break;
-        }
-      } else {
-        final difference = lastDate.difference(date).inDays;
-        if (difference <= 2) {
-          streak++;
-          lastDate = date;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return streak;
   }
 }
