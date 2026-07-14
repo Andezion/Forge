@@ -314,6 +314,7 @@
   "moderateLevel": "Umiarkowany",
   "intenseLevel": "Intensywny",
   "exercisesColonLabel": "Ćwiczenia:",
+  "expandWorkout": "Rozwiń",
   "createPlanDesc": "Utwórz tygodniowy plan treningów\naby mieć ustrukturyzowany harmonogram.",
   "noWorkoutsFound": "Nie znaleziono treningów",
   "noMuscleDataAvailable": "Brak danych o mięśniach",

@@ -314,6 +314,7 @@
   "moderateLevel": "Умеренная",
   "intenseLevel": "Интенсивная",
   "exercisesColonLabel": "Упражнения:",
+  "expandWorkout": "Развернуть",
   "createPlanDesc": "Создайте недельный план тренировок\nдля структурированного расписания.",
   "noWorkoutsFound": "Тренировки не найдены",
   "noMuscleDataAvailable": "Нет данных о мышцах",

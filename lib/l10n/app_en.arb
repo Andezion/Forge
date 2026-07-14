@@ -1375,6 +1375,10 @@
   "@exercisesColonLabel": {
     "description": "Exercises colon heading"
   },
+  "expandWorkout": "Expand",
+  "@expandWorkout": {
+    "description": "Button to expand and preview the full recommended workout"
+  },
   "createPlanDesc": "Create a weekly training plan\nto follow a structured schedule.",
   "@createPlanDesc": {
     "description": "Create plan empty state description"
