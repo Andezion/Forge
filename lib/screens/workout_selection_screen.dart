@@ -7,6 +7,7 @@ import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../services/workout_recommendation_service.dart';
 import '../models/exercise.dart';
+import '../widgets/workout_preview_sheet.dart';
 import 'quick_workout_screen.dart';
 
 class WorkoutSelectionScreen extends StatefulWidget {
@@ -392,11 +393,38 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _matchLabel(matchPercent),
-                    style: AppTextStyles.body2
-                        .copyWith(color: color, fontWeight: FontWeight.w500),
+                  Expanded(
+                    child: Text(
+                      _matchLabel(matchPercent),
+                      style: AppTextStyles.body2.copyWith(
+                          color: color, fontWeight: FontWeight.w500),
+                    ),
                   ),
+                  OutlinedButton.icon(
+                    onPressed: () => showWorkoutPreviewSheet(
+                      context,
+                      title: workout.name,
+                      exercises: workout.exercises,
+                    ),
+                    icon: Icon(Icons.visibility_outlined,
+                        size: 16, color: AppColors.textSecondary),
+                    label: Text(
+                      'Preview',
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.divider),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Row(
                     children: [
                       Text(
