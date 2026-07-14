@@ -1178,6 +1178,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
     final progress = completedExercises / totalExercises;
     final allSetsCompleted = _setCompleted.every((c) => c);
     final anySetsCompleted = _setCompleted.any((c) => c);
+    final nextExerciseIndex = _currentExerciseIndex + 1 < _exerciseQueue.length
+        ? _currentExerciseIndex + 1
+        : -1;
+    final nextExercise =
+        nextExerciseIndex != -1 ? _exerciseQueue[nextExerciseIndex] : null;
 
     return PopScope(
       canPop: false,
@@ -1315,6 +1320,29 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen> {
                       currentExercise.sets,
                       (i) => _buildSetRow(i, currentExercise),
                     ),
+                    if (nextExercise != null) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.subdirectory_arrow_right,
+                            size: 14,
+                            color: AppColors.textHint,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              'Next: ${nextExercise.exercise.name}',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textHint,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 16),
                   ],
                 ),
