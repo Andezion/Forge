@@ -11,6 +11,7 @@ import '../models/training_plan.dart';
 import '../services/tour_service.dart';
 import '../widgets/compact_calendar.dart';
 import '../widgets/muscle_recovery_card.dart';
+import '../widgets/workout_preview_sheet.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
 import 'plan_editor_screen.dart';
@@ -572,6 +573,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+            const SizedBox(height: 8),
+            Center(
+              child: TextButton.icon(
+                onPressed: () => showWorkoutPreviewSheet(
+                  context,
+                  title: workout.name,
+                  exercises: _todayRecommendation!.exercises
+                      .map((e) => e.exercise)
+                      .toList(),
+                ),
+                icon: const Icon(Icons.expand_more, size: 18),
+                label: Text(l10n.expandWorkout),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                ),
+              ),
+            ),
           ],
         ),
       ),
