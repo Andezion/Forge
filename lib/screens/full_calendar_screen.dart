@@ -5,6 +5,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/data_manager.dart';
 import 'package:provider/provider.dart';
+import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
 import 'workout_execution_screen.dart';
@@ -149,54 +150,24 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (ctx) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-            child: Text(
-              'Log workout for $dayLabel',
-              style: AppTextStyles.h4,
+      builder: (ctx) => _WorkoutPickerSheet(
+        dayLabel: dayLabel,
+        workouts: workouts,
+        onSelect: (workout) {
+          Navigator.of(ctx).pop();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => WorkoutExecutionScreen(
+                workout: workout,
+                targetDate: _selectedDay,
+              ),
             ),
-          ),
-          const Divider(),
-          Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: workouts.length,
-              itemBuilder: (ctx, index) {
-                final workout = workouts[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                    child: Icon(Icons.fitness_center, color: AppColors.primary, size: 20),
-                  ),
-                  title: Text(workout.name, style: AppTextStyles.body1),
-                  subtitle: Text(
-                    '${workout.exercises.length} exercises',
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-                  ),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => WorkoutExecutionScreen(
-                          workout: workout,
-                          targetDate: _selectedDay,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
+          );
+        },
       ),
     );
   }
@@ -520,6 +491,125 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _WorkoutPickerSheet extends StatefulWidget {
+  final String dayLabel;
+  final List<Workout> workouts;
+  final ValueChanged<Workout> onSelect;
+
+  const _WorkoutPickerSheet({
+    required this.dayLabel,
+    required this.workouts,
+    required this.onSelect,
+  });
+
+  @override
+  State<_WorkoutPickerSheet> createState() => _WorkoutPickerSheetState();
+}
+
+class _WorkoutPickerSheetState extends State<_WorkoutPickerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filteredWorkouts = _query.isEmpty
+        ? widget.workouts
+        : widget.workouts
+            .where((w) => w.name.toLowerCase().contains(_query.toLowerCase()))
+            .toList();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+            child: Text(
+              'Log workout for ${widget.dayLabel}',
+              style: AppTextStyles.h4,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => setState(() => _query = value),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.searchWorkouts,
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _query = '');
+                        },
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ),
+          const Divider(height: 1),
+          if (filteredWorkouts.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context)!.noWorkoutsFound,
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+              ),
+            )
+          else
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: filteredWorkouts.length,
+                itemBuilder: (ctx, index) {
+                  final workout = filteredWorkouts[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          AppColors.primary.withValues(alpha: 0.15),
+                      child: Icon(Icons.fitness_center,
+                          color: AppColors.primary, size: 20),
+                    ),
+                    title: Text(workout.name, style: AppTextStyles.body1),
+                    subtitle: Text(
+                      '${workout.exercises.length} exercises',
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
+                    ),
+                    onTap: () => widget.onSelect(workout),
+                  );
+                },
+              ),
+            ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
