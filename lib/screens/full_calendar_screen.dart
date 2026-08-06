@@ -538,7 +538,7 @@ class _WorkoutPickerSheetState extends State<_WorkoutPickerSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 36, 16, 8),
             child: Text(
               'Log workout for ${widget.dayLabel}',
               style: AppTextStyles.h4,
