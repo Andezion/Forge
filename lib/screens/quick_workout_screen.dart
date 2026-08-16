@@ -24,10 +24,12 @@ class QuickWorkoutScreen extends StatefulWidget {
   State<QuickWorkoutScreen> createState() => _QuickWorkoutScreenState();
 }
 
-class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
+class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
+    with WidgetsBindingObserver {
   _Mode _mode = _Mode.idle;
   Timer? _timer;
   int _totalDurationSeconds = 0;
+  final DateTime _sessionStartTime = DateTime.now();
   final List<ExerciseResult> _completedExercises = [];
   bool _workoutFinished = false;
 
@@ -38,19 +40,42 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
   List<bool> _setCompleted = [];
   List<int> _setTimers = [];
   int? _activeSetIndex;
+  DateTime? _activeSetStartTime;
   ExerciseResult? _previousExercisePerformance;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _startTimer();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _disposeControllers();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _refreshElapsedTime();
+        if (_timer == null && mounted && !_workoutFinished) {
+          _startTimer();
+        }
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        _timer?.cancel();
+        _timer = null;
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   void _disposeControllers() {
@@ -65,14 +90,22 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          _totalDurationSeconds++;
-          if (_activeSetIndex != null && _mode == _Mode.exercising) {
-            _setTimers[_activeSetIndex!]++;
-          }
-        });
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _refreshElapsedTime();
+    });
+  }
+
+  void _refreshElapsedTime() {
+    if (!mounted) return;
+    setState(() {
+      _totalDurationSeconds =
+          DateTime.now().difference(_sessionStartTime).inSeconds;
+      if (_activeSetIndex != null &&
+          _mode == _Mode.exercising &&
+          _activeSetStartTime != null) {
+        _setTimers[_activeSetIndex!] =
+            DateTime.now().difference(_activeSetStartTime!).inSeconds;
       }
     });
   }
@@ -163,9 +196,10 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
   }
 
   void _startSet(int index) {
+    if (_activeSetIndex != null) return;
     setState(() {
-      if (_activeSetIndex != null) return;
       _activeSetIndex = index;
+      _activeSetStartTime = DateTime.now();
       _setTimers[index] = 0;
     });
   }
@@ -188,15 +222,20 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
       return;
     }
 
+    final elapsedSeconds = _activeSetStartTime != null
+        ? DateTime.now().difference(_activeSetStartTime!).inSeconds
+        : _setTimers[index];
+
     setState(() {
       _setCompleted[index] = true;
       _activeSetIndex = null;
+      _activeSetStartTime = null;
       _currentExerciseResult!.setResults.add(ExerciseSetResult(
         setNumber: index + 1,
         actualReps: actualReps,
         weight: actualWeight,
         timestamp: DateTime.now(),
-        durationSeconds: _setTimers[index],
+        durationSeconds: elapsedSeconds,
       ));
     });
 
@@ -398,7 +437,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen> {
       id: sessionId,
       workoutId: workoutId,
       workoutName: 'Quick Workout',
-      startTime: now.subtract(Duration(seconds: _totalDurationSeconds)),
+      startTime: _sessionStartTime,
       endTime: now,
       exerciseResults: _completedExercises,
       status: WorkoutSessionStatus.completed,
