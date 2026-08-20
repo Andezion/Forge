@@ -212,6 +212,23 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     });
   }
 
+  void _addSet() {
+    setState(() {
+      final current = _exerciseQueue[_currentExerciseIndex];
+      _exerciseQueue[_currentExerciseIndex] =
+          current.copyWith(sets: current.sets + 1);
+      _repsControllers.add(TextEditingController());
+      _weightControllers.add(TextEditingController(
+        text: current.weight > 0 ? current.weight.toString() : '',
+      ));
+      _setTimers.add(0);
+      _setCompleted.add(false);
+      _currentExerciseResult = _currentExerciseResult!.copyWith(
+        targetSets: _currentExerciseResult!.targetSets + 1,
+      );
+    });
+  }
+
   void _completeSetAtIndex(int index) {
     final repsText = _repsControllers[index].text;
     final weightText = _weightControllers[index].text;
@@ -1486,6 +1503,27 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                     ...List.generate(
                       currentExercise.sets,
                       (i) => _buildSetRow(i, currentExercise),
+                    ),
+                    const SizedBox(height: 4),
+                    Center(
+                      child: OutlinedButton.icon(
+                        onPressed: _addSet,
+                        icon: const Icon(Icons.add, size: 18),
+                        label: Text('Add Set', style: AppTextStyles.caption),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(
+                            color: AppColors.primary.withValues(alpha: 0.5),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
                     ),
                     if (nextExercise != null) ...[
                       const SizedBox(height: 12),
