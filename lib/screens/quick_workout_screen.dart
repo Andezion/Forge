@@ -204,6 +204,22 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     });
   }
 
+  void _addSet() {
+    setState(() {
+      final current = _currentWorkoutExercise!;
+      _currentWorkoutExercise = current.copyWith(sets: current.sets + 1);
+      _repsControllers.add(TextEditingController());
+      _weightControllers.add(TextEditingController(
+        text: current.weight > 0 ? current.weight.toString() : '',
+      ));
+      _setTimers.add(0);
+      _setCompleted.add(false);
+      _currentExerciseResult = _currentExerciseResult!.copyWith(
+        targetSets: _currentExerciseResult!.targetSets + 1,
+      );
+    });
+  }
+
   void _completeSetAtIndex(int index) {
     final actualReps =
         int.tryParse(_repsControllers[index].text) ?? 0;
@@ -1038,6 +1054,27 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                   ),
                 const SizedBox(height: 16),
                 ...List.generate(exercise.sets, _buildSetRow),
+                const SizedBox(height: 4),
+                Center(
+                  child: OutlinedButton.icon(
+                    onPressed: _addSet,
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text('Add Set', style: AppTextStyles.caption),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: BorderSide(
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
               ],
             ),
