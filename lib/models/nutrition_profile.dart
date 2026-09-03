@@ -131,6 +131,7 @@ class NutritionProfile {
   final MacroTargets? aiTargets;
   final List<MealSlot> mealSchedule;
   final int waterReminderIntervalMinutes;
+  final bool remindersEnabled;
   final String? aiReasoning;
   final DateTime? lastCalculated;
 
@@ -140,6 +141,7 @@ class NutritionProfile {
     this.aiTargets,
     this.mealSchedule = const [],
     this.waterReminderIntervalMinutes = 90,
+    this.remindersEnabled = false,
     this.aiReasoning,
     this.lastCalculated,
   });
@@ -150,6 +152,7 @@ class NutritionProfile {
         'aiTargets': aiTargets?.toJson(),
         'mealSchedule': mealSchedule.map((m) => m.toJson()).toList(),
         'waterReminderIntervalMinutes': waterReminderIntervalMinutes,
+        'remindersEnabled': remindersEnabled,
         'aiReasoning': aiReasoning,
         'lastCalculated': lastCalculated?.toIso8601String(),
       };
@@ -176,6 +179,7 @@ class NutritionProfile {
             : [],
         waterReminderIntervalMinutes:
             json['waterReminderIntervalMinutes'] as int? ?? 90,
+        remindersEnabled: json['remindersEnabled'] as bool? ?? false,
         aiReasoning: json['aiReasoning'] as String?,
         lastCalculated: json['lastCalculated'] != null
             ? DateTime.parse(json['lastCalculated'] as String)
@@ -188,6 +192,7 @@ class NutritionProfile {
     MacroTargets? aiTargets,
     List<MealSlot>? mealSchedule,
     int? waterReminderIntervalMinutes,
+    bool? remindersEnabled,
     String? aiReasoning,
     DateTime? lastCalculated,
   }) =>
@@ -198,6 +203,7 @@ class NutritionProfile {
         mealSchedule: mealSchedule ?? this.mealSchedule,
         waterReminderIntervalMinutes:
             waterReminderIntervalMinutes ?? this.waterReminderIntervalMinutes,
+        remindersEnabled: remindersEnabled ?? this.remindersEnabled,
         aiReasoning: aiReasoning ?? this.aiReasoning,
         lastCalculated: lastCalculated ?? this.lastCalculated,
       );
