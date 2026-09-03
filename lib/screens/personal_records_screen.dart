@@ -57,6 +57,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final gender = profile.gender ?? 'male';
     final weightClass = _getWeightClass(profile.weightKg ?? 75.0);
 
+    String? aiError;
     for (final entry in records.entries) {
       final exercise = _getExerciseById(entry.key, dataManager);
       if (exercise == null) continue;
@@ -64,6 +65,9 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       final match = await _groqService.matchExerciseToRecord(
           exercise.id, exercise.name);
       _exerciseMatches[exercise.id] = match;
+      if (match == null && _groqService.lastError != null) {
+        aiError = _groqService.lastError;
+      }
 
       if (match != null) {
         final wr = await _worldRecordsService.getRecord(
@@ -77,6 +81,14 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     }
 
     if (mounted) setState(() => _loadingRanks = false);
+    if (aiError != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('World-record matching unavailable: $aiError'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+    }
   }
 
   @override
