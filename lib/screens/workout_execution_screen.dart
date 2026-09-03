@@ -889,6 +889,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     }
 
     double? estimatedCalories;
+    String? calorieEstimateError;
     OverallRankResult? previousRank;
     OverallRankResult? freshRank;
     List<RankPopupEvent> popupEvents = [];
@@ -916,6 +917,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         session: completedSession,
         bodyWeightKg: profileService.weightKg ?? 75.0,
       );
+      if (estimatedCalories == null) {
+        calorieEstimateError = groq.lastError ?? 'AI calorie estimate unavailable.';
+      }
 
       if (!mounted) return;
       final rankingService =
@@ -1011,6 +1015,29 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       Text(
                         '~${estimatedCalories.round()} kcal burned',
                         style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                )
+              else if (calorieEstimateError != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cloud_off, color: AppColors.warning, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Calorie estimate unavailable: $calorieEstimateError',
+                          style: AppTextStyles.caption.copyWith(color: AppColors.warning),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   ),
