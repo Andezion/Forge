@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/settings_service.dart';
 import '../services/theme_service.dart';
+import '../services/groq_service.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
@@ -18,6 +19,8 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
   late final TextEditingController _keyController;
   bool _obscure = true;
   bool _isSaving = false;
+  bool _isTesting = false;
+  GroqTestResult? _testResult;
 
   @override
   void initState() {
@@ -43,6 +46,21 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.apiKeySaved)),
     );
+  }
+
+  Future<void> _testKey() async {
+    final key = _keyController.text.trim();
+    setState(() {
+      _isTesting = true;
+      _testResult = null;
+    });
+    final groq = GroqService(apiKey: key.isEmpty ? null : key);
+    final result = await groq.testConnection();
+    if (!mounted) return;
+    setState(() {
+      _isTesting = false;
+      _testResult = result;
+    });
   }
 
   Future<void> _remove() async {
@@ -155,6 +173,66 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _isTesting ? null : _testKey,
+                icon: _isTesting
+                    ? SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: appColor.color),
+                      )
+                    : Icon(Icons.wifi_tethering, color: appColor.color),
+                label: Text(
+                  _isTesting ? 'Testing...' : 'Test key',
+                  style: AppTextStyles.button.copyWith(color: appColor.color),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: appColor.color),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+            if (_testResult != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: (_testResult!.success ? Colors.green : AppColors.error)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _testResult!.success ? Colors.green : AppColors.error,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      _testResult!.success ? Icons.check_circle : Icons.error,
+                      color: _testResult!.success ? Colors.green : AppColors.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _testResult!.message,
+                        style: AppTextStyles.body2.copyWith(
+                          color: _testResult!.success ? Colors.green : AppColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 32),
             _buildStatusTile(appColor.color),
           ],
