@@ -158,8 +158,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
             workoutExercise.weight > 0 ? workoutExercise.weight.toString() : '',
       ),
     );
-    _setTimers = List.filled(numSets, 0);
-    _setCompleted = List.filled(numSets, false);
+    _setTimers = List.filled(numSets, 0, growable: true);
+    _setCompleted = List.filled(numSets, false, growable: true);
     _activeSetIndex = null;
   }
 
