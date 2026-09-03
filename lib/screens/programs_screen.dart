@@ -46,8 +46,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
     if (suggestion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to generate program. Check your API key or internet connection.'),
+        SnackBar(
+          content: Text(groqService.lastError ??
+              'Failed to generate program. Check your API key or internet connection.'),
           backgroundColor: Colors.red,
         ),
       );
