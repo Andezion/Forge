@@ -172,8 +172,8 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
           text: weight > 0 ? weight.toString() : '',
         ),
       );
-      _setTimers = List.filled(sets, 0);
-      _setCompleted = List.filled(sets, false);
+      _setTimers = List.filled(sets, 0, growable: true);
+      _setCompleted = List.filled(sets, false, growable: true);
       _activeSetIndex = null;
       _mode = _Mode.exercising;
     });
