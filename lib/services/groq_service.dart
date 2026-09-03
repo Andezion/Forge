@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -99,11 +100,24 @@ class GroqService {
       ? _apiKey!
       : (dotenv.env['key'] ?? '');
 
+  String? lastError;
+
+  bool _hasApiKey() {
+    if (_resolvedKey.isEmpty) {
+      lastError = 'No Groq API key configured. Add one in Settings → AI.';
+      debugPrint('[GROQ] $lastError');
+      return false;
+    }
+    return true;
+  }
+
   Future<AiSuggestedWorkout?> generateProgram({
     required List<WorkoutHistory> history,
     required List<Exercise> exercises,
     required TrainingDirection direction,
   }) async {
+    lastError = null;
+    if (!_hasApiKey()) return null;
     try {
       final prompt = _buildPrompt(history, exercises, direction);
 
@@ -129,9 +143,10 @@ class GroqService {
             },
           ],
         }),
-      );
+      ).timeout(const Duration(seconds: 25));
 
       if (response.statusCode != 200) {
+        lastError = 'Groq API error ${response.statusCode}';
         debugPrint('[GROQ] Error ${response.statusCode}: ${response.body}');
         return null;
       }
@@ -140,7 +155,12 @@ class GroqService {
       final content = data['choices'][0]['message']['content'] as String;
 
       return _parseResponse(content, exercises);
+    } on TimeoutException {
+      lastError = 'Groq request timed out. Check your connection and try again.';
+      debugPrint('[GROQ] Exception: timeout');
+      return null;
     } catch (e) {
+      lastError = 'Groq request failed: $e';
       debugPrint('[GROQ] Exception: $e');
       return null;
     }
@@ -227,6 +247,8 @@ Rules:
     required WorkoutSession session,
     required double bodyWeightKg,
   }) async {
+    lastError = null;
+    if (!_hasApiKey()) return null;
     try {
       final summary = session.exerciseResults.map((er) {
         final sets = er.setResults;
@@ -272,9 +294,12 @@ Return ONLY a JSON object (no markdown, no extra text):
             {'role': 'user', 'content': prompt},
           ],
         }),
-      );
+      ).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        lastError = 'Groq API error ${response.statusCode}';
+        return null;
+      }
 
       final data = jsonDecode(response.body);
       final content = data['choices'][0]['message']['content'] as String;
@@ -287,7 +312,12 @@ Return ONLY a JSON object (no markdown, no extra text):
       }
       final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
       return (parsed['caloriesBurned'] as num).toDouble();
+    } on TimeoutException {
+      lastError = 'Groq request timed out. Check your connection and try again.';
+      debugPrint('[GROQ] estimateWorkoutCalories error: timeout');
+      return null;
     } catch (e) {
+      lastError = 'Groq request failed: $e';
       debugPrint('[GROQ] estimateWorkoutCalories error: $e');
       return null;
     }
@@ -307,6 +337,8 @@ Return ONLY a JSON object (no markdown, no extra text):
     required NutritionGoal goal,
     double workoutCaloriesBurned = 0,
   }) async {
+    lastError = null;
+    if (!_hasApiKey()) return null;
     try {
       final genderStr = gender.name;
       final prompt = '''
@@ -363,9 +395,10 @@ Return ONLY a JSON object (no markdown, no extra text):
             {'role': 'user', 'content': prompt},
           ],
         }),
-      );
+      ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode != 200) {
+        lastError = 'Groq API error ${response.statusCode}';
         debugPrint('[GROQ] nutrition plan error ${response.statusCode}');
         return null;
       }
@@ -401,7 +434,12 @@ Return ONLY a JSON object (no markdown, no extra text):
         mealSchedule: mealSchedule,
         reasoning: reasoning,
       );
+    } on TimeoutException {
+      lastError = 'Groq request timed out. Check your connection and try again.';
+      debugPrint('[GROQ] generateNutritionPlan error: timeout');
+      return null;
     } catch (e) {
+      lastError = 'Groq request failed: $e';
       debugPrint('[GROQ] generateNutritionPlan error: $e');
       return null;
     }
@@ -412,6 +450,9 @@ Return ONLY a JSON object (no markdown, no extra text):
     final prefs = await SharedPreferences.getInstance();
     final cached = prefs.getString('$cachePrefix$exerciseId');
     if (cached != null) return cached == 'none' ? null : cached;
+
+    lastError = null;
+    if (!_hasApiKey()) return null;
 
     try {
       final response = await http.post(
@@ -445,9 +486,12 @@ Return ONLY JSON: {"match": "squat"|"bench"|"deadlift"|null, "confidence": 0.0-1
             },
           ],
         }),
-      );
+      ).timeout(const Duration(seconds: 12));
 
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        lastError = 'Groq API error ${response.statusCode}';
+        return null;
+      }
 
       final data = jsonDecode(response.body);
       var content = (data['choices'][0]['message']['content'] as String).trim();
@@ -464,7 +508,12 @@ Return ONLY JSON: {"match": "squat"|"bench"|"deadlift"|null, "confidence": 0.0-1
       final result = (match != null && confidence >= 0.75) ? match : null;
       await prefs.setString('$cachePrefix$exerciseId', result ?? 'none');
       return result;
+    } on TimeoutException {
+      lastError = 'Groq request timed out. Check your connection and try again.';
+      debugPrint('[GROQ] matchExerciseToRecord error: timeout');
+      return null;
     } catch (e) {
+      lastError = 'Groq request failed: $e';
       debugPrint('[GROQ] matchExerciseToRecord error: $e');
       return null;
     }
@@ -477,6 +526,8 @@ Return ONLY JSON: {"match": "squat"|"bench"|"deadlift"|null, "confidence": 0.0-1
     required int workoutCount,
     required Map<String, double> knownLifts,
   }) async {
+    lastError = null;
+    if (!_hasApiKey()) return null;
     try {
       final liftsSummary = knownLifts.isEmpty
           ? 'none recorded'
@@ -520,7 +571,10 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
         }),
       ).timeout(const Duration(seconds: 8));
 
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        lastError = 'Groq API error ${response.statusCode}';
+        return null;
+      }
 
       final data = jsonDecode(response.body);
       var content = (data['choices'][0]['message']['content'] as String).trim();
@@ -550,7 +604,12 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
         reason: reason,
         computedAt: DateTime.now(),
       );
+    } on TimeoutException {
+      lastError = 'Groq request timed out. Check your connection and try again.';
+      debugPrint('[GROQ] estimateRankFromPartialProfile error: timeout');
+      return null;
     } catch (e) {
+      lastError = 'Groq request failed: $e';
       debugPrint('[GROQ] estimateRankFromPartialProfile error: $e');
       return null;
     }
@@ -606,8 +665,75 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
         generatedAt: now,
       );
     } catch (e) {
+      lastError = 'Failed to parse the AI response.';
       debugPrint('[GROQ] Parse error: $e\nContent: $content');
       return null;
     }
   }
+
+  Future<GroqTestResult> testConnection() async {
+    if (_resolvedKey.isEmpty) {
+      return const GroqTestResult(
+        success: false,
+        message: 'No API key configured.',
+      );
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(_groqApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_resolvedKey',
+        },
+        body: jsonEncode({
+          'model': _model,
+          'max_tokens': 5,
+          'messages': [
+            {'role': 'user', 'content': 'Reply with just: OK'},
+          ],
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return const GroqTestResult(
+          success: true,
+          message: 'Connected — the key works.',
+        );
+      }
+      if (response.statusCode == 401) {
+        return const GroqTestResult(
+          success: false,
+          message: 'Invalid API key (401 Unauthorized).',
+        );
+      }
+      if (response.statusCode == 429) {
+        return const GroqTestResult(
+          success: false,
+          message: 'Key is valid, but rate-limited (429) right now.',
+        );
+      }
+      return GroqTestResult(
+        success: false,
+        message: 'Groq API error ${response.statusCode}.',
+      );
+    } on TimeoutException {
+      return const GroqTestResult(
+        success: false,
+        message: 'Request timed out. Check your internet connection.',
+      );
+    } catch (e) {
+      return GroqTestResult(
+        success: false,
+        message: 'Request failed: $e',
+      );
+    }
+  }
+}
+
+class GroqTestResult {
+  final bool success;
+  final String message;
+
+  const GroqTestResult({required this.success, required this.message});
 }
