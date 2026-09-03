@@ -21,7 +21,6 @@ class NutritionScreen extends StatefulWidget {
 class _NutritionScreenState extends State<NutritionScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabs;
-  bool _notificationsEnabled = false;
 
   @override
   void initState() {
@@ -72,6 +71,7 @@ class _NutritionScreenState extends State<NutritionScreen>
   Future<void> _toggleNotifications(
       bool value, List<MealSlot> meals, int waterInterval) async {
     final l10n = AppLocalizations.of(context)!;
+    final nutrition = context.read<NutritionService>();
     final ns = NotificationService();
     await ns.init();
     final granted = await ns.requestPermission();
@@ -79,7 +79,7 @@ class _NutritionScreenState extends State<NutritionScreen>
       _showSnack(l10n.notificationDenied);
       return;
     }
-    setState(() => _notificationsEnabled = value);
+    await nutrition.setRemindersEnabled(value);
     if (value) {
       await ns.scheduleMealReminders(meals);
       await ns.scheduleWaterReminders(waterInterval);
@@ -141,7 +141,7 @@ class _NutritionScreenState extends State<NutritionScreen>
                     _SettingsTab(
                       profile: prof,
                       appColor: appColor.color,
-                      notificationsEnabled: _notificationsEnabled,
+                      notificationsEnabled: prof.remindersEnabled,
                       onToggleNotifications: (v) => _toggleNotifications(
                         v,
                         prof.mealSchedule,
@@ -157,7 +157,7 @@ class _NutritionScreenState extends State<NutritionScreen>
                       },
                       onWaterIntervalChanged: (v) async {
                         await nutrition.setWaterReminderInterval(v);
-                        if (_notificationsEnabled) {
+                        if (prof.remindersEnabled) {
                           await NotificationService().scheduleWaterReminders(v);
                         }
                       },
