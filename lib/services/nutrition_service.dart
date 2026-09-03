@@ -109,6 +109,10 @@ class NutritionService extends ChangeNotifier {
         goal: goal,
         workoutCaloriesBurned: workoutCalories,
       );
+      if (aiResult == null && _groq.lastError != null) {
+        _error = _groq.lastError;
+        debugPrint('[NutritionService] AI plan unavailable: ${_groq.lastError}');
+      }
 
       _profile = _profile.copyWith(
         algorithmTargets: algoTargets,
