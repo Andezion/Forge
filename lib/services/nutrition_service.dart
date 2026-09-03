@@ -56,6 +56,12 @@ class NutritionService extends ChangeNotifier {
     await _save();
   }
 
+  Future<void> setRemindersEnabled(bool enabled) async {
+    _profile = _profile.copyWith(remindersEnabled: enabled);
+    notifyListeners();
+    await _save();
+  }
+
   Future<void> recalculate({
     required double weightKg,
     required double heightCm,
