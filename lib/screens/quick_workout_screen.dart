@@ -467,6 +467,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     ));
 
     double? estimatedCalories;
+    String? calorieEstimateError;
     try {
       if (!mounted) return;
       final leaderboardService =
@@ -490,6 +491,9 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
         session: session,
         bodyWeightKg: profileService.weightKg ?? 75.0,
       );
+      if (estimatedCalories == null) {
+        calorieEstimateError = groq.lastError ?? 'AI calorie estimate unavailable.';
+      }
     } catch (e) {
       debugPrint('[QUICK_WORKOUT] Post-save error: $e');
     }
@@ -554,6 +558,35 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                         '~${estimatedCalories.round()} kcal burned',
                         style: AppTextStyles.body1
                             .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (calorieEstimateError != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.warning.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cloud_off, color: AppColors.warning, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Calorie estimate unavailable: $calorieEstimateError',
+                          style: AppTextStyles.caption.copyWith(color: AppColors.warning),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   ),
