@@ -25,15 +25,25 @@ void main() {
     expect(BodyMapData.drawnGroups, expected);
   });
 
-  Future<MuscleGroup?> tapAt(
+  test('muscles stay inside the silhouette half', () {
+    final body = parseSvgPath(BodyMapData.silhouette).getBounds().inflate(1);
+    for (final region in [...BodyMapData.front, ...BodyMapData.back]) {
+      final bounds = parseSvgPath(region.path).getBounds();
+      expect(body.contains(bounds.topLeft) && body.contains(bounds.bottomRight),
+          isTrue,
+          reason: region.name);
+    }
+  });
+
+  Future<BodyMapRegion?> tapAt(
       WidgetTester tester, BodyMapSide side, Offset point) async {
-    MuscleGroup? tapped;
+    BodyMapRegion? tapped;
     await tester.pumpWidget(MaterialApp(
       home: Align(
         alignment: Alignment.topLeft,
         child: SizedBox(
           width: BodyMapData.width,
-          child: BodyMap(side: side, onMuscleTap: (g) => tapped = g),
+          child: BodyMap(side: side, onMuscleTap: (m) => tapped = m),
         ),
       ),
     ));
@@ -42,17 +52,34 @@ void main() {
   }
 
   testWidgets('tapping resolves the muscle under the finger', (tester) async {
-    expect(await tapAt(tester, BodyMapSide.front, const Offset(80, 115)),
-        MuscleGroup.chest);
-    expect(await tapAt(tester, BodyMapSide.front, const Offset(120, 115)),
-        MuscleGroup.chest);
-    expect(await tapAt(tester, BodyMapSide.front, const Offset(90, 190)),
-        MuscleGroup.core);
-    expect(await tapAt(tester, BodyMapSide.back, const Offset(80, 250)),
-        MuscleGroup.glutes);
-    expect(await tapAt(tester, BodyMapSide.back, const Offset(80, 375)),
-        MuscleGroup.calves);
+    final cases = {
+      (BodyMapSide.front, const Offset(80, 125)):
+          ('Pectoralis major (sternal head)', MuscleGroup.chest),
+      (BodyMapSide.front, const Offset(120, 125)):
+          ('Pectoralis major (sternal head)', MuscleGroup.chest),
+      (BodyMapSide.front, const Offset(90, 185)):
+          ('Rectus abdominis', MuscleGroup.core),
+      (BodyMapSide.front, const Offset(64, 285)):
+          ('Vastus lateralis', MuscleGroup.legs),
+      (BodyMapSide.front, const Offset(66, 245)):
+          ('Tensor fasciae latae', MuscleGroup.glutes),
+      (BodyMapSide.back, const Offset(80, 265)):
+          ('Gluteus maximus', MuscleGroup.glutes),
+      (BodyMapSide.back, const Offset(74, 365)):
+          ('Gastrocnemius (lateral head)', MuscleGroup.calves),
+      (BodyMapSide.back, const Offset(36, 160)):
+          ('Triceps brachii (lateral head)', MuscleGroup.triceps),
+    };
+    for (final MapEntry(key: (side, point), value: (name, group))
+        in cases.entries) {
+      final muscle = await tapAt(tester, side, point);
+      expect(muscle?.name, name, reason: '$side $point');
+      expect(muscle?.group, group);
+    }
+
     expect(await tapAt(tester, BodyMapSide.front, const Offset(100, 30)),
+        isNull);
+    expect(await tapAt(tester, BodyMapSide.front, const Offset(94, 78)),
         isNull);
   });
 }
