@@ -10,8 +10,10 @@ enum BodyMapSide { front, back }
 class BodyMap extends StatelessWidget {
   final BodyMapSide side;
   final Map<MuscleGroup, Color> fills;
-  final MuscleGroup? selected;
-  final ValueChanged<MuscleGroup>? onMuscleTap;
+
+  final BodyMapRegion? selected;
+
+  final ValueChanged<BodyMapRegion>? onMuscleTap;
 
   const BodyMap({
     super.key,
@@ -36,9 +38,9 @@ class BodyMap extends StatelessWidget {
             onTapUp: onMuscleTap == null
                 ? null
                 : (details) {
-                    final group =
-                        shapes.groupAt(details.localPosition / scale);
-                    if (group != null) onMuscleTap!(group);
+                    final region =
+                        shapes.regionAt(details.localPosition / scale);
+                    if (region != null) onMuscleTap!(region);
                   },
             child: CustomPaint(
               size: Size(constraints.maxWidth, constraints.maxHeight),
@@ -62,7 +64,7 @@ class BodyMap extends StatelessWidget {
 class _BodyMapShapes {
   final Path silhouette;
   final Path outline;
-  final List<(MuscleGroup, Path)> regions;
+  final List<(BodyMapRegion, Path)> regions;
   final Path details;
 
   _BodyMapShapes._(this.silhouette, this.outline, this.regions, this.details);
@@ -85,7 +87,7 @@ class _BodyMapShapes {
       [
         for (final region in regions)
           (
-            region.group,
+            region,
             region.mirrored
                 ? _mirrored(parseSvgPath(region.path))
                 : parseSvgPath(region.path),
@@ -105,9 +107,9 @@ class _BodyMapShapes {
   static Path _mirrored(Path half) =>
       Path.from(half)..addPath(half.transform(_mirror), Offset.zero);
 
-  MuscleGroup? groupAt(Offset point) {
-    for (final (group, path) in regions.reversed) {
-      if (path.contains(point)) return group;
+  BodyMapRegion? regionAt(Offset point) {
+    for (final (region, path) in regions.reversed) {
+      if (path.contains(point)) return region.group == null ? null : region;
     }
     return null;
   }
@@ -116,7 +118,7 @@ class _BodyMapShapes {
 class _BodyMapPainter extends CustomPainter {
   final _BodyMapShapes shapes;
   final Map<MuscleGroup, Color> fills;
-  final MuscleGroup? selected;
+  final BodyMapRegion? selected;
   final Color skin;
   final Color muscle;
   final Color outline;
@@ -144,22 +146,28 @@ class _BodyMapPainter extends CustomPainter {
 
     canvas.drawPath(shapes.silhouette, Paint()..color = skin);
 
-    for (final (group, path) in shapes.regions) {
-      canvas.drawPath(path, Paint()..color = fills[group] ?? muscle);
-      canvas.drawPath(path, stroke..strokeWidth = 1);
+    for (final (region, path) in shapes.regions) {
+      canvas.drawPath(path, Paint()..color = fills[region.group] ?? muscle);
+      canvas.drawPath(path, stroke..strokeWidth = 0.7);
     }
 
-    canvas.drawPath(shapes.details, stroke..strokeWidth = 0.8);
-    canvas.drawPath(shapes.outline, stroke..strokeWidth = 1.6);
+    canvas.drawPath(shapes.details, stroke..strokeWidth = 0.6);
+    canvas.drawPath(shapes.outline, stroke..strokeWidth = 1.4);
 
     if (selected != null) {
       final ring = Paint()
         ..style = PaintingStyle.stroke
         ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = 2.4
         ..color = highlight;
-      for (final (group, path) in shapes.regions) {
-        if (group == selected) canvas.drawPath(path, ring);
+      for (final (region, path) in shapes.regions) {
+        if (region.group == selected!.group) {
+          canvas.drawPath(path, ring..strokeWidth = 1.2);
+        }
+      }
+      for (final (region, path) in shapes.regions) {
+        if (region.name == selected!.name) {
+          canvas.drawPath(path, ring..strokeWidth = 2.4);
+        }
       }
     }
   }
