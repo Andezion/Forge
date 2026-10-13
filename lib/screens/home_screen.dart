@@ -10,7 +10,7 @@ import '../models/workout_recommendation.dart';
 import '../models/training_plan.dart';
 import '../services/tour_service.dart';
 import '../widgets/compact_calendar.dart';
-import '../widgets/muscle_recovery_card.dart';
+import '../widgets/muscle_recovery_map.dart';
 import '../widgets/workout_preview_sheet.dart';
 import 'workout_execution_screen.dart';
 import 'full_calendar_screen.dart';
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 16),
                   _buildWorkoutCard(),
                   const SizedBox(height: 8),
-                  _buildMuscleRecoveryCompact(),
+                  _buildMuscleRecoveryMap(),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -869,7 +869,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMuscleRecoveryCompact() {
+  Widget _buildMuscleRecoveryMap() {
     try {
       final recommendationService = Provider.of<WorkoutRecommendationService>(
         context,
@@ -881,7 +881,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final recoveryPriorities =
           recommendationService.getMuscleRecoveryPriorities();
 
-      return MuscleRecoveryCompact(
+      return MuscleRecoveryMap(
         daysSinceTraining: daysSinceTraining,
         recoveryPriorities: recoveryPriorities,
       );
