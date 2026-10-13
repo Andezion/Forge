@@ -23,7 +23,7 @@ class MuscleRecoveryMap extends StatefulWidget {
 }
 
 class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
-  MuscleGroup? _selected;
+  BodyMapRegion? _selected;
 
   static Color _statusColor(double priority) {
     if (priority >= 0.7) return AppColors.success;
@@ -31,18 +31,22 @@ class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
     return AppColors.error;
   }
 
-  void _toggle(MuscleGroup group) {
-    setState(() => _selected = _selected == group ? null : group);
+  void _toggle(BodyMapRegion muscle) {
+    setState(
+        () => _selected = _selected?.name == muscle.name ? null : muscle);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final surface = Theme.of(context).colorScheme.surface;
     final fills = {
       for (final group in BodyMapData.drawnGroups)
         if (widget.recoveryPriorities[group] != null)
-          group: _statusColor(widget.recoveryPriorities[group]!)
-              .withValues(alpha: 0.75),
+          group: Color.alphaBlend(
+              _statusColor(widget.recoveryPriorities[group]!)
+                  .withValues(alpha: 0.75),
+              surface),
     };
 
     return Card(
@@ -62,7 +66,7 @@ class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
             ),
             const SizedBox(height: 12),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 280),
+              constraints: const BoxConstraints(maxHeight: 360),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -120,7 +124,8 @@ class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
   }
 
   Widget _buildDetails(
-      BuildContext context, AppLocalizations l10n, MuscleGroup group) {
+      BuildContext context, AppLocalizations l10n, BodyMapRegion muscle) {
+    final group = muscle.group!;
     final days = widget.daysSinceTraining[group] ?? 0;
     final priority = widget.recoveryPriorities[group] ?? 0.5;
     final recommendation = MuscleRecoveryTracker()
@@ -142,18 +147,18 @@ class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${MuscleGroupUtils.getLabel(group)} · '
-                '${days >= 10 ? '10+' : days} ${l10n.days}',
+                muscle.name,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),
-              if (recommendation != null)
-                Text(
-                  recommendation,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+              Text(
+                '${MuscleGroupUtils.getLabel(group)} · '
+                '${days >= 10 ? '10+' : days} ${l10n.days}'
+                '${recommendation != null ? ' · $recommendation' : ''}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),
