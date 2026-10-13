@@ -36,12 +36,13 @@ void _figure(StringBuffer buffer, String id, double dx,
       '<path d="${BodyMapData.silhouetteOutline}" fill="none" '
       'stroke="$_outline" stroke-width="1.6" stroke-linejoin="round"/>');
 
-  for (final group in MuscleGroup.values) {
+  for (final group in [...MuscleGroup.values, null]) {
     final shapes = regions.where((r) => r.group == group).toList();
     if (shapes.isEmpty) continue;
-    buffer.writeln('<g id="$id-${group.name}" class="m">');
+    buffer.writeln('<g id="$id-${group?.name ?? 'untracked'}" class="m">');
     for (final region in shapes) {
-      final path = '<path d="${region.path}"/>';
+      final path =
+          '<path d="${region.path}"><title>${region.name}</title></path>';
       region.mirrored ? _mirrored(buffer, path) : buffer.writeln(path);
     }
     buffer.writeln('</g>');
