@@ -235,7 +235,7 @@
   "algorithm": "Алгоритм",
   "mifflinFormula": "Формула Миффлина-Сен Жеора",
   "aiRecommendation": "Рекомендация ИИ",
-  "groqModel": "Groq · Llama 3.3 70B",
+  "groqModel": "Groq · GPT-OSS 120B",
   "lastUpdated": "Последнее обновление: {date}",
   "setGoalForMeals": "Установите цель и рассчитайте показатели для расписания питания.",
   "mealSchedule": "Расписание питания",

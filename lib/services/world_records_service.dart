@@ -56,10 +56,10 @@ class WorldRecordsService {
         final data = doc.data()!;
         final record = WorldRecord(
           id: key,
-          exercise: data['exercise'] as String? ?? exercise,
-          federation: data['federation'] as String? ?? federation,
-          weightClass: data['weightClass'] as String? ?? weightClass,
-          gender: data['gender'] as String? ?? gender,
+          exercise: data['exercise']?.toString() ?? exercise,
+          federation: data['federation']?.toString() ?? federation,
+          weightClass: data['weightClass']?.toString() ?? weightClass,
+          gender: data['gender']?.toString() ?? gender,
           equipped: data['equipped'] as bool? ?? equipped,
           weight: (data['weight'] as num).toDouble(),
           athleteName: data['athleteName'] as String? ?? '',

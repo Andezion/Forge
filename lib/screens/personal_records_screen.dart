@@ -7,6 +7,7 @@ import '../models/strength_rank.dart';
 import '../services/data_manager.dart';
 import '../services/profile_service.dart';
 import '../services/rank_service.dart';
+import '../services/settings_service.dart';
 import '../services/world_records_service.dart';
 import '../services/groq_service.dart';
 import '../utils/strength_coefficients.dart';
@@ -26,7 +27,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   String _selectedFederation = 'IPF';
 
   final _worldRecordsService = WorldRecordsService();
-  final _groqService = GroqService();
+  late final GroqService _groqService = GroqService(
+      apiKey: Provider.of<SettingsService>(context, listen: false).groqApiKey);
 
   final Map<String, String?> _exerciseMatches = {};
   final Map<String, double?> _worldRecordWeights = {};

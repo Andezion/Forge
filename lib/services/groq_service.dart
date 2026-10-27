@@ -16,7 +16,7 @@ import '../models/workout_session.dart';
 import 'ranking_service.dart';
 
 const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-const String _model = 'llama-3.3-70b-versatile';
+const String _model = 'openai/gpt-oss-120b';
 
 enum TrainingDirection {
   fullBody,
@@ -129,6 +129,7 @@ class GroqService {
         },
         body: jsonEncode({
           'model': _model,
+          'reasoning_effort': 'low',
           'temperature': 0.7,
           'max_tokens': 2000,
           'messages': [
@@ -283,8 +284,9 @@ Return ONLY a JSON object (no markdown, no extra text):
         },
         body: jsonEncode({
           'model': _model,
+          'reasoning_effort': 'low',
           'temperature': 0.3,
-          'max_tokens': 200,
+          'max_tokens': 800,
           'messages': [
             {
               'role': 'system',
@@ -384,8 +386,9 @@ Return ONLY a JSON object (no markdown, no extra text):
         },
         body: jsonEncode({
           'model': _model,
+          'reasoning_effort': 'low',
           'temperature': 0.4,
-          'max_tokens': 1000,
+          'max_tokens': 2000,
           'messages': [
             {
               'role': 'system',
@@ -463,8 +466,9 @@ Return ONLY a JSON object (no markdown, no extra text):
         },
         body: jsonEncode({
           'model': _model,
+          'reasoning_effort': 'low',
           'temperature': 0.1,
-          'max_tokens': 60,
+          'max_tokens': 400,
           'messages': [
             {
               'role': 'system',
@@ -558,8 +562,9 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
         },
         body: jsonEncode({
           'model': _model,
+          'reasoning_effort': 'low',
           'temperature': 0.2,
-          'max_tokens': 150,
+          'max_tokens': 600,
           'messages': [
             {
               'role': 'system',
@@ -688,7 +693,8 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
         },
         body: jsonEncode({
           'model': _model,
-          'max_tokens': 5,
+          'reasoning_effort': 'low',
+          'max_tokens': 200,
           'messages': [
             {'role': 'user', 'content': 'Reply with just: OK'},
           ],
@@ -713,9 +719,15 @@ Return ONLY JSON: {"rank": "wooden"|"stone"|"iron"|"bronze"|"silver"|"gold"|"dia
           message: 'Key is valid, but rate-limited (429) right now.',
         );
       }
+      debugPrint('[GROQ] testConnection ${response.statusCode}: ${response.body}');
+      String? detail;
+      try {
+        detail = jsonDecode(response.body)['error']?['message'] as String?;
+      } catch (_) {}
       return GroqTestResult(
         success: false,
-        message: 'Groq API error ${response.statusCode}.',
+        message: 'Groq API error ${response.statusCode}'
+            '${detail != null ? ': $detail' : '.'}',
       );
     } on TimeoutException {
       return const GroqTestResult(

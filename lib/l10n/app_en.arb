@@ -1026,7 +1026,7 @@
   "@aiRecommendation": {
     "description": "AI recommendation section header"
   },
-  "groqModel": "Groq · Llama 3.3 70B",
+  "groqModel": "Groq · GPT-OSS 120B",
   "@groqModel": {
     "description": "Groq model subtitle"
   },
