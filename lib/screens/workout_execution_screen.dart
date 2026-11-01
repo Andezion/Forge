@@ -21,6 +21,7 @@ import '../services/settings_service.dart';
 import '../services/profile_service.dart';
 import '../services/progression_service.dart';
 import '../utils/exercise_sequence.dart';
+import '../widgets/fix_set_dialog.dart';
 import '../widgets/rank_event_popup.dart';
 import 'exercise_library_screen.dart';
 
@@ -270,6 +271,35 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     if (_setCompleted.every((c) => c)) {
       Future.microtask(() => _showExerciseDifficultyDialog());
     }
+  }
+
+  Future<void> _fixSetAtIndex(int index) async {
+    final setResults = _currentExerciseResult!.setResults;
+    final resultIndex =
+        setResults.indexWhere((s) => s.setNumber == index + 1);
+    if (resultIndex == -1) return;
+    final old = setResults[resultIndex];
+
+    final fixed = await showFixSetDialog(
+      context,
+      setNumber: old.setNumber,
+      reps: old.actualReps,
+      weight: old.weight,
+    );
+    if (fixed == null || !mounted) return;
+    final (reps, weight) = fixed;
+
+    setState(() {
+      setResults[resultIndex] = ExerciseSetResult(
+        setNumber: old.setNumber,
+        actualReps: reps,
+        weight: weight,
+        timestamp: DateTime.now(),
+        durationSeconds: old.durationSeconds,
+      );
+      _repsControllers[index].text = reps.toString();
+      _weightControllers[index].text = weight > 0 ? weight.toString() : '';
+    });
   }
 
   void _swapExercise(WorkoutExercise currentWorkoutExercise) {
@@ -1243,6 +1273,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                const SizedBox(width: 8),
+                FixSetButton(
+                  enabled: isCompleted,
+                  onPressed: () => _fixSetAtIndex(index),
+                ),
               ],
             ),
             const SizedBox(height: 8),
