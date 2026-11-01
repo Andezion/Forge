@@ -30,7 +30,7 @@ class CustomizationScreen extends StatelessWidget {
     return Consumer<AppColor>(
       builder: (context, appColor, _) => Scaffold(
         appBar: AppBar(
-          title: Text('Customization', style: AppTextStyles.h4),
+          title: Text(l10n.customization, style: AppTextStyles.h4),
           backgroundColor: appColor.color,
           foregroundColor: Colors.white,
         ),
@@ -68,9 +68,9 @@ class CustomizationScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Dark Theme', style: AppTextStyles.h4),
+                              Text(l10n.darkTheme, style: AppTextStyles.h4),
                               Text(
-                                appColor.isDarkMode ? 'Enabled' : 'Disabled',
+                                appColor.isDarkMode ? l10n.enabled : l10n.disabled,
                                 style: AppTextStyles.caption.copyWith(
                                   color: Theme.of(context)
                                       .textTheme
@@ -104,7 +104,7 @@ class CustomizationScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('Profile', style: AppTextStyles.h3),
+                Text(l10n.profileSection, style: AppTextStyles.h3),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -145,7 +145,7 @@ class CustomizationScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Profile Image', style: AppTextStyles.body1),
+                          Text(l10n.profileImage, style: AppTextStyles.body1),
                           const SizedBox(height: 8),
                           ElevatedButton(
                             onPressed: () async {
@@ -163,7 +163,7 @@ class CustomizationScreen extends StatelessWidget {
                               backgroundColor: appColor.color,
                               foregroundColor: Colors.black,
                             ),
-                            child: const Text('Choose Photo'),
+                            child: Text(l10n.choosePhoto),
                           ),
                           const SizedBox(height: 8),
                           TextButton(
@@ -173,7 +173,7 @@ class CustomizationScreen extends StatelessWidget {
                                   listen: false);
                               await profile.setImagePath(null);
                             },
-                            child: const Text('Delete Photo'),
+                            child: Text(l10n.deletePhoto),
                           ),
                         ],
                       ),
@@ -181,7 +181,7 @@ class CustomizationScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text('Profile Frame', style: AppTextStyles.h3),
+                Text(l10n.profileFrame, style: AppTextStyles.h3),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 88,
@@ -214,7 +214,7 @@ class CustomizationScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('Choose the primary app color', style: AppTextStyles.h3),
+                Text(l10n.choosePrimaryColor, style: AppTextStyles.h3),
                 const SizedBox(height: 16),
                 Wrap(
                   spacing: 12,
