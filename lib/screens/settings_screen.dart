@@ -196,14 +196,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      l10n.distance,
+                      l10n.heightUnitTitle,
                       style: AppTextStyles.body1.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     _buildRadioTile<DistanceUnit>(
-                      title: l10n.meters,
+                      title: l10n.centimeters,
                       value: DistanceUnit.meters,
                       groupValue: settings.distanceUnit,
                       icon: Icons.straighten,
@@ -214,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const Divider(height: 1),
                     _buildRadioTile<DistanceUnit>(
-                      title: l10n.feet,
+                      title: l10n.feetInches,
                       value: DistanceUnit.feet,
                       groupValue: settings.distanceUnit,
                       icon: Icons.straighten,
