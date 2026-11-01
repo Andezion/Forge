@@ -233,7 +233,7 @@
   "algorithm": "Algorytm",
   "mifflinFormula": "Formuła Mifflina-St Jeora",
   "aiRecommendation": "Rekomendacja AI",
-  "groqModel": "Groq · GPT-OSS 120B",
+  "groqModel": "Groq - GPT-OSS 120B",
   "lastUpdated": "Ostatnia aktualizacja: {date}",
   "setGoalForMeals": "Ustaw cel i oblicz wskaźniki, aby zobaczyć harmonogram posiłków.",
   "mealSchedule": "Harmonogram posiłków",
