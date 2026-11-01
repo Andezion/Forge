@@ -267,10 +267,6 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
 
       _currentExerciseResult!.setResults.add(setResult);
     });
-
-    if (_setCompleted.every((c) => c)) {
-      Future.microtask(() => _showExerciseDifficultyDialog());
-    }
   }
 
   Future<void> _fixSetAtIndex(int index) async {
@@ -1666,16 +1662,14 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: allSetsCompleted
                                 ? AppColors.success
-                                : AppColors.primary,
+                                : AppColors.error,
                             foregroundColor: AppColors.textOnPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           child: Text(
-                            allSetsCompleted
-                                ? 'Finish Exercise'
-                                : 'Finish Early',
+                            allSetsCompleted ? 'Finish' : 'Finish Early',
                             style: AppTextStyles.button.copyWith(fontSize: 16),
                           ),
                         ),
