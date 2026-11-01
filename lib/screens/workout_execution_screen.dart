@@ -23,6 +23,7 @@ import '../services/progression_service.dart';
 import '../utils/exercise_sequence.dart';
 import '../widgets/fix_set_dialog.dart';
 import '../widgets/rank_event_popup.dart';
+import '../widgets/workout_note_field.dart';
 import 'exercise_library_screen.dart';
 
 class WorkoutExecutionScreen extends StatefulWidget {
@@ -988,6 +989,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     }
 
     if (!mounted) return;
+    String note = '';
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -995,7 +997,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1112,10 +1114,15 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                   ),
                 ),
               ],
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              WorkoutNoteField(onChanged: (value) => note = value),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
                   final dialogContext = context;
+                  if (note.trim().isNotEmpty) {
+                    DataManager().updateWorkoutHistoryNote(history.id, note);
+                  }
                   Navigator.of(dialogContext).pop();
                   for (final event in popupEvents) {
                     if (!dialogContext.mounted) break;
