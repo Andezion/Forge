@@ -155,7 +155,7 @@ class _MuscleRecoveryMapState extends State<MuscleRecoveryMap> {
               ),
               Text(
                 '${MuscleGroupUtils.getLabel(group)} · '
-                '${days >= 10 ? '10+' : days} ${l10n.days}'
+                '${days >= 10 ? '10+ ${l10n.days}' : l10n.durationDaysCount(days)}'
                 '${recommendation != null ? ' · $recommendation' : ''}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
