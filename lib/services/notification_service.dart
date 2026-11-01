@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../l10n/l10n.dart';
 import '../models/nutrition_profile.dart';
 
 class NotificationService {
@@ -72,16 +73,17 @@ class NotificationService {
       final meal = meals[i];
       final id = _mealBaseId + i;
       final body =
-          '${meal.calories.toStringAsFixed(0)} kcal · ${meal.proteinG.toStringAsFixed(0)}g protein';
+          L10n.current.notifMealBody(meal.calories.toStringAsFixed(0),
+              meal.proteinG.toStringAsFixed(0));
 
       await _scheduleDailyAt(
         id: id,
-        title: '🍽 Time for ${meal.name}',
+        title: L10n.current.notifMealTitle(localizedMealName(meal.name)),
         body: body,
         hour: meal.hour,
         minute: meal.minute,
         channelId: _channelMeals,
-        channelName: 'Meal Reminders',
+        channelName: L10n.current.notifMealChannel,
         group: _groupMeals,
       );
     }
@@ -109,12 +111,12 @@ class NotificationService {
 
       await _scheduleDailyAt(
         id: id++,
-        title: '💧 Time to drink water',
-        body: 'Stay hydrated — your body will thank you!',
+        title: L10n.current.notifWaterTitle,
+        body: L10n.current.notifWaterBody,
         hour: hour,
         minute: minute,
         channelId: _channelWater,
-        channelName: 'Water Reminders',
+        channelName: L10n.current.notifWaterChannel,
         group: _groupWater,
       );
 
