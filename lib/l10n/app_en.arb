@@ -1005,7 +1005,7 @@
   "@aiRecommendation": {
     "description": "AI recommendation section header"
   },
-  "groqModel": "Groq · GPT-OSS 120B",
+  "groqModel": "Groq - GPT-OSS 120B",
   "@groqModel": {
     "description": "Groq model subtitle"
   },
