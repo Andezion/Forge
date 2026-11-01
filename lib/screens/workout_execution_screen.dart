@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/workout_history.dart';
 import '../models/overall_rank_result.dart';
+import '../l10n/l10n.dart';
 import '../models/rank_popup_event.dart';
 import '../services/achievement_popup_service.dart';
 import '../services/challenge_service.dart';
@@ -21,6 +22,7 @@ import '../services/settings_service.dart';
 import '../services/profile_service.dart';
 import '../services/progression_service.dart';
 import '../utils/exercise_sequence.dart';
+import '../utils/units.dart';
 import '../widgets/fix_set_dialog.dart';
 import '../widgets/rank_event_popup.dart';
 import '../widgets/workout_note_field.dart';
@@ -64,6 +66,11 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
   List<TextEditingController> _weightControllers = [];
   List<int> _setTimers = [];
   List<bool> _setCompleted = [];
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+  Units get _units => Units.of(context, listen: false);
+
+  String _weightFieldText(double kg) => kg > 0 ? _units.weightValue(kg) : '';
 
   @override
   void initState() {
@@ -156,8 +163,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     _weightControllers = List.generate(
       numSets,
       (_) => TextEditingController(
-        text:
-            workoutExercise.weight > 0 ? workoutExercise.weight.toString() : '',
+        text: _weightFieldText(workoutExercise.weight),
       ),
     );
     _setTimers = List.filled(numSets, 0, growable: true);
@@ -221,7 +227,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
           current.copyWith(sets: current.sets + 1);
       _repsControllers.add(TextEditingController());
       _weightControllers.add(TextEditingController(
-        text: current.weight > 0 ? current.weight.toString() : '',
+        text: _weightFieldText(current.weight),
       ));
       _setTimers.add(0);
       _setCompleted.add(false);
@@ -235,13 +241,14 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     final repsText = _repsControllers[index].text;
     final weightText = _weightControllers[index].text;
     final actualReps = int.tryParse(repsText) ?? 0;
-    final actualWeight = double.tryParse(weightText) ??
+    final actualWeight = _units.parseWeight(weightText,
+            originalKg: _exerciseQueue[_currentExerciseIndex].weight) ??
         _currentExerciseResult!.targetWeight.clamp(0.0, double.infinity);
 
     if (actualReps <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please enter the number of reps'),
+          content: Text(_l10n.pleaseEnterReps),
           backgroundColor: AppColors.warning,
           duration: const Duration(seconds: 2),
         ),
@@ -295,7 +302,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         durationSeconds: old.durationSeconds,
       );
       _repsControllers[index].text = reps.toString();
-      _weightControllers[index].text = weight > 0 ? weight.toString() : '';
+      _weightControllers[index].text = _weightFieldText(weight);
     });
   }
 
@@ -305,20 +312,20 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Switch Exercise'),
+        title: Text(_l10n.switchExercise),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Current: ${currentWorkoutExercise.exercise.name}',
+              _l10n.currentExerciseName(currentWorkoutExercise.exercise.name),
               style: AppTextStyles.body2.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              'Choose alternative:',
+              _l10n.chooseAlternative,
               style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
@@ -351,7 +358,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                     Navigator.of(dialogContext).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Switched to ${alt.name}'),
+                        content: Text(_l10n.switchedTo(alt.name)),
                         backgroundColor: AppColors.success,
                         duration: const Duration(seconds: 2),
                       ),
@@ -386,7 +393,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(AppStrings.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
         ],
       ),
@@ -415,7 +422,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                 Text(
-                  'How was this exercise?',
+                  _l10n.howWasExercise,
                   style: AppTextStyles.h4,
                   textAlign: TextAlign.center,
                 ),
@@ -429,7 +436,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 ),
                 const SizedBox(height: 24),
                 _buildDifficultyButton(
-                  AppStrings.easy,
+                  AppLocalizations.of(context)!.easy,
                   ExerciseDifficulty.easy,
                   AppColors.success,
                   selectedDifficulty,
@@ -441,7 +448,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 ),
                 const SizedBox(height: 12),
                 _buildDifficultyButton(
-                  AppStrings.medium,
+                  AppLocalizations.of(context)!.medium,
                   ExerciseDifficulty.medium,
                   AppColors.warning,
                   selectedDifficulty,
@@ -453,7 +460,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 ),
                 const SizedBox(height: 12),
                 _buildDifficultyButton(
-                  AppStrings.hard,
+                  AppLocalizations.of(context)!.hard,
                   ExerciseDifficulty.hard,
                   AppColors.error,
                   selectedDifficulty,
@@ -471,7 +478,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       Expanded(
                         child: chosenNextExercise != null
                             ? Text(
-                                'Next: ${chosenNextExercise!.exercise.name}',
+                                _l10n.nextExerciseName(
+                                    chosenNextExercise!.exercise.name),
                                 style: AppTextStyles.caption.copyWith(
                                   color: AppColors.primary,
                                 ),
@@ -499,7 +507,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           }
                         },
                         icon: const Icon(Icons.swap_vert, size: 14),
-                        label: const Text('Choose next'),
+                        label: Text(_l10n.chooseNext),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.textSecondary,
                           padding: const EdgeInsets.symmetric(
@@ -553,7 +561,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           });
                         },
                         icon: const Icon(Icons.travel_explore, size: 16),
-                        label: const Text('Choose Any Exercise'),
+                        label: Text(_l10n.chooseAnyExercise),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.primary,
                           textStyle: const TextStyle(fontSize: 12),
@@ -579,7 +587,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           });
                         },
                         icon: const Icon(Icons.add_circle_outline, size: 16),
-                        label: Text(AppStrings.addExercise),
+                        label: Text(AppLocalizations.of(context)!.addExercise),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.primary,
                           textStyle: const TextStyle(fontSize: 12),
@@ -604,7 +612,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(AppStrings.next),
+                  child: Text(AppLocalizations.of(context)!.next),
                 ),
               ],
             ),
@@ -714,14 +722,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Decline exercise?'),
-        content: Text(
-          '"$exerciseName" will be marked as skipped for this session and won\'t appear again.',
-        ),
+        title: Text(_l10n.declineExerciseTitle),
+        content: Text(_l10n.declineExerciseConfirm(exerciseName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(AppStrings.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -732,7 +738,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Decline'),
+            child: Text(_l10n.decline),
           ),
         ],
       ),
@@ -848,7 +854,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text('Choose next exercise', style: AppTextStyles.h4),
+            child: Text(_l10n.chooseNextExercise, style: AppTextStyles.h4),
           ),
           const Divider(height: 1),
           Expanded(
@@ -861,12 +867,12 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                     title: Text(exercise.exercise.name),
                     subtitle: isNaturalNext
                         ? Text(
-                            'Next by program',
+                            _l10n.nextByProgram,
                             style: TextStyle(color: AppColors.primary, fontSize: 12),
                           )
                         : isSkipped
                             ? Text(
-                                'Skipped',
+                                _l10n.skipped,
                                 style: TextStyle(color: AppColors.warning, fontSize: 12),
                               )
                             : null,
@@ -945,7 +951,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         bodyWeightKg: profileService.weightKg ?? 75.0,
       );
       if (estimatedCalories == null) {
-        calorieEstimateError = groq.lastError ?? 'AI calorie estimate unavailable.';
+        calorieEstimateError = groq.lastError ?? L10n.current.aiCalorieUnavailable;
       }
 
       if (!mounted) return;
@@ -1010,19 +1016,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Workout Complete!',
+                _l10n.workoutComplete,
                 style: AppTextStyles.h3,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Duration: ${_formatDuration(_totalDurationSeconds)}',
+                _l10n.duration(_formatDuration(_totalDurationSeconds)),
                 style: AppTextStyles.body1,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Completed: ${_exerciseResults.length}',
+                _l10n.completedExercises(_exerciseResults.length),
                 style: AppTextStyles.body2,
                 textAlign: TextAlign.center,
               ),
@@ -1041,7 +1047,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       Icon(Icons.local_fire_department, color: Colors.orange, size: 22),
                       const SizedBox(width: 8),
                       Text(
-                        '~${estimatedCalories.round()} kcal burned',
+                        _l10n.kcalBurned(estimatedCalories.round()),
                         style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -1062,7 +1068,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Calorie estimate unavailable: $calorieEstimateError',
+                          _l10n.calorieEstimateUnavailable(calorieEstimateError),
                           style: AppTextStyles.caption.copyWith(color: AppColors.warning),
                           textAlign: TextAlign.center,
                         ),
@@ -1094,7 +1100,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Declined:',
+                            _l10n.declinedLabel,
                             style: AppTextStyles.body1.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.error,
@@ -1140,7 +1146,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text(AppStrings.done),
+                child: Text(AppLocalizations.of(context)!.done),
               ),
             ],
           ),
@@ -1170,14 +1176,14 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Finish exercise early?'),
+        title: Text(_l10n.finishExerciseEarlyTitle),
         content: Text(
-          'You completed $completedCount of ${_setCompleted.length} sets. Finish this exercise now?',
+          _l10n.finishExerciseEarlyConfirm(completedCount, _setCompleted.length),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(AppStrings.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1188,7 +1194,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
             ),
-            child: const Text('Finish'),
+            child: Text(_l10n.finish),
           ),
         ],
       ),
@@ -1252,16 +1258,16 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Target: ${currentExercise.targetReps} reps'
-                        '${currentExercise.weight > 0 ? " × ${currentExercise.weight} kg" : ""}',
+                        '${_l10n.targetReps(currentExercise.targetReps)}'
+                        '${currentExercise.weight > 0 ? " × ${_units.weight(currentExercise.weight)}" : ""}',
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.textSecondary,
                         ),
                       ),
                       if (prevSet != null)
                         Text(
-                          'Last time: ${prevSet.actualReps} reps'
-                          '${prevSet.weight > 0 ? " × ${prevSet.weight} kg" : ""}',
+                          '${_l10n.lastTimeReps(prevSet.actualReps)}'
+                          '${prevSet.weight > 0 ? " × ${_units.weight(prevSet.weight)}" : ""}',
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.textSecondary,
                             fontStyle: FontStyle.italic,
@@ -1298,7 +1304,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       enabled: !isCompleted,
                       decoration: InputDecoration(
                         hintText: '${currentExercise.targetReps}',
-                        labelText: 'Reps',
+                        labelText: _l10n.reps,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -1323,9 +1329,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       enabled: !isCompleted,
                       decoration: InputDecoration(
                         hintText: currentExercise.weight > 0
-                            ? '${currentExercise.weight}'
+                            ? _units.weightValue(currentExercise.weight)
                             : '0',
-                        labelText: 'kg',
+                        labelText: _units.weightLabel,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -1366,7 +1372,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                                 ),
                                 padding: EdgeInsets.zero,
                               ),
-                              child: const Text('Done'),
+                              child: Text(_l10n.done),
                             )
                           : ElevatedButton(
                               onPressed: _activeSetIndex != null
@@ -1380,7 +1386,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                                 ),
                                 padding: EdgeInsets.zero,
                               ),
-                              child: const Text('Start'),
+                              child: Text(_l10n.start),
                             ),
                 ),
               ],
@@ -1393,6 +1399,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
 
   @override
   Widget build(BuildContext context) {
+    Units.of(context);
     if (_exerciseQueue.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -1414,7 +1421,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'No remaining exercises',
+              _l10n.noRemainingExercises,
               style: AppTextStyles.h3,
               textAlign: TextAlign.center,
             ),
@@ -1444,17 +1451,17 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
         final shouldPop = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Exit Workout?'),
-            content: const Text('Your progress will be lost.'),
+            title: Text(_l10n.exitWorkout),
+            content: Text(_l10n.progressWillBeLost),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text(AppStrings.cancel),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Exit',
-                    style: TextStyle(color: AppColors.error)),
+                child: Text(_l10n.exit,
+                    style: const TextStyle(color: AppColors.error)),
               ),
             ],
           ),
@@ -1488,7 +1495,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Exercise ${completedExercises + 1} of $totalExercises',
+                    _l10n.exerciseNum(completedExercises + 1, totalExercises),
                     style: AppTextStyles.caption,
                   ),
                   Row(
@@ -1550,7 +1557,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                         child: OutlinedButton.icon(
                           onPressed: () => _swapExercise(currentExercise),
                           icon: const Icon(Icons.swap_horiz, size: 18),
-                          label: Text('Swap', style: AppTextStyles.caption),
+                          label: Text(_l10n.swap, style: AppTextStyles.caption),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primary,
                             side: BorderSide(
@@ -1577,7 +1584,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                       child: OutlinedButton.icon(
                         onPressed: _addSet,
                         icon: const Icon(Icons.add, size: 18),
-                        label: Text('Add Set', style: AppTextStyles.caption),
+                        label: Text(_l10n.addSet, style: AppTextStyles.caption),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
                           side: BorderSide(
@@ -1606,7 +1613,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(
-                              'Next: ${nextExercise.exercise.name}',
+                              _l10n.nextExerciseName(nextExercise.exercise.name),
                               style: AppTextStyles.caption.copyWith(
                                 color: AppColors.textHint,
                               ),
@@ -1640,7 +1647,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
-                        child: const Text('Decline'),
+                        child: Text(_l10n.decline),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1656,7 +1663,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
-                        child: Text(AppStrings.skip),
+                        child: Text(AppLocalizations.of(context)!.skip),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1679,7 +1686,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                             ),
                           ),
                           child: Text(
-                            allSetsCompleted ? 'Finish' : 'Finish Early',
+                            allSetsCompleted ? _l10n.finish : _l10n.finishEarly,
                             style: AppTextStyles.button.copyWith(fontSize: 16),
                           ),
                         ),
@@ -1732,6 +1739,8 @@ class _InsertExerciseConfigSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final units = Units.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: 24,
@@ -1764,7 +1773,7 @@ class _InsertExerciseConfigSheetState
                   keyboardType: TextInputType.number,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: 'Sets',
+                    labelText: l10n.sets,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -1777,7 +1786,7 @@ class _InsertExerciseConfigSheetState
                   controller: _repsController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Reps',
+                    labelText: l10n.reps,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -1791,7 +1800,7 @@ class _InsertExerciseConfigSheetState
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: 'kg',
+                    labelText: units.weightLabel,
                     hintText: '0',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -1808,7 +1817,7 @@ class _InsertExerciseConfigSheetState
                   (int.tryParse(_setsController.text) ?? 3).clamp(1, 20);
               final reps =
                   (int.tryParse(_repsController.text) ?? 10).clamp(1, 999);
-              final weight = (double.tryParse(_weightController.text) ?? 0.0)
+              final weight = (units.parseWeight(_weightController.text) ?? 0.0)
                   .clamp(0.0, 9999.0);
               Navigator.of(context).pop((sets, reps, weight));
             },
@@ -1820,7 +1829,7 @@ class _InsertExerciseConfigSheetState
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Insert Exercise'),
+            child: Text(l10n.insertExercise),
           ),
         ],
       ),
