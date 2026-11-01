@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/challenge.dart';
 
 class ChallengeService extends ChangeNotifier {
@@ -99,7 +100,7 @@ class ChallengeService extends ChangeNotifier {
     String? exerciseName,
   }) async {
     if (_currentUserId == null) {
-      return 'You must be logged in';
+      return L10n.current.mustBeLoggedIn;
     }
 
     try {
@@ -130,7 +131,7 @@ class ChallengeService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error creating challenge: $e');
-      return 'Failed to create challenge. Please try again.';
+      return L10n.current.errCreateChallengeFailed;
     }
   }
 
@@ -423,7 +424,7 @@ class ChallengeService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error accepting challenge: $e');
-      return 'Failed to accept challenge';
+      return L10n.current.errAcceptChallengeFailed;
     }
   }
 
@@ -436,7 +437,7 @@ class ChallengeService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error declining challenge: $e');
-      return 'Failed to decline challenge';
+      return L10n.current.errDeclineChallengeFailed;
     }
   }
 }
