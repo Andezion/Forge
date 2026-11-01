@@ -255,10 +255,6 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
         durationSeconds: elapsedSeconds,
       ));
     });
-
-    if (_setCompleted.every((c) => c)) {
-      Future.microtask(_showDifficultyDialog);
-    }
   }
 
   Future<void> _fixSetAtIndex(int index) async {
@@ -1163,14 +1159,14 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                         : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      allCompleted ? AppColors.success : AppColors.primary,
+                      allCompleted ? AppColors.success : AppColors.error,
                   foregroundColor: AppColors.textOnPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
-                  allCompleted ? 'Finish Exercise' : 'Finish Early',
+                  allCompleted ? 'Finish' : 'Finish Early',
                   style: AppTextStyles.button.copyWith(fontSize: 16),
                 ),
               ),
