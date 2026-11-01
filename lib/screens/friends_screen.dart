@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import '../utils/units.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/friends_service.dart';
@@ -122,14 +123,14 @@ class _FriendsScreenState extends State<FriendsScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No friends yet',
+                  AppLocalizations.of(context)!.noFriendsYet,
                   style: AppTextStyles.h3.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Add friends to track their progress',
+                  AppLocalizations.of(context)!.noFriendsDesc,
                   style: AppTextStyles.body2.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -138,7 +139,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 ElevatedButton.icon(
                   onPressed: _showAddFriendDialog,
                   icon: Icon(Icons.person_add, color: AppColors.textOnPrimary),
-                  label: const Text('Add Friend'),
+                  label: Text(AppLocalizations.of(context)!.addFriend),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
@@ -179,7 +180,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No pending requests',
+                  AppLocalizations.of(context)!.noPendingRequests,
                   style: AppTextStyles.h3.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -194,7 +195,7 @@ class _FriendsScreenState extends State<FriendsScreen>
           children: [
             if (receivedRequests.isNotEmpty) ...[
               Text(
-                'Received Requests',
+                AppLocalizations.of(context)!.receivedRequests,
                 style: AppTextStyles.h3.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -207,7 +208,7 @@ class _FriendsScreenState extends State<FriendsScreen>
             ],
             if (sentRequests.isNotEmpty) ...[
               Text(
-                'Sent Requests',
+                AppLocalizations.of(context)!.sentRequests,
                 style: AppTextStyles.h3.copyWith(
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.bold,
@@ -269,8 +270,8 @@ class _FriendsScreenState extends State<FriendsScreen>
                 const SizedBox(width: 4),
                 Text(
                   daysSinceWorkout != null
-                      ? 'Last workout: $daysSinceWorkout day(s) ago'
-                      : 'No workouts yet',
+                      ? AppLocalizations.of(context)!.lastWorkoutDaysAgo(daysSinceWorkout)
+                      : AppLocalizations.of(context)!.noWorkoutsYetFriend,
                   style: AppTextStyles.caption,
                 ),
               ],
@@ -283,7 +284,8 @@ class _FriendsScreenState extends State<FriendsScreen>
                       size: 12, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
-                    'Weight: ${friend.weight!.toStringAsFixed(1)} kg',
+                    AppLocalizations.of(context)!.weightKgDisplay(
+                        Units.of(context).weight(friend.weight!)),
                     style: AppTextStyles.caption,
                   ),
                   const SizedBox(width: 12),
@@ -303,7 +305,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                 if (result == 'success' && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('${friend.name} removed from friends'),
+                      content: Text(AppLocalizations.of(context)!.friendRemoved(friend.name)),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -319,13 +321,13 @@ class _FriendsScreenState extends State<FriendsScreen>
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'remove',
               child: Row(
                 children: [
-                  Icon(Icons.person_remove, color: AppColors.error),
-                  SizedBox(width: 8),
-                  Text('Remove Friend'),
+                  const Icon(Icons.person_remove, color: AppColors.error),
+                  const SizedBox(width: 8),
+                  Text(AppLocalizations.of(context)!.removeFriend),
                 ],
               ),
             ),
@@ -402,15 +404,15 @@ class _FriendsScreenState extends State<FriendsScreen>
                         await friendsService.rejectFriendRequest(request);
                     if (result == 'success' && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Request declined'),
+                        SnackBar(
+                          content: Text(AppLocalizations.of(context)!.requestDeclined),
                           backgroundColor: AppColors.info,
                         ),
                       );
                     }
                   },
                   icon: const Icon(Icons.close),
-                  label: const Text('Decline'),
+                  label: Text(AppLocalizations.of(context)!.decline),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.error,
                   ),
@@ -424,7 +426,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              'You are now friends with ${request.fromUserName}'),
+                              AppLocalizations.of(context)!.nowFriendsWith(request.fromUserName)),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -438,7 +440,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                     }
                   },
                   icon: const Icon(Icons.check),
-                  label: const Text('Accept'),
+                  label: Text(AppLocalizations.of(context)!.accept),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.success,
                     foregroundColor: Colors.white,
@@ -472,7 +474,7 @@ class _FriendsScreenState extends State<FriendsScreen>
           style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          'Pending',
+          AppLocalizations.of(context)!.pending,
           style: AppTextStyles.caption.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -483,8 +485,8 @@ class _FriendsScreenState extends State<FriendsScreen>
             final result = await friendsService.cancelSentRequest(request.id);
             if (result == 'success' && mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Request cancelled'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.requestCancelled),
                   backgroundColor: AppColors.info,
                 ),
               );
@@ -587,14 +589,12 @@ class _FriendsScreenState extends State<FriendsScreen>
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove Friend'),
-        content: Text(
-          'Are you sure you want to remove $friendName from your friends?',
-        ),
+        title: Text(AppLocalizations.of(context)!.removeFriend),
+        content: Text(AppLocalizations.of(context)!.removeFriendConfirm(friendName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -602,7 +602,7 @@ class _FriendsScreenState extends State<FriendsScreen>
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Remove'),
+            child: Text(AppLocalizations.of(context)!.remove),
           ),
         ],
       ),
