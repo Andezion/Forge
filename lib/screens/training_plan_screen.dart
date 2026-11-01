@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_strings.dart';
 import '../models/training_plan.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
@@ -21,11 +21,11 @@ class TrainingPlanScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text(AppStrings.trainingPlan),
+            title: Text(AppLocalizations.of(context)!.trainingPlan),
             actions: [
               IconButton(
                 icon: const Icon(Icons.add),
-                tooltip: AppStrings.createPlan,
+                tooltip: AppLocalizations.of(context)!.createPlan,
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const PlanEditorScreen()),
                 ),
@@ -74,19 +74,19 @@ class TrainingPlanScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete plan?'),
-        content: Text('Delete "${plan.name}"?'),
+        title: Text(AppLocalizations.of(context)!.deletePlan),
+        content: Text(AppLocalizations.of(context)!.deletePlanConfirm(plan.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(AppStrings.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () {
               dataManager.removeTrainingPlan(plan.id);
               Navigator.of(ctx).pop();
             },
-            child: Text(AppStrings.delete,
+            child: Text(AppLocalizations.of(context)!.delete,
                 style: const TextStyle(color: AppColors.error)),
           ),
         ],
@@ -110,7 +110,7 @@ class _EmptyState extends StatelessWidget {
               size: 64, color: AppColors.textSecondary),
           const SizedBox(height: 16),
           Text(
-            AppStrings.noPlansYet,
+            AppLocalizations.of(context)!.noPlansYet,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -119,7 +119,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create a weekly training plan\nto follow a structured schedule.',
+            AppLocalizations.of(context)!.createPlanDesc,
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.textSecondary),
           ),
@@ -127,7 +127,7 @@ class _EmptyState extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onCreateTap,
             icon: const Icon(Icons.add),
-            label: const Text(AppStrings.createPlan),
+            label: Text(AppLocalizations.of(context)!.createPlan),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
@@ -173,7 +173,7 @@ class _TodayCard extends StatelessWidget {
               Icon(Icons.today, color: AppColors.textOnPrimary, size: 18),
               const SizedBox(width: 6),
               Text(
-                AppStrings.todayFromPlan,
+                AppLocalizations.of(context)!.todayFromPlan,
                 style: TextStyle(
                   color: AppColors.textOnPrimary,
                   fontWeight: FontWeight.bold,
@@ -193,7 +193,7 @@ class _TodayCard extends StatelessWidget {
           const SizedBox(height: 12),
           if (todayWorkouts.isEmpty)
             Text(
-              AppStrings.noWorkoutToday,
+              AppLocalizations.of(context)!.noWorkoutToday,
               style: TextStyle(
                 color: AppColors.textOnPrimary,
                 fontSize: 18,
@@ -205,7 +205,7 @@ class _TodayCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'Choose a workout:',
+                  AppLocalizations.of(context)!.chooseAWorkout,
                   style: TextStyle(
                     color: AppColors.textOnPrimary.withValues(alpha: 0.8),
                     fontSize: 13,
@@ -269,7 +269,7 @@ class _TodayCard extends StatelessWidget {
                               ),
                               if (workout != null)
                                 Text(
-                                  '${workout.exercises.length} exercises',
+                                  AppLocalizations.of(context)!.exercisesCount(workout.exercises.length),
                                   style: TextStyle(
                                     color: AppColors.textOnPrimary
                                         .withValues(alpha: 0.7),
@@ -306,8 +306,8 @@ class _TodayCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: const Text(
-                              AppStrings.startWorkout,
+                            child: Text(
+                              AppLocalizations.of(context)!.startWorkout,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -408,21 +408,21 @@ class _PlanCard extends StatelessWidget {
                   },
                   itemBuilder: (_) => [
                     if (!isActive)
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'activate',
-                        child: Text(AppStrings.activatePlan),
+                        child: Text(AppLocalizations.of(context)!.activatePlan),
                       ),
                     if (isActive)
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'deactivate',
-                        child: Text(AppStrings.deactivatePlan),
+                        child: Text(AppLocalizations.of(context)!.deactivatePlan),
                       ),
-                    const PopupMenuItem(
-                        value: 'edit', child: Text(AppStrings.edit)),
-                    const PopupMenuItem(
+                    PopupMenuItem(
+                        value: 'edit', child: Text(AppLocalizations.of(context)!.edit)),
+                    PopupMenuItem(
                         value: 'delete',
                         child: Text(
-                          AppStrings.delete,
+                          AppLocalizations.of(context)!.delete,
                           style: TextStyle(color: AppColors.error),
                         )),
                   ],
