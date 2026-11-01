@@ -10,6 +10,7 @@ import '../services/data_manager.dart';
 import '../services/profile_service.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../utils/units.dart';
 
 class ProgressChartsScreen extends StatefulWidget {
   const ProgressChartsScreen({super.key});
@@ -37,6 +38,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
 
   int _lookbackDays = 90;
   DateTimeRange? _customDateRange;
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+  Units get _units => Units.of(context, listen: false);
+
+  double get _weightScale => _units.toDisplayWeight(1);
+
+  String get _locale => Localizations.localeOf(context).toString();
 
   @override
   void initState() {
@@ -217,6 +225,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    Units.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -384,7 +393,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Strength Coefficient',
+          _l10n.strengthCoefficient,
           _overallStrengthData!.currentTotalStrength.toStringAsFixed(1),
           _overallStrengthData!.progressPercentage,
         ),
@@ -402,7 +411,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'About Strength Coefficient',
+                        _l10n.aboutStrengthCoefficient,
                         style: AppTextStyles.body1.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -412,9 +421,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'This coefficient is calculated based on your progress across ALL exercises. '
-                  '100 = baseline (your starting weights), 150 = 50% stronger overall, 200 = 2x stronger. '
-                  'It tracks your long-term strength development, not just recent workouts.',
+                  _l10n.strengthCoefficientDesc,
                   style: AppTextStyles.body2.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -425,7 +432,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Strength Coefficient Progress',
+          _l10n.strengthCoefficientProgress,
           _buildLineChart(
             _overallStrengthData!.totalStrengthData,
             color: AppColors.primary,
@@ -447,8 +454,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Current Weight',
-          '${_bodyWeightData!.currentWeight.toStringAsFixed(1)} kg',
+          _l10n.currentWeight,
+          _units.weight(_bodyWeightData!.currentWeight),
           (_bodyWeightData!.weightChange / _bodyWeightData!.startWeight) * 100,
         ),
         const SizedBox(height: 16),
@@ -467,12 +474,12 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     )),
                 const SizedBox(height: 12),
-                _buildInfoRow('Starting Weight',
-                    '${_bodyWeightData!.startWeight.toStringAsFixed(1)} kg'),
-                _buildInfoRow('Change',
-                    '${_bodyWeightData!.weightChange >= 0 ? '+' : ''}${_bodyWeightData!.weightChange.toStringAsFixed(1)} kg'),
-                _buildInfoRow('Average Weight',
-                    '${_bodyWeightData!.averageWeight.toStringAsFixed(1)} kg'),
+                _buildInfoRow(_l10n.startingWeight,
+                    _units.weight(_bodyWeightData!.startWeight)),
+                _buildInfoRow(_l10n.change,
+                    _units.weightDelta(_bodyWeightData!.weightChange)),
+                _buildInfoRow(_l10n.averageWeight,
+                    _units.weight(_bodyWeightData!.averageWeight)),
               ],
             ),
           ),
@@ -491,7 +498,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Weight Tracking Tip',
+                        _l10n.weightTrackingTip,
                         style: AppTextStyles.body1.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -501,7 +508,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'For detailed weight history tracking, use the "Weight" feature in the main menu to update your current weight regularly.',
+                  _l10n.weightTrackingTipDesc(_l10n.weight),
                   style: AppTextStyles.body2.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -526,23 +533,23 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       periodLabel =
           '${fmt.format(_customDateRange!.start)} – ${fmt.format(_customDateRange!.end)}';
     } else if (_lookbackDays <= 7) {
-      periodLabel = 'This Week';
+      periodLabel = _l10n.periodThisWeek;
     } else if (_lookbackDays <= 30) {
-      periodLabel = 'Last 30 Days';
+      periodLabel = _l10n.periodLast30Days;
     } else if (_lookbackDays <= 90) {
-      periodLabel = 'Last 90 Days';
+      periodLabel = _l10n.periodLast90Days;
     } else if (_lookbackDays <= 180) {
-      periodLabel = 'Last 180 Days';
+      periodLabel = _l10n.periodLast180Days;
     } else {
-      periodLabel = 'Last Year';
+      periodLabel = _l10n.periodLastYear;
     }
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Total Volume ($periodLabel)',
-          '${_formatWeight(_volumeData!.totalPeriodVolume)} kg',
+          _l10n.totalVolumeFor(periodLabel),
+          _formatWeight(_volumeData!.totalPeriodVolume),
           _volumeData!.previousWeekVolume > 0
               ? ((_volumeData!.currentWeekVolume -
                           _volumeData!.previousWeekVolume) /
@@ -555,16 +562,16 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           children: [
             Expanded(
               child: _buildMiniStatsCard(
-                'Avg/Week',
-                '${_formatWeight(_volumeData!.averageVolume)} kg',
+                _l10n.avgPerWeek,
+                _formatWeight(_volumeData!.averageVolume),
                 Icons.show_chart,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _buildMiniStatsCard(
-                'This Week',
-                '${_formatWeight(_volumeData!.currentWeekVolume)} kg',
+                _l10n.periodThisWeek,
+                _formatWeight(_volumeData!.currentWeekVolume),
                 Icons.fitness_center,
               ),
             ),
@@ -572,29 +579,33 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Weekly Volume',
-          _buildBarChart(_volumeData!.weeklyVolumeData),
+          _l10n.weeklyVolume,
+          _buildBarChart(_volumeData!.weeklyVolumeData, yScale: _weightScale),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Daily Volume',
+          _l10n.dailyVolume,
           _buildLineChart(
             _volumeData!.dailyVolumeData,
             color: Colors.green,
+            yScale: _weightScale,
           ),
         ),
       ],
     );
   }
 
-  String _formatWeight(double weight) {
+  String _formatWeight(double kg) {
+    final weight = _units.toDisplayWeight(kg);
+    final String value;
     if (weight >= 1000000) {
-      return '${(weight / 1000000).toStringAsFixed(1)}M';
+      value = '${(weight / 1000000).toStringAsFixed(1)} ${_l10n.millionSuffix}';
     } else if (weight >= 1000) {
-      return '${(weight / 1000).toStringAsFixed(1)}K';
+      value = '${(weight / 1000).toStringAsFixed(1)} ${_l10n.thousandSuffix}';
     } else {
-      return weight.toStringAsFixed(0);
+      value = weight.toStringAsFixed(0);
     }
+    return '$value ${_units.weightLabel}';
   }
 
   Widget _buildWeightChart() {
@@ -609,7 +620,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Weight History',
+              _l10n.weightHistory,
               style: AppTextStyles.h2.copyWith(
                 color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
@@ -621,6 +632,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                 _bodyWeightData!.weightData,
                 color: AppColors.primary,
                 yAxisDecimals: 1,
+                yScale: _weightScale,
               ),
             ),
           ],
@@ -642,7 +654,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
           children: [
             Expanded(
               child: _buildMiniStatsCard(
-                'Workouts/Week',
+                _l10n.workoutsPerWeek,
                 _frequencyData!.currentWeekFrequency.toStringAsFixed(1),
                 Icons.fitness_center,
               ),
@@ -650,8 +662,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: _buildMiniStatsCard(
-                'Streak',
-                '${_frequencyData!.currentStreak} days',
+                _l10n.streak,
+                _l10n.durationDaysCount(_frequencyData!.currentStreak),
                 Icons.local_fire_department,
               ),
             ),
@@ -659,13 +671,13 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         ),
         const SizedBox(height: 16),
         _buildStatsCard(
-          'Total Workouts',
+          _l10n.totalWorkouts,
           '${_frequencyData!.totalWorkouts}',
           0,
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Workout Frequency (workouts per week)',
+          _l10n.workoutFrequencyChart,
           _buildBarChart(_frequencyData!.weeklyFrequencyData),
         ),
       ],
@@ -682,7 +694,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Completion Rate',
+          _l10n.completionRate,
           '${_consistencyData!.overallCompletionRate.toStringAsFixed(1)}%',
           0,
         ),
@@ -698,17 +710,17 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     )),
                 const SizedBox(height: 12),
-                _buildInfoRow('Sets Completed',
+                _buildInfoRow(_l10n.setsCompleted,
                     '${_consistencyData!.totalSetsCompleted}'),
                 _buildInfoRow(
-                    'Sets Planned', '${_consistencyData!.totalSetsPlanned}'),
+                    _l10n.setsPlanned, '${_consistencyData!.totalSetsPlanned}'),
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Workout Completion Rate',
+          _l10n.workoutCompletionRate,
           _buildLineChart(
             _consistencyData!.completionRateData,
             color: Colors.purple,
@@ -792,29 +804,31 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         _buildStatsCard(
-          'Maximum Weight',
-          '${_exerciseProgressData!.currentMax.toStringAsFixed(1)} kg',
+          _l10n.maximumWeight,
+          _units.weight(_exerciseProgressData!.currentMax),
           _exerciseProgressData!.progressPercentage,
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Maximum Weight Progress',
+          _l10n.maximumWeightProgress,
           _buildLineChart(
             _exerciseProgressData!.maxWeightData,
             color: AppColors.primary,
+            yScale: _weightScale,
           ),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Volume (weight × repetitions)',
+          _l10n.volumeWeightReps,
           _buildLineChart(
             _exerciseProgressData!.volumeData,
             color: Colors.green,
+            yScale: _weightScale,
           ),
         ),
         const SizedBox(height: 16),
         _buildChartCard(
-          'Intensity (%)',
+          _l10n.intensityPercent,
           _buildLineChart(
             _exerciseProgressData!.intensityData,
             color: Colors.orange,
@@ -942,7 +956,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                   children: [
                     Expanded(child: Text(entry.key)),
                     Text(
-                      '${entry.value.toStringAsFixed(1)} кг',
+                      _units.weight(entry.value),
                       style: AppTextStyles.body1.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -979,6 +993,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     double? minY,
     double? maxY,
     int yAxisDecimals = 0,
+    double yScale = 1,
   }) {
     final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
@@ -988,7 +1003,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     final spots = data
         .asMap()
         .entries
-        .map((e) => FlSpot(e.key.toDouble(), e.value.value))
+        .map((e) => FlSpot(e.key.toDouble(), e.value.value * yScale))
         .toList();
 
     return LineChart(
@@ -1027,7 +1042,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                 if (value.toInt() >= 0 && value.toInt() < data.length) {
                   final date = data[value.toInt()].date;
                   final fmt = _lookbackDays >= 180
-                      ? DateFormat('MMM yy')
+                      ? DateFormat('MMM yy', _locale)
                       : DateFormat('dd/MM');
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -1072,7 +1087,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     );
   }
 
-  Widget _buildBarChart(List<ChartDataPoint> data) {
+  Widget _buildBarChart(List<ChartDataPoint> data, {double yScale = 1}) {
     final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
       return Center(child: Text(l10n.noDataToDisplay));
@@ -1090,7 +1105,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               x: e.key,
               barRods: [
                 BarChartRodData(
-                  toY: e.value.value,
+                  toY: e.value.value * yScale,
                   color: AppColors.primary,
                   width: barWidth,
                   borderRadius: const BorderRadius.only(
@@ -1105,7 +1120,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     final double barLabelInterval =
         data.length > 8 ? (data.length / 5).ceilToDouble() : 1.0;
     final barFmt =
-        _lookbackDays >= 180 ? DateFormat('MMM yy') : DateFormat('dd/MM');
+        _lookbackDays >= 180 ? DateFormat('MMM yy', _locale) : DateFormat('dd/MM');
 
     return BarChart(
       BarChartData(
