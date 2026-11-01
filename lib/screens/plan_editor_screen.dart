@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_strings.dart';
 import '../models/training_plan.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
@@ -20,7 +20,6 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
   final _nameController = TextEditingController();
   final Map<int, List<ScheduledWorkout>> _daySchedule = {};
 
-  static const _dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   void initState() {
@@ -144,7 +143,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a plan name')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseEnterPlanName)),
       );
       return;
     }
@@ -177,8 +176,8 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
       appBar: AppBar(
         title: Text(
           widget.existingPlan != null
-              ? AppStrings.editPlan
-              : AppStrings.createPlan,
+              ? AppLocalizations.of(context)!.editPlan
+              : AppLocalizations.of(context)!.createPlan,
         ),
       ),
       body: Column(
@@ -188,7 +187,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
             child: TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: AppStrings.planName,
+                labelText: AppLocalizations.of(context)!.planName,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -200,7 +199,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
             child: Row(
               children: [
                 Text(
-                  'Weekly schedule',
+                  AppLocalizations.of(context)!.weeklySchedule,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -218,7 +217,10 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
                 final day = i + 1;
                 final dayWorkouts = _daySchedule[day] ?? [];
                 return _DayCard(
-                  dayName: _dayNames[i],
+                  // 2024-01-01 was a Monday.
+                  dayName: DateFormat.E(
+                          Localizations.localeOf(context).toString())
+                      .format(DateTime(2024, 1, day)),
                   dayIndex: day,
                   workouts: dayWorkouts,
                   onAdd: () => _addWorkoutToDay(day),
@@ -236,8 +238,8 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               child: ElevatedButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.save, color: Colors.white),
-                label: const Text(
-                  AppStrings.save,
+                label: Text(
+                  AppLocalizations.of(context)!.save,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -313,7 +315,7 @@ class _DayCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 if (workouts.isEmpty)
                   Text(
-                    AppStrings.noWorkoutToday,
+                    AppLocalizations.of(context)!.noWorkoutToday,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -324,7 +326,7 @@ class _DayCard extends StatelessWidget {
                   icon:
                       Icon(Icons.add_circle_outline, color: AppColors.primary),
                   onPressed: onAdd,
-                  tooltip: AppStrings.addWorkoutToDay,
+                  tooltip: AppLocalizations.of(context)!.addWorkoutToDay,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -336,7 +338,7 @@ class _DayCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Text(
-                    'Choose one on this day:',
+                    AppLocalizations.of(context)!.chooseOneOnDay,
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
@@ -391,8 +393,8 @@ class _DayCard extends StatelessWidget {
                             ),
                             child: Text(
                               sw.frequencyWeeks == 1
-                                  ? AppStrings.everyWeek
-                                  : AppStrings.everyTwoWeeks,
+                                  ? AppLocalizations.of(context)!.everyWeek
+                                  : AppLocalizations.of(context)!.everyTwoWeeks,
                               style: TextStyle(
                                   fontSize: 10, color: AppColors.primary),
                             ),
@@ -446,7 +448,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Select workout'),
+      title: Text(AppLocalizations.of(context)!.selectWorkout),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -464,7 +466,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                     return RadioListTile<Workout>(
                       title: Text(w.name, style: const TextStyle(fontSize: 14)),
                       subtitle: Text(
-                        '${w.exercises.length} exercises',
+                        AppLocalizations.of(context)!.exercisesCount(w.exercises.length),
                         style: const TextStyle(fontSize: 12),
                       ),
                       value: w,
@@ -477,22 +479,22 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                 ),
               ),
               const Divider(),
-            Text(AppStrings.frequency,
+            Text(AppLocalizations.of(context)!.frequency,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             DropdownButton<int>(
               value: _frequencyWeeks,
               isExpanded: true,
               onChanged: (v) => setState(() => _frequencyWeeks = v!),
-              items: const [
-                DropdownMenuItem(value: 1, child: Text(AppStrings.everyWeek)),
+              items: [
+                DropdownMenuItem(value: 1, child: Text(AppLocalizations.of(context)!.everyWeek)),
                 DropdownMenuItem(
-                    value: 2, child: Text(AppStrings.everyTwoWeeks)),
+                    value: 2, child: Text(AppLocalizations.of(context)!.everyTwoWeeks)),
               ],
             ),
             if (_frequencyWeeks == 2) ...[
               const SizedBox(height: 8),
-              Text('Starting week:', style: const TextStyle(fontSize: 13)),
+              Text(AppLocalizations.of(context)!.startingWeek, style: const TextStyle(fontSize: 13)),
               DropdownButton<int>(
                 value: _weekOffset,
                 isExpanded: true,
@@ -510,7 +512,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(AppStrings.cancel),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         TextButton(
           onPressed: _selected == null
@@ -523,7 +525,7 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
                     ),
                   ),
           child:
-              Text(AppStrings.add, style: TextStyle(color: AppColors.primary)),
+              Text(AppLocalizations.of(context)!.add, style: TextStyle(color: AppColors.primary)),
         ),
       ],
     );
