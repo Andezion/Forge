@@ -1,4 +1,6 @@
+import '../l10n/l10n.dart';
 import '../models/exercise.dart';
+import '../utils/muscle_group_utils.dart';
 import '../models/workout_history.dart';
 
 class MuscleRecoveryTracker {
@@ -121,19 +123,19 @@ class MuscleRecoveryTracker {
       final optimalDays = _optimalRecoveryDays[group] ?? 2;
 
       if (daysSince >= 10) {
-        result[group] = 'Really need to train!';
+        result[group] = L10n.current.recoveryReallyNeedTrain;
       } else if (daysSince >= 7) {
-        result[group] = 'Definitely time to train';
+        result[group] = L10n.current.recoveryDefinitelyTime;
       } else if (daysSince < 1) {
-        result[group] = 'Trained today - rest';
+        result[group] = L10n.current.recoveryTrainedToday;
       } else if (daysSince < optimalDays) {
-        result[group] = 'Recovery ($daysSince/$optimalDays days)';
+        result[group] = L10n.current.recoveryProgress(daysSince, optimalDays);
       } else if (daysSince == optimalDays) {
-        result[group] = 'Ready to train';
+        result[group] = L10n.current.readyToTrain;
       } else if (daysSince < optimalDays * 2) {
-        result[group] = 'Good time to train';
+        result[group] = L10n.current.recoveryGoodTime;
       } else {
-        result[group] = 'Long time no train ($daysSince days)';
+        result[group] = L10n.current.recoveryLongTime(daysSince);
       }
     }
 
@@ -165,32 +167,6 @@ class MuscleRecoveryTracker {
     return daysSinceTraining >= optimalDays;
   }
 
-  static String getMuscleGroupDisplayName(MuscleGroup group) {
-    switch (group) {
-      case MuscleGroup.chest:
-        return 'Chest';
-      case MuscleGroup.back:
-        return 'Back';
-      case MuscleGroup.legs:
-        return 'Legs';
-      case MuscleGroup.shoulders:
-        return 'Shoulders';
-      case MuscleGroup.biceps:
-        return 'Biceps';
-      case MuscleGroup.triceps:
-        return 'Triceps';
-      case MuscleGroup.forearms:
-        return 'Forearms';
-      case MuscleGroup.wrists:
-        return 'Wrists';
-      case MuscleGroup.core:
-        return 'Core';
-      case MuscleGroup.glutes:
-        return 'Glutes';
-      case MuscleGroup.calves:
-        return 'Calves';
-      case MuscleGroup.cardio:
-        return 'Cardio';
-    }
-  }
+  static String getMuscleGroupDisplayName(MuscleGroup group) =>
+      MuscleGroupUtils.getLabel(group);
 }
