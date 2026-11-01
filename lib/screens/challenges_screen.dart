@@ -9,6 +9,7 @@ import '../services/auth_service.dart';
 import '../services/friends_service.dart';
 import '../services/challenge_service.dart';
 import '../models/friend.dart';
+import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
 
 class ChallengesScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Challenges',
+          AppLocalizations.of(context)!.challenges,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         actions: [
@@ -58,10 +59,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           labelColor: AppColors.textOnPrimary,
           unselectedLabelColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
           indicatorColor: AppColors.textOnPrimary,
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Completed'),
-            Tab(text: 'Pending'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.active),
+            Tab(text: AppLocalizations.of(context)!.completed),
+            Tab(text: AppLocalizations.of(context)!.pending),
           ],
         ),
       ),
@@ -90,7 +91,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         if (snapshot.hasError) {
           return Center(
             child: Text(
-              'Error loading challenges',
+              AppLocalizations.of(context)!.errorLoadingChallenges,
               style:
                   AppTextStyles.body1.copyWith(color: AppColors.textSecondary),
             ),
@@ -115,12 +116,12 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'No challenges yet',
+              AppLocalizations.of(context)!.noChallengesYet,
               style: AppTextStyles.h3.copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 8),
             Text(
-              'Create a challenge to compete with friends',
+              AppLocalizations.of(context)!.createChallengeDesc,
               style:
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
@@ -195,7 +196,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                           children: [
                             Expanded(
                               child: Text(
-                                challenge.title,
+                                ChallengeTemplate.titleFor(challenge.type),
                                 style: AppTextStyles.body1.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -281,7 +282,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                                 RankBadgeWidget(rank: StrengthRank.gold, size: 16),
                           ),
                         Text(
-                          isCurrentUser ? 'You' : name,
+                          isCurrentUser
+                              ? AppLocalizations.of(context)!.you
+                              : name,
                           style: AppTextStyles.caption.copyWith(
                             fontWeight: isCurrentUser
                                 ? FontWeight.bold
@@ -362,9 +365,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(challenge.title, style: AppTextStyles.h3),
+                    Text(ChallengeTemplate.titleFor(challenge.type),
+                        style: AppTextStyles.h3),
                     Text(
-                      challenge.description,
+                      ChallengeTemplate.descriptionFor(challenge.type),
                       style: AppTextStyles.body2.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -377,25 +381,26 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           const SizedBox(height: 24),
           _buildInfoRow(
             Icons.calendar_today,
-            'Start',
+            AppLocalizations.of(context)!.start,
             _formatDate(challenge.startDate),
           ),
           const SizedBox(height: 8),
           _buildInfoRow(
             Icons.event,
-            'End',
+            AppLocalizations.of(context)!.end,
             _formatDate(challenge.endDate),
           ),
           if (challenge.exerciseName != null) ...[
             const SizedBox(height: 8),
             _buildInfoRow(
               Icons.fitness_center,
-              'Exercise',
+              AppLocalizations.of(context)!.exerciseLabel,
               challenge.exerciseName!,
             ),
           ],
           const SizedBox(height: 24),
-          Text('Leaderboard', style: AppTextStyles.h3),
+          Text(AppLocalizations.of(context)!.leaderboard,
+              style: AppTextStyles.h3),
           const SizedBox(height: 12),
           ...sortedParticipants.asMap().entries.map((entry) {
             final rank = entry.key + 1;
@@ -436,7 +441,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      isCurrentUser ? 'You' : participant['name'] as String,
+                      isCurrentUser
+                          ? AppLocalizations.of(context)!.you
+                          : participant['name'] as String,
                       style: AppTextStyles.body1.copyWith(
                         fontWeight:
                             isCurrentUser ? FontWeight.bold : FontWeight.normal,
@@ -444,7 +451,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     ),
                   ),
                   Text(
-                    '${(participant['score'] as double).toStringAsFixed(0)} ${_getScoreUnit(challenge.type)}',
+                    _formatScore(
+                        (participant['score'] as num).toDouble(), challenge.type),
                     style: AppTextStyles.body1.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
@@ -471,7 +479,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(result == 'success'
-                                ? 'Challenge accepted!'
+                                ? AppLocalizations.of(context)!.challengeAccepted
                                 : result),
                             backgroundColor:
                                 result == 'success' ? AppColors.success : null,
@@ -484,7 +492,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                       foregroundColor: AppColors.textOnPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Accept'),
+                    child: Text(AppLocalizations.of(context)!.accept),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -500,7 +508,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(result == 'success'
-                                ? 'Challenge declined'
+                                ? AppLocalizations.of(context)!.challengeDeclined
                                 : result),
                           ),
                         );
@@ -509,7 +517,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Decline'),
+                    child: Text(AppLocalizations.of(context)!.decline),
                   ),
                 ),
               ],
@@ -569,10 +577,11 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Create Challenge', style: AppTextStyles.h3),
+          Text(AppLocalizations.of(context)!.createChallenge,
+              style: AppTextStyles.h3),
           const SizedBox(height: 16),
           Text(
-            'Choose a challenge type',
+            AppLocalizations.of(context)!.chooseChallengeType,
             style: AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
@@ -608,7 +617,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('Select Friends'),
+          title: Text(AppLocalizations.of(context)!.selectFriends),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -620,7 +629,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Select friends to challenge',
+                  AppLocalizations.of(context)!.selectFriendsToChallenge,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -644,7 +653,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 }),
                 const SizedBox(height: 16),
                 Text(
-                  'Duration (days)',
+                  AppLocalizations.of(context)!.durationDays,
                   style: AppTextStyles.body1,
                 ),
                 Slider(
@@ -652,7 +661,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   min: 1,
                   max: 30,
                   divisions: 29,
-                  label: '$durationDays days',
+                  label: AppLocalizations.of(context)!
+                      .durationDaysCount(durationDays),
                   onChanged: (value) {
                     setDialogState(() {
                       durationDays = value.toInt();
@@ -660,7 +670,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   },
                 ),
                 Text(
-                  '$durationDays days',
+                  AppLocalizations.of(context)!.durationDaysCount(durationDays),
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -670,7 +680,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
               onPressed: selectedFriends.isEmpty
@@ -680,7 +690,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                       await _createChallenge(
                           template, selectedFriends.toList(), durationDays);
                     },
-              child: const Text('Create'),
+              child: Text(AppLocalizations.of(context)!.create),
             ),
           ],
         ),
@@ -769,18 +779,17 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     }
   }
 
-  String _getScoreUnit(ChallengeType type) {
+  String _formatScore(double score, ChallengeType type) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
       case ChallengeType.workouts:
-        return 'workouts';
+        return l10n.workoutsCount(score.round());
       case ChallengeType.totalWeight:
-        return 'kg';
       case ChallengeType.specificExercise:
-        return 'kg';
+        return Units.of(context).weight(score, decimals: 0);
       case ChallengeType.streak:
-        return 'days';
       case ChallengeType.consistency:
-        return 'days';
+        return l10n.durationDaysCount(score.round());
     }
   }
 
@@ -798,10 +807,11 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   }
 
   String _formatTimeRemaining(Duration duration) {
-    if (duration.isNegative) return 'Ended';
-    if (duration.inDays > 0) return '${duration.inDays}d left';
-    if (duration.inHours > 0) return '${duration.inHours}h left';
-    return '${duration.inMinutes}m left';
+    final l10n = AppLocalizations.of(context)!;
+    if (duration.isNegative) return l10n.challengeEnded;
+    if (duration.inDays > 0) return l10n.daysLeft(duration.inDays);
+    if (duration.inHours > 0) return l10n.hoursLeft(duration.inHours);
+    return l10n.minutesLeft(duration.inMinutes);
   }
 
   String _formatDate(DateTime date) {
