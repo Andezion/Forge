@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../constants/app_text_styles.dart';
@@ -29,16 +30,16 @@ class WorkoutAiEvaluation extends StatelessWidget {
 
   const WorkoutAiEvaluation({super.key, required this.workout});
 
-  _WorkoutAiResult _evaluate() {
+  _WorkoutAiResult _evaluate(AppLocalizations l10n) {
     final exercises = workout.exercises;
 
     if (exercises.isEmpty) {
-      return const _WorkoutAiResult(
+      return _WorkoutAiResult(
         grade: 'F',
-        gradeColor: Color(0xFFB71C1C),
-        gradeBgColor: Color(0xFFFFEBEE),
-        summary: 'Empty workout',
-        detail: 'Add exercises to get an AI evaluation.',
+        gradeColor: const Color(0xFFB71C1C),
+        gradeBgColor: const Color(0xFFFFEBEE),
+        summary: l10n.evalEmptySummary,
+        detail: l10n.evalEmptyDetail,
         recoveryDays: 0,
         score: 0,
       );
@@ -130,39 +131,38 @@ class WorkoutAiEvaluation extends StatelessWidget {
       grade = 'A';
       gradeColor = const Color(0xFF1B5E20);
       gradeBgColor = const Color(0xFFE8F5E9);
-      summary = 'Excellent workout!';
-      detail =
-          'Well-structured, balanced load across $groupCount muscle groups. Smart volume choice.';
+      summary = l10n.evalExcellentSummary;
+      detail = l10n.evalExcellentDetail(groupCount);
     } else if (score >= 7) {
       grade = 'B';
       gradeColor = const Color(0xFF33691E);
       gradeBgColor = const Color(0xFFF1F8E9);
-      summary = 'Good workout.';
+      summary = l10n.evalGoodSummary;
       detail = topGroup != null
-          ? 'Solid structure with emphasis on $topGroup. Minor tweaks could improve balance.'
-          : 'Solid structure. Minor tweaks could improve balance.';
+          ? l10n.evalGoodDetailFocus(topGroup)
+          : l10n.evalGoodDetail;
     } else if (score >= 5) {
       grade = 'C';
       gradeColor = const Color(0xFFE65100);
       gradeBgColor = const Color(0xFFFFF3E0);
-      summary = 'Average workout.';
+      summary = l10n.evalAverageSummary;
       detail = exerciseCount < 3
-          ? 'Consider adding more exercises for better stimulus.'
-          : 'Volume or muscle balance could be improved.';
+          ? l10n.evalAverageDetailFew
+          : l10n.evalAverageDetail;
     } else if (score >= 3) {
       grade = 'D';
       gradeColor = const Color(0xFFBF360C);
       gradeBgColor = const Color(0xFFFBE9E7);
-      summary = 'Needs improvement.';
+      summary = l10n.evalWeakSummary;
       detail = totalSets < 6
-          ? 'Very low volume — add more sets for meaningful training stimulus.'
-          : 'Heavily imbalanced load. Distribute exercises across more muscle groups.';
+          ? l10n.evalWeakDetailLowVolume
+          : l10n.evalWeakDetailImbalanced;
     } else {
       grade = 'F';
       gradeColor = const Color(0xFFB71C1C);
       gradeBgColor = const Color(0xFFFFEBEE);
-      summary = 'Poor workout structure.';
-      detail = 'Extreme imbalance or insufficient volume. Rebuild the plan.';
+      summary = l10n.evalPoorSummary;
+      detail = l10n.evalPoorDetail;
     }
 
     return _WorkoutAiResult(
@@ -178,7 +178,8 @@ class WorkoutAiEvaluation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final result = _evaluate();
+    final l10n = AppLocalizations.of(context)!;
+    final result = _evaluate(l10n);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final bgColor = isDark
@@ -229,7 +230,7 @@ class WorkoutAiEvaluation extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'AI Evaluation',
+                      l10n.aiEvaluation,
                       style: AppTextStyles.caption.copyWith(
                         color: result.gradeColor,
                         fontWeight: FontWeight.w700,
@@ -281,7 +282,7 @@ class WorkoutAiEvaluation extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${result.recoveryDays}d',
+                        l10n.daysShort(result.recoveryDays),
                         style: AppTextStyles.caption.copyWith(
                           color: result.gradeColor,
                           fontWeight: FontWeight.bold,
