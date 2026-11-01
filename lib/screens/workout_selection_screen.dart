@@ -7,6 +7,7 @@ import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../services/workout_recommendation_service.dart';
 import '../models/exercise.dart';
+import '../utils/muscle_group_utils.dart';
 import '../widgets/workout_preview_sheet.dart';
 import 'quick_workout_screen.dart';
 
@@ -65,11 +66,12 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
   }
 
   String _matchLabel(double percent) {
-    if (percent < 20) return 'Poor match';
-    if (percent < 40) return 'Fair match';
-    if (percent < 60) return 'Moderate match';
-    if (percent < 80) return 'Good match';
-    return 'Great match';
+    final l10n = AppLocalizations.of(context)!;
+    if (percent < 20) return l10n.matchPoor;
+    if (percent < 40) return l10n.matchFair;
+    if (percent < 60) return l10n.matchModerate;
+    if (percent < 80) return l10n.matchGood;
+    return l10n.matchGreat;
   }
 
   Set<String> _getMuscleGroupNames(Workout workout) {
@@ -77,40 +79,11 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
     for (final ex in workout.exercises) {
       for (final mg in ex.exercise.muscleGroups) {
         if (mg.intensity == MuscleGroupIntensity.primary) {
-          groups.add(_muscleGroupDisplayName(mg.group));
+          groups.add(MuscleGroupUtils.getLabel(mg.group));
         }
       }
     }
     return groups;
-  }
-
-  static String _muscleGroupDisplayName(MuscleGroup group) {
-    switch (group) {
-      case MuscleGroup.chest:
-        return 'Chest';
-      case MuscleGroup.back:
-        return 'Back';
-      case MuscleGroup.legs:
-        return 'Legs';
-      case MuscleGroup.shoulders:
-        return 'Shoulders';
-      case MuscleGroup.biceps:
-        return 'Biceps';
-      case MuscleGroup.triceps:
-        return 'Triceps';
-      case MuscleGroup.forearms:
-        return 'Forearms';
-      case MuscleGroup.wrists:
-        return 'Wrists';
-      case MuscleGroup.core:
-        return 'Core';
-      case MuscleGroup.glutes:
-        return 'Glutes';
-      case MuscleGroup.calves:
-        return 'Calves';
-      case MuscleGroup.cardio:
-        return 'Cardio';
-    }
   }
 
   Widget _buildQuickWorkoutCard() {
@@ -156,14 +129,14 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Quick Workout',
+                      AppLocalizations.of(context)!.quickWorkout,
                       style: AppTextStyles.h4.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'No plan? Just go — add exercises as you train',
+                      AppLocalizations.of(context)!.quickWorkoutDesc,
                       style: AppTextStyles.body2.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -192,7 +165,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Select Workout',
+          AppLocalizations.of(context)!.selectWorkout,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         elevation: 0,
@@ -229,13 +202,13 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                 Icon(Icons.fitness_center, size: 48, color: AppColors.textHint),
                 const SizedBox(height: 12),
                 Text(
-                  'No saved workouts yet',
+                  AppLocalizations.of(context)!.noSavedWorkoutsYet,
                   style: AppTextStyles.body1
                       .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Create one in Workshop or start a Quick Workout above',
+                  AppLocalizations.of(context)!.createInWorkshopOrQuick,
                   style: AppTextStyles.body2,
                   textAlign: TextAlign.center,
                 ),
@@ -244,7 +217,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
           ),
         ] else ...[
           if (recommended != null) ...[
-            _buildSectionHeader('Recommended for Today', AppColors.primary),
+            _buildSectionHeader(AppLocalizations.of(context)!.recommendedForToday, AppColors.primary),
             const SizedBox(height: 8),
             _buildWorkoutCard(recommended.$1, recommended.$2,
                 isRecommended: true),
@@ -263,7 +236,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
             else
               const SizedBox(height: 16),
           ],
-          _buildSectionHeader('All Workouts', AppColors.textSecondary),
+          _buildSectionHeader(AppLocalizations.of(context)!.allWorkouts, AppColors.textSecondary),
           const SizedBox(height: 8),
           TextField(
             controller: _searchController,
@@ -284,7 +257,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'No workouts found',
+                  AppLocalizations.of(context)!.noWorkoutsFound,
                   style: AppTextStyles.body2
                       .copyWith(color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
@@ -369,7 +342,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${workout.exercises.length} exercises',
+                          AppLocalizations.of(context)!.exercisesCount(workout.exercises.length),
                           style: AppTextStyles.body2,
                         ),
                       ],
@@ -409,7 +382,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                     icon: Icon(Icons.visibility_outlined,
                         size: 16, color: AppColors.textSecondary),
                     label: Text(
-                      'Preview',
+                      AppLocalizations.of(context)!.preview,
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.textSecondary),
                     ),
@@ -428,7 +401,7 @@ class _WorkoutSelectionScreenState extends State<WorkoutSelectionScreen> {
                   Row(
                     children: [
                       Text(
-                        'Start',
+                        AppLocalizations.of(context)!.start,
                         style: AppTextStyles.body2.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
