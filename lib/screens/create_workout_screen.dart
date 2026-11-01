@@ -6,9 +6,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
+import '../utils/units.dart';
+import '../utils/workout_format.dart';
 import 'exercise_library_screen.dart';
 
 class CreateWorkoutScreen extends StatefulWidget {
@@ -154,8 +155,9 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
     final repsController = TextEditingController(
       text: existing?.targetReps.toString() ?? '10',
     );
+    final units = Units.of(context, listen: false);
     final weightController = TextEditingController(
-      text: existing?.weight.toString() ?? '0',
+      text: existing != null ? units.weightValue(existing.weight) : '0',
     );
     final durationController = TextEditingController(
       text: existing?.targetDurationMinutes?.toString() ?? '30',
@@ -211,7 +213,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                               FilteringTextInputFormatter.digitsOnly
                             ],
                             decoration: InputDecoration(
-                              labelText: AppStrings.sets,
+                              labelText: AppLocalizations.of(context)!.sets,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -225,7 +227,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                               FilteringTextInputFormatter.digitsOnly
                             ],
                             decoration: InputDecoration(
-                              labelText: AppStrings.targetReps,
+                              labelText: AppLocalizations.of(context)!.targetRepsLabel,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -239,7 +241,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                                   const TextInputType.numberWithOptions(
                                       decimal: true),
                               decoration: InputDecoration(
-                                labelText: '${AppStrings.weight} (kg)',
+                                labelText: AppLocalizations.of(context)!
+                                    .weightWithUnit(units.weightLabel),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -261,7 +264,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: Text(AppStrings.cancel),
+                                child: Text(AppLocalizations.of(context)!.cancel),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -277,8 +280,9 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                                         ? int.tryParse(repsController.text) ?? 0
                                         : 0,
                                     weight: type == ExerciseType.weightAndReps
-                                        ? double.tryParse(
-                                                weightController.text) ??
+                                        ? units.parseWeight(
+                                                weightController.text,
+                                                originalKg: existing?.weight) ??
                                             0
                                         : 0,
                                     targetDurationMinutes:
@@ -301,7 +305,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: Text(AppStrings.save),
+                                child: Text(AppLocalizations.of(context)!.save),
                               ),
                             ),
                           ],
@@ -329,8 +333,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         SnackBar(
           content: Text(
             existing != null
-                ? 'Exercise updated: ${result.exercise.name}'
-                : 'Exercise added: ${result.exercise.name}',
+                ? AppLocalizations.of(context)!.exerciseUpdatedName(result.exercise.name)
+                : AppLocalizations.of(context)!.exerciseAddedName(result.exercise.name),
           ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
@@ -344,22 +348,22 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
       case ExerciseType.weightAndReps:
         return Chip(
           avatar: const Icon(Icons.fitness_center, size: 16, color: Colors.white),
-          label: const Text('Weight + Reps',
-              style: TextStyle(color: Colors.white, fontSize: 12)),
+          label: Text(AppLocalizations.of(context)!.typeWeightReps,
+              style: const TextStyle(color: Colors.white, fontSize: 12)),
           backgroundColor: AppColors.primary,
         );
       case ExerciseType.repsOnly:
         return Chip(
           avatar: const Icon(Icons.repeat, size: 16, color: Colors.white),
-          label: const Text('Reps Only',
-              style: TextStyle(color: Colors.white, fontSize: 12)),
+          label: Text(AppLocalizations.of(context)!.typeRepsOnly,
+              style: const TextStyle(color: Colors.white, fontSize: 12)),
           backgroundColor: AppColors.warning,
         );
       case ExerciseType.cardio:
         return Chip(
           avatar: const Icon(Icons.directions_walk, size: 16, color: Colors.white),
-          label: const Text('Cardio',
-              style: TextStyle(color: Colors.white, fontSize: 12)),
+          label: Text(AppLocalizations.of(context)!.typeCardio,
+              style: const TextStyle(color: Colors.white, fontSize: 12)),
           backgroundColor: AppColors.success,
         );
     }
@@ -453,13 +457,13 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
           children: [
             Text(
               widget.existingWorkout != null
-                  ? 'Edit Workout'
-                  : AppStrings.createWorkout,
+                  ? AppLocalizations.of(context)!.editWorkout
+                  : AppLocalizations.of(context)!.createWorkout,
               style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
             ),
             if (_isDraft)
               Text(
-                'Draft',
+                AppLocalizations.of(context)!.draft,
                 style: AppTextStyles.caption.copyWith(
                   color: AppColors.textOnPrimary.withValues(alpha: 0.7),
                 ),
@@ -484,14 +488,14 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
               child: TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: AppStrings.workoutName,
+                  labelText: AppLocalizations.of(context)!.workoutName,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return AppStrings.errorFieldRequired;
+                    return AppLocalizations.of(context)!.errorFieldRequired;
                   }
                   return null;
                 },
@@ -510,14 +514,14 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No exercises added yet',
+                            AppLocalizations.of(context)!.noExercisesAddedYet,
                             style: AppTextStyles.body1.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tap the + button to add exercises',
+                            AppLocalizations.of(context)!.tapPlusToAddExercises,
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -557,11 +561,15 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
   String _exerciseSubtitle(WorkoutExercise we) {
     switch (we.exercise.exerciseType) {
       case ExerciseType.cardio:
-        return '${we.targetDurationMinutes ?? 0} min';
+        return AppLocalizations.of(context)!.minutesShort(we.targetDurationMinutes ?? 0);
       case ExerciseType.repsOnly:
-        return '${we.sets} sets x ${we.targetReps} reps';
       case ExerciseType.weightAndReps:
-        return '${we.sets} sets x ${we.targetReps} reps, ${we.weight} kg';
+        return formatSetsRepsWeight(AppLocalizations.of(context)!, Units.of(context),
+            sets: we.sets,
+            reps: we.targetReps,
+            weightKg: we.exercise.exerciseType == ExerciseType.weightAndReps
+                ? we.weight
+                : 0);
     }
   }
 
@@ -665,7 +673,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Alt ${altIndex + 1}: ${alt.name}',
+                            AppLocalizations.of(context)!.alternativeN(altIndex + 1, alt.name),
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w500,
@@ -704,7 +712,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                     _addAlternativeExercise(workoutExercise, index),
                 icon: const Icon(Icons.add, size: 18),
                 label: Text(
-                  'Add Alternative',
+                  AppLocalizations.of(context)!.addAlternative,
                   style: AppTextStyles.caption,
                 ),
                 style: OutlinedButton.styleFrom(
@@ -732,7 +740,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         child: ElevatedButton.icon(
           onPressed: _addExercise,
           icon: const Icon(Icons.add, color: Colors.white),
-          label: Text(AppStrings.addExercise),
+          label: Text(AppLocalizations.of(context)!.addExercise),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.textOnPrimary,
