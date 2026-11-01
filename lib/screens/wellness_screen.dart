@@ -7,6 +7,8 @@ import '../models/wellness_entry.dart';
 import '../models/workout_recommendation.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_colors.dart';
+import '../utils/units.dart';
+import '../utils/workout_format.dart';
 
 class WellnessScreen extends StatefulWidget {
   const WellnessScreen({super.key});
@@ -119,7 +121,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                       const Icon(Icons.info_outline, size: 40),
                       const SizedBox(height: 8),
                       Text(
-                        'Complete wellness check to get workout recommendation',
+                        AppLocalizations.of(context)!.completeWellnessForRecommendation,
                         style: AppTextStyles.body1,
                         textAlign: TextAlign.center,
                       ),
@@ -222,7 +224,9 @@ class _WellnessScreenState extends State<WellnessScreen> {
                         title: Text(
                             e.timestamp.toLocal().toString().split('.')[0]),
                         subtitle: Text(
-                            'Avg: ${e.averageScore.toStringAsFixed(1)} — ${e.answers.values.join(', ')}'),
+                            AppLocalizations.of(context)!.wellnessAverage(
+                                e.averageScore.toStringAsFixed(1),
+                                e.answers.values.join(', '))),
                       ),
                     ),
                 ],
@@ -244,22 +248,22 @@ class _WellnessScreenState extends State<WellnessScreen> {
       case RecommendationLevel.rest:
         levelColor = Colors.blue;
         levelIcon = Icons.hotel;
-        levelText = 'Rest Day';
+        levelText = AppLocalizations.of(context)!.restDayLevel;
         break;
       case RecommendationLevel.light:
         levelColor = Colors.green;
         levelIcon = Icons.brightness_low;
-        levelText = 'Light';
+        levelText = AppLocalizations.of(context)!.lightLevel;
         break;
       case RecommendationLevel.moderate:
         levelColor = Colors.orange;
         levelIcon = Icons.brightness_medium;
-        levelText = 'Moderate';
+        levelText = AppLocalizations.of(context)!.moderateLevel;
         break;
       case RecommendationLevel.intense:
         levelColor = Colors.red;
         levelIcon = Icons.brightness_high;
-        levelText = 'Intense';
+        levelText = AppLocalizations.of(context)!.intenseLevel;
         break;
     }
 
@@ -280,7 +284,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Today\'s Recommendation',
+                        AppLocalizations.of(context)!.todaysRecommendation,
                         style: AppTextStyles.h4.copyWith(
                           color: levelColor,
                           fontWeight: FontWeight.bold,
@@ -307,7 +311,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
               const Divider(),
               const SizedBox(height: 8),
               Text(
-                'Exercises (${rec.exercises.length})',
+                AppLocalizations.of(context)!.exercisesWithCount(rec.exercises.length),
                 style: AppTextStyles.h4.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -363,13 +367,17 @@ class _WellnessScreenState extends State<WellnessScreen> {
                             _buildStatChip(
                               icon: Icons.fitness_center,
                               label: we.weight > 0
-                                  ? '${we.weight} kg'
-                                  : 'Bodyweight',
+                                  ? Units.of(context).weight(we.weight)
+                                  : AppLocalizations.of(context)!.bodyweight,
                             ),
                             const SizedBox(width: 8),
                             _buildStatChip(
                               icon: Icons.repeat,
-                              label: '${we.sets} sets × ${we.targetReps} reps',
+                              label: formatSetsRepsWeight(
+                                  AppLocalizations.of(context)!, Units.of(context),
+                                  sets: we.sets,
+                                  reps: we.targetReps,
+                                  weightKg: 0),
                             ),
                           ],
                         ),
@@ -391,7 +399,8 @@ class _WellnessScreenState extends State<WellnessScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Overall Confidence: ${(rec.overallConfidence * 100).toStringAsFixed(0)}%',
+                      AppLocalizations.of(context)!.overallConfidence(
+                          (rec.overallConfidence * 100).toStringAsFixed(0)),
                       style: AppTextStyles.caption.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -400,7 +409,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                   TextButton.icon(
                     onPressed: _loadRecommendation,
                     icon: const Icon(Icons.refresh, size: 16),
-                    label: const Text('Refresh'),
+                    label: Text(AppLocalizations.of(context)!.refresh),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
                     ),
