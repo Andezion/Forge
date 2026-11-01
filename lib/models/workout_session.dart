@@ -1,3 +1,4 @@
+import '../l10n/l10n.dart';
 import 'exercise.dart';
 
 class ExerciseSetResult {
@@ -129,6 +130,9 @@ class WorkoutSession {
     required this.totalDurationSeconds,
     this.userId,
   });
+
+  String get displayName =>
+      workoutId.startsWith('quick_') ? L10n.current.quickWorkout : workoutName;
 
   Map<String, dynamic> toJson() {
     return {
