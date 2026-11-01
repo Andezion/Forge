@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../utils/muscle_group_utils.dart';
 
@@ -100,7 +100,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                AppStrings.pickMuscleGroup,
+                AppLocalizations.of(context)!.pickMuscleGroup,
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -141,7 +141,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                '${AppStrings.intensityFor}\n${_getMuscleGroupLabel(group)}',
+                '${AppLocalizations.of(context)!.intensityFor}\n${_getMuscleGroupLabel(group)}',
                 style: AppTextStyles.h4,
                 textAlign: TextAlign.center,
               ),
@@ -257,7 +257,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          _isEditing ? AppStrings.edit : AppStrings.createExercise,
+          _isEditing ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.createExercise,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         actions: [
@@ -265,7 +265,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
             onPressed: _save,
             icon: const Icon(Icons.check, color: Colors.white),
             label: Text(
-              _isEditing ? AppStrings.save : AppStrings.create,
+              _isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
               style: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.w600),
             ),
@@ -283,7 +283,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 controller: _nameController,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  labelText: AppStrings.exerciseName,
+                  labelText: AppLocalizations.of(context)!.exerciseName,
                   prefixIcon: const Icon(Icons.fitness_center),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -291,7 +291,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return AppStrings.errorFieldRequired;
+                    return AppLocalizations.of(context)!.errorFieldRequired;
                   }
                   return null;
                 },
@@ -302,7 +302,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  labelText: AppStrings.description,
+                  labelText: AppLocalizations.of(context)!.description,
                   alignLabelWithHint: true,
                   prefixIcon: const Padding(
                     padding: EdgeInsets.only(bottom: 40),
@@ -314,20 +314,20 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return AppStrings.errorFieldRequired;
+                    return AppLocalizations.of(context)!.errorFieldRequired;
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 24),
               Text(
-                'Exercise Type',
+                AppLocalizations.of(context)!.exerciseType,
                 style:
                     AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text(
-                'Determines what metrics are tracked during workout',
+                AppLocalizations.of(context)!.exerciseTypeDesc,
                 style: AppTextStyles.caption
                     .copyWith(color: AppColors.textSecondary),
               ),
@@ -336,8 +336,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 children: [
                   Expanded(
                     child: _buildTypeCard(
-                      'Weight + Reps',
-                      'Sets, reps & kg',
+                      AppLocalizations.of(context)!.typeWeightReps,
+                      AppLocalizations.of(context)!.typeWeightRepsDesc,
                       Icons.fitness_center,
                       ExerciseType.weightAndReps,
                       AppColors.primary,
@@ -346,8 +346,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildTypeCard(
-                      'Reps Only',
-                      'Sets & reps, no weight',
+                      AppLocalizations.of(context)!.typeRepsOnly,
+                      AppLocalizations.of(context)!.typeRepsOnlyDesc,
                       Icons.repeat,
                       ExerciseType.repsOnly,
                       AppColors.warning,
@@ -356,8 +356,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildTypeCard(
-                      'Cardio',
-                      'Duration only',
+                      AppLocalizations.of(context)!.typeCardio,
+                      AppLocalizations.of(context)!.typeCardioDesc,
                       Icons.directions_walk,
                       ExerciseType.cardio,
                       AppColors.success,
@@ -367,7 +367,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                AppStrings.difficulty,
+                AppLocalizations.of(context)!.difficulty,
                 style:
                     AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
@@ -376,7 +376,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 children: [
                   Expanded(
                     child: _buildDifficultyChip(
-                      AppStrings.easy,
+                      AppLocalizations.of(context)!.easy,
                       ExerciseDifficulty.easy,
                       AppColors.success,
                     ),
@@ -384,7 +384,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildDifficultyChip(
-                      AppStrings.medium,
+                      AppLocalizations.of(context)!.medium,
                       ExerciseDifficulty.medium,
                       AppColors.warning,
                     ),
@@ -392,7 +392,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildDifficultyChip(
-                      AppStrings.hard,
+                      AppLocalizations.of(context)!.hard,
                       ExerciseDifficulty.hard,
                       AppColors.error,
                     ),
@@ -401,7 +401,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                AppStrings.muscleGroups,
+                AppLocalizations.of(context)!.muscleGroups,
                 style:
                     AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700),
               ),
@@ -410,7 +410,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    AppStrings.pressToAddMuscleGroups,
+                    AppLocalizations.of(context)!.pressToAddMuscleGroups,
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -447,7 +447,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
               OutlinedButton.icon(
                 onPressed: _showMuscleGroupSelector,
                 icon: const Icon(Icons.add),
-                label: Text(AppStrings.addMuscleGroup),
+                label: Text(AppLocalizations.of(context)!.addMuscleGroup),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -467,7 +467,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   ),
                 ),
                 child: Text(
-                  _isEditing ? AppStrings.save : AppStrings.createExercise,
+                  _isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.createExercise,
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w600),
                 ),
