@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -10,6 +11,7 @@ import '../models/user_stats.dart';
 import '../models/exercise.dart';
 import '../models/friend.dart';
 import '../models/strength_rank.dart';
+import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
 import 'user_profile_screen.dart';
 
@@ -59,7 +61,7 @@ class _CommunityLeaderboardScreenState
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Community Rankings',
+          AppLocalizations.of(context)!.communityRankings,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         bottom: PreferredSize(
@@ -74,12 +76,12 @@ class _CommunityLeaderboardScreenState
                 unselectedLabelColor:
                     AppColors.textOnPrimary.withValues(alpha: 0.7),
                 indicatorColor: AppColors.textOnPrimary,
-                tabs: const [
-                  Tab(text: 'Workouts'),
-                  Tab(text: 'Total Weight'),
-                  Tab(text: 'Records'),
-                  Tab(text: 'Streak'),
-                  Tab(text: 'Progress'),
+                tabs: [
+                  Tab(text: AppLocalizations.of(context)!.workouts),
+                  Tab(text: AppLocalizations.of(context)!.tabTotalWeight),
+                  Tab(text: AppLocalizations.of(context)!.tabRecords),
+                  Tab(text: AppLocalizations.of(context)!.streak),
+                  Tab(text: AppLocalizations.of(context)!.progress),
                 ],
               ),
             ],
@@ -142,7 +144,7 @@ class _CommunityLeaderboardScreenState
             children: [
               Icon(_scopeIcons[scope], size: 16, color: AppColors.primary),
               const SizedBox(width: 6),
-              Text(scope,
+              Text(_optionLabel(scope),
                   style: AppTextStyles.body2.copyWith(color: Colors.black)),
             ],
           ),
@@ -152,6 +154,20 @@ class _CommunityLeaderboardScreenState
         if (v != null) setState(() => _selectedScope = v);
       },
     );
+  }
+
+  String _optionLabel(String id) {
+    final l10n = AppLocalizations.of(context)!;
+    return switch (id) {
+      'Global' => l10n.scopeGlobal,
+      'My League' => l10n.scopeMyLeague,
+      'Country' => l10n.scopeCountry,
+      'City' => l10n.scopeCity,
+      'All Time' => l10n.periodAllTime,
+      'This Month' => l10n.periodThisMonth,
+      'This Week' => l10n.periodThisWeek,
+      _ => id,
+    };
   }
 
   Widget _buildFilterDropdown(
@@ -177,7 +193,7 @@ class _CommunityLeaderboardScreenState
           .map((o) => DropdownMenuItem<String>(
               value: o,
               child:
-                  Text(o, style: AppTextStyles.body2.copyWith(color: Colors.black))))
+                  Text(_optionLabel(o), style: AppTextStyles.body2.copyWith(color: Colors.black))))
           .toList(),
       onChanged: (v) { if (v != null) onChanged(v); },
     );
@@ -191,13 +207,13 @@ class _CommunityLeaderboardScreenState
   Widget _buildScopeEmptyState() {
     String message;
     if (_selectedScope == 'Country' && _userCountry == null) {
-      message = 'Set your country in Profile → About Me to see country rankings';
+      message = AppLocalizations.of(context)!.setCountryForRankings;
     } else if (_selectedScope == 'City' && _userCity == null) {
-      message = 'Set your city in Profile → About Me to see city rankings';
+      message = AppLocalizations.of(context)!.setCityForRankings;
     } else if (_selectedScope == 'My League') {
-      message = 'Add friends to see your league rankings';
+      message = AppLocalizations.of(context)!.addFriendsForLeague;
     } else {
-      message = 'No data available yet';
+      message = AppLocalizations.of(context)!.noDataYet;
     }
 
     return Center(
@@ -232,7 +248,7 @@ class _CommunityLeaderboardScreenState
       ),
       builder: (context, snapshot) => _buildStreamBody(
         snapshot,
-        (user) => '${user.workoutCount} workouts',
+        (user) => AppLocalizations.of(context)!.workoutsCount(user.workoutCount),
         Icons.fitness_center,
       ),
     );
@@ -248,7 +264,8 @@ class _CommunityLeaderboardScreenState
       ),
       builder: (context, snapshot) => _buildStreamBody(
         snapshot,
-        (user) => '${user.totalWeightLifted.toStringAsFixed(0)} kg',
+        (user) =>
+            Units.of(context).weight(user.totalWeightLifted, decimals: 0),
         Icons.bar_chart,
       ),
     );
@@ -272,7 +289,7 @@ class _CommunityLeaderboardScreenState
           color: AppColors.surface,
           child: Row(
             children: [
-              Text('Exercise:',
+              Text(AppLocalizations.of(context)!.exerciseColon,
                   style: AppTextStyles.body1
                       .copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 12),
@@ -311,7 +328,9 @@ class _CommunityLeaderboardScreenState
         ),
         Expanded(
           child: _selectedExercise == null
-              ? const Center(child: Text('Select an exercise'))
+              ? Center(
+                  child: Text(
+                      AppLocalizations.of(context)!.selectAnExerciseShort))
               : StreamBuilder<List<UserStats>>(
                   stream: leaderboardService.getExerciseRecordLeaderboard(
                     exerciseId: _selectedExercise!.id,
@@ -325,8 +344,8 @@ class _CommunityLeaderboardScreenState
                       final record =
                           user.exerciseRecords[_selectedExercise!.id];
                       return record != null
-                          ? '${record.toStringAsFixed(1)} kg'
-                          : 'No record';
+                          ? Units.of(context).weight(record)
+                          : AppLocalizations.of(context)!.noRecord;
                     },
                     Icons.emoji_events,
                   ),
@@ -346,7 +365,8 @@ class _CommunityLeaderboardScreenState
       ),
       builder: (context, snapshot) => _buildStreamBody(
         snapshot,
-        (user) => '${user.currentStreak} days',
+        (user) =>
+            AppLocalizations.of(context)!.durationDaysCount(user.currentStreak),
         Icons.local_fire_department,
       ),
     );
@@ -377,7 +397,9 @@ class _CommunityLeaderboardScreenState
       return const Center(child: CircularProgressIndicator());
     }
     if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
+      return Center(
+          child: Text(AppLocalizations.of(context)!
+              .errorWithMessage('${snapshot.error}')));
     }
     final users = snapshot.data ?? [];
     if (users.isEmpty) return _buildScopeEmptyState();
@@ -461,7 +483,7 @@ class _CommunityLeaderboardScreenState
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'You',
+                      AppLocalizations.of(context)!.you,
                       style: AppTextStyles.caption.copyWith(
                           color: AppColors.textOnPrimary,
                           fontWeight: FontWeight.bold),
