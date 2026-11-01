@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import '../l10n/l10n.dart';
+import '../utils/units.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
@@ -323,7 +325,7 @@ class ProgressionService {
       double newWeight = we.weight;
       int newReps = we.targetReps;
       int newSets = we.sets;
-      String reason = 'No history — using programmed parameters';
+      String reason = L10n.current.progNoHistory;
 
       if (metrics.sessionsCount == 0) {
         final suggestedReps = _goalService.calculateTargetReps(
@@ -336,7 +338,7 @@ class ProgressionService {
         );
         newReps = suggestedReps > we.targetReps ? suggestedReps : we.targetReps;
         newSets = suggestedSets > we.sets ? suggestedSets : we.sets;
-        reason = 'New exercise — parameters tailored to your goals';
+        reason = L10n.current.progNewExercise;
       } else {
         final c = metrics.completionRate;
         final wasHard =
@@ -355,7 +357,7 @@ class ProgressionService {
           newReps =
               metrics.lastActualReps > 0 ? metrics.lastActualReps.round() : we.targetReps;
           newSets = we.sets;
-          reason = 'Deload week — recovering at 90% of your last weight';
+          reason = L10n.current.progDeload;
         } else if (we.weight <= 0.0) {
           final lastReps = metrics.lastActualReps > 0
               ? metrics.lastActualReps.round()
@@ -369,17 +371,17 @@ class ProgressionService {
             newReps = (lastReps + increment * wellnessModifiers.volumeMultiplier)
                 .round()
                 .clamp(1, 200);
-            reason = 'Excellent performance — +${increment.toStringAsFixed(0)} rep target';
+            reason = L10n.current.progExcellentReps(increment.toStringAsFixed(0));
           } else if (c >= 0.85 && metrics.performanceTrend > 0) {
             newSets = (we.sets + 1).clamp(1, 10);
             newReps = lastReps;
-            reason = 'Good progress — adding a set';
+            reason = L10n.current.progAddingSet;
           } else if (c < 0.70 || wasHard) {
             newReps = lastReps;
-            reason = 'Challenging workout — maintaining last session reps';
+            reason = L10n.current.progMaintainReps;
           } else {
             newReps = lastReps;
-            reason = 'Bodyweight exercise — maintaining level';
+            reason = L10n.current.progBodyweightMaintain;
           }
         } else {
           final lastWeight =
@@ -439,22 +441,22 @@ class ProgressionService {
               .clamp(we.sets, 10);
 
           if (needsDeload) {
-            reason = 'Deload week — recovering at 90% of your last weight';
+            reason = L10n.current.progDeload;
           } else if (wellnessModifiers.weightMultiplier < 0.9) {
-            reason = 'Reduced load — wellness adjustment applied';
+            reason = L10n.current.progWellnessReduced;
           } else if (recoveryModifier < 0.95) {
-            reason = 'Limited recovery — maintaining last session weight';
+            reason = L10n.current.progLimitedRecovery;
           } else if (weightIncrement > 0.25) {
             reason =
-                'Trending up — +${weightIncrement.toStringAsFixed(1)} kg based on your last month';
+                L10n.current.progTrendingUp(Units.current.weightDelta(weightIncrement));
           } else if (weightIncrement < -0.25) {
-            reason = 'Load reduced — easing off based on your recent trend';
+            reason = L10n.current.progLoadReduced;
           } else {
-            reason = 'Stable — maintaining your last session weight';
+            reason = L10n.current.progStable;
           }
 
           if (wellnessModifiers.weightMultiplier < 0.9) {
-            reason += ' (wellness considered)';
+            reason += L10n.current.progWellnessConsidered;
           }
         }
       }
