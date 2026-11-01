@@ -1,3 +1,5 @@
+import '../l10n/l10n.dart';
+
 enum NutritionGoal {
   aggressiveFatLoss,
   fatLoss,
@@ -10,30 +12,30 @@ extension NutritionGoalExt on NutritionGoal {
   String get displayName {
     switch (this) {
       case NutritionGoal.aggressiveFatLoss:
-        return 'Aggressive Fat Loss';
+        return L10n.current.goalAggressiveFatLoss;
       case NutritionGoal.fatLoss:
-        return 'Fat Loss';
+        return L10n.current.goalFatLoss;
       case NutritionGoal.maintain:
-        return 'Maintain Weight';
+        return L10n.current.goalMaintain;
       case NutritionGoal.leanBulk:
-        return 'Lean Bulk';
+        return L10n.current.goalLeanBulk;
       case NutritionGoal.bulk:
-        return 'Bulk';
+        return L10n.current.goalBulk;
     }
   }
 
   String get description {
     switch (this) {
       case NutritionGoal.aggressiveFatLoss:
-        return 'Aggressive deficit for fast fat loss. -500 kcal/day.';
+        return L10n.current.goalAggressiveFatLossDesc;
       case NutritionGoal.fatLoss:
-        return 'Moderate deficit for steady fat loss. -300 kcal/day.';
+        return L10n.current.goalFatLossDesc;
       case NutritionGoal.maintain:
-        return 'Eat at maintenance to preserve current weight.';
+        return L10n.current.goalMaintainDesc;
       case NutritionGoal.leanBulk:
-        return 'Small surplus for muscle gain with minimal fat. +250 kcal/day.';
+        return L10n.current.goalLeanBulkDesc;
       case NutritionGoal.bulk:
-        return 'Significant surplus for maximum muscle growth. +500 kcal/day.';
+        return L10n.current.goalBulkDesc;
     }
   }
 
@@ -84,6 +86,15 @@ class MacroTargets {
         waterMl: (json['waterMl'] as num).toDouble(),
       );
 }
+
+String localizedMealName(String name) => switch (name) {
+      'Breakfast' => L10n.current.mealBreakfast,
+      'Lunch' => L10n.current.mealLunch,
+      'Dinner' => L10n.current.mealDinner,
+      'Afternoon Snack' => L10n.current.mealAfternoonSnack,
+      'Mid-Morning Snack' => L10n.current.mealMidMorningSnack,
+      _ => name,
+    };
 
 class MealSlot {
   final String name;
