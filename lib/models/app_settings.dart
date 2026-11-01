@@ -2,7 +2,14 @@ enum WeightUnit { kg, lb }
 
 enum DistanceUnit { meters, feet }
 
-enum AppLanguage { english, russian, polish }
+enum AppLanguage {
+  english('en'),
+  russian('ru'),
+  polish('pl');
+
+  final String code;
+  const AppLanguage(this.code);
+}
 
 class AppSettings {
   final String? nickname;
