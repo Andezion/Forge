@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../services/data_manager.dart';
 import '../utils/muscle_group_utils.dart';
@@ -204,7 +203,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         child: ElevatedButton.icon(
           onPressed: _showCreateExerciseDialog,
           icon: const Icon(Icons.add, color: Colors.white),
-          label: Text(AppStrings.createExercise),
+          label: Text(AppLocalizations.of(context)!.createExercise),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.textOnPrimary,
@@ -240,7 +239,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               controller: _searchController,
               onChanged: _filterExercises,
               decoration: InputDecoration(
-                hintText: '${AppStrings.search}...',
+                hintText: '${AppLocalizations.of(context)!.search}...',
                 hintStyle: AppTextStyles.body2,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
@@ -302,7 +301,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${updatedExercise.name} updated'),
+                  content: Text(AppLocalizations.of(context)!.exerciseUpdated(updatedExercise.name)),
                   backgroundColor: AppColors.success,
                   duration: const Duration(seconds: 2),
                 ),
@@ -321,21 +320,19 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       final shouldDelete = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Exercise in Use'),
-          content: Text(
-            'The exercise "${exercise.name}" is currently used in one or more workout programs. Are you sure you want to delete it?',
-          ),
+          title: Text(AppLocalizations.of(context)!.exerciseInUse),
+          content: Text(AppLocalizations.of(context)!.exerciseInUseConfirm(exercise.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppStrings.cancel),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.error,
               ),
-              child: const Text('Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         ),
@@ -346,21 +343,19 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       final shouldDelete = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Delete Exercise'),
-          content: Text(
-            'Are you sure you want to delete "${exercise.name}"?',
-          ),
+          title: Text(AppLocalizations.of(context)!.deleteExerciseTitle),
+          content: Text(AppLocalizations.of(context)!.deleteExerciseConfirm(exercise.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppStrings.cancel),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.error,
               ),
-              child: const Text('Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         ),
@@ -377,7 +372,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${exercise.name} deleted'),
+          content: Text(AppLocalizations.of(context)!.exerciseDeleted(exercise.name)),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -433,13 +428,13 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               icon: const Icon(Icons.edit_outlined),
               color: AppColors.primary,
               onPressed: () => _showEditExerciseDialog(exercise),
-              tooltip: AppStrings.edit,
+              tooltip: AppLocalizations.of(context)!.edit,
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
               color: AppColors.error,
               onPressed: () => _deleteExercise(exercise),
-              tooltip: AppStrings.delete,
+              tooltip: AppLocalizations.of(context)!.delete,
             ),
             const Icon(Icons.add_circle_outline),
           ],
