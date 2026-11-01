@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -11,6 +12,7 @@ import '../services/settings_service.dart';
 import '../services/world_records_service.dart';
 import '../services/groq_service.dart';
 import '../utils/strength_coefficients.dart';
+import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
 
 class PersonalRecordsScreen extends StatefulWidget {
@@ -35,6 +37,9 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   bool _loadingRanks = false;
 
   final List<String> _federations = ['IPF', 'WRPF', 'GPA', 'WPC', 'IPA'];
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+  Units get _units => Units.of(context, listen: false);
 
   @override
   void initState() {
@@ -86,7 +91,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     if (aiError != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('World-record matching unavailable: $aiError'),
+          content: Text(_l10n.worldRecordMatchingUnavailable(aiError)),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -97,6 +102,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
   Widget build(BuildContext context) {
     final dataManager = Provider.of<DataManager>(context);
     final profile = Provider.of<ProfileService>(context);
+    Units.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -104,7 +110,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Personal Records',
+          _l10n.personalRecords,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         bottom: TabBar(
@@ -112,9 +118,9 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
           labelColor: AppColors.textOnPrimary,
           unselectedLabelColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
           indicatorColor: AppColors.textOnPrimary,
-          tabs: const [
-            Tab(text: 'My Records'),
-            Tab(text: 'World Records'),
+          tabs: [
+            Tab(text: _l10n.myRecords),
+            Tab(text: _l10n.worldRecords),
           ],
         ),
       ),
@@ -197,7 +203,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Your Rank', style: AppTextStyles.caption),
+                    Text(_l10n.yourRank, style: AppTextStyles.caption),
                     const SizedBox(height: 2),
                     Text(
                       StrengthRank.wooden.displayName,
@@ -206,7 +212,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'World record data unavailable — rank will update once loaded.',
+                      _l10n.worldRecordDataUnavailable,
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.textSecondary),
                     ),
@@ -241,7 +247,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Your Rank', style: AppTextStyles.caption),
+                      Text(_l10n.yourRank, style: AppTextStyles.caption),
                       const SizedBox(height: 2),
                       Text(
                         rank.displayName,
@@ -272,11 +278,11 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Your best: ${best.toStringAsFixed(1)} kg',
+                  _l10n.yourBest(_units.weight(best)),
                   style: AppTextStyles.body2,
                 ),
                 Text(
-                  'World record (IPF): ${worldRecord.toStringAsFixed(1)} kg',
+                  _l10n.worldRecordFederation('IPF', _units.weight(worldRecord)),
                   style: AppTextStyles.caption
                       .copyWith(color: AppColors.textSecondary),
                 ),
@@ -299,7 +305,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                   RankBadgeWidget(rank: nextRank, size: 20),
                   const SizedBox(width: 6),
                   Text(
-                    '+${kgToNext.toStringAsFixed(1)} kg to ${nextRank.displayName}',
+                    _l10n.weightToNextRank(
+                        _units.weight(kgToNext), nextRank.displayName),
                     style: AppTextStyles.caption
                         .copyWith(color: AppColors.textSecondary),
                   ),
@@ -307,7 +314,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               )
             else
               Text(
-                'Maximum rank achieved!',
+                _l10n.maxRankAchieved,
                 style: AppTextStyles.caption
                     .copyWith(color: rank.color, fontWeight: FontWeight.bold),
               ),
@@ -326,10 +333,10 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Rank System', style: AppTextStyles.h3),
+            Text(_l10n.rankSystem, style: AppTextStyles.h3),
             const SizedBox(height: 4),
             Text(
-              'Based on % of the world record in your weight class',
+              _l10n.rankSystemDesc,
               style: AppTextStyles.caption
                   .copyWith(color: AppColors.textSecondary),
             ),
@@ -352,7 +359,9 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                               ),
                             ),
                             Text(
-                              '${rank.minPercent.toStringAsFixed(0)}% – ${rank.maxPercent.toStringAsFixed(0)}% of world record',
+                              _l10n.rankPercentRange(
+                                  rank.minPercent.toStringAsFixed(0),
+                                  rank.maxPercent.toStringAsFixed(0)),
                               style: AppTextStyles.caption.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -397,7 +406,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
           const SizedBox(height: 16),
           _buildWeightClassInfo(userWeight, weightClass),
           const SizedBox(height: 24),
-          Text('World Records', style: AppTextStyles.h3),
+          Text(_l10n.worldRecords, style: AppTextStyles.h3),
           const SizedBox(height: 16),
           _buildWorldRecordsList(weightClass),
         ],
@@ -416,21 +425,21 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select Exercise', style: AppTextStyles.h3),
+            Text(_l10n.selectExercise, style: AppTextStyles.h3),
             const SizedBox(height: 12),
             DropdownButtonFormField<Exercise?>(
               value: _selectedExercise,
               decoration: InputDecoration(
-                hintText: 'All Exercises',
+                hintText: _l10n.allExercises,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8)),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 12),
               ),
               items: [
-                const DropdownMenuItem<Exercise?>(
+                DropdownMenuItem<Exercise?>(
                   value: null,
-                  child: Text('All Exercises'),
+                  child: Text(_l10n.allExercises),
                 ),
                 ...exercises.map((ex) => DropdownMenuItem<Exercise?>(
                       value: ex,
@@ -468,7 +477,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'Last 30 days',
+                    _l10n.last30Days,
                     style: AppTextStyles.caption
                         .copyWith(color: AppColors.primary),
                   ),
@@ -489,22 +498,23 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Actual Max', style: AppTextStyles.caption),
+                          Text(_l10n.actualMax, style: AppTextStyles.caption),
                           const SizedBox(height: 6),
                           if (summary.actualMax != null) ...[
                             Text(
-                              '${summary.actualMax!.toStringAsFixed(1)} kg',
+                              _units.weight(summary.actualMax!),
                               style: AppTextStyles.h2
                                   .copyWith(color: AppColors.primary),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '1 rep · ${_formatDate(summary.actualMaxDate!)}',
+                              _l10n.oneRepOnDate(
+                                  _formatDate(summary.actualMaxDate!)),
                               style: AppTextStyles.caption,
                             ),
                           ] else
                             Text(
-                              'No 1-rep sets',
+                              _l10n.noOneRepSets,
                               style: AppTextStyles.body2.copyWith(
                                   color: AppColors.textSecondary),
                             ),
@@ -523,18 +533,18 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Estimated 1RM',
+                          Text(_l10n.estimated1RM,
                               style: AppTextStyles.caption),
                           const SizedBox(height: 6),
                           if (summary.estimated1RM != null) ...[
                             Text(
-                              '${summary.estimated1RM!.toStringAsFixed(1)} kg',
+                              _units.weight(summary.estimated1RM!),
                               style: AppTextStyles.h2
                                   .copyWith(color: AppColors.accent),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${summary.bestSetWeight!.toStringAsFixed(1)} kg × ${summary.bestSetReps} · ${_formatDate(summary.estimated1RMDate!)}',
+                              '${_units.weight(summary.bestSetWeight!)} × ${summary.bestSetReps} · ${_formatDate(summary.estimated1RMDate!)}',
                               style: AppTextStyles.caption,
                             ),
                           ],
@@ -549,7 +559,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 child: Padding(
                   padding: const EdgeInsets.all(32),
                   child: Text(
-                    'No workouts in last 30 days',
+                    _l10n.noWorkoutsLast30Days,
                     style: AppTextStyles.body1
                         .copyWith(color: AppColors.textSecondary),
                   ),
@@ -573,7 +583,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Record History', style: AppTextStyles.h3),
+            Text(_l10n.recordHistory, style: AppTextStyles.h3),
             const SizedBox(height: 16),
             ...history.map((record) => _buildHistoryItem(record)),
           ],
@@ -599,7 +609,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${record.weight.toStringAsFixed(1)} kg × ${record.reps}',
+                  '${_units.weight(record.weight)} × ${record.reps}',
                   style: AppTextStyles.body1
                       .copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -609,7 +619,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
             ),
           ),
           Text(
-            '1RM: ${record.estimated1RM.toStringAsFixed(1)} kg',
+            _l10n.oneRmValue(_units.weight(record.estimated1RM)),
             style: AppTextStyles.body2
                 .copyWith(color: AppColors.textSecondary),
           ),
@@ -632,12 +642,12 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                   size: 64,
                   color: AppColors.textSecondary.withValues(alpha: 0.5)),
               const SizedBox(height: 16),
-              Text('No records yet',
+              Text(_l10n.noRecordsYet,
                   style: AppTextStyles.h3
                       .copyWith(color: AppColors.textSecondary)),
               const SizedBox(height: 8),
               Text(
-                'Complete workouts to track your personal records',
+                _l10n.completeWorkoutsForRecords,
                 style: AppTextStyles.body2
                     .copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
@@ -666,7 +676,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('All Personal Records', style: AppTextStyles.h3),
+        Text(_l10n.allPersonalRecords, style: AppTextStyles.h3),
         const SizedBox(height: 16),
         ...sorted.map((entry) {
           final exercise = _getExerciseById(entry.key, dataManager);
@@ -711,14 +721,14 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
           children: [
             if (record.actualMax != null)
               Text(
-                '${record.actualMax!.toStringAsFixed(1)} kg',
+                _units.weight(record.actualMax!),
                 style: AppTextStyles.body1.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
                 ),
               ),
             Text(
-              'est. ${(record.estimated1RM ?? 0).toStringAsFixed(1)} kg',
+              _l10n.estimatedShort(_units.weight(record.estimated1RM ?? 0)),
               style: AppTextStyles.caption,
             ),
           ],
@@ -737,7 +747,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Federation', style: AppTextStyles.h3),
+            Text(_l10n.federation, style: AppTextStyles.h3),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _selectedFederation,
@@ -776,7 +786,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Your Weight Class', style: AppTextStyles.caption),
+                  Text(_l10n.yourWeightClass, style: AppTextStyles.caption),
                   const SizedBox(height: 4),
                   Text(weightClass,
                       style:
@@ -784,8 +794,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 ],
               ),
             ),
-            Text('${userWeight.toStringAsFixed(1)} kg',
-                style: AppTextStyles.h3),
+            Text(_units.weight(userWeight), style: AppTextStyles.h3),
           ],
         ),
       ),
@@ -801,6 +810,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     final wilks = _calculateWilksCoefficient(bodyWeight, summary.estimated1RM!);
     final dots = _calculateDotsCoefficient(bodyWeight, summary.estimated1RM!);
 
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -809,24 +819,24 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Strength Coefficients', style: AppTextStyles.h3),
+            Text(_l10n.strengthCoefficients, style: AppTextStyles.h3),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: _buildCoefficientItem('Wilks', wilks,
+                  child: _buildCoefficientItem(_l10n.wilks, wilks,
                       _getWilksRating(wilks), AppColors.primary),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildCoefficientItem('Dots', dots,
+                  child: _buildCoefficientItem(_l10n.dots, dots,
                       _getDotsRating(dots), AppColors.accent),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Text(
-              'These coefficients normalize your strength relative to body weight for fair comparison',
+              _l10n.coefficientsDesc,
               style: AppTextStyles.caption
                   .copyWith(color: AppColors.textSecondary),
             ),
@@ -896,11 +906,11 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total Strength', style: AppTextStyles.h3),
+                      Text(_l10n.totalStrength, style: AppTextStyles.h3),
                       Text(
                           foundLifts == 3
-                              ? 'Big 3 Total'
-                              : '$foundLifts/3 lifts',
+                              ? _l10n.big3Total
+                              : _l10n.liftsOutOfThree(foundLifts),
                           style: AppTextStyles.caption),
                     ],
                   ),
@@ -912,15 +922,15 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Column(children: [
-                  Text('Total', style: AppTextStyles.caption),
+                  Text(_l10n.total, style: AppTextStyles.caption),
                   const SizedBox(height: 4),
-                  Text('${total.toStringAsFixed(1)} kg',
+                  Text(_units.weight(total),
                       style: AppTextStyles.h2
                           .copyWith(color: AppColors.primary)),
                 ]),
                 Container(width: 1, height: 40, color: AppColors.divider),
                 Column(children: [
-                  Text('Wilks', style: AppTextStyles.caption),
+                  Text(_l10n.wilks, style: AppTextStyles.caption),
                   const SizedBox(height: 4),
                   Text(wilks.toStringAsFixed(1),
                       style: AppTextStyles.h2
@@ -928,7 +938,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                 ]),
                 Container(width: 1, height: 40, color: AppColors.divider),
                 Column(children: [
-                  Text('Dots', style: AppTextStyles.caption),
+                  Text(_l10n.dots, style: AppTextStyles.caption),
                   const SizedBox(height: 4),
                   Text(dots.toStringAsFixed(1),
                       style: AppTextStyles.h2
@@ -958,7 +968,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ExpansionTile(
-        title: Text(exercise, style: AppTextStyles.body1),
+        title: Text(_liftLabel(exercise), style: AppTextStyles.body1),
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
@@ -979,7 +989,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
                         ],
                       ),
                       Text(
-                        '${entry.value.toStringAsFixed(1)} kg',
+                        _units.weight(entry.value),
                         style: AppTextStyles.body1.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary),
@@ -1086,32 +1096,41 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
     return weight * (1 + reps / 30.0);
   }
 
-  double _calculateWilksCoefficient(double bodyWeight, double totalLifted,
-          {bool isMale = true}) =>
-      StrengthCoefficients.wilks(bodyWeight, totalLifted, isMale: isMale);
+  bool get _isMale =>
+      Provider.of<ProfileService>(context, listen: false).gender != 'female';
 
-  double _calculateDotsCoefficient(double bodyWeight, double totalLifted,
-          {bool isMale = true}) =>
-      StrengthCoefficients.dots(bodyWeight, totalLifted, isMale: isMale);
+  double _calculateWilksCoefficient(double bodyWeight, double totalLifted) =>
+      StrengthCoefficients.wilks(bodyWeight, totalLifted, isMale: _isMale);
+
+  double _calculateDotsCoefficient(double bodyWeight, double totalLifted) =>
+      StrengthCoefficients.dots(bodyWeight, totalLifted, isMale: _isMale);
 
   String _formatDate(DateTime date) =>
       '${date.day}.${date.month}.${date.year}';
 
   String _getWilksRating(double wilks) {
-    if (wilks < 250) return 'Beginner';
-    if (wilks < 350) return 'Intermediate';
-    if (wilks < 450) return 'Advanced';
-    if (wilks < 550) return 'Elite';
-    return 'World Class';
+    if (wilks < 250) return _l10n.ratingBeginner;
+    if (wilks < 350) return _l10n.ratingIntermediate;
+    if (wilks < 450) return _l10n.ratingAdvanced;
+    if (wilks < 550) return _l10n.ratingElite;
+    return _l10n.ratingWorldClass;
   }
 
   String _getDotsRating(double dots) {
-    if (dots < 300) return 'Beginner';
-    if (dots < 400) return 'Intermediate';
-    if (dots < 500) return 'Advanced';
-    if (dots < 600) return 'Elite';
-    return 'World Class';
+    if (dots < 300) return _l10n.ratingBeginner;
+    if (dots < 400) return _l10n.ratingIntermediate;
+    if (dots < 500) return _l10n.ratingAdvanced;
+    if (dots < 600) return _l10n.ratingElite;
+    return _l10n.ratingWorldClass;
   }
+
+  String _liftLabel(String key) => switch (key) {
+        'Squat' => _l10n.liftSquat,
+        'Bench Press' => _l10n.liftBenchPress,
+        'Deadlift' => _l10n.liftDeadlift,
+        'Total' => _l10n.total,
+        _ => key,
+      };
 
   String _getWeightClass(double weight) {
     if (weight <= 59) return '-59 kg';
