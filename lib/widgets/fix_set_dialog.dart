@@ -156,6 +156,8 @@ class FixSetButton extends StatelessWidget {
         label: const Text('Fix'),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.warning,
+          iconColor: AppColors.warning,
+          backgroundColor: enabled ? AppColors.surface : null,
           side: BorderSide(
             color: enabled ? AppColors.warning : AppColors.divider,
           ),
