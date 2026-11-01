@@ -221,6 +221,7 @@ class _WorkoutCardWidget extends StatefulWidget {
 
 class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
   bool _isExpanded = false;
+  bool _isNoteExpanded = false;
 
   Map<String, int> _getPreviousSessionReps() {
     final dataManager = DataManager();
@@ -489,8 +490,60 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                 );
               }),
             ],
+            if (widget.workout.hasNote) ...[
+              const SizedBox(height: 8),
+              _buildNoteSection(widget.workout.note!.trim()),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoteSection(String note) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () => setState(() => _isNoteExpanded = !_isNoteExpanded),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.sticky_note_2_outlined,
+                      size: 18, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Note',
+                      style: AppTextStyles.body2.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _isNoteExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_isNoteExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Text(note, style: AppTextStyles.body2),
+            ),
+        ],
       ),
     );
   }
