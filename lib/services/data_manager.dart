@@ -1185,6 +1185,17 @@ class DataManager extends ChangeNotifier {
     _updateChallengeScoresAfterWorkout();
   }
 
+  void updateWorkoutHistoryNote(String historyId, String? note) {
+    final index = _workoutHistory.indexWhere((h) => h.id == historyId);
+    if (index == -1) return;
+
+    final trimmed = note?.trim();
+    _workoutHistory[index] = _workoutHistory[index]
+        .copyWithNote(trimmed == null || trimmed.isEmpty ? null : trimmed);
+    _scheduleSave();
+    notifyListeners();
+  }
+
   Future<void> _updateChallengeScoresAfterWorkout() async {
     try {
       final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid;
