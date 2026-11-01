@@ -10,6 +10,7 @@ import '../services/friends_service.dart';
 import '../services/challenge_service.dart';
 import '../services/auth_service.dart';
 import '../models/challenge.dart';
+import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
 import 'stats_comparison_screen.dart';
 
@@ -121,10 +122,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           children: [
             Icon(Icons.lock_outline, size: 56, color: AppColors.textSecondary),
             const SizedBox(height: 16),
-            Text('Private Profile', style: AppTextStyles.h3),
+            Text(AppLocalizations.of(context)!.privateProfile, style: AppTextStyles.h3),
             const SizedBox(height: 8),
             Text(
-              '${widget.friend.name} has a private profile.\nOnly their username and avatar are visible.',
+              AppLocalizations.of(context)!.privateProfileDesc(widget.friend.name),
               style:
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
@@ -156,9 +157,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       children: [
         Expanded(
           child: _buildStatCard(
-            'Streak',
+            AppLocalizations.of(context)!.streak,
             '${stats.currentStreak}',
-            'days',
+            AppLocalizations.of(context)!.days,
             Icons.local_fire_department,
             Colors.orange,
           ),
@@ -169,9 +170,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              'Weight',
-              widget.friend.weight!.toStringAsFixed(1),
-              'kg',
+              AppLocalizations.of(context)!.weight,
+              Units.of(context).weightValue(widget.friend.weight!),
+              Units.of(context).weightLabel,
               Icons.monitor_weight_outlined,
               Colors.teal,
             ),
@@ -199,7 +200,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 style: AppTextStyles.h3.copyWith(color: rank.color)),
             const SizedBox(height: 2),
             Text(
-              'Rank',
+              AppLocalizations.of(context)!.rank,
               style: AppTextStyles.caption
                   .copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
@@ -237,7 +238,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Widget _buildVolumeCard(UserStats stats) {
-    final volumeT = (stats.totalWeightLifted / 1000).toStringAsFixed(1);
+    final units = Units.of(context);
+    final volumeThousands =
+        Units.number(units.toDisplayWeight(stats.totalWeightLifted) / 1000);
+    final volumeText = units.isLb
+        ? '$volumeThousands ${AppLocalizations.of(context)!.thousandSuffix} ${units.weightLabel}'
+        : AppLocalizations.of(context)!.tonnesShort(volumeThousands);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -258,9 +264,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total Volume', style: AppTextStyles.caption),
+                Text(AppLocalizations.of(context)!.totalVolume, style: AppTextStyles.caption),
                 Text(
-                  '$volumeT t',
+                  volumeText,
                   style: AppTextStyles.h3.copyWith(color: Colors.deepPurple),
                 ),
               ],
@@ -269,7 +275,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('Workouts', style: AppTextStyles.caption),
+                Text(AppLocalizations.of(context)!.workouts, style: AppTextStyles.caption),
                 Text(
                   '${stats.workoutCount}',
                   style: AppTextStyles.h3.copyWith(color: AppColors.primary),
@@ -290,7 +296,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: ElevatedButton.icon(
             onPressed: () => _showChallengeDialog(context),
             icon: const Icon(Icons.emoji_events),
-            label: const Text('Challenge'),
+            label: Text(AppLocalizations.of(context)!.challenge),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
@@ -317,7 +323,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               );
             },
             icon: const Icon(Icons.compare_arrows),
-            label: const Text('Compare Stats'),
+            label: Text(AppLocalizations.of(context)!.compareStats),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -347,10 +353,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Challenge ${widget.friend.name}', style: AppTextStyles.h3),
+            Text(AppLocalizations.of(context)!.challengeFriend(widget.friend.name),
+                style: AppTextStyles.h3),
             const SizedBox(height: 16),
             Text(
-              'Choose a challenge type',
+              AppLocalizations.of(context)!.chooseChallengeType,
               style:
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
@@ -414,7 +421,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result == 'success'
-              ? 'Challenge sent to ${widget.friend.name}!'
+              ? AppLocalizations.of(context)!.challengeSentTo(widget.friend.name)
               : result),
           backgroundColor:
               result == 'success' ? AppColors.success : AppColors.error,
