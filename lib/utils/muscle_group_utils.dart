@@ -1,73 +1,44 @@
+import '../l10n/l10n.dart';
 import '../models/exercise.dart';
-import '../constants/app_strings.dart';
 
 class MuscleGroupUtils {
   static String getLabel(MuscleGroup group) {
     switch (group) {
       case MuscleGroup.chest:
-        return AppStrings.muscleGroupChest;
+        return L10n.current.muscleGroupChest;
       case MuscleGroup.back:
-        return AppStrings.muscleGroupBack;
+        return L10n.current.muscleGroupBack;
       case MuscleGroup.legs:
-        return AppStrings.muscleGroupLegs;
+        return L10n.current.muscleGroupLegs;
       case MuscleGroup.shoulders:
-        return AppStrings.muscleGroupShoulders;
+        return L10n.current.muscleGroupShoulders;
       case MuscleGroup.biceps:
-        return AppStrings.muscleGroupBiceps;
+        return L10n.current.muscleGroupBiceps;
       case MuscleGroup.triceps:
-        return AppStrings.muscleGroupTriceps;
+        return L10n.current.muscleGroupTriceps;
       case MuscleGroup.forearms:
-        return AppStrings.muscleGroupForearms;
+        return L10n.current.muscleGroupForearms;
       case MuscleGroup.wrists:
-        return AppStrings.muscleGroupWrists;
+        return L10n.current.muscleGroupWrists;
       case MuscleGroup.core:
-        return AppStrings.muscleGroupCore;
+        return L10n.current.muscleGroupCore;
       case MuscleGroup.glutes:
-        return AppStrings.muscleGroupGlutes;
+        return L10n.current.muscleGroupGlutes;
       case MuscleGroup.calves:
-        return AppStrings.muscleGroupCalves;
+        return L10n.current.muscleGroupCalves;
       case MuscleGroup.cardio:
-        return AppStrings.muscleGroupCardio;
+        return L10n.current.muscleGroupCardio;
     }
   }
 
   static String getIntensityLabel(MuscleGroupIntensity intensity) {
     switch (intensity) {
       case MuscleGroupIntensity.primary:
-        return AppStrings.intensityPrimary;
+        return L10n.current.intensityPrimary;
       case MuscleGroupIntensity.secondary:
-        return AppStrings.intensitySecondary;
+        return L10n.current.intensitySecondary;
       case MuscleGroupIntensity.stabilizer:
-        return AppStrings.intensityStabilizer;
-    }
-  }
-
-  static String getDescription(MuscleGroup group) {
-    switch (group) {
-      case MuscleGroup.chest:
-        return 'Pectoral muscles';
-      case MuscleGroup.back:
-        return 'Back muscles including lats and traps';
-      case MuscleGroup.legs:
-        return 'Quadriceps and hamstrings';
-      case MuscleGroup.shoulders:
-        return 'Deltoid muscles';
-      case MuscleGroup.biceps:
-        return 'Front arm muscles';
-      case MuscleGroup.triceps:
-        return 'Back arm muscles';
-      case MuscleGroup.forearms:
-        return 'Lower arm muscles';
-      case MuscleGroup.wrists:
-        return 'Wrist flexors and extensors';
-      case MuscleGroup.core:
-        return 'Abdominal and lower back muscles';
-      case MuscleGroup.glutes:
-        return 'Gluteal muscles';
-      case MuscleGroup.calves:
-        return 'Lower leg muscles';
-      case MuscleGroup.cardio:
-        return 'Cardiovascular exercise';
+        return L10n.current.intensityStabilizer;
     }
   }
 
