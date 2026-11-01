@@ -12,7 +12,7 @@ import '../services/auth_service.dart';
 import '../services/data_manager.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
+import '../utils/units.dart';
 import 'login_screen.dart';
 import 'customization_screen.dart';
 import 'weight_screen.dart';
@@ -128,7 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ? nickname
                                 : (firebaseUser?.displayName?.isNotEmpty == true
                                     ? firebaseUser!.displayName!
-                                    : (_cachedUser?.name ?? 'User Name'));
+                                    : (_cachedUser?.name ??
+                                        AppLocalizations.of(context)!.userNamePlaceholder));
 
                         return Text(
                           displayText,
@@ -154,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppStrings.progress,
+                      AppLocalizations.of(context)!.progress,
                       style: AppTextStyles.h3,
                     ),
                     const SizedBox(height: 16),
@@ -162,9 +163,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                       children: [
                         Expanded(
                           child: _buildStatCard(
-                            'Body Weight',
+                            AppLocalizations.of(context)!.bodyWeight,
                             profile.weightKg != null
-                                ? '${profile.weightKg!.toStringAsFixed(1)} kg'
+                                ? Units.of(context).weight(profile.weightKg!)
                                 : '—',
                             Icons.monitor_weight,
                           ),
@@ -172,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildStatCard(
-                            'Workouts',
+                            AppLocalizations.of(context)!.workouts,
                             dataManager.totalWorkouts().toString(),
                             Icons.fitness_center,
                           ),
@@ -182,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     const SizedBox(height: 24),
                     _buildMenuItem(
                       context,
-                      'Progress Charts',
+                      AppLocalizations.of(context)!.progressCharts,
                       Icons.show_chart,
                       () {
                         Navigator.of(context).push(
@@ -194,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      'About Me',
+                      AppLocalizations.of(context)!.aboutMe,
                       Icons.fitness_center,
                       () {
                         Navigator.of(context).push(
@@ -206,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      AppStrings.oneRepMax,
+                      AppLocalizations.of(context)!.oneRepMaxFull,
                       Icons.fitness_center,
                       () {
                         Navigator.of(context).push(
@@ -218,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      AppStrings.wellness,
+                      AppLocalizations.of(context)!.wellness,
                       Icons.favorite,
                       () {
                         Navigator.of(context).push(
@@ -230,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      'Customisation',
+                      AppLocalizations.of(context)!.customisation,
                       Icons.color_lens,
                       () {
                         Navigator.of(context).push(
@@ -242,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      'Achievements',
+                      AppLocalizations.of(context)!.achievements,
                       Icons.emoji_events,
                       () {
                         Navigator.of(context).push(
@@ -254,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      AppStrings.bodyWeight,
+                      AppLocalizations.of(context)!.bodyWeight,
                       Icons.monitor_weight,
                       () {
                         Navigator.of(context).push(
@@ -266,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      'Nutrition',
+                      AppLocalizations.of(context)!.nutrition,
                       Icons.restaurant_menu,
                       () {
                         Navigator.of(context).push(
@@ -278,7 +279,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     _buildMenuItem(
                       context,
-                      'AI Config',
+                      AppLocalizations.of(context)!.aiConfig,
                       Icons.smart_toy,
                       () {
                         Navigator.of(context).push(
@@ -312,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                         ),
                         child: Text(
-                          AppStrings.logout,
+                          AppLocalizations.of(context)!.logout,
                           style: AppTextStyles.button,
                         ),
                       ),
