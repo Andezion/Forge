@@ -53,7 +53,9 @@ class _CompactCalendarState extends State<CompactCalendar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                DateFormat('MMMM yyyy').format(_focusedDay),
+                toBeginningOfSentenceCase(DateFormat('LLLL yyyy',
+                        Localizations.localeOf(context).toString())
+                    .format(_focusedDay))!,
                 style: AppTextStyles.h4.copyWith(
                   color: AppColors.textPrimary,
                 ),
@@ -88,6 +90,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
           ),
           const SizedBox(height: 8),
           TableCalendar(
+            locale: Localizations.localeOf(context).toString(),
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
