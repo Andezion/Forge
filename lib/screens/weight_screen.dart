@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../services/profile_service.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/app_colors.dart';
+import '../utils/units.dart';
 
 class WeightScreen extends StatefulWidget {
   const WeightScreen({super.key});
@@ -14,41 +16,62 @@ class WeightScreen extends StatefulWidget {
 }
 
 class _WeightScreenState extends State<WeightScreen> {
-  final int _minKg = 30;
-  final int _maxKg = 200;
-  late int _selectedKg;
-  late int _selectedGramsIndex;
-  final List<int> _gramsList = List<int>.generate(10, (i) => i * 100);
+  static const double _minKg = 30;
+  static const double _maxKg = 200;
+  static const double _defaultKg = 75;
+
+  late final Units _units;
+  late final int _minWhole;
+  late final int _maxWhole;
+  late int _selectedWhole;
+  late int _selectedTenths;
+  double? _initialKg;
+  late final int _initialWhole;
+  late final int _initialTenths;
 
   @override
   void initState() {
     super.initState();
+    _units = Units.of(context, listen: false);
+    _minWhole = _units.toDisplayWeight(_minKg).floor();
+    _maxWhole = _units.toDisplayWeight(_maxKg).ceil();
+
     final profile = Provider.of<ProfileService>(context, listen: false);
-    final current = profile.weightKg ?? 75.0;
-    _selectedKg = current.floor();
-    final grams = ((current - _selectedKg) * 1000).round();
-    final g = (grams / 100).round();
-    _selectedGramsIndex = g.clamp(0, _gramsList.length - 1);
+    _initialKg = profile.weightKg;
+    _setFromKg(_initialKg ?? _defaultKg);
+    _initialWhole = _selectedWhole;
+    _initialTenths = _selectedTenths;
   }
 
-  double _composeWeight() {
-    final grams = _gramsList[_selectedGramsIndex];
-    return _selectedKg + grams / 1000.0;
+  void _setFromKg(double kg) {
+    final tenthsTotal = (_units.toDisplayWeight(kg) * 10).round();
+    _selectedWhole = (tenthsTotal ~/ 10).clamp(_minWhole, _maxWhole);
+    _selectedTenths = tenthsTotal % 10;
+  }
+
+  double _composeWeightKg() {
+    if (_initialKg != null &&
+        _selectedWhole == _initialWhole &&
+        _selectedTenths == _initialTenths) {
+      return _initialKg!;
+    }
+    return _units.toKg(_selectedWhole + _selectedTenths / 10.0);
   }
 
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileService>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weight', style: AppTextStyles.h4),
+        title: Text(l10n.weight, style: AppTextStyles.h4),
         backgroundColor: AppColors.primary,
       ),
       body: Column(
         children: [
           const SizedBox(height: 24),
-          Text('Specify your current weight', style: AppTextStyles.h3),
+          Text(l10n.specifyWeight, style: AppTextStyles.h3),
           const SizedBox(height: 24),
           Expanded(
             child: Row(
@@ -57,14 +80,15 @@ class _WeightScreenState extends State<WeightScreen> {
                   child: CupertinoPicker.builder(
                     itemExtent: 40,
                     scrollController: FixedExtentScrollController(
-                        initialItem: (_selectedKg - _minKg)),
-                    childCount: _maxKg - _minKg + 1,
+                        initialItem: (_selectedWhole - _minWhole)),
+                    childCount: _maxWhole - _minWhole + 1,
                     onSelectedItemChanged: (i) =>
-                        setState(() => _selectedKg = _minKg + i),
+                        setState(() => _selectedWhole = _minWhole + i),
                     itemBuilder: (context, index) {
-                      final kg = _minKg + index;
+                      final value = _minWhole + index;
                       return Center(
-                          child: Text('$kg kg', style: AppTextStyles.body1));
+                          child: Text('$value ${_units.weightLabel}',
+                              style: AppTextStyles.body1));
                     },
                   ),
                 ),
@@ -73,14 +97,13 @@ class _WeightScreenState extends State<WeightScreen> {
                   child: CupertinoPicker.builder(
                     itemExtent: 40,
                     scrollController: FixedExtentScrollController(
-                        initialItem: _selectedGramsIndex),
-                    childCount: _gramsList.length,
+                        initialItem: _selectedTenths),
+                    childCount: 10,
                     onSelectedItemChanged: (i) =>
-                        setState(() => _selectedGramsIndex = i),
+                        setState(() => _selectedTenths = i),
                     itemBuilder: (context, index) {
-                      final g = _gramsList[index] ~/ 100;
                       return Center(
-                          child: Text('.$g', style: AppTextStyles.body1));
+                          child: Text('.$index', style: AppTextStyles.body1));
                     },
                   ),
                 ),
@@ -97,20 +120,20 @@ class _WeightScreenState extends State<WeightScreen> {
                     child: OutlinedButton(
                       onPressed: () async {
                         setState(() {
-                          _selectedKg = 75;
-                          _selectedGramsIndex = 0;
+                          _initialKg = null;
+                          _setFromKg(_defaultKg);
                         });
                       },
                       style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.black),
-                      child: const Text('Reset'),
+                      child: Text(l10n.reset),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        final weight = _composeWeight();
+                        final weight = _composeWeightKg();
                         await profile.setWeightKg(weight);
                         if (!context.mounted) return;
                         Navigator.of(context).pop();
@@ -118,7 +141,7 @@ class _WeightScreenState extends State<WeightScreen> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.black),
-                      child: const Text('Save'),
+                      child: Text(l10n.save),
                     ),
                   ),
                 ],
