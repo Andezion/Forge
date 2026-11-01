@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import '../l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/overall_rank_result.dart';
@@ -127,10 +128,9 @@ class RankingAlgorithm {
 
   static String _buildReason(RankSignals s) {
     final liftsPart = s.perExerciseRankPositions.isEmpty
-        ? 'your training consistency and achievements'
-        : '${s.perExerciseRankPositions.length} tracked lift(s) measured against world-record benchmarks';
-    return 'Based on $liftsPart, ${s.workoutCount} logged workouts and a '
-        '${s.currentStreak}-day streak.';
+        ? L10n.current.rankReasonConsistency
+        : L10n.current.rankReasonLifts(s.perExerciseRankPositions.length);
+    return L10n.current.rankReasonSummary(liftsPart, s.workoutCount, s.currentStreak);
   }
 
   static OverallRankResult deterministicFallback(RankSignals s, {DateTime? now}) {
@@ -145,7 +145,7 @@ class RankingAlgorithm {
       dataSource: RankDataSource.heuristic,
       confidence: 0.25,
       reason:
-          'Not enough workout history yet — rank will refine as you log more sessions.',
+          L10n.current.rankReasonNotEnough,
       computedAt: now ?? DateTime.now(),
     );
   }
