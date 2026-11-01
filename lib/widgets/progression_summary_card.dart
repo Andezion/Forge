@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/l10n.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/progression_service.dart';
@@ -41,7 +43,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       if (histories.isEmpty) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Not enough data';
+          _errorMessage = L10n.current.notEnoughData;
         });
         return;
       }
@@ -86,7 +88,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Error loading data: $e';
+        _errorMessage = L10n.current.errorLoadingData('$e');
       });
     }
   }
@@ -131,8 +133,8 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       child: InkWell(
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Select a workout to view detailed analytics'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.selectWorkoutForAnalyticsHint),
             ),
           );
         },
@@ -151,7 +153,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Workout Progress',
+                    AppLocalizations.of(context)!.workoutProgress,
                     style: AppTextStyles.h2,
                   ),
                 ],
@@ -192,7 +194,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Recommended Deload Week',
+              AppLocalizations.of(context)!.recommendedDeloadWeek,
               style: AppTextStyles.body2.copyWith(
                 color: Colors.orange.shade900,
                 fontWeight: FontWeight.w600,
@@ -209,7 +211,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
 
     if (total == 0) {
       return Text(
-        'Complete more workouts for analysis',
+        AppLocalizations.of(context)!.completeMoreWorkouts,
         style: AppTextStyles.body2.copyWith(
           color: AppColors.textSecondary,
         ),
@@ -220,21 +222,21 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
       children: [
         _buildStatRow(
           icon: Icons.trending_up,
-          label: 'Improving',
+          label: AppLocalizations.of(context)!.improving,
           value: _improvingExercises,
           color: Colors.green,
         ),
         const SizedBox(height: 8),
         _buildStatRow(
           icon: Icons.trending_flat,
-          label: 'Stable',
+          label: AppLocalizations.of(context)!.stable,
           value: _stableExercises,
           color: Colors.limeAccent,
         ),
         const SizedBox(height: 8),
         _buildStatRow(
           icon: Icons.trending_down,
-          label: 'Declining',
+          label: AppLocalizations.of(context)!.declining,
           value: _decliningExercises,
           color: Colors.red,
         ),
