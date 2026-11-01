@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/workout.dart';
+import '../utils/units.dart';
 
 Future<void> showWorkoutPreviewSheet(
   BuildContext context, {
@@ -75,7 +76,7 @@ class _WorkoutPreviewSheet extends StatelessWidget {
                       itemCount: exercises.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) =>
-                          _buildExerciseTile(exercises[i], i + 1),
+                          _buildExerciseTile(Units.of(context), exercises[i], i + 1),
                     ),
             ),
           ],
@@ -84,7 +85,7 @@ class _WorkoutPreviewSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildExerciseTile(WorkoutExercise we, int number) {
+  Widget _buildExerciseTile(Units units, WorkoutExercise we, int number) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -119,7 +120,7 @@ class _WorkoutPreviewSheet extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${we.sets} × ${we.targetReps}'
-                  '${we.weight > 0 ? ' · ${we.weight} kg' : ''}',
+                  '${we.weight > 0 ? ' · ${units.weight(we.weight)}' : ''}',
                   style: AppTextStyles.caption
                       .copyWith(color: AppColors.textSecondary),
                 ),
