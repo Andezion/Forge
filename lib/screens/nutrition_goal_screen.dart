@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../models/nutrition_profile.dart';
 import '../services/nutrition_service.dart';
@@ -27,27 +28,27 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
     NutritionGoal.aggressiveFatLoss: (
       icon: Icons.local_fire_department,
       color: Color(0xFFF44336),
-      tag: '-500 kcal',
+      tag: '-500',
     ),
     NutritionGoal.fatLoss: (
       icon: Icons.trending_down,
       color: Color(0xFFFF9800),
-      tag: '-300 kcal',
+      tag: '-300',
     ),
     NutritionGoal.maintain: (
       icon: Icons.balance,
       color: Color(0xFF4CAF50),
-      tag: '0 kcal',
+      tag: '0',
     ),
     NutritionGoal.leanBulk: (
       icon: Icons.trending_up,
       color: Color(0xFF2196F3),
-      tag: '+250 kcal',
+      tag: '+250',
     ),
     NutritionGoal.bulk: (
       icon: Icons.fitness_center,
       color: Color(0xFF9C27B0),
-      tag: '+500 kcal',
+      tag: '+500',
     ),
   };
 
@@ -67,7 +68,7 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
           backgroundColor: appColor.color,
           foregroundColor: AppColors.textOnPrimary,
           title: Text(
-            'Nutrition Goal',
+            AppLocalizations.of(context)!.nutritionGoal,
             style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
           ),
         ),
@@ -78,12 +79,12 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
                 padding: const EdgeInsets.all(16),
                 children: [
                   Text(
-                    'What is your nutrition goal?',
+                    AppLocalizations.of(context)!.nutritionGoalQuestion,
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'This determines your daily calorie target and macro split.',
+                    AppLocalizations.of(context)!.nutritionGoalDesc,
                     style: AppTextStyles.body2.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -96,7 +97,7 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
                       goal: goal,
                       icon: meta.icon,
                       accentColor: meta.color,
-                      tag: meta.tag,
+                      tag: AppLocalizations.of(context)!.kcalValue(meta.tag),
                       isSelected: isSelected,
                       primaryColor: appColor.color,
                       onTap: () => setState(() => _selected = goal),
@@ -121,7 +122,7 @@ class _NutritionGoalScreenState extends State<NutritionGoalScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text('Confirm Goal', style: AppTextStyles.button),
+                    child: Text(AppLocalizations.of(context)!.confirmGoal, style: AppTextStyles.button),
                   ),
                 ),
               ),
