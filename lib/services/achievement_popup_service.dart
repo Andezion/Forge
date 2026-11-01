@@ -2,7 +2,9 @@ import 'dart:math' as math;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/l10n.dart';
 import '../models/overall_rank_result.dart';
+import '../utils/units.dart';
 import '../models/rank_popup_event.dart';
 import '../models/strength_rank.dart';
 import '../models/workout_history.dart';
@@ -32,8 +34,8 @@ class AchievementPopupService {
           events.add(RankPopupEvent(
             type: RankPopupEventType.rankUp,
             dedupeKey: key,
-            title: 'Rank Up!',
-            message: 'You\'ve reached ${freshRank.rank.displayName} rank.',
+            title: L10n.current.popupRankUpTitle,
+            message: L10n.current.popupRankUpMessage(freshRank.rank.displayName),
             badgeRank: freshRank.rank,
           ));
         }
@@ -41,8 +43,8 @@ class AchievementPopupService {
         events.add(RankPopupEvent(
           type: RankPopupEventType.majorImprovement,
           dedupeKey: '',
-          title: 'Great Progress!',
-          message: 'Your overall rank score is climbing fast.',
+          title: L10n.current.popupGreatProgressTitle,
+          message: L10n.current.popupGreatProgressMessage,
           badgeRank: freshRank.rank,
         ));
       }
@@ -66,9 +68,9 @@ class AchievementPopupService {
       events.add(RankPopupEvent(
         type: RankPopupEventType.newRecord,
         dedupeKey: key,
-        title: 'New Personal Record!',
+        title: L10n.current.popupNewRecordTitle,
         message:
-            '${er.exercise.name}: ${maxWeightThisSession.toStringAsFixed(1)} kg',
+            '${er.exercise.name}: ${Units.current.weight(maxWeightThisSession)}',
         badgeRank: freshRank.rank,
       ));
     }
@@ -79,8 +81,8 @@ class AchievementPopupService {
         events.add(RankPopupEvent(
           type: RankPopupEventType.firstTime,
           dedupeKey: key,
-          title: 'First Workout Complete!',
-          message: 'Welcome to your strength journey.',
+          title: L10n.current.popupFirstWorkoutTitle,
+          message: L10n.current.popupFirstWorkoutMessage,
           badgeRank: freshRank.rank,
         ));
       }
