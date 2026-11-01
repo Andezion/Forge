@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
+import '../utils/units.dart';
 
 enum AchievementCategory { workouts, strength, consistency, social, special }
 
@@ -26,6 +28,60 @@ class Achievement {
     this.unlockedAt,
     this.currentProgress = 0,
   });
+
+  String get localizedTitle {
+    final l = L10n.current;
+    return switch (id) {
+      'first_workout' => l.achFirstWorkoutTitle,
+      'workout_10' => l.achWorkout10Title,
+      'workout_50' => l.achWorkout50Title,
+      'workout_100' => l.achWorkout100Title,
+      'workout_500' => l.achWorkout500Title,
+      'total_weight_1000' => l.achWeight1000Title,
+      'total_weight_10000' => l.achWeight10000Title,
+      'total_weight_100000' => l.achWeight100000Title,
+      'wilks_300' => l.achWilks300Title,
+      'wilks_400' => l.achWilks400Title,
+      'streak_7' => l.achStreak7Title,
+      'streak_30' => l.achStreak30Title,
+      'streak_100' => l.achStreak100Title,
+      'early_bird' => l.achEarlyBirdTitle,
+      'night_owl' => l.achNightOwlTitle,
+      'first_friend' => l.achFirstFriendTitle,
+      'friends_10' => l.achFriends10Title,
+      'challenge_winner' => l.achChallengeWinnerTitle,
+      'challenge_5' => l.achChallenge5Title,
+      'new_year' => l.achNewYearTitle,
+      'birthday' => l.achBirthdayTitle,
+      'perfect_week' => l.achPerfectWeekTitle,
+      _ => title,
+    };
+  }
+
+  String get localizedDescription {
+    final l = L10n.current;
+    final units = Units.current;
+    return switch (id) {
+      'first_workout' => l.achFirstWorkoutDesc,
+      'workout_10' || 'workout_50' || 'workout_100' || 'workout_500' =>
+        l.achCompleteWorkouts(requiredValue),
+      'total_weight_1000' || 'total_weight_10000' || 'total_weight_100000' =>
+        l.achLiftTotal(units.weight(requiredValue.toDouble(), decimals: 0)),
+      'wilks_300' || 'wilks_400' => l.achReachWilks(requiredValue),
+      'streak_7' || 'streak_30' || 'streak_100' =>
+        l.achTrainDaysInRow(requiredValue),
+      'early_bird' => l.achEarlyBirdDesc,
+      'night_owl' => l.achNightOwlDesc,
+      'first_friend' => l.achFirstFriendDesc,
+      'friends_10' => l.achFriends10Desc,
+      'challenge_winner' => l.achChallengeWinnerDesc,
+      'challenge_5' => l.achChallenge5Desc,
+      'new_year' => l.achNewYearDesc,
+      'birthday' => l.achBirthdayDesc,
+      'perfect_week' => l.achPerfectWeekDesc,
+      _ => description,
+    };
+  }
 
   double get progressPercentage {
     if (isUnlocked) return 1.0;
