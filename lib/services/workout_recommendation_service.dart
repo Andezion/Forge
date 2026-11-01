@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../l10n/l10n.dart';
 import '../models/workout.dart';
 import '../models/workout_recommendation.dart';
 import '../models/workout_history.dart';
@@ -111,7 +112,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
     final exerciseRecommendations = <ExerciseRecommendation>[];
     for (var exercise in adjustedWorkout.exercises) {
-      final reason = reasons[exercise.exercise.id] ?? 'Standard progression';
+      final reason = reasons[exercise.exercise.id] ?? L10n.current.standardProgression;
       final confidence = _calculateExerciseConfidence(
         exercise.exercise.id,
         histories,
@@ -539,7 +540,7 @@ class WorkoutRecommendationService extends ChangeNotifier {
     final reasons = <String>[];
 
     if (needsDeload) {
-      reasons.add('Deload week recommended for recovery');
+      reasons.add(L10n.current.reasonDeloadRecommended);
     }
 
     final readiness = factors['readiness'] as double;
@@ -552,55 +553,55 @@ class WorkoutRecommendationService extends ChangeNotifier {
 
     if (level == RecommendationLevel.rest) {
       if (daysSince < 1) {
-        reasons.add('Rest day - you trained yesterday');
+        reasons.add(L10n.current.reasonRestTrainedYesterday);
       } else if (readiness < 0.4) {
-        reasons.add('Rest day - wellness indicators suggest recovery needed');
+        reasons.add(L10n.current.reasonRestWellness);
       } else {
-        reasons.add('Rest day recommended based on overall condition');
+        reasons.add(L10n.current.reasonRestOverall);
       }
     } else {
       if (readiness >= 0.75) {
-        reasons.add('High readiness - great day for training');
+        reasons.add(L10n.current.reasonHighReadiness);
       } else if (readiness >= 0.6) {
-        reasons.add('Good readiness for a moderate workout');
+        reasons.add(L10n.current.reasonGoodReadiness);
       } else {
-        reasons.add('Light training recommended today');
+        reasons.add(L10n.current.reasonLightTraining);
       }
 
       if (daysSince >= 3) {
-        reasons.add('$daysSince days since last workout - good recovery time');
+        reasons.add(L10n.current.reasonDaysSinceWorkout(daysSince));
       } else if (daysSince >= 2) {
-        reasons.add('Well-recovered from last session');
+        reasons.add(L10n.current.reasonWellRecovered);
       } else if (daysSince == 1) {
-        reasons.add('One day recovery - intensity adjusted accordingly');
+        reasons.add(L10n.current.reasonOneDayRecovery);
       }
 
       if (musclesToTrain.isNotEmpty) {
         final topMuscles = musclesToTrain.take(2).map((m) {
           final days = daysSinceTraining[m] ?? 0;
-          return '${MuscleRecoveryTracker.getMuscleGroupDisplayName(m)} ($days days)';
+          return '${MuscleRecoveryTracker.getMuscleGroupDisplayName(m)} (${L10n.current.durationDaysCount(days)})';
         }).join(', ');
-        reasons.add('Ready to train: $topMuscles');
+        reasons.add(L10n.current.reasonReadyToTrain(topMuscles));
       }
 
       if (musclesToRest.isNotEmpty) {
         final restingMuscles = musclesToRest.take(2).map((m) {
           return MuscleRecoveryTracker.getMuscleGroupDisplayName(m);
         }).join(', ');
-        reasons.add('Require rest: $restingMuscles');
+        reasons.add(L10n.current.reasonRequireRest(restingMuscles));
       }
     }
 
     final muscleSoreness = factors['muscleSoreness'] as int? ?? 3;
     if (muscleSoreness >= 4) {
-      reasons.add('High muscle soreness noted - weights adjusted');
+      reasons.add(L10n.current.reasonHighSoreness);
     }
 
     final energy = factors['energy'] as int? ?? 3;
     if (energy <= 2) {
-      reasons.add('Low energy - consider lighter intensity');
+      reasons.add(L10n.current.reasonLowEnergy);
     } else if (energy >= 4) {
-      reasons.add('Good energy levels detected');
+      reasons.add(L10n.current.reasonGoodEnergy);
     }
 
     return '${reasons.join('. ')}.';
