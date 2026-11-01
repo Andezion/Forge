@@ -1209,7 +1209,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                 ? BorderSide(color: AppColors.primary, width: 2)
                 : BorderSide.none,
       ),
-      color: isCompleted ? AppColors.success.withValues(alpha: 0.05) : null,
+      color: isCompleted
+          ? Color.alphaBlend(
+              AppColors.success.withValues(alpha: 0.08), AppColors.surface)
+          : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Column(
