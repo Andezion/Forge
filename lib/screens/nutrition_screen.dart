@@ -667,20 +667,20 @@ class _MealCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(meal.name,
+                  Text(localizedMealName(meal.name),
                       style: AppTextStyles.body1
                           .copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   Wrap(
                     spacing: 10,
                     children: [
-                      _Chip('${meal.calories.toStringAsFixed(0)} kcal',
+                      _Chip(AppLocalizations.of(context)!.kcalValue(meal.calories.toStringAsFixed(0)),
                           Colors.grey),
-                      _Chip('P: ${meal.proteinG.toStringAsFixed(0)}g',
+                      _Chip(AppLocalizations.of(context)!.macroProteinShort(meal.proteinG.toStringAsFixed(0)),
                           const Color(0xFF2196F3)),
-                      _Chip('C: ${meal.carbsG.toStringAsFixed(0)}g',
+                      _Chip(AppLocalizations.of(context)!.macroCarbsShort(meal.carbsG.toStringAsFixed(0)),
                           const Color(0xFFFF9800)),
-                      _Chip('F: ${meal.fatG.toStringAsFixed(0)}g',
+                      _Chip(AppLocalizations.of(context)!.macroFatShort(meal.fatG.toStringAsFixed(0)),
                           const Color(0xFFF44336)),
                     ],
                   ),
@@ -746,7 +746,8 @@ class _WaterCard extends StatelessWidget {
                     style: AppTextStyles.body1
                         .copyWith(fontWeight: FontWeight.w600)),
                 Text(
-                  '${(waterMl / 1000).toStringAsFixed(1)} L  (${waterMl.toStringAsFixed(0)} ml)',
+                  l10n.waterAmount((waterMl / 1000).toStringAsFixed(1),
+                      waterMl.toStringAsFixed(0)),
                   style: AppTextStyles.body2.copyWith(
                     color: const Color(0xFF00BCD4),
                     fontWeight: FontWeight.w600,
