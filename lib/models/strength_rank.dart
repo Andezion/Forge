@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 
 enum StrengthRank { wooden, stone, iron, bronze, silver, gold, diamond }
 
 extension StrengthRankExt on StrengthRank {
   String get displayName {
     switch (this) {
-      case StrengthRank.wooden:  return 'Wooden';
-      case StrengthRank.stone:   return 'Stone';
-      case StrengthRank.iron:    return 'Iron';
-      case StrengthRank.bronze:  return 'Bronze';
-      case StrengthRank.silver:  return 'Silver';
-      case StrengthRank.gold:    return 'Gold';
-      case StrengthRank.diamond: return 'Diamond';
+      case StrengthRank.wooden:  return L10n.current.rankWooden;
+      case StrengthRank.stone:   return L10n.current.rankStone;
+      case StrengthRank.iron:    return L10n.current.rankIron;
+      case StrengthRank.bronze:  return L10n.current.rankBronze;
+      case StrengthRank.silver:  return L10n.current.rankSilver;
+      case StrengthRank.gold:    return L10n.current.rankGold;
+      case StrengthRank.diamond: return L10n.current.rankDiamond;
     }
   }
 
