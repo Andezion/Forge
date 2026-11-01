@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/friend.dart';
 import '../models/user_stats.dart';
 
@@ -97,17 +98,17 @@ class FriendsService extends ChangeNotifier {
 
   Future<String> sendFriendRequest(String email) async {
     if (_currentUserId == null || _currentUserEmail == null) {
-      return 'You must be logged in to send friend requests';
+      return L10n.current.errMustBeLoggedInFriends;
     }
 
     if (email.trim().isEmpty) {
-      return 'Please enter an email address';
+      return L10n.current.pleaseEnterEmail;
     }
 
     final normalizedEmail = email.trim().toLowerCase();
 
     if (normalizedEmail == _currentUserEmail!.toLowerCase()) {
-      return 'You cannot add yourself as a friend';
+      return L10n.current.errCannotAddYourself;
     }
 
     try {
@@ -118,7 +119,7 @@ class FriendsService extends ChangeNotifier {
           .get();
 
       if (usersSnapshot.docs.isEmpty) {
-        return 'No user found with this email address';
+        return L10n.current.errNoUserWithEmail;
       }
 
       final targetUser = usersSnapshot.docs.first;
@@ -132,7 +133,7 @@ class FriendsService extends ChangeNotifier {
           .get();
 
       if (friendDoc.exists) {
-        return 'You are already friends with this user';
+        return L10n.current.errAlreadyFriends;
       }
 
       final existingRequestSnapshot = await _db
@@ -144,7 +145,7 @@ class FriendsService extends ChangeNotifier {
           .get();
 
       if (existingRequestSnapshot.docs.isNotEmpty) {
-        return 'Friend request already sent';
+        return L10n.current.errRequestAlreadySent;
       }
 
       final request = FriendRequest(
@@ -165,13 +166,13 @@ class FriendsService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error sending friend request: $e');
-      return 'Failed to send friend request. Please try again.';
+      return L10n.current.errSendRequestFailed;
     }
   }
 
   Future<String> acceptFriendRequest(FriendRequest request) async {
     if (_currentUserId == null) {
-      return 'You must be logged in';
+      return L10n.current.mustBeLoggedIn;
     }
 
     try {
@@ -181,7 +182,7 @@ class FriendsService extends ChangeNotifier {
           await _db.collection('users').doc(request.toUserId).get();
 
       if (!fromUserDoc.exists || !toUserDoc.exists) {
-        return 'User data not found';
+        return L10n.current.errUserDataNotFound;
       }
 
       final fromUserData = fromUserDoc.data()!;
@@ -254,13 +255,13 @@ class FriendsService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error accepting friend request: $e');
-      return 'Failed to accept friend request. Please try again.';
+      return L10n.current.errAcceptRequestFailed;
     }
   }
 
   Future<String> rejectFriendRequest(FriendRequest request) async {
     if (_currentUserId == null) {
-      return 'You must be logged in';
+      return L10n.current.mustBeLoggedIn;
     }
 
     try {
@@ -274,13 +275,13 @@ class FriendsService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error rejecting friend request: $e');
-      return 'Failed to reject friend request. Please try again.';
+      return L10n.current.errRejectRequestFailed;
     }
   }
 
   Future<String> removeFriend(String friendUserId) async {
     if (_currentUserId == null) {
-      return 'You must be logged in';
+      return L10n.current.mustBeLoggedIn;
     }
 
     try {
@@ -305,7 +306,7 @@ class FriendsService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error removing friend: $e');
-      return 'Failed to remove friend. Please try again.';
+      return L10n.current.errRemoveFriendFailed;
     }
   }
 
@@ -316,7 +317,7 @@ class FriendsService extends ChangeNotifier {
       return 'success';
     } catch (e) {
       debugPrint('Error canceling request: $e');
-      return 'Failed to cancel request. Please try again.';
+      return L10n.current.errCancelRequestFailed;
     }
   }
 
