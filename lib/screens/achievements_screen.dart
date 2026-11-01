@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -55,7 +56,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Achievements',
+          AppLocalizations.of(context)!.achievements,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
         bottom: PreferredSize(
@@ -74,7 +75,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$unlockedCount / $totalCount Unlocked',
+                            AppLocalizations.of(context)!.unlockedOfTotal(unlockedCount, totalCount),
                             style: AppTextStyles.h3
                                 .copyWith(color: AppColors.textOnPrimary),
                           ),
@@ -99,13 +100,13 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 unselectedLabelColor:
                     AppColors.textOnPrimary.withValues(alpha: 0.7),
                 indicatorColor: AppColors.textOnPrimary,
-                tabs: const [
-                  Tab(text: 'All'),
-                  Tab(text: 'Workouts'),
-                  Tab(text: 'Strength'),
-                  Tab(text: 'Consistency'),
-                  Tab(text: 'Social'),
-                  Tab(text: 'Special'),
+                tabs: [
+                  Tab(text: AppLocalizations.of(context)!.tabAll),
+                  Tab(text: AppLocalizations.of(context)!.workouts),
+                  Tab(text: AppLocalizations.of(context)!.tabStrength),
+                  Tab(text: AppLocalizations.of(context)!.consistency),
+                  Tab(text: AppLocalizations.of(context)!.tabSocial),
+                  Tab(text: AppLocalizations.of(context)!.tabSpecial),
                 ],
               ),
             ],
@@ -149,7 +150,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'No achievements in this category',
+              AppLocalizations.of(context)!.noAchievementsInCategory,
               style: AppTextStyles.body1.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -226,7 +227,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                       children: [
                         Expanded(
                           child: Text(
-                            achievement.title,
+                            achievement.localizedTitle,
                             style: AppTextStyles.body1.copyWith(
                               fontWeight: FontWeight.bold,
                               color: achievement.isUnlocked
@@ -245,7 +246,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      achievement.description,
+                      achievement.localizedDescription,
                       style: AppTextStyles.body2.copyWith(
                         color: achievement.isUnlocked
                             ? AppColors.textSecondary
@@ -285,8 +286,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                           const SizedBox(width: 4),
                           Text(
                             achievement.unlockedAt != null
-                                ? 'Unlocked ${_formatDate(achievement.unlockedAt!)}'
-                                : 'Unlocked',
+                                ? AppLocalizations.of(context)!.unlockedOn(
+                                    _formatDate(achievement.unlockedAt!))
+                                : AppLocalizations.of(context)!.unlocked,
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.textSecondary,
                             ),
