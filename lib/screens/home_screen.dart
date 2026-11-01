@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../utils/units.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import 'package:provider/provider.dart';
@@ -505,7 +506,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${(_todayRecommendation!.overallConfidence * 100).toInt()}% confidence',
+                            AppLocalizations.of(context)!.confidencePercent(
+                                (_todayRecommendation!.overallConfidence * 100)
+                                    .toInt()),
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -559,7 +562,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 exerciseRec.exercise.exercise.name,
                 '${exerciseRec.exercise.sets}x${exerciseRec.exercise.targetReps}',
                 exerciseRec.exercise.weight > 0
-                    ? ' with ${exerciseRec.exercise.weight} kg'
+                    ? AppLocalizations.of(context)!.withWeight(
+                        Units.of(context).weight(exerciseRec.exercise.weight))
                     : '',
               );
             }),
