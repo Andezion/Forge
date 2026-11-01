@@ -352,7 +352,7 @@ ATHLETE PROFILE:
 - Age: $age years
 - Gender: $genderStr
 - Training days per week: $trainingDaysPerWeek
-- Nutrition goal: ${goal.displayName} (calorie adjustment: ${goal.calorieAdjustment > 0 ? '+' : ''}${goal.calorieAdjustment} kcal/day)
+- Nutrition goal: ${goal.name} (calorie adjustment: ${goal.calorieAdjustment > 0 ? '+' : ''}${goal.calorieAdjustment} kcal/day)
 - Calories burned in today's workout: ${workoutCaloriesBurned.toStringAsFixed(0)} kcal
 
 Calculate:
