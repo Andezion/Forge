@@ -13,6 +13,7 @@ import '../services/groq_service.dart';
 import '../services/leaderboard_service.dart';
 import '../services/settings_service.dart';
 import '../services/profile_service.dart';
+import '../widgets/fix_set_dialog.dart';
 import 'exercise_library_screen.dart';
 
 enum _Mode { idle, exercising }
@@ -258,6 +259,35 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     if (_setCompleted.every((c) => c)) {
       Future.microtask(_showDifficultyDialog);
     }
+  }
+
+  Future<void> _fixSetAtIndex(int index) async {
+    final setResults = _currentExerciseResult!.setResults;
+    final resultIndex =
+        setResults.indexWhere((s) => s.setNumber == index + 1);
+    if (resultIndex == -1) return;
+    final old = setResults[resultIndex];
+
+    final fixed = await showFixSetDialog(
+      context,
+      setNumber: old.setNumber,
+      reps: old.actualReps,
+      weight: old.weight,
+    );
+    if (fixed == null || !mounted) return;
+    final (reps, weight) = fixed;
+
+    setState(() {
+      setResults[resultIndex] = ExerciseSetResult(
+        setNumber: old.setNumber,
+        actualReps: reps,
+        weight: weight,
+        timestamp: DateTime.now(),
+        durationSeconds: old.durationSeconds,
+      );
+      _repsControllers[index].text = reps.toString();
+      _weightControllers[index].text = weight > 0 ? weight.toString() : '';
+    });
   }
 
   void _showDifficultyDialog() {
@@ -696,6 +726,11 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                const SizedBox(width: 8),
+                FixSetButton(
+                  enabled: isCompleted,
+                  onPressed: () => _fixSetAtIndex(index),
+                ),
               ],
             ),
             const SizedBox(height: 8),
