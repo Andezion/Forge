@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../utils/units.dart';
 import '../services/progression_service.dart';
 import '../services/data_manager.dart';
 import '../models/workout.dart';
@@ -81,7 +83,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingData('$e'))),
         );
       }
     }
@@ -89,10 +91,11 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Units.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Progression Recommendations'),
+        title: Text(AppLocalizations.of(context)!.progressionRecommendationsTitle),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
       ),
@@ -104,8 +107,8 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
 
   Widget _buildContent() {
     if (_suggestedWorkout == null) {
-      return const Center(
-        child: Text('Not enough data for recommendations'),
+      return Center(
+        child: Text(AppLocalizations.of(context)!.notEnoughData),
       );
     }
 
@@ -135,14 +138,14 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Recommended Deload Week!',
+                    AppLocalizations.of(context)!.recommendedDeloadWeek,
                     style: AppTextStyles.h2.copyWith(
                       color: Colors.orange.shade900,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Recent workouts have been hard. Reduce the load for recovery.',
+                    AppLocalizations.of(context)!.recommendedDeloadDesc,
                     style: AppTextStyles.body2.copyWith(
                       color: Colors.orange.shade800,
                     ),
@@ -163,7 +166,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Workout Comparison', style: AppTextStyles.h2),
+            Text(AppLocalizations.of(context)!.workoutComparison, style: AppTextStyles.h2),
             const SizedBox(height: 16),
             Table(
               columnWidths: const {
@@ -177,9 +180,9 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                   ),
                   children: [
-                    _buildTableHeader('Exercise'),
-                    _buildTableHeader('Current'),
-                    _buildTableHeader('Suggested'),
+                    _buildTableHeader(AppLocalizations.of(context)!.exerciseLabel),
+                    _buildTableHeader(AppLocalizations.of(context)!.current),
+                    _buildTableHeader(AppLocalizations.of(context)!.suggested),
                   ],
                 ),
                 ...widget.workout.exercises.map((original) {
@@ -227,7 +230,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (original.weight > 0)
-                Text('${original.weight.toStringAsFixed(1)} kg',
+                Text(Units.of(context).weight(original.weight),
                     style: AppTextStyles.body2),
               Text('${original.sets}x${original.targetReps}',
                   style: AppTextStyles.body2),
@@ -241,7 +244,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
             children: [
               if (suggested.weight > 0)
                 Text(
-                  '${suggested.weight.toStringAsFixed(1)} kg',
+                  Units.of(context).weight(suggested.weight),
                   style: AppTextStyles.body2.copyWith(
                     color: weightChanged ? Colors.green : null,
                     fontWeight: weightChanged ? FontWeight.bold : null,
@@ -266,11 +269,11 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Detailed analysis', style: AppTextStyles.h2),
+        Text(AppLocalizations.of(context)!.detailedAnalysis, style: AppTextStyles.h2),
         const SizedBox(height: 16),
         ...widget.workout.exercises.map((exercise) {
           final metrics = _exerciseMetrics![exercise.exercise.id];
-          final reason = _reasons![exercise.exercise.id] ?? 'No data';
+          final reason = _reasons![exercise.exercise.id] ?? AppLocalizations.of(context)!.noData;
           return _buildExerciseCard(exercise, metrics!, reason);
         }),
       ],
@@ -294,33 +297,35 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
               style: AppTextStyles.h3,
             ),
             const SizedBox(height: 12),
-            _buildMetricRow('Reason for change:', reason),
+            _buildMetricRow(AppLocalizations.of(context)!.reasonForChange, reason),
             if (metrics.sessionsCount > 0) ...[
               const Divider(height: 24),
               _buildMetricRow(
-                'Completed in recent workouts:',
+                AppLocalizations.of(context)!.completedInRecentWorkouts,
                 '${(metrics.completionRate * 100).toStringAsFixed(0)}%',
               ),
               _buildMetricRow(
-                'Average weight:',
-                '${metrics.avgWeight.toStringAsFixed(1)} kg',
+                AppLocalizations.of(context)!.averageWeightColon,
+                Units.of(context).weight(metrics.avgWeight),
               ),
               _buildMetricRow(
-                'Average reps:',
+                AppLocalizations.of(context)!.averageRepsColon,
                 metrics.avgRepsPerSet.toStringAsFixed(1),
               ),
               if (metrics.estimated1RM > 0)
                 _buildMetricRow(
-                  'Estimated 1RM:',
-                  '${metrics.estimated1RM.toStringAsFixed(1)} kg',
+                  AppLocalizations.of(context)!.estimated1RMColon,
+                  Units.of(context).weight(metrics.estimated1RM),
                 ),
               _buildMetricRow(
-                'Weight trend:',
+                AppLocalizations.of(context)!.weightTrendColon,
                 metrics.weightTrend > 0
-                    ? '↑ Rising (+${metrics.weightTrend.toStringAsFixed(1)} kg)'
+                    ? AppLocalizations.of(context)!.trendRising(
+                        Units.of(context).weightDelta(metrics.weightTrend))
                     : metrics.weightTrend < 0
-                        ? '↓ Falling (${metrics.weightTrend.toStringAsFixed(1)} kg)'
-                        : '→ Stable',
+                        ? AppLocalizations.of(context)!.trendFalling(
+                            Units.of(context).weightDelta(metrics.weightTrend))
+                        : AppLocalizations.of(context)!.trendStable,
                 color: metrics.weightTrend > 0
                     ? Colors.green
                     : metrics.weightTrend < 0
@@ -328,7 +333,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                         : null,
               ),
               _buildMetricRow(
-                'Days since last session:',
+                AppLocalizations.of(context)!.daysSinceLastSession,
                 metrics.daysSinceLastSession.toString(),
               ),
             ],
