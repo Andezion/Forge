@@ -14,6 +14,7 @@ import '../services/leaderboard_service.dart';
 import '../services/settings_service.dart';
 import '../services/profile_service.dart';
 import '../widgets/fix_set_dialog.dart';
+import '../widgets/workout_note_field.dart';
 import 'exercise_library_screen.dart';
 
 enum _Mode { idle, exercising }
@@ -486,11 +487,12 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
       totalDurationSeconds: _totalDurationSeconds,
     );
 
-    DataManager().addWorkoutHistory(WorkoutHistory(
+    final history = WorkoutHistory(
       id: sessionId,
       date: now,
       session: session,
-    ));
+    );
+    DataManager().addWorkoutHistory(history);
 
     double? estimatedCalories;
     String? calorieEstimateError;
@@ -525,6 +527,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     }
 
     if (!mounted) return;
+    String note = '';
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -532,7 +535,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -618,9 +621,14 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                   ),
                 ),
               ],
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              WorkoutNoteField(onChanged: (value) => note = value),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
+                  if (note.trim().isNotEmpty) {
+                    DataManager().updateWorkoutHistoryNote(history.id, note);
+                  }
                   Navigator.of(ctx).pop();
                   Navigator.of(context).pop();
                 },
