@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import 'main_screen.dart';
 import '../services/auth_service.dart';
 import '../services/tour_service.dart';
@@ -101,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    AppStrings.register,
+                    AppLocalizations.of(context)!.register,
                     style: AppTextStyles.h2.copyWith(color: AppColors.primary),
                     textAlign: TextAlign.center,
                   ),
@@ -110,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _nameController,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.name,
+                      labelText: AppLocalizations.of(context)!.name,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.person_outlined),
                       border: OutlineInputBorder(
@@ -121,7 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       return null;
                     },
@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     keyboardType: TextInputType.emailAddress,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.email,
+                      labelText: AppLocalizations.of(context)!.email,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
@@ -143,10 +143,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       if (!value.contains('@')) {
-                        return AppStrings.errorInvalidEmail;
+                        return AppLocalizations.of(context)!.errorInvalidEmail;
                       }
                       return null;
                     },
@@ -157,7 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: _obscurePassword,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.password,
+                      labelText: AppLocalizations.of(context)!.password,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
@@ -180,10 +180,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       if (value.length < 6) {
-                        return AppStrings.errorPasswordTooShort;
+                        return AppLocalizations.of(context)!.errorPasswordTooShort;
                       }
                       return null;
                     },
@@ -194,7 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: _obscureConfirmPassword,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.confirmPassword,
+                      labelText: AppLocalizations.of(context)!.confirmPassword,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
@@ -217,10 +217,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       if (value != _passwordController.text) {
-                        return AppStrings.errorPasswordsDontMatch;
+                        return AppLocalizations.of(context)!.errorPasswordsDontMatch;
                       }
                       return null;
                     },
@@ -241,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('Remember me', style: AppTextStyles.body2),
+                      Text(AppLocalizations.of(context)!.rememberMe, style: AppTextStyles.body2),
                     ],
                   ),
                   ElevatedButton(
@@ -267,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           )
                         : Text(
-                            AppStrings.signUp,
+                            AppLocalizations.of(context)!.signUp,
                             style: AppTextStyles.button,
                           ),
                   ),
@@ -276,7 +276,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        AppStrings.alreadyHaveAccount,
+                        AppLocalizations.of(context)!.alreadyHaveAccount,
                         style: AppTextStyles.body2,
                       ),
                       TextButton(
@@ -284,7 +284,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          AppStrings.login,
+                          AppLocalizations.of(context)!.login,
                           style: AppTextStyles.button.copyWith(
                             color: AppColors.primary,
                             fontSize: 14,
