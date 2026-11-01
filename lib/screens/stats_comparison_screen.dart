@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../utils/units.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -66,7 +68,8 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
     final auth = Provider.of<AuthService>(context);
     final currentUserName = auth.firebaseUser?.displayName ??
         auth.firebaseUser?.email?.split('@')[0] ??
-        'You';
+        AppLocalizations.of(context)!.you;
+    final units = Units.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -74,7 +77,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Stats Comparison',
+          AppLocalizations.of(context)!.statsComparison,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -87,7 +90,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   _buildHeaderRow(currentUserName, widget.otherUserName),
                   const SizedBox(height: 24),
                   _buildComparisonCard(
-                    'Workouts',
+                    AppLocalizations.of(context)!.workouts,
                     _currentUserStats?.workoutCount ?? 0,
                     _otherUserStats?.workoutCount ?? 0,
                     Icons.fitness_center,
@@ -95,7 +98,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   ),
                   const SizedBox(height: 12),
                   _buildComparisonCard(
-                    'Current Streak',
+                    AppLocalizations.of(context)!.currentStreak,
                     _currentUserStats?.currentStreak ?? 0,
                     _otherUserStats?.currentStreak ?? 0,
                     Icons.local_fire_department,
@@ -103,15 +106,20 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                   ),
                   const SizedBox(height: 12),
                   _buildComparisonCard(
-                    'Total Weight',
-                    (_currentUserStats?.totalWeightLifted ?? 0).toInt(),
-                    (_otherUserStats?.totalWeightLifted ?? 0).toInt(),
+                    AppLocalizations.of(context)!.tabTotalWeight,
+                    units
+                        .toDisplayWeight(
+                            _currentUserStats?.totalWeightLifted ?? 0)
+                        .round(),
+                    units
+                        .toDisplayWeight(_otherUserStats?.totalWeightLifted ?? 0)
+                        .round(),
                     Icons.fitness_center,
                     Colors.green,
-                    suffix: ' kg',
+                    suffix: ' ${units.weightLabel}',
                   ),
                   const SizedBox(height: 24),
-                  Text('Personal Records', style: AppTextStyles.h3),
+                  Text(AppLocalizations.of(context)!.personalRecords, style: AppTextStyles.h3),
                   const SizedBox(height: 12),
                   _buildRecordsComparison(),
                 ],
@@ -157,7 +165,7 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
         ),
         if (isCurrentUser)
           Text(
-            '(You)',
+            AppLocalizations.of(context)!.youInParens,
             style:
                 AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
           ),
@@ -233,8 +241,10 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
                 ),
                 child: Text(
                   currentIsHigher
-                      ? 'You\'re ahead by $difference$suffix (${percentDiff.toStringAsFixed(1)}%)'
-                      : 'Behind by $difference$suffix (${percentDiff.toStringAsFixed(1)}%)',
+                      ? AppLocalizations.of(context)!.aheadBy(
+                          '$difference$suffix', percentDiff.toStringAsFixed(1))
+                      : AppLocalizations.of(context)!.behindBy(
+                          '$difference$suffix', percentDiff.toStringAsFixed(1)),
                   style: AppTextStyles.caption.copyWith(
                     color:
                         currentIsHigher ? AppColors.success : AppColors.error,
@@ -357,7 +367,9 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          weight > 0 ? '${weight.toStringAsFixed(1)} kg' : 'N/A',
+          weight > 0
+              ? Units.of(context).weight(weight)
+              : AppLocalizations.of(context)!.notAvailable,
           style: AppTextStyles.body1.copyWith(
             color: weight > 0 ? color : AppColors.textSecondary,
             fontWeight: FontWeight.bold,
