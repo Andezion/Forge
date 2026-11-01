@@ -3,7 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'dart:convert';
+import '../l10n/l10n.dart';
 import '../models/app_settings.dart';
+import '../utils/units.dart';
 
 class SettingsService extends ChangeNotifier {
   static const _settingsKey = 'app_settings';
@@ -34,6 +36,7 @@ class SettingsService extends ChangeNotifier {
       try {
         final map = json.decode(settingsJson) as Map<String, dynamic>;
         _settings = AppSettings.fromJson(map);
+        _syncGlobals();
         notifyListeners();
       } catch (_) {}
     }
@@ -42,6 +45,11 @@ class SettingsService extends ChangeNotifier {
 
     await _loadNicknameFromFirebase();
     await _loadGroqApiKeyFromFirebase();
+  }
+
+  void _syncGlobals() {
+    L10n.setLanguage(_settings.language);
+    Units.setCurrent(_settings.weightUnit, _settings.distanceUnit);
   }
 
   Future<void> _loadNicknameFromFirebase() async {
@@ -162,18 +170,21 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setLanguage(AppLanguage language) async {
     _settings = _settings.copyWith(language: language);
+    _syncGlobals();
     notifyListeners();
     await _save();
   }
 
   Future<void> setWeightUnit(WeightUnit unit) async {
     _settings = _settings.copyWith(weightUnit: unit);
+    _syncGlobals();
     notifyListeners();
     await _save();
   }
 
   Future<void> setDistanceUnit(DistanceUnit unit) async {
     _settings = _settings.copyWith(distanceUnit: unit);
+    _syncGlobals();
     notifyListeners();
     await _save();
   }
@@ -244,25 +255,4 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
-  double convertWeight(double kg) {
-    if (_settings.weightUnit == WeightUnit.lb) {
-      return kg * 2.20462;
-    }
-    return kg;
-  }
-
-  double convertWeightToKg(double value) {
-    if (_settings.weightUnit == WeightUnit.lb) {
-      return value / 2.20462;
-    }
-    return value;
-  }
-
-  String getWeightUnitString() {
-    return _settings.weightUnit == WeightUnit.kg ? 'kg' : 'lb';
-  }
-
-  String getDistanceUnitString() {
-    return _settings.distanceUnit == DistanceUnit.meters ? 'm' : 'ft';
-  }
 }
