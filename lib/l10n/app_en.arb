@@ -94,15 +94,15 @@
   },
   "achievements": "Achievements",
   "@achievements": {
-    "description": "Achievements screen title"
+    "description": "Achievements menu item"
   },
   "progressCharts": "Progress Charts",
   "@progressCharts": {
-    "description": "Progress charts screen title"
+    "description": "Progress charts menu item"
   },
   "aboutMe": "About Me",
   "@aboutMe": {
-    "description": "About me screen title"
+    "description": "About me menu item"
   },
   "easy": "Easy",
   "@easy": {
@@ -299,9 +299,8 @@
       }
     }
   },
-  "targetReps": "Target: {reps} reps",
+  "targetReps": "{reps, plural, =1{Target: 1 rep} other{Target: {reps} reps}}",
   "@targetReps": {
-    "description": "Target reps label",
     "placeholders": {
       "reps": {
         "type": "int"
@@ -370,34 +369,15 @@
       }
     }
   },
-  "weightKg": "Weight: {weight} kg",
-  "@weightKg": {
-    "description": "Weight label in kg",
-    "placeholders": {
-      "weight": {
-        "type": "double"
-      }
-    }
-  },
   "completedSets": "Completed Sets",
   "@completedSets": {
     "description": "Completed sets section title"
   },
-  "repsCount": "{reps} reps",
+  "repsCount": "{reps, plural, =1{1 rep} other{{reps} reps}}",
   "@repsCount": {
-    "description": "Reps count",
     "placeholders": {
       "reps": {
         "type": "int"
-      }
-    }
-  },
-  "kgCount": "{kg} kg",
-  "@kgCount": {
-    "description": "Kg count",
-    "placeholders": {
-      "kg": {
-        "type": "double"
       }
     }
   },
@@ -667,9 +647,8 @@
   "@noWorkoutsAvailable": {
     "description": "No workouts available message"
   },
-  "exercisesCount": "{count} exercises",
+  "exercisesCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
   "@exercisesCount": {
-    "description": "Exercises count",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1047,9 +1026,8 @@
   "@mealSchedule": {
     "description": "Meal schedule section title"
   },
-  "mealsPerDay": "{count} meals per day",
+  "mealsPerDay": "{count, plural, =1{1 meal per day} other{{count} meals per day}}",
   "@mealsPerDay": {
-    "description": "Meals per day subtitle",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1299,14 +1277,6 @@
   "@workshop": {
     "description": "Workshop bottom nav label"
   },
-  "cancel": "Cancel",
-  "@cancel": {
-    "description": "Cancel button"
-  },
-  "delete": "Delete",
-  "@delete": {
-    "description": "Delete button"
-  },
   "close": "Close",
   "@close": {
     "description": "Close button"
@@ -1395,9 +1365,8 @@
   "@muscleLoad": {
     "description": "Muscle load section title"
   },
-  "setsCount": "{count} sets",
+  "setsCount": "{count, plural, =1{1 set} other{{count} sets}}",
   "@setsCount": {
-    "description": "Sets count label",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1454,21 +1423,9 @@
   "@selectProgram": {
     "description": "Select program button"
   },
-  "progressCharts": "Progress Charts",
-  "@progressCharts": {
-    "description": "Progress charts menu item"
-  },
-  "aboutMe": "About Me",
-  "@aboutMe": {
-    "description": "About me menu item"
-  },
   "customisation": "Customisation",
   "@customisation": {
     "description": "Customisation menu item"
-  },
-  "achievements": "Achievements",
-  "@achievements": {
-    "description": "Achievements menu item"
   },
   "logWorkout": "Log Workout",
   "@logWorkout": {
@@ -1563,9 +1520,8 @@
   "@sentRequests": {
     "description": "Sent friend requests section"
   },
-  "lastWorkoutDaysAgo": "Last workout: {days} day(s) ago",
+  "lastWorkoutDaysAgo": "{days, plural, =1{Last workout: 1 day ago} other{Last workout: {days} days ago}}",
   "@lastWorkoutDaysAgo": {
-    "description": "Last workout days ago label",
     "placeholders": {
       "days": {
         "type": "int"
@@ -1576,9 +1532,8 @@
   "@noWorkoutsYetFriend": {
     "description": "No workouts yet for friend"
   },
-  "weightKgDisplay": "Weight: {weight} kg",
+  "weightKgDisplay": "Weight: {weight}",
   "@weightKgDisplay": {
-    "description": "Weight display label",
     "placeholders": {
       "weight": {
         "type": "String"
@@ -1655,9 +1610,8 @@
   "@durationDays": {
     "description": "Duration in days label"
   },
-  "durationDaysCount": "{count} days",
+  "durationDaysCount": "{count, plural, =1{1 day} other{{count} days}}",
   "@durationDaysCount": {
-    "description": "Duration days count",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1728,10 +1682,6 @@
   "@declining": {
     "description": "Declining trend label"
   },
-  "edit": "Edit",
-  "@edit": {
-    "description": "Edit button"
-  },
   "startWorkout": "Start Workout",
   "@startWorkout": {
     "description": "Start workout button"
@@ -1777,9 +1727,8 @@
       }
     }
   },
-  "moreExercises": "+ {count} more exercises",
+  "moreExercises": "{count, plural, =1{+ 1 more exercise} other{+ {count} more exercises}}",
   "@moreExercises": {
-    "description": "More exercises indicator",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1787,101 +1736,1282 @@
     }
   },
   "tourRestartTooltip": "App tour",
-  "@tourRestartTooltip": { "description": "Tooltip for the tour restart button in Home AppBar" },
+  "@tourRestartTooltip": {
+    "description": "Tooltip for the tour restart button in Home AppBar"
+  },
   "tourWelcomeTitle": "Welcome to Forge!",
-  "@tourWelcomeTitle": { "description": "Tour step 0 title" },
+  "@tourWelcomeTitle": {
+    "description": "Tour step 0 title"
+  },
   "tourWelcomeDesc": "Here's a quick tour of everything the app has to offer. Follow along to discover all the features that will help you reach your fitness goals.",
-  "@tourWelcomeDesc": { "description": "Tour step 0 description" },
+  "@tourWelcomeDesc": {
+    "description": "Tour step 0 description"
+  },
   "tourCalendarTitle": "Workout Calendar",
-  "@tourCalendarTitle": { "description": "Tour step 1 title" },
+  "@tourCalendarTitle": {
+    "description": "Tour step 1 title"
+  },
   "tourCalendarDesc": "The calendar shows your workout history. Highlighted days have completed sessions. Tap any day to view or log a workout.",
-  "@tourCalendarDesc": { "description": "Tour step 1 description" },
+  "@tourCalendarDesc": {
+    "description": "Tour step 1 description"
+  },
   "tourTodayWorkoutTitle": "Today's Workout",
-  "@tourTodayWorkoutTitle": { "description": "Tour step 2 title" },
+  "@tourTodayWorkoutTitle": {
+    "description": "Tour step 2 title"
+  },
   "tourTodayWorkoutDesc": "The AI analyzes your training history and recovery to recommend the best workout for today. The confidence percentage shows how certain the recommendation is.",
-  "@tourTodayWorkoutDesc": { "description": "Tour step 2 description" },
+  "@tourTodayWorkoutDesc": {
+    "description": "Tour step 2 description"
+  },
   "tourMuscleRecoveryTitle": "Muscle Recovery",
-  "@tourMuscleRecoveryTitle": { "description": "Tour step 3 title" },
+  "@tourMuscleRecoveryTitle": {
+    "description": "Tour step 3 title"
+  },
   "tourMuscleRecoveryDesc": "This card shows the recovery status of each muscle group - which are ready to train, currently recovering, or need more rest before your next session.",
-  "@tourMuscleRecoveryDesc": { "description": "Tour step 3 description" },
+  "@tourMuscleRecoveryDesc": {
+    "description": "Tour step 3 description"
+  },
   "tourStartWorkoutTitle": "Start Workout",
-  "@tourStartWorkoutTitle": { "description": "Tour step 4 title" },
+  "@tourStartWorkoutTitle": {
+    "description": "Tour step 4 title"
+  },
   "tourStartWorkoutDesc": "Tap this button to begin a training session. You'll choose from your saved workouts or follow your active training plan.",
-  "@tourStartWorkoutDesc": { "description": "Tour step 4 description" },
+  "@tourStartWorkoutDesc": {
+    "description": "Tour step 4 description"
+  },
   "tourStatisticsTitle": "Statistics",
-  "@tourStatisticsTitle": { "description": "Tour step 5 title" },
+  "@tourStatisticsTitle": {
+    "description": "Tour step 5 title"
+  },
   "tourStatisticsDesc": "Track your monthly workout count and current day streak here. Keep your streak going to build long-term consistency!",
-  "@tourStatisticsDesc": { "description": "Tour step 5 description" },
+  "@tourStatisticsDesc": {
+    "description": "Tour step 5 description"
+  },
   "tourTrainingPlansTitle": "Training Plans",
-  "@tourTrainingPlansTitle": { "description": "Tour step 6 title" },
+  "@tourTrainingPlansTitle": {
+    "description": "Tour step 6 title"
+  },
   "tourTrainingPlansDesc": "Create structured weekly training plans by assigning workouts to specific days. Activate a plan to follow a schedule automatically.",
-  "@tourTrainingPlansDesc": { "description": "Tour step 6 description" },
+  "@tourTrainingPlansDesc": {
+    "description": "Tour step 6 description"
+  },
   "tourProfileTitle": "Your Profile",
-  "@tourProfileTitle": { "description": "Tour step 7 title" },
+  "@tourProfileTitle": {
+    "description": "Tour step 7 title"
+  },
   "tourProfileDesc": "This tab contains all your personal information, health metrics, progress charts, and activity summary.",
-  "@tourProfileDesc": { "description": "Tour step 7 description" },
+  "@tourProfileDesc": {
+    "description": "Tour step 7 description"
+  },
   "tourAboutMeTitle": "About Me",
-  "@tourAboutMeTitle": { "description": "Tour step 8 title" },
+  "@tourAboutMeTitle": {
+    "description": "Tour step 8 title"
+  },
   "tourAboutMeDesc": "Fill in your personal details - age, height, weight, training goals, and experience level. This data helps the AI personalize recommendations for you.",
-  "@tourAboutMeDesc": { "description": "Tour step 8 description" },
+  "@tourAboutMeDesc": {
+    "description": "Tour step 8 description"
+  },
   "tourBodyWeightTitle": "Body Weight",
-  "@tourBodyWeightTitle": { "description": "Tour step 9 title" },
+  "@tourBodyWeightTitle": {
+    "description": "Tour step 9 title"
+  },
   "tourBodyWeightDesc": "Log your body weight regularly to track changes over time. The chart visualizes your weight trend and helps you monitor progress.",
-  "@tourBodyWeightDesc": { "description": "Tour step 9 description" },
+  "@tourBodyWeightDesc": {
+    "description": "Tour step 9 description"
+  },
   "tourWellnessTitle": "Wellness Check-in",
-  "@tourWellnessTitle": { "description": "Tour step 10 title" },
+  "@tourWellnessTitle": {
+    "description": "Tour step 10 title"
+  },
   "tourWellnessDesc": "Log your daily wellness - energy level, mood, stress, and muscle soreness. This helps the AI avoid pushing you too hard on low-energy days.",
-  "@tourWellnessDesc": { "description": "Tour step 10 description" },
+  "@tourWellnessDesc": {
+    "description": "Tour step 10 description"
+  },
   "tourNutritionTitle": "Nutrition",
-  "@tourNutritionTitle": { "description": "Tour step 11 title" },
+  "@tourNutritionTitle": {
+    "description": "Tour step 11 title"
+  },
   "tourNutritionDesc": "Set your nutrition goal and receive personalized daily targets for calories, protein, carbs, and fat. You can also enable meal and water reminders.",
-  "@tourNutritionDesc": { "description": "Tour step 11 description" },
+  "@tourNutritionDesc": {
+    "description": "Tour step 11 description"
+  },
   "tourAchievementsTitle": "Achievements",
-  "@tourAchievementsTitle": { "description": "Tour step 12 title" },
+  "@tourAchievementsTitle": {
+    "description": "Tour step 12 title"
+  },
   "tourAchievementsDesc": "Unlock achievements by hitting milestones - completing workouts, setting personal records, and maintaining streaks. Check your progress here.",
-  "@tourAchievementsDesc": { "description": "Tour step 12 description" },
+  "@tourAchievementsDesc": {
+    "description": "Tour step 12 description"
+  },
   "tourSettingsTitle": "Settings",
-  "@tourSettingsTitle": { "description": "Tour step 13 title" },
+  "@tourSettingsTitle": {
+    "description": "Tour step 13 title"
+  },
   "tourSettingsDesc": "Configure the app to your preferences - change the language, units of measurement, privacy settings, and visual theme.",
-  "@tourSettingsDesc": { "description": "Tour step 13 description" },
+  "@tourSettingsDesc": {
+    "description": "Tour step 13 description"
+  },
   "tourFriendsTitle": "Friends",
-  "@tourFriendsTitle": { "description": "Tour step 14 title" },
+  "@tourFriendsTitle": {
+    "description": "Tour step 14 title"
+  },
   "tourFriendsDesc": "Connect with friends to follow each other's progress. Send friend requests by email, view profiles, and compare stats.",
-  "@tourFriendsDesc": { "description": "Tour step 14 description" },
+  "@tourFriendsDesc": {
+    "description": "Tour step 14 description"
+  },
   "tourLeaderboardTitle": "Leaderboard",
-  "@tourLeaderboardTitle": { "description": "Tour step 15 title" },
+  "@tourLeaderboardTitle": {
+    "description": "Tour step 15 title"
+  },
   "tourLeaderboardDesc": "See where you rank in global, country, and city leaderboards based on strength metrics. Compete and rise through the ranks!",
-  "@tourLeaderboardDesc": { "description": "Tour step 15 description" },
+  "@tourLeaderboardDesc": {
+    "description": "Tour step 15 description"
+  },
   "tourChallengesTitle": "Challenges",
-  "@tourChallengesTitle": { "description": "Tour step 16 title" },
+  "@tourChallengesTitle": {
+    "description": "Tour step 16 title"
+  },
   "tourChallengesDesc": "Create workout challenges with friends and compete over a set time period. Who can complete the most sessions?",
-  "@tourChallengesDesc": { "description": "Tour step 16 description" },
+  "@tourChallengesDesc": {
+    "description": "Tour step 16 description"
+  },
   "tourProgramsTitle": "Programs",
-  "@tourProgramsTitle": { "description": "Tour step 17 title" },
+  "@tourProgramsTitle": {
+    "description": "Tour step 17 title"
+  },
   "tourProgramsDesc": "Discover AI-generated training programs tailored to your workout history. Select one to get a structured training schedule.",
-  "@tourProgramsDesc": { "description": "Tour step 17 description" },
+  "@tourProgramsDesc": {
+    "description": "Tour step 17 description"
+  },
   "tourCreatePlanTitle": "Create a Plan",
-  "@tourCreatePlanTitle": { "description": "Tour step 18 title" },
+  "@tourCreatePlanTitle": {
+    "description": "Tour step 18 title"
+  },
   "tourCreatePlanDesc": "Build a custom weekly training plan by assigning your workouts to specific days of the week. Activate it to follow a structured routine.",
-  "@tourCreatePlanDesc": { "description": "Tour step 18 description" },
+  "@tourCreatePlanDesc": {
+    "description": "Tour step 18 description"
+  },
   "tourWorkshopTitle": "Workshop",
-  "@tourWorkshopTitle": { "description": "Tour step 19 title" },
+  "@tourWorkshopTitle": {
+    "description": "Tour step 19 title"
+  },
   "tourWorkshopDesc": "The Workshop is your personal gym - create and manage all your exercises and workouts here. Everything you build is available throughout the app.",
-  "@tourWorkshopDesc": { "description": "Tour step 19 description" },
+  "@tourWorkshopDesc": {
+    "description": "Tour step 19 description"
+  },
   "tourExerciseLibraryTitle": "Exercise Library",
-  "@tourExerciseLibraryTitle": { "description": "Tour step 20 title" },
+  "@tourExerciseLibraryTitle": {
+    "description": "Tour step 20 title"
+  },
   "tourExerciseLibraryDesc": "Browse hundreds of built-in exercises. Filter by muscle group, view detailed instructions, and add your own custom exercises.",
-  "@tourExerciseLibraryDesc": { "description": "Tour step 20 description" },
+  "@tourExerciseLibraryDesc": {
+    "description": "Tour step 20 description"
+  },
   "tourCreateWorkoutTitle": "Create a Workout",
-  "@tourCreateWorkoutTitle": { "description": "Tour step 21 title" },
+  "@tourCreateWorkoutTitle": {
+    "description": "Tour step 21 title"
+  },
   "tourCreateWorkoutDesc": "Build custom workouts by combining exercises from the library. Configure sets, reps, and weights for each exercise to match your training style.",
-  "@tourCreateWorkoutDesc": { "description": "Tour step 21 description" },
+  "@tourCreateWorkoutDesc": {
+    "description": "Tour step 21 description"
+  },
   "tourAiConfigTitle": "AI Configuration",
-  "@tourAiConfigTitle": { "description": "Tour step 22 title" },
+  "@tourAiConfigTitle": {
+    "description": "Tour step 22 title"
+  },
   "tourAiConfigDesc": "Enter your Groq API key here to unlock AI-powered features - personalized workout recommendations, nutrition advice, and smart training programs.",
-  "@tourAiConfigDesc": { "description": "Tour step 22 description" },
+  "@tourAiConfigDesc": {
+    "description": "Tour step 22 description"
+  },
   "tourFinishTitle": "You're All Set!",
-  "@tourFinishTitle": { "description": "Tour step 23 title" },
+  "@tourFinishTitle": {
+    "description": "Tour step 23 title"
+  },
   "tourFinishDesc": "You now know the key features of Forge. Start by completing your profile, creating your first workout in Workshop, and logging your first session. Good luck!",
-  "@tourFinishDesc": { "description": "Tour step 23 description" }
+  "@tourFinishDesc": {
+    "description": "Tour step 23 description"
+  },
+  "unitKg": "kg",
+  "unitLb": "lb",
+  "unitCm": "cm",
+  "heightUnitTitle": "Height",
+  "centimeters": "Centimeters (cm)",
+  "feetInches": "Feet & inches (ft/in)",
+  "unitFt": "ft",
+  "unitIn": "in",
+  "addExercise": "Add Exercise",
+  "addMuscleGroup": "Add Muscle Group",
+  "addWorkoutToDay": "Add workout",
+  "alreadyHaveAccount": "Already have an account?",
+  "armwrestling": "Arm Wrestling",
+  "confirmPassword": "Confirm Password",
+  "createExercise": "Create Exercise",
+  "createWorkout": "Create Workout",
+  "description": "Description",
+  "difficulty": "Difficulty",
+  "dontHaveAccount": "Don't have an account?",
+  "editPlan": "Edit Plan",
+  "email": "Email",
+  "errorFieldRequired": "This field is required",
+  "errorInvalidEmail": "Invalid email format",
+  "errorPasswordTooShort": "Password must be at least 6 characters",
+  "errorPasswordsDontMatch": "Passwords do not match",
+  "everyTwoWeeks": "Every 2 weeks",
+  "everyWeek": "Every week",
+  "exerciseName": "Exercise Name",
+  "forgotPassword": "Forgot Password?",
+  "intensityFor": "Intensity for",
+  "intensityPrimary": "Primary",
+  "intensitySecondary": "Secondary",
+  "intensityStabilizer": "Stabilizer",
+  "login": "Login",
+  "muscleGroupBack": "Back",
+  "muscleGroupBiceps": "Biceps",
+  "muscleGroupCalves": "Calves",
+  "muscleGroupCardio": "Cardio",
+  "muscleGroupChest": "Chest",
+  "muscleGroupCore": "Core",
+  "muscleGroupForearms": "Forearms",
+  "muscleGroupGlutes": "Glutes",
+  "muscleGroupLegs": "Legs",
+  "muscleGroupShoulders": "Shoulders",
+  "muscleGroupTriceps": "Triceps",
+  "muscleGroupWrists": "Wrists",
+  "muscleGroups": "Muscle Groups",
+  "name": "Name",
+  "noWorkoutToday": "Rest day",
+  "oneRepMaxFull": "1RM (One Rep Max)",
+  "password": "Password",
+  "pickMuscleGroup": "Pick muscle group",
+  "planName": "Plan Name",
+  "powerlifting": "Powerlifting",
+  "pressToAddMuscleGroups": "Press the button below to add muscle groups",
+  "register": "Register",
+  "search": "Search",
+  "sets": "Sets",
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "streetlifting": "Streetlifting",
+  "targetRepsLabel": "Target Reps",
+  "trainingPlan": "My Plan",
+  "workoutName": "Workout Name",
+  "pleaseEnterReps": "Please enter the number of reps",
+  "switchExercise": "Switch Exercise",
+  "currentExerciseName": "Current: {name}",
+  "@currentExerciseName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseAlternative": "Choose alternative:",
+  "switchedTo": "Switched to {name}",
+  "@switchedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nextExerciseName": "Next: {name}",
+  "@nextExerciseName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseNext": "Choose next",
+  "chooseAnyExercise": "Choose Any Exercise",
+  "declineExerciseTitle": "Decline exercise?",
+  "declineExerciseConfirm": "\"{name}\" will be marked as skipped for this session and won't appear again.",
+  "@declineExerciseConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseNextExercise": "Choose next exercise",
+  "nextByProgram": "Next by program",
+  "skipped": "Skipped",
+  "aiCalorieUnavailable": "AI calorie estimate unavailable.",
+  "kcalBurned": "~{kcal} kcal burned",
+  "@kcalBurned": {
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "calorieEstimateUnavailable": "Calorie estimate unavailable: {error}",
+  "@calorieEstimateUnavailable": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "declinedLabel": "Declined:",
+  "finishExerciseEarlyTitle": "Finish exercise early?",
+  "finishExerciseEarlyConfirm": "{total, plural, =1{You completed {done} of 1 set. Finish this exercise now?} other{You completed {done} of {total} sets. Finish this exercise now?}}",
+  "@finishExerciseEarlyConfirm": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "finish": "Finish",
+  "finishEarly": "Finish Early",
+  "lastTimeReps": "{reps, plural, =1{Last time: 1 rep} other{Last time: {reps} reps}}",
+  "@lastTimeReps": {
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "swap": "Swap",
+  "addSet": "Add Set",
+  "insertExercise": "Insert Exercise",
+  "endWorkoutTitle": "End workout?",
+  "endWorkoutNoExercises": "You haven't completed any exercises. End anyway?",
+  "endAction": "End",
+  "quickWorkout": "Quick Workout",
+  "exercisesTotal": "Exercises: {count}",
+  "@exercisesTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bodyweight": "Bodyweight",
+  "targetWeight": "Target: {weight}",
+  "@targetWeight": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "noExercisesYet": "No exercises yet",
+  "tapAddExerciseToStart": "Tap \"{button}\" to get started",
+  "@tapAddExerciseToStart": {
+    "placeholders": {
+      "button": {
+        "type": "String"
+      }
+    }
+  },
+  "endWorkout": "End Workout",
+  "exerciseNumber": "Exercise {number}",
+  "@exerciseNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "weightWithUnit": "Weight ({unit})",
+  "@weightWithUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "startExercise": "Start Exercise",
+  "fixSetTitle": "Fix set {number}",
+  "@fixSetTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recordedReps": "{reps, plural, =1{Recorded: 1 rep} other{Recorded: {reps} reps}}",
+  "@recordedReps": {
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "fix": "Fix",
+  "noteOptional": "Note (optional)",
+  "noteHint": "How did it go? What to change next time?",
+  "note": "Note",
+  "today": "today",
+  "moreItems": "+{count} more...",
+  "@moreItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repsProgress": "{current} / {previous} reps",
+  "@repsProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "previous": {
+        "type": "int"
+      }
+    }
+  },
+  "focusLegs": "legs",
+  "focusUpperBody": "upper body",
+  "focusCore": "core",
+  "focusGlutes": "glutes",
+  "focusBack": "back",
+  "focusChest": "chest",
+  "focusShoulders": "shoulders",
+  "focusArms": "arms",
+  "focusCardio": "cardio",
+  "injuryKnee": "knee",
+  "injuryLowerBack": "lower back",
+  "injuryShoulder": "shoulder",
+  "injuryWrist": "wrist",
+  "injuryElbow": "elbow",
+  "injuryAnkle": "ankle",
+  "injuryHip": "hip",
+  "injuryNeck": "neck",
+  "injuryHamstring": "hamstring",
+  "injuryGroin": "groin",
+  "hintWeightLb": "e.g. 155",
+  "worldRecordMatchingUnavailable": "World-record matching unavailable: {error}",
+  "@worldRecordMatchingUnavailable": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "myRecords": "My Records",
+  "yourRank": "Your Rank",
+  "worldRecordDataUnavailable": "World record data unavailable — rank will update once loaded.",
+  "yourBest": "Your best: {weight}",
+  "@yourBest": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "worldRecordFederation": "World record ({federation}): {weight}",
+  "@worldRecordFederation": {
+    "placeholders": {
+      "federation": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "weightToNextRank": "+{weight} to {rank}",
+  "@weightToNextRank": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "maxRankAchieved": "Maximum rank achieved!",
+  "rankSystem": "Rank System",
+  "rankSystemDesc": "Based on % of the world record in your weight class",
+  "rankPercentRange": "{min}% – {max}% of world record",
+  "@rankPercentRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "last30Days": "Last 30 days",
+  "actualMax": "Actual Max",
+  "oneRepOnDate": "1 rep · {date}",
+  "@oneRepOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noOneRepSets": "No 1-rep sets",
+  "estimated1RM": "Estimated 1RM",
+  "noWorkoutsLast30Days": "No workouts in last 30 days",
+  "oneRmValue": "1RM: {weight}",
+  "@oneRmValue": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "noRecordsYet": "No records yet",
+  "completeWorkoutsForRecords": "Complete workouts to track your personal records",
+  "estimatedShort": "est. {weight}",
+  "@estimatedShort": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "yourWeightClass": "Your Weight Class",
+  "coefficientsDesc": "These coefficients normalize your strength relative to body weight for fair comparison",
+  "big3Total": "Big 3 Total",
+  "liftsOutOfThree": "{count}/3 lifts",
+  "@liftsOutOfThree": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ratingBeginner": "Beginner",
+  "ratingIntermediate": "Intermediate",
+  "ratingAdvanced": "Advanced",
+  "ratingElite": "Elite",
+  "ratingWorldClass": "World Class",
+  "liftSquat": "Squat",
+  "liftBenchPress": "Bench Press",
+  "liftDeadlift": "Deadlift",
+  "strengthCoefficient": "Strength Coefficient",
+  "aboutStrengthCoefficient": "About Strength Coefficient",
+  "strengthCoefficientDesc": "This coefficient is calculated based on your progress across ALL exercises. 100 = baseline (your starting weights), 150 = 50% stronger overall, 200 = 2x stronger. It tracks your long-term strength development, not just recent workouts.",
+  "strengthCoefficientProgress": "Strength Coefficient Progress",
+  "currentWeight": "Current Weight",
+  "startingWeight": "Starting Weight",
+  "change": "Change",
+  "averageWeight": "Average Weight",
+  "weightTrackingTip": "Weight Tracking Tip",
+  "weightTrackingTipDesc": "For detailed weight history tracking, use the \"{feature}\" feature in the main menu to update your current weight regularly.",
+  "@weightTrackingTipDesc": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "periodThisWeek": "This Week",
+  "periodLast30Days": "Last 30 Days",
+  "periodLast90Days": "Last 90 Days",
+  "periodLast180Days": "Last 180 Days",
+  "periodLastYear": "Last Year",
+  "totalVolumeFor": "Total Volume ({period})",
+  "@totalVolumeFor": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "avgPerWeek": "Avg/Week",
+  "weeklyVolume": "Weekly Volume",
+  "dailyVolume": "Daily Volume",
+  "weightHistory": "Weight History",
+  "workoutsPerWeek": "Workouts/Week",
+  "totalWorkouts": "Total Workouts",
+  "workoutFrequencyChart": "Workout Frequency (workouts per week)",
+  "completionRate": "Completion Rate",
+  "setsCompleted": "Sets Completed",
+  "setsPlanned": "Sets Planned",
+  "workoutCompletionRate": "Workout Completion Rate",
+  "maximumWeight": "Maximum Weight",
+  "maximumWeightProgress": "Maximum Weight Progress",
+  "volumeWeightReps": "Volume (weight × repetitions)",
+  "intensityPercent": "Intensity (%)",
+  "thousandSuffix": "K",
+  "millionSuffix": "M",
+  "you": "You",
+  "exerciseLabel": "Exercise",
+  "challengeAccepted": "Challenge accepted!",
+  "challengeDeclined": "Challenge declined",
+  "challengeEnded": "Ended",
+  "daysLeft": "{count}d left",
+  "@daysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursLeft": "{count}h left",
+  "@hoursLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesLeft": "{count}m left",
+  "@minutesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutsCount": "{count, plural, =1{1 workout} other{{count} workouts}}",
+  "@workoutsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeWorkoutsTitle": "Workout Challenge",
+  "challengeWorkoutsDesc": "Who can complete the most workouts?",
+  "challengeWeightTitle": "Weight Challenge",
+  "challengeWeightDesc": "Who can lift the most total weight?",
+  "challengeExerciseTitle": "Exercise Challenge",
+  "challengeExerciseDesc": "Who can lift the most in a specific exercise?",
+  "challengeStreakTitle": "Streak Challenge",
+  "challengeStreakDesc": "Who can maintain the longest training streak?",
+  "challengeConsistencyTitle": "Consistency Challenge",
+  "challengeConsistencyDesc": "Who can train the most days in a row?",
+  "scopeGlobal": "Global",
+  "scopeMyLeague": "My League",
+  "scopeCountry": "Country",
+  "scopeCity": "City",
+  "periodAllTime": "All Time",
+  "periodThisMonth": "This Month",
+  "tabTotalWeight": "Total Weight",
+  "tabRecords": "Records",
+  "setCountryForRankings": "Set your country in Profile → About Me to see country rankings",
+  "setCityForRankings": "Set your city in Profile → About Me to see city rankings",
+  "addFriendsForLeague": "Add friends to see your league rankings",
+  "noDataYet": "No data available yet",
+  "exerciseColon": "Exercise:",
+  "selectAnExerciseShort": "Select an exercise",
+  "noRecord": "No record",
+  "errorWithMessage": "Error: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "matchPoor": "Poor match",
+  "matchFair": "Fair match",
+  "matchModerate": "Moderate match",
+  "matchGood": "Good match",
+  "matchGreat": "Great match",
+  "quickWorkoutDesc": "No plan? Just go — add exercises as you train",
+  "noSavedWorkoutsYet": "No saved workouts yet",
+  "createInWorkshopOrQuick": "Create one in Workshop or start a Quick Workout above",
+  "recommendedForToday": "Recommended for Today",
+  "allWorkouts": "All Workouts",
+  "preview": "Preview",
+  "progressionRecommendationsTitle": "Progression Recommendations",
+  "recommendedDeloadDesc": "Recent workouts have been hard. Reduce the load for recovery.",
+  "current": "Current",
+  "suggested": "Suggested",
+  "reasonForChange": "Reason for change:",
+  "completedInRecentWorkouts": "Completed in recent workouts:",
+  "averageWeightColon": "Average weight:",
+  "averageRepsColon": "Average reps:",
+  "estimated1RMColon": "Estimated 1RM:",
+  "weightTrendColon": "Weight trend:",
+  "trendRising": "↑ Rising ({delta})",
+  "@trendRising": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "trendFalling": "↓ Falling ({delta})",
+  "@trendFalling": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "trendStable": "→ Stable",
+  "daysSinceLastSession": "Days since last session:",
+  "generateProgramFailed": "Failed to generate program. Check your API key or internet connection.",
+  "bodyweightTraining": "Bodyweight training",
+  "specializedTraining": "Specialized training",
+  "maxStrengthPrograms": "Programs for maximum strength",
+  "approve": "Approve",
+  "aiEvaluation": "AI Evaluation",
+  "evalEmptySummary": "Empty workout",
+  "evalEmptyDetail": "Add exercises to get an AI evaluation.",
+  "evalExcellentSummary": "Excellent workout!",
+  "evalExcellentDetail": "Well-structured, balanced load across {count} muscle groups. Smart volume choice.",
+  "@evalExcellentDetail": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "evalGoodSummary": "Good workout.",
+  "evalGoodDetailFocus": "Solid structure with emphasis on {group}. Minor tweaks could improve balance.",
+  "@evalGoodDetailFocus": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "evalGoodDetail": "Solid structure. Minor tweaks could improve balance.",
+  "evalAverageSummary": "Average workout.",
+  "evalAverageDetailFew": "Consider adding more exercises for better stimulus.",
+  "evalAverageDetail": "Volume or muscle balance could be improved.",
+  "evalWeakSummary": "Needs improvement.",
+  "evalWeakDetailLowVolume": "Very low volume — add more sets for meaningful training stimulus.",
+  "evalWeakDetailImbalanced": "Heavily imbalanced load. Distribute exercises across more muscle groups.",
+  "evalPoorSummary": "Poor workout structure.",
+  "evalPoorDetail": "Extreme imbalance or insufficient volume. Rebuild the plan.",
+  "daysShort": "{count}d",
+  "@daysShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exerciseUpdatedName": "Exercise updated: {name}",
+  "@exerciseUpdatedName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseAddedName": "Exercise added: {name}",
+  "@exerciseAddedName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeWeightReps": "Weight + Reps",
+  "typeRepsOnly": "Reps Only",
+  "typeCardio": "Cardio",
+  "editWorkout": "Edit Workout",
+  "draft": "Draft",
+  "noExercisesAddedYet": "No exercises added yet",
+  "tapPlusToAddExercises": "Tap the + button to add exercises",
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alternativeN": "Alt {number}: {name}",
+  "@alternativeN": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addAlternative": "Add Alternative",
+  "completeWellnessForRecommendation": "Complete wellness check to get workout recommendation",
+  "wellnessAverage": "Avg: {avg} — {answers}",
+  "@wellnessAverage": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "answers": {
+        "type": "String"
+      }
+    }
+  },
+  "todaysRecommendation": "Today's Recommendation",
+  "exercisesWithCount": "Exercises ({count})",
+  "@exercisesWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overallConfidence": "Overall Confidence: {percent}%",
+  "@overallConfidence": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "privateProfile": "Private Profile",
+  "privateProfileDesc": "{name} has a private profile.\nOnly their username and avatar are visible.",
+  "@privateProfileDesc": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rank": "Rank",
+  "totalVolume": "Total Volume",
+  "tonnesShort": "{value} t",
+  "@tonnesShort": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "compareStats": "Compare Stats",
+  "challengeFriend": "Challenge {name}",
+  "@challengeFriend": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeSentTo": "Challenge sent to {name}!",
+  "@challengeSentTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "statsComparison": "Stats Comparison",
+  "currentStreak": "Current Streak",
+  "youInParens": "(You)",
+  "aheadBy": "You're ahead by {diff} ({percent}%)",
+  "@aheadBy": {
+    "placeholders": {
+      "diff": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "behindBy": "Behind by {diff} ({percent}%)",
+  "@behindBy": {
+    "placeholders": {
+      "diff": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "notAvailable": "N/A",
+  "unlockedOfTotal": "{unlocked} / {total} Unlocked",
+  "@unlockedOfTotal": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tabAll": "All",
+  "tabStrength": "Strength",
+  "tabSocial": "Social",
+  "tabSpecial": "Special",
+  "noAchievementsInCategory": "No achievements in this category",
+  "unlockedOn": "Unlocked {date}",
+  "@unlockedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "unlocked": "Unlocked",
+  "userNamePlaceholder": "User Name",
+  "selectWorkoutForAnalyticsHint": "Select a workout to view detailed analytics",
+  "kcalValue": "{value} kcal",
+  "@kcalValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "nutritionGoalQuestion": "What is your nutrition goal?",
+  "nutritionGoalDesc": "This determines your daily calorie target and macro split.",
+  "confirmGoal": "Confirm Goal",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "choosePrimaryColor": "Choose the primary app color",
+  "exerciseType": "Exercise Type",
+  "exerciseTypeDesc": "Determines what metrics are tracked during workout",
+  "typeWeightRepsDesc": "Sets, reps & weight",
+  "typeRepsOnlyDesc": "Sets & reps, no weight",
+  "typeCardioDesc": "Duration only",
+  "chooseTrainingDirection": "Choose Training Direction",
+  "aiProgramGeneration": "AI Program Generation",
+  "aiProgramGenerationDesc": "AI will tailor the program to your goals and workout history",
+  "selectDirection": "Select direction",
+  "directionFullBody": "Full Body",
+  "directionFullBodyDesc": "Balanced development of all muscle groups",
+  "directionPowerliftingDesc": "Max strength: squat, bench, deadlift",
+  "directionArmWrestlingDesc": "Forearms, wrists, grip & pulling strength",
+  "directionStreetliftingDesc": "Weighted calisthenics & bodyweight skills",
+  "testing": "Testing...",
+  "testKey": "Test key",
+  "howToGetApiKey": "How to get a free API key",
+  "apiKeyStep1": "Go to console.groq.com and sign up (it's free)",
+  "apiKeyStep2": "Open \"API Keys\" in the left menu",
+  "apiKeyStep3": "Click \"Create API Key\", give it a name",
+  "apiKeyStep4": "Copy the key and paste it here",
+  "apiKeyFreeTier": "The free tier is generous — plenty for personal use.",
+  "readyToTrainColon": "Ready to train:",
+  "chooseAWorkout": "Choose a workout:",
+  "macroProteinShort": "P: {grams}g",
+  "@macroProteinShort": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "macroCarbsShort": "C: {grams}g",
+  "@macroCarbsShort": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "macroFatShort": "F: {grams}g",
+  "@macroFatShort": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "waterAmount": "{liters} L  ({ml} ml)",
+  "@waterAmount": {
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      },
+      "ml": {
+        "type": "String"
+      }
+    }
+  },
+  "confidencePercent": "{percent}% confidence",
+  "@confidencePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "withWeight": " with {weight}",
+  "@withWeight": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "topPercentOfAthletes": "Top {percent}% of athletes",
+  "@topPercentOfAthletes": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "nice": "Nice!",
+  "rankWooden": "Wooden",
+  "rankStone": "Stone",
+  "rankIron": "Iron",
+  "rankBronze": "Bronze",
+  "rankSilver": "Silver",
+  "rankGold": "Gold",
+  "rankDiamond": "Diamond",
+  "goalAggressiveFatLoss": "Aggressive Fat Loss",
+  "goalFatLoss": "Fat Loss",
+  "goalMaintain": "Maintain Weight",
+  "goalLeanBulk": "Lean Bulk",
+  "goalBulk": "Bulk",
+  "goalAggressiveFatLossDesc": "Aggressive deficit for fast fat loss. -500 kcal/day.",
+  "goalFatLossDesc": "Moderate deficit for steady fat loss. -300 kcal/day.",
+  "goalMaintainDesc": "Eat at maintenance to preserve current weight.",
+  "goalLeanBulkDesc": "Small surplus for muscle gain with minimal fat. +250 kcal/day.",
+  "goalBulkDesc": "Significant surplus for maximum muscle growth. +500 kcal/day.",
+  "mealBreakfast": "Breakfast",
+  "mealLunch": "Lunch",
+  "mealDinner": "Dinner",
+  "mealAfternoonSnack": "Afternoon Snack",
+  "mealMidMorningSnack": "Mid-Morning Snack",
+  "notifMealTitle": "🍽 Time for {meal}",
+  "@notifMealTitle": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMealBody": "{kcal} kcal · {protein}g protein",
+  "@notifMealBody": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "protein": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMealChannel": "Meal Reminders",
+  "notifWaterTitle": "💧 Time to drink water",
+  "notifWaterBody": "Stay hydrated — your body will thank you!",
+  "notifWaterChannel": "Water Reminders",
+  "recoveryReallyNeedTrain": "Really need to train!",
+  "recoveryDefinitelyTime": "Definitely time to train",
+  "recoveryTrainedToday": "Trained today - rest",
+  "recoveryProgress": "Recovery ({days}/{optimal} days)",
+  "@recoveryProgress": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "optimal": {
+        "type": "int"
+      }
+    }
+  },
+  "recoveryGoodTime": "Good time to train",
+  "recoveryLongTime": "Long time no train ({days} days)",
+  "@recoveryLongTime": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "standardProgression": "Standard progression",
+  "reasonDeloadRecommended": "Deload week recommended for recovery",
+  "reasonRestTrainedYesterday": "Rest day - you trained yesterday",
+  "reasonRestWellness": "Rest day - wellness indicators suggest recovery needed",
+  "reasonRestOverall": "Rest day recommended based on overall condition",
+  "reasonHighReadiness": "High readiness - great day for training",
+  "reasonGoodReadiness": "Good readiness for a moderate workout",
+  "reasonLightTraining": "Light training recommended today",
+  "reasonDaysSinceWorkout": "{days, plural, =1{1 day since last workout - good recovery time} other{{days} days since last workout - good recovery time}}",
+  "@reasonDaysSinceWorkout": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reasonWellRecovered": "Well-recovered from last session",
+  "reasonOneDayRecovery": "One day recovery - intensity adjusted accordingly",
+  "reasonReadyToTrain": "Ready to train: {muscles}",
+  "@reasonReadyToTrain": {
+    "placeholders": {
+      "muscles": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonRequireRest": "Require rest: {muscles}",
+  "@reasonRequireRest": {
+    "placeholders": {
+      "muscles": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonHighSoreness": "High muscle soreness noted - weights adjusted",
+  "reasonLowEnergy": "Low energy - consider lighter intensity",
+  "reasonGoodEnergy": "Good energy levels detected",
+  "progNoHistory": "No history — using programmed parameters",
+  "progNewExercise": "New exercise — parameters tailored to your goals",
+  "progDeload": "Deload week — recovering at 90% of your last weight",
+  "progExcellentReps": "Excellent performance — +{reps} rep target",
+  "@progExcellentReps": {
+    "placeholders": {
+      "reps": {
+        "type": "String"
+      }
+    }
+  },
+  "progAddingSet": "Good progress — adding a set",
+  "progMaintainReps": "Challenging workout — maintaining last session reps",
+  "progBodyweightMaintain": "Bodyweight exercise — maintaining level",
+  "progWellnessReduced": "Reduced load — wellness adjustment applied",
+  "progLimitedRecovery": "Limited recovery — maintaining last session weight",
+  "progTrendingUp": "Trending up — {delta} based on your last month",
+  "@progTrendingUp": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "progLoadReduced": "Load reduced — easing off based on your recent trend",
+  "progStable": "Stable — maintaining your last session weight",
+  "progWellnessConsidered": " (wellness considered)",
+  "popupRankUpTitle": "Rank Up!",
+  "popupRankUpMessage": "You've reached {rank} rank.",
+  "@popupRankUpMessage": {
+    "placeholders": {
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "popupGreatProgressTitle": "Great Progress!",
+  "popupGreatProgressMessage": "Your overall rank score is climbing fast.",
+  "popupNewRecordTitle": "New Personal Record!",
+  "popupFirstWorkoutTitle": "First Workout Complete!",
+  "popupFirstWorkoutMessage": "Welcome to your strength journey.",
+  "rankReasonConsistency": "your training consistency and achievements",
+  "rankReasonLifts": "{count, plural, =1{1 tracked lift measured against world-record benchmarks} other{{count} tracked lifts measured against world-record benchmarks}}",
+  "@rankReasonLifts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rankReasonSummary": "Based on {basis}, {workouts} logged workouts and a {streak}-day streak.",
+  "@rankReasonSummary": {
+    "placeholders": {
+      "basis": {
+        "type": "String"
+      },
+      "workouts": {
+        "type": "int"
+      },
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "rankReasonNotEnough": "Not enough workout history yet — rank will refine as you log more sessions.",
+  "errMustBeLoggedInFriends": "You must be logged in to send friend requests",
+  "errCannotAddYourself": "You cannot add yourself as a friend",
+  "errNoUserWithEmail": "No user found with this email address",
+  "errAlreadyFriends": "You are already friends with this user",
+  "errRequestAlreadySent": "Friend request already sent",
+  "errSendRequestFailed": "Failed to send friend request. Please try again.",
+  "errUserDataNotFound": "User data not found",
+  "errAcceptRequestFailed": "Failed to accept friend request. Please try again.",
+  "errRejectRequestFailed": "Failed to reject friend request. Please try again.",
+  "errRemoveFriendFailed": "Failed to remove friend. Please try again.",
+  "errCancelRequestFailed": "Failed to cancel request. Please try again.",
+  "errCreateChallengeFailed": "Failed to create challenge. Please try again.",
+  "errAcceptChallengeFailed": "Failed to accept challenge",
+  "errDeclineChallengeFailed": "Failed to decline challenge",
+  "errRegistrationFailed": "Registration failed.",
+  "errWeakPassword": "The password is too weak.",
+  "errEmailInUse": "The email address is already in use.",
+  "errInvalidEmailAuth": "The email address is invalid.",
+  "errSignInFailed": "Sign in failed.",
+  "errUserNotFound": "No user found for that email.",
+  "errWrongPassword": "Incorrect password.",
+  "errUserDisabled": "This user has been disabled.",
+  "minutesValue": "{count} min",
+  "@minutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achFirstWorkoutTitle": "First Steps",
+  "achFirstWorkoutDesc": "Complete your first workout",
+  "achWorkout10Title": "Getting Started",
+  "achWorkout50Title": "Dedicated",
+  "achWorkout100Title": "Century",
+  "achWorkout500Title": "Legend",
+  "achCompleteWorkouts": "{count, plural, =1{Complete 1 workout} other{Complete {count} workouts}}",
+  "@achCompleteWorkouts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achWeight1000Title": "Lightweight",
+  "achWeight10000Title": "Heavy Lifter",
+  "achWeight100000Title": "Iron Warrior",
+  "achLiftTotal": "Lift {weight} total",
+  "@achLiftTotal": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "achWilks300Title": "Strong",
+  "achWilks400Title": "Elite Strength",
+  "achReachWilks": "Reach {value} Wilks coefficient",
+  "@achReachWilks": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "achStreak7Title": "Week Warrior",
+  "achStreak30Title": "Monthly Master",
+  "achStreak100Title": "Unstoppable",
+  "achTrainDaysInRow": "{count, plural, =1{Train 1 day in a row} other{Train {count} days in a row}}",
+  "@achTrainDaysInRow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achEarlyBirdTitle": "Early Bird",
+  "achEarlyBirdDesc": "Complete 10 workouts before 8 AM",
+  "achNightOwlTitle": "Night Owl",
+  "achNightOwlDesc": "Complete 10 workouts after 8 PM",
+  "achFirstFriendTitle": "Social",
+  "achFirstFriendDesc": "Add your first friend",
+  "achFriends10Title": "Popular",
+  "achFriends10Desc": "Have 10 friends",
+  "achChallengeWinnerTitle": "Champion",
+  "achChallengeWinnerDesc": "Win your first challenge",
+  "achChallenge5Title": "Competitor",
+  "achChallenge5Desc": "Complete 5 challenges",
+  "achNewYearTitle": "New Year, New Me",
+  "achNewYearDesc": "Train on New Year's Day",
+  "achBirthdayTitle": "Birthday Gains",
+  "achBirthdayDesc": "Train on your birthday",
+  "achPerfectWeekTitle": "Perfect Week",
+  "achPerfectWeekDesc": "Complete all planned workouts in a week"
 }
