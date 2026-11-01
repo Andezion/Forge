@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../models/overall_rank_result.dart';
@@ -57,7 +58,8 @@ class RankEventPopup extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'Top ${rankResult!.topPercent.toStringAsFixed(0)}% of athletes',
+                  AppLocalizations.of(context)!.topPercentOfAthletes(
+                      rankResult!.topPercent.toStringAsFixed(0)),
                   style: AppTextStyles.body1.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -86,7 +88,7 @@ class RankEventPopup extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Nice!'),
+              child: Text(AppLocalizations.of(context)!.nice),
             ),
           ],
         ),
