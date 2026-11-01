@@ -3,7 +3,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
@@ -116,7 +115,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppStrings.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -173,7 +172,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          AppStrings.workshop,
+          AppLocalizations.of(context)!.workshop,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -271,7 +270,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'No workouts found',
+                  AppLocalizations.of(context)!.noWorkoutsFound,
                   style: AppTextStyles.body2.copyWith(
                     color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
@@ -334,7 +333,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
         child: Text(
-          'No muscle data available',
+          AppLocalizations.of(context)!.noMuscleDataAvailable,
           style: AppTextStyles.caption.copyWith(
             color: Theme.of(context).textTheme.bodySmall?.color,
           ),
@@ -359,7 +358,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Muscle Load',
+            AppLocalizations.of(context)!.muscleLoad,
             style: AppTextStyles.caption.copyWith(
               fontWeight: FontWeight.w600,
               color: Theme.of(context).textTheme.bodySmall?.color,
@@ -404,7 +403,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '${stats.setsCount} sets',
+                    AppLocalizations.of(context)!.setsCount(stats.setsCount),
                     style: AppTextStyles.caption.copyWith(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
@@ -481,7 +480,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           children: [
                             const Icon(Icons.play_arrow, size: 20),
                             const SizedBox(width: 8),
-                            Text(AppStrings.start),
+                            Text(AppLocalizations.of(context)!.start),
                           ],
                         ),
                         onTap: () {
@@ -494,7 +493,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           children: [
                             const Icon(Icons.edit, size: 20),
                             const SizedBox(width: 8),
-                            Text(AppStrings.edit),
+                            Text(AppLocalizations.of(context)!.edit),
                           ],
                         ),
                         onTap: () {
@@ -508,7 +507,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                             const Icon(Icons.delete,
                                 size: 20, color: AppColors.error),
                             const SizedBox(width: 8),
-                            Text(AppStrings.delete,
+                            Text(AppLocalizations.of(context)!.delete,
                                 style: const TextStyle(color: AppColors.error)),
                           ],
                         ),
