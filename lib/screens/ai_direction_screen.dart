@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 import '../services/groq_service.dart';
@@ -8,22 +9,22 @@ class AiDirectionScreen extends StatelessWidget {
 
   static const _aiColor = Color(0xFF6C63FF);
 
-  static final _options = [
-    (TrainingDirection.fullBody, 'Full Body', Icons.fitness_center, 'Balanced development of all muscle groups'),
-    (TrainingDirection.powerlifting, 'Powerlifting', Icons.sports_martial_arts, 'Max strength: squat, bench, deadlift'),
-    (TrainingDirection.armWrestling, 'Arm Wrestling', Icons.back_hand, 'Forearms, wrists, grip & pulling strength'),
-    (TrainingDirection.streetlifting, 'Streetlifting', Icons.sports_gymnastics, 'Weighted calisthenics & bodyweight skills'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final options = [
+      (TrainingDirection.fullBody, l10n.directionFullBody, Icons.fitness_center, l10n.directionFullBodyDesc),
+      (TrainingDirection.powerlifting, l10n.powerlifting, Icons.sports_martial_arts, l10n.directionPowerliftingDesc),
+      (TrainingDirection.armWrestling, l10n.armwrestling, Icons.back_hand, l10n.directionArmWrestlingDesc),
+      (TrainingDirection.streetlifting, l10n.streetlifting, Icons.sports_gymnastics, l10n.directionStreetliftingDesc),
+    ];
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          'Choose Training Direction',
+          l10n.chooseTrainingDirection,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -52,9 +53,9 @@ class AiDirectionScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('AI Program Generation', style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600)),
+                      Text(l10n.aiProgramGeneration, style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
-                      Text('AI will tailor the program to your goals and workout history', style: AppTextStyles.caption),
+                      Text(l10n.aiProgramGenerationDesc, style: AppTextStyles.caption),
                     ],
                   ),
                 ),
@@ -62,9 +63,9 @@ class AiDirectionScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Text('Select direction', style: AppTextStyles.h3),
+          Text(l10n.selectDirection, style: AppTextStyles.h3),
           const SizedBox(height: 12),
-          ..._options.map(
+          ...options.map(
             (opt) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _DirectionCard(
