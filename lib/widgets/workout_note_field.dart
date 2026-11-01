@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
@@ -22,6 +23,7 @@ class _WorkoutNoteFieldState extends State<WorkoutNoteField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -30,7 +32,7 @@ class _WorkoutNoteFieldState extends State<WorkoutNoteField> {
             Icon(Icons.edit_note, size: 20, color: AppColors.textSecondary),
             const SizedBox(width: 6),
             Text(
-              'Note (optional)',
+              l10n.noteOptional,
               style: AppTextStyles.body2.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.bold,
@@ -47,7 +49,7 @@ class _WorkoutNoteFieldState extends State<WorkoutNoteField> {
           maxLength: 500,
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(
-            hintText: 'How did it go? What to change next time?',
+            hintText: l10n.noteHint,
             hintStyle: AppTextStyles.body2.copyWith(
               color: AppColors.textSecondary,
             ),
