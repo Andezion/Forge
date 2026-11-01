@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/l10n.dart';
 import '../models/user.dart' as app_user;
 
 class AuthException implements Exception {
@@ -71,13 +72,13 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return cred;
     } on fb_auth.FirebaseAuthException catch (e) {
-      String message = 'Registration failed.';
+      String message = L10n.current.errRegistrationFailed;
       if (e.code == 'weak-password') {
-        message = 'The password is too weak.';
+        message = L10n.current.errWeakPassword;
       } else if (e.code == 'email-already-in-use') {
-        message = 'The email address is already in use.';
+        message = L10n.current.errEmailInUse;
       } else if (e.code == 'invalid-email') {
-        message = 'The email address is invalid.';
+        message = L10n.current.errInvalidEmailAuth;
       }
       throw AuthException(message);
     }
@@ -122,15 +123,15 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return cred;
     } on fb_auth.FirebaseAuthException catch (e) {
-      String message = 'Sign in failed.';
+      String message = L10n.current.errSignInFailed;
       if (e.code == 'user-not-found') {
-        message = 'No user found for that email.';
+        message = L10n.current.errUserNotFound;
       } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password.';
+        message = L10n.current.errWrongPassword;
       } else if (e.code == 'invalid-email') {
-        message = 'The email address is invalid.';
+        message = L10n.current.errInvalidEmailAuth;
       } else if (e.code == 'user-disabled') {
-        message = 'This user has been disabled.';
+        message = L10n.current.errUserDisabled;
       }
       throw AuthException(message);
     }
