@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/exercise.dart';
 import '../services/muscle_recovery_tracker.dart';
 
@@ -31,7 +32,7 @@ class MuscleRecoveryCard extends StatelessWidget {
                     color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
                 Text(
-                  'Muscle Recovery',
+                  AppLocalizations.of(context)!.muscleRecovery,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ],
@@ -40,7 +41,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             if (musclesToTrain.isNotEmpty) ...[
               _buildSectionHeader(
                 context,
-                'Ready to train',
+                AppLocalizations.of(context)!.readyToTrain,
                 Colors.green,
               ),
               const SizedBox(height: 8),
@@ -54,7 +55,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             ],
             _buildSectionHeader(
               context,
-              'In recovery',
+              AppLocalizations.of(context)!.inRecovery,
               Colors.orange,
             ),
             const SizedBox(height: 8),
@@ -68,7 +69,7 @@ class MuscleRecoveryCard extends StatelessWidget {
               const SizedBox(height: 16),
               _buildSectionHeader(
                 context,
-                'Require rest',
+                AppLocalizations.of(context)!.requireRest,
                 Colors.red,
               ),
               const SizedBox(height: 8),
@@ -236,7 +237,7 @@ class MuscleRecoveryCompact extends StatelessWidget {
                 const Icon(Icons.flash_on, color: Colors.green, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Ready to train:',
+                  AppLocalizations.of(context)!.readyToTrainColon,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -254,7 +255,8 @@ class MuscleRecoveryCompact extends StatelessWidget {
                 return Chip(
                   avatar: const Icon(Icons.check_circle,
                       size: 16, color: Colors.green),
-                  label: Text('$displayName ($days days)'),
+                  label: Text(
+                      '$displayName (${AppLocalizations.of(context)!.durationDaysCount(days)})'),
                   visualDensity: VisualDensity.compact,
                 );
               }).toList(),
