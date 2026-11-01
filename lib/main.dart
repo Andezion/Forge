@@ -20,7 +20,6 @@ import 'services/workout_recommendation_service.dart';
 import 'services/leaderboard_service.dart';
 import 'services/ranking_service.dart';
 import 'services/nutrition_service.dart';
-import 'models/app_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
@@ -104,11 +103,7 @@ class MyApp extends StatelessWidget {
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: appColor.getTheme(),
-      locale: settings.language == AppLanguage.russian
-          ? const Locale('ru')
-          : settings.language == AppLanguage.polish
-              ? const Locale('pl')
-              : const Locale('en'),
+      locale: Locale(settings.language.code),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
