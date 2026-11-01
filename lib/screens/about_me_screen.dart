@@ -5,6 +5,7 @@ import '../services/profile_service.dart';
 import '../models/user.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../utils/units.dart';
 
 class AboutMeScreen extends StatefulWidget {
   const AboutMeScreen({super.key});
@@ -18,6 +19,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   final _injuryController = TextEditingController();
   final _ageController = TextEditingController();
   final _heightController = TextEditingController();
+  final _heightInchesController = TextEditingController();
   final _weightController = TextEditingController();
   final _yearsTrainingController = TextEditingController();
   final _countryController = TextEditingController();
@@ -93,11 +95,18 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     if (profile.age != null) {
       _ageController.text = profile.age.toString();
     }
+    final units = Units.of(context, listen: false);
     if (profile.heightCm != null) {
-      _heightController.text = profile.heightCm!.toStringAsFixed(0);
+      if (units.isImperialLength) {
+        final (feet, inches) = Units.cmToFeetInches(profile.heightCm!);
+        _heightController.text = '$feet';
+        _heightInchesController.text = '$inches';
+      } else {
+        _heightController.text = profile.heightCm!.toStringAsFixed(0);
+      }
     }
     if (profile.weightKg != null) {
-      _weightController.text = profile.weightKg!.toStringAsFixed(1);
+      _weightController.text = units.weightValue(profile.weightKg!);
     }
     if (profile.yearsTraining != null) {
       _yearsTrainingController.text = profile.yearsTraining!.toStringAsFixed(1);
@@ -112,6 +121,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     _injuryController.dispose();
     _ageController.dispose();
     _heightController.dispose();
+    _heightInchesController.dispose();
     _weightController.dispose();
     _yearsTrainingController.dispose();
     _countryController.dispose();
@@ -122,6 +132,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final units = Units.of(context);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -147,21 +158,46 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                   suffixText: l10n.years,
                 ),
                 const SizedBox(height: 12),
-                _buildTextField(
-                  controller: _heightController,
-                  label: l10n.heightLabel,
-                  hint: l10n.hintHeight,
-                  keyboardType: TextInputType.number,
-                  suffixText: 'cm',
-                ),
+                if (units.isImperialLength)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _heightController,
+                          label: l10n.heightLabel,
+                          hint: '5',
+                          keyboardType: TextInputType.number,
+                          suffixText: l10n.unitFt,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _heightInchesController,
+                          label: ' ',
+                          hint: '9',
+                          keyboardType: TextInputType.number,
+                          suffixText: l10n.unitIn,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  _buildTextField(
+                    controller: _heightController,
+                    label: l10n.heightLabel,
+                    hint: l10n.hintHeight,
+                    keyboardType: TextInputType.number,
+                    suffixText: units.cmLabel,
+                  ),
                 const SizedBox(height: 12),
                 _buildTextField(
                   controller: _weightController,
                   label: l10n.weight,
-                  hint: l10n.hintWeight,
+                  hint: units.isLb ? l10n.hintWeightLb : l10n.hintWeight,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  suffixText: 'kg',
+                  suffixText: units.weightLabel,
                 ),
                 const SizedBox(height: 16),
                 Text(l10n.gender, style: AppTextStyles.body1),
@@ -320,7 +356,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                     runSpacing: 4,
                     children: _focusList
                         .map((f) => Chip(
-                              label: Text(f),
+                              label: Text(_chipLabel(f, l10n)),
                               onDeleted: () =>
                                   setState(() => _focusList.remove(f)),
                               deleteIconColor: AppColors.textSecondary,
@@ -331,6 +367,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 _buildAutocompleteChipInput(
                   controller: _focusController,
                   suggestions: _suggestedFocus,
+                  labelOf: (s) => _chipLabel(s, l10n),
                   currentList: _focusList,
                   hint: l10n.hintFocus,
                   onAdd: (val) => setState(() => _focusList.add(val)),
@@ -354,7 +391,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                     runSpacing: 4,
                     children: _injuryList
                         .map((f) => Chip(
-                              label: Text(f),
+                              label: Text(_chipLabel(f, l10n)),
                               backgroundColor:
                                   Colors.red.withValues(alpha: 0.1),
                               side: BorderSide(
@@ -369,6 +406,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 _buildAutocompleteChipInput(
                   controller: _injuryController,
                   suggestions: _suggestedInjuries,
+                  labelOf: (s) => _chipLabel(s, l10n),
                   currentList: _injuryList,
                   hint: l10n.hintInjuries,
                   onAdd: (val) => setState(() => _injuryList.add(val)),
@@ -448,7 +486,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   Widget _buildDaysPicker() {
     return Row(
       children: List.generate(6, (i) {
-        final days = i + 2; // 2–7
+        final days = i + 2;
         final selected = _trainingDaysPerWeek == days;
         return Expanded(
           child: Padding(
@@ -529,16 +567,25 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
   Widget _buildAutocompleteChipInput({
     required TextEditingController controller,
     required List<String> suggestions,
+    required String Function(String) labelOf,
     required List<String> currentList,
     required String hint,
     required void Function(String) onAdd,
   }) {
+    String toKey(String typed) => suggestions.firstWhere(
+          (s) => labelOf(s).toLowerCase() == typed,
+          orElse: () => typed,
+        );
+
     return Autocomplete<String>(
+      displayStringForOption: labelOf,
       optionsBuilder: (textEditingValue) {
         final input = textEditingValue.text.toLowerCase();
         if (input.isEmpty) return const Iterable<String>.empty();
-        return suggestions.where(
-            (s) => s.toLowerCase().contains(input) && !currentList.contains(s));
+        return suggestions.where((s) =>
+            (labelOf(s).toLowerCase().contains(input) ||
+                s.contains(input)) &&
+            !currentList.contains(s));
       },
       fieldViewBuilder:
           (context, fieldController, focusNode, onFieldSubmitted) {
@@ -553,7 +600,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             suffixIcon: IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                final val = fieldController.text.trim().toLowerCase();
+                final val = toKey(fieldController.text.trim().toLowerCase());
                 if (val.isNotEmpty && !currentList.contains(val)) {
                   onAdd(val);
                   fieldController.clear();
@@ -562,7 +609,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
             ),
           ),
           onSubmitted: (v) {
-            final val = v.trim().toLowerCase();
+            final val = toKey(v.trim().toLowerCase());
             if (val.isNotEmpty && !currentList.contains(val)) {
               onAdd(val);
               fieldController.clear();
@@ -647,6 +694,31 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     );
   }
 
+  String _chipLabel(String key, AppLocalizations l10n) {
+    return switch (key) {
+      'legs' => l10n.focusLegs,
+      'upper body' => l10n.focusUpperBody,
+      'core' => l10n.focusCore,
+      'glutes' => l10n.focusGlutes,
+      'back' => l10n.focusBack,
+      'chest' => l10n.focusChest,
+      'shoulders' => l10n.focusShoulders,
+      'arms' => l10n.focusArms,
+      'cardio' => l10n.focusCardio,
+      'knee' => l10n.injuryKnee,
+      'lower back' => l10n.injuryLowerBack,
+      'shoulder' => l10n.injuryShoulder,
+      'wrist' => l10n.injuryWrist,
+      'elbow' => l10n.injuryElbow,
+      'ankle' => l10n.injuryAnkle,
+      'hip' => l10n.injuryHip,
+      'neck' => l10n.injuryNeck,
+      'hamstring' => l10n.injuryHamstring,
+      'groin' => l10n.injuryGroin,
+      _ => key,
+    };
+  }
+
   String _genderLabel(Gender g, AppLocalizations l10n) {
     switch (g) {
       case Gender.male:
@@ -686,6 +758,7 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
 
   void _save() async {
     final l10n = AppLocalizations.of(context)!;
+    final units = Units.of(context, listen: false);
     final profile = Provider.of<ProfileService>(context, listen: false);
     final selectedGoals = _selectedGoals.entries
         .where((e) => e.value)
@@ -711,10 +784,25 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
     final age = int.tryParse(_ageController.text.trim());
     await profile.setAge(age);
 
-    final height = double.tryParse(_heightController.text.trim());
+    final double? height;
+    if (units.isImperialLength) {
+      final feet = int.tryParse(_heightController.text.trim());
+      final inches = int.tryParse(_heightInchesController.text.trim()) ?? 0;
+      final previous = profile.heightCm;
+      final unchanged = previous != null &&
+          Units.cmToFeetInches(previous) == (feet, inches);
+      height = unchanged
+          ? previous
+          : feet == null
+              ? null
+              : Units.feetInchesToCm(feet, inches);
+    } else {
+      height = double.tryParse(_heightController.text.trim());
+    }
     await profile.setHeightCm(height);
 
-    final weight = double.tryParse(_weightController.text.trim());
+    final weight = units.parseWeight(_weightController.text,
+        originalKg: profile.weightKg);
     await profile.setWeightKg(weight);
 
     final yearsTraining = double.tryParse(_yearsTrainingController.text.trim());
