@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
+import '../utils/units.dart';
 import 'workout_execution_screen.dart';
 
 class FullCalendarScreen extends StatefulWidget {
@@ -33,7 +34,7 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Workout Calendar'),
+        title: Text(AppLocalizations.of(context)!.workoutCalendar),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         elevation: 0,
@@ -45,13 +46,14 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
               icon: const Icon(Icons.add),
-              label: const Text('Log Workout'),
+              label: Text(AppLocalizations.of(context)!.logWorkout),
             ),
       body: Column(
         children: [
           Container(
             color: AppColors.surface,
             child: TableCalendar(
+              locale: Localizations.localeOf(context).toString(),
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
               focusedDay: _focusedDay,
@@ -145,7 +147,9 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
     }
 
     final dayLabel =
-        isSameDay(_selectedDay, DateTime.now()) ? 'today' : _formatDate(_selectedDay);
+        isSameDay(_selectedDay, DateTime.now())
+            ? AppLocalizations.of(context)!.today
+            : _formatDate(_selectedDay);
 
     showModalBottomSheet(
       context: context,
@@ -191,7 +195,7 @@ class _FullCalendarScreenState extends State<FullCalendarScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No workouts on this day',
+              AppLocalizations.of(context)!.noWorkoutsOnDay,
               style: AppTextStyles.body1.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -253,6 +257,8 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final units = Units.of(context);
     final session = widget.workout.session;
     final duration = session.totalDurationSeconds;
     final hours = duration ~/ 3600;
@@ -278,7 +284,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
               children: [
                 Expanded(
                   child: Text(
-                    session.workoutName,
+                    session.displayName,
                     style: AppTextStyles.h4,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -293,7 +299,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Completed',
+                    l10n.completed,
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.success,
                       fontWeight: FontWeight.bold,
@@ -326,7 +332,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    '${session.exerciseResults.length} exercises',
+                    l10n.exercisesCount(session.exerciseResults.length),
                     style: AppTextStyles.body2.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -343,7 +349,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                       _isExpanded = !_isExpanded;
                     });
                   },
-                  tooltip: _isExpanded ? 'Collapse' : 'Expand',
+                  tooltip: _isExpanded ? l10n.collapse : l10n.expand,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   iconSize: 20,
@@ -355,14 +361,14 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
               ...session.exerciseResults.take(3).map((result) => Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
-                      '• ${result.exercise.name}: ${result.setResults.length} sets',
+                      '• ${result.exercise.name}: ${l10n.setsCount(result.setResults.length)}',
                       style: AppTextStyles.body2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   )),
               if (session.exerciseResults.length > 3)
                 Text(
-                  '  +${session.exerciseResults.length - 3} more...',
+                  '  ${l10n.moreItems(session.exerciseResults.length - 3)}',
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.textSecondary,
                     fontStyle: FontStyle.italic,
@@ -429,7 +435,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                                       size: 12, color: Colors.orange[800]),
                                   const SizedBox(width: 2),
                                   Text(
-                                    '$currentTotalReps / $prevReps reps',
+                                    l10n.repsProgress(currentTotalReps, prevReps),
                                     style: AppTextStyles.caption.copyWith(
                                       color: Colors.orange[800],
                                       fontWeight: FontWeight.bold,
@@ -469,7 +475,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                               const SizedBox(width: 12),
                               Flexible(
                                 child: Text(
-                                  '${set.actualReps} reps × ${set.weight.toStringAsFixed(1)} kg',
+                                  '${l10n.repsCount(set.actualReps)} × ${units.weight(set.weight)}',
                                   style: AppTextStyles.body2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -522,7 +528,7 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Note',
+                      AppLocalizations.of(context)!.note,
                       style: AppTextStyles.body2.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -593,7 +599,7 @@ class _WorkoutPickerSheetState extends State<_WorkoutPickerSheet> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 36, 16, 8),
             child: Text(
-              'Log workout for ${widget.dayLabel}',
+              AppLocalizations.of(context)!.logWorkoutFor(widget.dayLabel),
               style: AppTextStyles.h4,
             ),
           ),
@@ -652,7 +658,8 @@ class _WorkoutPickerSheetState extends State<_WorkoutPickerSheet> {
                     ),
                     title: Text(workout.name, style: AppTextStyles.body1),
                     subtitle: Text(
-                      '${workout.exercises.length} exercises',
+                      AppLocalizations.of(context)!
+                          .exercisesCount(workout.exercises.length),
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.textSecondary),
                     ),
