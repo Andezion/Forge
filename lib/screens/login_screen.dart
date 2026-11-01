@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -119,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    AppStrings.login,
+                    AppLocalizations.of(context)!.login,
                     style: AppTextStyles.h3,
                     textAlign: TextAlign.center,
                   ),
@@ -129,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.email,
+                      labelText: AppLocalizations.of(context)!.email,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
@@ -140,10 +141,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       if (!value.contains('@')) {
-                        return AppStrings.errorInvalidEmail;
+                        return AppLocalizations.of(context)!.errorInvalidEmail;
                       }
                       return null;
                     },
@@ -154,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     style: AppTextStyles.input,
                     decoration: InputDecoration(
-                      labelText: AppStrings.password,
+                      labelText: AppLocalizations.of(context)!.password,
                       labelStyle: AppTextStyles.inputLabel,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
@@ -177,10 +178,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return AppStrings.errorFieldRequired;
+                        return AppLocalizations.of(context)!.errorFieldRequired;
                       }
                       if (value.length < 6) {
-                        return AppStrings.errorPasswordTooShort;
+                        return AppLocalizations.of(context)!.errorPasswordTooShort;
                       }
                       return null;
                     },
@@ -193,11 +194,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         final auth =
                             Provider.of<AuthService>(context, listen: false);
                         final messenger = ScaffoldMessenger.of(context);
+                        final l10n = AppLocalizations.of(context)!;
                         final email = _emailController.text.trim();
                         if (email.isEmpty || !email.contains('@')) {
                           messenger.showSnackBar(
                             SnackBar(
-                                content: Text(AppStrings.errorInvalidEmail)),
+                                content: Text(AppLocalizations.of(context)!.errorInvalidEmail)),
                           );
                           return;
                         }
@@ -206,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (!mounted) return;
                           messenger.showSnackBar(
                             SnackBar(
-                                content: Text('Password reset email sent.')),
+                                content: Text(l10n.passwordResetEmailSent)),
                           );
                         } catch (e) {
                           String msg = e is Exception ? e.toString() : '$e';
@@ -218,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       },
                       child: Text(
-                        AppStrings.forgotPassword,
+                        AppLocalizations.of(context)!.forgotPassword,
                         style: AppTextStyles.buttonSmall.copyWith(
                           color: AppColors.primary,
                         ),
@@ -243,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('Remember me', style: AppTextStyles.body2),
+                      Text(AppLocalizations.of(context)!.rememberMe, style: AppTextStyles.body2),
                     ],
                   ),
                   ElevatedButton(
@@ -269,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )
                         : Text(
-                            AppStrings.signIn,
+                            AppLocalizations.of(context)!.signIn,
                             style: AppTextStyles.button,
                           ),
                   ),
@@ -278,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        AppStrings.dontHaveAccount,
+                        AppLocalizations.of(context)!.dontHaveAccount,
                         style: AppTextStyles.body2,
                       ),
                       TextButton(
@@ -290,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: Text(
-                          AppStrings.register,
+                          AppLocalizations.of(context)!.register,
                           style: AppTextStyles.button.copyWith(
                             color: AppColors.primary,
                             fontSize: 14,
