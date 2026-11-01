@@ -46,10 +46,10 @@ class StrengthCoefficients {
       d = 13.6175032;
       e = -57.96288;
     }
+    
     final bw = bodyWeight;
-    final denom =
-        a * bw * bw * bw * bw * bw + b * bw * bw * bw * bw + c * bw * bw * bw +
-            d * bw * bw + e * bw + 1;
+    final denom = a * bw * bw * bw * bw + b * bw * bw * bw + c * bw * bw +
+        d * bw + e;
     if (denom <= 0) return 0.0;
     return 500 / denom * totalLifted;
   }
