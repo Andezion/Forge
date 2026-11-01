@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 
 enum ChallengeType {
   workouts,
@@ -167,44 +168,60 @@ class ChallengeTemplate {
     this.defaultDurationDays = 7,
   });
 
+  static String titleFor(ChallengeType type) => switch (type) {
+        ChallengeType.workouts => L10n.current.challengeWorkoutsTitle,
+        ChallengeType.totalWeight => L10n.current.challengeWeightTitle,
+        ChallengeType.specificExercise => L10n.current.challengeExerciseTitle,
+        ChallengeType.streak => L10n.current.challengeStreakTitle,
+        ChallengeType.consistency => L10n.current.challengeConsistencyTitle,
+      };
+
+  static String descriptionFor(ChallengeType type) => switch (type) {
+        ChallengeType.workouts => L10n.current.challengeWorkoutsDesc,
+        ChallengeType.totalWeight => L10n.current.challengeWeightDesc,
+        ChallengeType.specificExercise => L10n.current.challengeExerciseDesc,
+        ChallengeType.streak => L10n.current.challengeStreakDesc,
+        ChallengeType.consistency => L10n.current.challengeConsistencyDesc,
+      };
+
   static List<ChallengeTemplate> getTemplates() {
     return [
       ChallengeTemplate(
         type: ChallengeType.workouts,
-        title: 'Workout Challenge',
-        description: 'Who can complete the most workouts?',
+        title: titleFor(ChallengeType.workouts),
+        description: descriptionFor(ChallengeType.workouts),
         icon: Icons.fitness_center,
         color: Colors.blue,
         defaultDurationDays: 7,
       ),
       ChallengeTemplate(
         type: ChallengeType.totalWeight,
-        title: 'Weight Challenge',
-        description: 'Who can lift the most total weight?',
+        title: titleFor(ChallengeType.totalWeight),
+        description: descriptionFor(ChallengeType.totalWeight),
         icon: Icons.fitness_center,
         color: Colors.orange,
         defaultDurationDays: 7,
       ),
       ChallengeTemplate(
         type: ChallengeType.specificExercise,
-        title: 'Exercise Challenge',
-        description: 'Who can lift the most in a specific exercise?',
+        title: titleFor(ChallengeType.specificExercise),
+        description: descriptionFor(ChallengeType.specificExercise),
         icon: Icons.emoji_events,
         color: Colors.purple,
         defaultDurationDays: 7,
       ),
       ChallengeTemplate(
         type: ChallengeType.streak,
-        title: 'Streak Challenge',
-        description: 'Who can maintain the longest training streak?',
+        title: titleFor(ChallengeType.streak),
+        description: descriptionFor(ChallengeType.streak),
         icon: Icons.local_fire_department,
         color: Colors.red,
         defaultDurationDays: 14,
       ),
       ChallengeTemplate(
         type: ChallengeType.consistency,
-        title: 'Consistency Challenge',
-        description: 'Who can train the most days in a row?',
+        title: titleFor(ChallengeType.consistency),
+        description: descriptionFor(ChallengeType.consistency),
         icon: Icons.calendar_today,
         color: Colors.green,
         defaultDurationDays: 30,
