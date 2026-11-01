@@ -3,13 +3,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../constants/app_strings.dart';
 import '../services/data_manager.dart';
 import '../services/groq_service.dart';
 import '../services/settings_service.dart';
 import '../models/workout.dart';
 import '../models/workout_session.dart';
 import '../models/ai_suggested_workout.dart';
+import '../utils/units.dart';
+import '../utils/workout_format.dart';
 import 'ai_direction_screen.dart';
 
 class ProgramsScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(groqService.lastError ??
-              'Failed to generate program. Check your API key or internet connection.'),
+              AppLocalizations.of(context)!.generateProgramFailed),
           backgroundColor: Colors.red,
         ),
       );
@@ -78,7 +79,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          AppStrings.programs,
+          AppLocalizations.of(context)!.programs,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
@@ -86,7 +87,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Select a training program',
+            AppLocalizations.of(context)!.selectTrainingProgram,
             style: AppTextStyles.h3,
           ),
           const SizedBox(height: 16),
@@ -94,8 +95,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           const SizedBox(height: 16),
           _buildProgramCategory(
             context,
-            AppStrings.streetlifting,
-            'Bodyweight training',
+            AppLocalizations.of(context)!.streetlifting,
+            AppLocalizations.of(context)!.bodyweightTraining,
             Icons.sports_gymnastics,
             AppColors.streetlifting,
             streetliftingWorkouts,
@@ -103,8 +104,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           const SizedBox(height: 16),
           _buildProgramCategory(
             context,
-            AppStrings.armwrestling,
-            'Specialized training',
+            AppLocalizations.of(context)!.armwrestling,
+            AppLocalizations.of(context)!.specializedTraining,
             Icons.back_hand,
             AppColors.armwrestling,
             armwrestlingWorkouts,
@@ -112,8 +113,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           const SizedBox(height: 16),
           _buildProgramCategory(
             context,
-            AppStrings.powerlifting,
-            'Programs for maximum strength',
+            AppLocalizations.of(context)!.powerlifting,
+            AppLocalizations.of(context)!.maxStrengthPrograms,
             Icons.fitness_center,
             AppColors.powerlifting,
             powerliftingWorkouts,
@@ -144,11 +145,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             child: const Icon(Icons.auto_awesome, color: aiColor, size: 28),
           ),
           title: Text(
-            'AI Suggested',
+            AppLocalizations.of(context)!.aiSuggested,
             style: AppTextStyles.h4.copyWith(color: aiColor),
           ),
           subtitle: Text(
-            'Personalized programs based on your history',
+            AppLocalizations.of(context)!.personalizedProgramsDesc,
             style: AppTextStyles.caption,
           ),
           children: [
@@ -160,7 +161,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
-                        'No suggestions yet. Generate one based on your workout history!',
+                        AppLocalizations.of(context)!.noSuggestionsYet,
                         style: AppTextStyles.caption,
                         textAlign: TextAlign.center,
                       ),
@@ -185,7 +186,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             )
                           : const Icon(Icons.auto_awesome, color: Colors.white),
                       label: Text(
-                          _isGenerating ? 'Generating...' : 'Generate Program'),
+                          _isGenerating
+                              ? AppLocalizations.of(context)!.generating
+                              : AppLocalizations.of(context)!.generateProgram),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: aiColor,
                         foregroundColor: Colors.white,
@@ -239,7 +242,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             .copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        '${suggestion.workout.exercises.length} exercises',
+                        AppLocalizations.of(context)!.exercisesCount(suggestion.workout.exercises.length),
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -277,7 +280,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     onPressed: () =>
                         dataManager.rejectAiSuggestedWorkout(suggestion.id),
                     icon: const Icon(Icons.close, size: 16, color: Colors.red),
-                    label: const Text('Decline'),
+                    label: Text(AppLocalizations.of(context)!.decline),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       side: const BorderSide(color: Colors.red),
@@ -295,13 +298,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              '"${suggestion.workout.name}" added to your workouts'),
+                              AppLocalizations.of(context)!.workoutAddedToWorkouts(suggestion.workout.name)),
                           backgroundColor: color,
                         ),
                       );
                     },
                     icon: const Icon(Icons.check, size: 16, color: Colors.white),
-                    label: const Text('Approve'),
+                    label: Text(AppLocalizations.of(context)!.approve),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color,
                       foregroundColor: Colors.white,
@@ -359,7 +362,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Exercises:',
+                Text(AppLocalizations.of(context)!.exercisesColonLabel,
                     style: AppTextStyles.body1
                         .copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -389,8 +392,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                         style: AppTextStyles.body2.copyWith(
                                             fontWeight: FontWeight.w600)),
                                     Text(
-                                      '${we.sets} sets × ${we.targetReps} reps'
-                                      '${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
+                                      formatSetsRepsWeight(
+                                          AppLocalizations.of(context)!, Units.of(context),
+                                          sets: we.sets,
+                                          reps: we.targetReps,
+                                          weightKg: we.weight),
                                       style: AppTextStyles.caption,
                                     ),
                                   ],
@@ -411,7 +417,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Close'),
+                  child: Text(AppLocalizations.of(context)!.close),
                 ),
               ],
             ),
@@ -511,7 +517,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${workout.exercises.length} exercises',
+                                    AppLocalizations.of(context)!.exercisesCount(workout.exercises.length),
                                     style: AppTextStyles.caption,
                                   ),
                                 ],
@@ -569,7 +575,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Exercises:',
+                          AppLocalizations.of(context)!.exercisesColonLabel,
                           style: AppTextStyles.body1.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -613,7 +619,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                         ),
                                       ),
                                       Text(
-                                        '${we.sets} sets × ${we.targetReps} reps${we.weight > 0 ? ' @ ${we.weight}kg' : ''}',
+                                        formatSetsRepsWeight(
+                                            AppLocalizations.of(context)!, Units.of(context),
+                                            sets: we.sets,
+                                            reps: we.targetReps,
+                                            weightKg: we.weight),
                                         style: AppTextStyles.caption.copyWith(
                                           color: wasCompleted
                                               ? null
@@ -623,7 +633,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                       ),
                                       if (!wasCompleted)
                                         Text(
-                                          'Not completed last time',
+                                          AppLocalizations.of(context)!.notCompletedLastTime,
                                           style: AppTextStyles.caption.copyWith(
                                             color: AppColors.error,
                                             fontStyle: FontStyle.italic,
@@ -653,7 +663,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Close'),
+                        child: Text(AppLocalizations.of(context)!.close),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -663,7 +673,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Program "${workout.name}" selected'),
+                              content: Text(AppLocalizations.of(context)!.programSelected(workout.name)),
                               backgroundColor: color,
                             ),
                           );
@@ -676,7 +686,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Select Program'),
+                        child: Text(AppLocalizations.of(context)!.selectProgram),
                       ),
                     ),
                   ],
