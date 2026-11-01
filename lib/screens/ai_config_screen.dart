@@ -187,7 +187,7 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                       )
                     : Icon(Icons.wifi_tethering, color: appColor.color),
                 label: Text(
-                  _isTesting ? 'Testing...' : 'Test key',
+                  _isTesting ? AppLocalizations.of(context)!.testing : AppLocalizations.of(context)!.testKey,
                   style: AppTextStyles.button.copyWith(color: appColor.color),
                 ),
                 style: OutlinedButton.styleFrom(
@@ -253,21 +253,21 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
               children: [
                 Icon(Icons.info_outline, color: accent),
                 const SizedBox(width: 8),
-                Text('How to get a free API key', style: AppTextStyles.h4),
+                Text(AppLocalizations.of(context)!.howToGetApiKey, style: AppTextStyles.h4),
               ],
             ),
             const SizedBox(height: 12),
             _step(
               '1',
-              'Go to console.groq.com and sign up (it\'s free)',
+              AppLocalizations.of(context)!.apiKeyStep1,
               accent,
             ),
-            _step('2', 'Open "API Keys" in the left menu', accent),
-            _step('3', 'Click "Create API Key", give it a name', accent),
-            _step('4', 'Copy the key and paste it here', accent),
+            _step('2', AppLocalizations.of(context)!.apiKeyStep2, accent),
+            _step('3', AppLocalizations.of(context)!.apiKeyStep3, accent),
+            _step('4', AppLocalizations.of(context)!.apiKeyStep4, accent),
             const SizedBox(height: 8),
             Text(
-              'The free tier is generous — plenty for personal use.',
+              AppLocalizations.of(context)!.apiKeyFreeTier,
               style:
                   AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
             ),
