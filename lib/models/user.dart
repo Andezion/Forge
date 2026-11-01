@@ -1,3 +1,5 @@
+import '../l10n/l10n.dart';
+
 class ExerciseMax {
   final String exerciseId;
   final String exerciseName;
@@ -163,13 +165,13 @@ extension SessionDurationExt on SessionDuration {
   String get label {
     switch (this) {
       case SessionDuration.thirtyMin:
-        return '30 min';
+        return L10n.current.minutesValue(30);
       case SessionDuration.fortyFiveMin:
-        return '45 min';
+        return L10n.current.minutesValue(45);
       case SessionDuration.sixtyMin:
-        return '60 min';
+        return L10n.current.minutesValue(60);
       case SessionDuration.ninetyMin:
-        return '90 min';
+        return L10n.current.minutesValue(90);
     }
   }
 
