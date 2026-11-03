@@ -280,6 +280,7 @@
   "weekB": "Неделя B (следующая неделя)",
   "viewDetails": "Подробнее",
   "searchWorkouts": "Поиск тренировок...",
+  "searchExercise": "Поиск упражнения...",
   "noWorkoutsAvailableCreate": "Нет доступных тренировок. Создайте одну сначала.",
   "noWorkoutsAvailableWorkshop": "Нет доступных тренировок. Создайте одну в Мастерской.",
   "apiKeySaved": "API ключ сохранён",
