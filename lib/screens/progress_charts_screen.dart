@@ -747,24 +747,47 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
                     color: Theme.of(context).textTheme.bodyLarge?.color,
                   )),
               const SizedBox(height: 12),
-              DropdownButtonFormField<Exercise>(
-                value: _selectedExercise,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                hint: Text(l10n.selectExercise),
-                items: _availableExercises.map((exercise) {
-                  return DropdownMenuItem(
-                    value: exercise,
-                    child: Text(exercise.name),
-                  );
-                }).toList(),
-                onChanged: (exercise) {
-                  if (exercise != null) {
-                    _loadExerciseData(exercise);
+              Autocomplete<Exercise>(
+                initialValue:
+                    TextEditingValue(text: _selectedExercise?.name ?? ''),
+                displayStringForOption: (exercise) => exercise.name,
+                optionsBuilder: (textEditingValue) {
+                  final input = textEditingValue.text.trim().toLowerCase();
+                  if (input.isEmpty ||
+                      input == _selectedExercise?.name.toLowerCase()) {
+                    return _availableExercises;
                   }
+                  return _availableExercises.where(
+                      (e) => e.name.toLowerCase().contains(input));
+                },
+                fieldViewBuilder:
+                    (context, fieldController, focusNode, onFieldSubmitted) {
+                  return TextField(
+                    controller: fieldController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      hintText: l10n.searchExercise,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: fieldController.text.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                fieldController.clear();
+                                focusNode.requestFocus();
+                              },
+                            ),
+                    ),
+                    onChanged: (_) => setState(() {}),
+                    onSubmitted: (_) => onFieldSubmitted(),
+                  );
+                },
+                onSelected: (exercise) {
+                  FocusScope.of(context).unfocus();
+                  _loadExerciseData(exercise);
                 },
               ),
             ],
