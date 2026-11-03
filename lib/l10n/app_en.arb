@@ -1217,6 +1217,10 @@
   "@searchWorkouts": {
     "description": "Search workouts hint"
   },
+  "searchExercise": "Search exercise...",
+  "@searchExercise": {
+    "description": "Search exercise by name hint"
+  },
   "noWorkoutsAvailableCreate": "No workouts available. Create one first.",
   "@noWorkoutsAvailableCreate": {
     "description": "No workouts available create message"
