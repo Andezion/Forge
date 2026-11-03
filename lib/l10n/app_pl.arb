@@ -280,6 +280,7 @@
   "weekB": "Tydzień B (następny tydzień)",
   "viewDetails": "Szczegóły",
   "searchWorkouts": "Szukaj treningów...",
+  "searchExercise": "Szukaj ćwiczenia...",
   "noWorkoutsAvailableCreate": "Brak dostępnych treningów. Utwórz najpierw jeden.",
   "noWorkoutsAvailableWorkshop": "Brak dostępnych treningów. Utwórz jeden w Warsztacie.",
   "apiKeySaved": "Klucz API zapisany",
