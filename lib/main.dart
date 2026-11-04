@@ -20,7 +20,8 @@ import 'services/workout_recommendation_service.dart';
 import 'services/leaderboard_service.dart';
 import 'services/ranking_service.dart';
 import 'services/nutrition_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'services/personal_challenge_service.dart';
+import 'package:dyplom/l10n/generated/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,9 @@ void main() async {
   final friendsService = FriendsService();
 
   final challengeService = ChallengeService();
+
+  final personalChallengeService = PersonalChallengeService();
+  await personalChallengeService.load();
 
   final settingsService = SettingsService();
   await settingsService.load();
@@ -79,6 +83,7 @@ void main() async {
         ChangeNotifierProvider.value(value: authService),
         ChangeNotifierProvider.value(value: friendsService),
         ChangeNotifierProvider.value(value: challengeService),
+        ChangeNotifierProvider.value(value: personalChallengeService),
         ChangeNotifierProvider.value(value: settingsService),
         ChangeNotifierProvider.value(value: workoutRecommendationService),
         ChangeNotifierProvider.value(value: leaderboardService),
