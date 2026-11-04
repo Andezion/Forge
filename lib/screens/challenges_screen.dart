@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dyplom/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
@@ -13,7 +13,9 @@ import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
 
 class ChallengesScreen extends StatefulWidget {
-  const ChallengesScreen({super.key});
+  final bool embedded;
+
+  const ChallengesScreen({super.key, this.embedded = false});
 
   @override
   State<ChallengesScreen> createState() => _ChallengesScreenState();
@@ -38,6 +40,53 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   @override
   Widget build(BuildContext context) {
     final challengeService = Provider.of<ChallengeService>(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    final tabViews = TabBarView(
+      controller: _tabController,
+      children: [
+        _buildChallengesStreamList(challengeService.getActiveChallengesStream()),
+        _buildChallengesStreamList(
+            challengeService.getCompletedChallengesStream()),
+        _buildChallengesStreamList(
+            challengeService.getPendingChallengesStream()),
+      ],
+    );
+
+    if (widget.embedded) {
+      return Stack(
+        children: [
+          Column(
+            children: [
+              TabBar(
+                controller: _tabController,
+                labelColor: AppColors.primary,
+                unselectedLabelColor: AppColors.textSecondary,
+                indicatorColor: AppColors.primary,
+                tabs: [
+                  Tab(text: l10n.active),
+                  Tab(text: l10n.completed),
+                  Tab(text: l10n.pending),
+                ],
+              ),
+              Expanded(child: tabViews),
+            ],
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16 + MediaQuery.of(context).padding.bottom,
+            child: FloatingActionButton.extended(
+              heroTag: 'createSocialChallenge',
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+              onPressed: _showCreateChallengeDialog,
+              icon: const Icon(Icons.add),
+              label: Text(l10n.createChallenge),
+            ),
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -66,17 +115,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildChallengesStreamList(
-              challengeService.getActiveChallengesStream()),
-          _buildChallengesStreamList(
-              challengeService.getCompletedChallengesStream()),
-          _buildChallengesStreamList(
-              challengeService.getPendingChallengesStream()),
-        ],
-      ),
+      body: tabViews,
     );
   }
 
@@ -544,16 +583,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   void _showCreateChallengeDialog() {
     final friendsService = Provider.of<FriendsService>(context, listen: false);
+    // No friends is fine: the challenge can be taken solo.
     final friends = friendsService.friends;
-
-    if (friends.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.addFriendsFirst),
-        ),
-      );
-      return;
-    }
 
     showModalBottomSheet(
       context: context,
@@ -628,9 +659,16 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   style: AppTextStyles.h4,
                 ),
                 const SizedBox(height: 8),
+                if (friends.isNotEmpty)
+                  Text(
+                    AppLocalizations.of(context)!.selectFriendsToChallenge,
+                    style: AppTextStyles.body2
+                        .copyWith(color: AppColors.textSecondary),
+                  ),
+                const SizedBox(height: 4),
                 Text(
-                  AppLocalizations.of(context)!.selectFriendsToChallenge,
-                  style: AppTextStyles.body2
+                  AppLocalizations.of(context)!.challengeYourselfHint,
+                  style: AppTextStyles.caption
                       .copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 16),
@@ -683,14 +721,14 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
-              onPressed: selectedFriends.isEmpty
-                  ? null
-                  : () async {
-                      Navigator.pop(context);
-                      await _createChallenge(
-                          template, selectedFriends.toList(), durationDays);
-                    },
-              child: Text(AppLocalizations.of(context)!.create),
+              onPressed: () async {
+                Navigator.pop(context);
+                await _createChallenge(
+                    template, selectedFriends.toList(), durationDays);
+              },
+              child: Text(selectedFriends.isEmpty
+                  ? AppLocalizations.of(context)!.challengeYourself
+                  : AppLocalizations.of(context)!.create),
             ),
           ],
         ),
