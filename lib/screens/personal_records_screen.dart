@@ -428,7 +428,8 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
             Text(_l10n.selectExercise, style: AppTextStyles.h3),
             const SizedBox(height: 12),
             DropdownButtonFormField<Exercise?>(
-              value: _selectedExercise,
+              key: ValueKey(_selectedExercise?.id),
+              initialValue: _selectedExercise,
               decoration: InputDecoration(
                 hintText: _l10n.allExercises,
                 border: OutlineInputBorder(
@@ -750,7 +751,7 @@ class _PersonalRecordsScreenState extends State<PersonalRecordsScreen>
             Text(_l10n.federation, style: AppTextStyles.h3),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _selectedFederation,
+              initialValue: _selectedFederation,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8)),
