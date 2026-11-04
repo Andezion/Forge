@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dyplom/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/profile_service.dart';
 import '../services/theme_service.dart';
@@ -22,6 +22,7 @@ import 'about_me_screen.dart';
 import 'progress_charts_screen.dart';
 import 'personal_records_screen.dart';
 import 'achievements_screen.dart';
+import 'challenges_hub_screen.dart';
 import 'settings_screen.dart';
 import 'nutrition_screen.dart';
 import 'ai_config_screen.dart';
@@ -238,6 +239,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const CustomizationScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      AppLocalizations.of(context)!.challenges,
+                      Icons.flag,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ChallengesHubScreen(),
                           ),
                         );
                       },
