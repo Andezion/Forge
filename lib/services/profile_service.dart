@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import '../models/body_measurement.dart';
 import '../models/chart_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +22,7 @@ class ProfileService extends ChangeNotifier {
   static const _keyInjuries = 'profile_injuries';
   static const _keyCountry = 'profile_country';
   static const _keyCity = 'profile_city';
+  static const _keyMeasurements = 'profile_measurements';
 
   String? _imagePath;
   int _frameIndex = 0;
@@ -39,6 +41,7 @@ class ProfileService extends ChangeNotifier {
   List<String> _injuries = [];
   String? _country;
   String? _city;
+  final Map<BodyMeasurement, BodyMeasurementEntry> _measurements = {};
 
   String? get imagePath => _imagePath;
   int get frameIndex => _frameIndex;
@@ -57,6 +60,8 @@ class ProfileService extends ChangeNotifier {
   List<String> get injuries => _injuries;
   String? get country => _country;
   String? get city => _city;
+  Map<BodyMeasurement, BodyMeasurementEntry> get measurements =>
+      Map.unmodifiable(_measurements);
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -94,7 +99,38 @@ class ProfileService extends ChangeNotifier {
     } catch (_) {
       _weightHistory.clear();
     }
+    _measurements.clear();
+    try {
+      final raw = prefs.getString(_keyMeasurements);
+      if (raw != null) {
+        final map = jsonDecode(raw) as Map<String, dynamic>;
+        for (final type in BodyMeasurement.values) {
+          final value = map[type.name];
+          if (value is Map<String, dynamic>) {
+            _measurements[type] = BodyMeasurementEntry.fromJson(value);
+          }
+        }
+      }
+    } catch (_) {
+      _measurements.clear();
+    }
     notifyListeners();
+  }
+
+  Future<void> setMeasurement(BodyMeasurement type, double? cm) async {
+    if (cm == null) {
+      _measurements.remove(type);
+    } else {
+      _measurements[type] = BodyMeasurementEntry(cm: cm, date: DateTime.now());
+    }
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _keyMeasurements,
+      jsonEncode({
+        for (final e in _measurements.entries) e.key.name: e.value.toJson(),
+      }),
+    );
   }
 
   Future<void> setImagePath(String? path) async {
