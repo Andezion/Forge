@@ -16,6 +16,7 @@ import '../utils/units.dart';
 import 'login_screen.dart';
 import 'customization_screen.dart';
 import 'weight_screen.dart';
+import 'measurements_screen.dart';
 import 'wellness_screen.dart';
 import 'about_me_screen.dart';
 import 'progress_charts_screen.dart';
@@ -261,6 +262,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const WeightScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      AppLocalizations.of(context)!.measurements,
+                      Icons.straighten,
+                      () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const MeasurementsScreen(),
                           ),
                         );
                       },
