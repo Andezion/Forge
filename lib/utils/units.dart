@@ -14,6 +14,7 @@ class Units {
   final String kgLabel;
   final String lbLabel;
   final String cmLabel;
+  final String inLabel;
 
   const Units({
     this.weightUnit = WeightUnit.kg,
@@ -21,6 +22,7 @@ class Units {
     this.kgLabel = 'kg',
     this.lbLabel = 'lb',
     this.cmLabel = 'cm',
+    this.inLabel = 'in',
   });
 
   static Units _current = const Units();
@@ -35,6 +37,7 @@ class Units {
       kgLabel: l10n.unitKg,
       lbLabel: l10n.unitLb,
       cmLabel: l10n.unitCm,
+      inLabel: l10n.unitIn,
     );
   }
 
@@ -47,6 +50,7 @@ class Units {
       kgLabel: l10n?.unitKg ?? 'kg',
       lbLabel: l10n?.unitLb ?? 'lb',
       cmLabel: l10n?.unitCm ?? 'cm',
+      inLabel: l10n?.unitIn ?? 'in',
     );
   }
 
@@ -88,6 +92,25 @@ class Units {
     if (!isImperialLength) return '${cm.round()} $cmLabel';
     final (feet, inches) = cmToFeetInches(cm);
     return '$feet\'$inches"';
+  }
+
+  String get circumferenceLabel => isImperialLength ? inLabel : cmLabel;
+
+  double toDisplayLength(double cm) => isImperialLength ? cm / cmPerInch : cm;
+
+  double toCm(double displayed) =>
+      isImperialLength ? displayed * cmPerInch : displayed;
+
+  String circumferenceValue(double cm, {int decimals = 1}) =>
+      number(toDisplayLength(cm), decimals: decimals);
+
+  double? parseCircumference(String text, {double? originalCm}) {
+    final trimmed = text.trim();
+    if (originalCm != null && trimmed == circumferenceValue(originalCm)) {
+      return originalCm;
+    }
+    final value = double.tryParse(trimmed.replaceAll(',', '.'));
+    return value == null ? null : toCm(value);
   }
 
   static (int, int) cmToFeetInches(double cm) {
