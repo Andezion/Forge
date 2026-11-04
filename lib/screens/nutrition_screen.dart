@@ -325,7 +325,7 @@ class _SettingsTab extends StatelessWidget {
                   AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
             ),
             value: notificationsEnabled,
-            activeColor: appColor,
+            activeThumbColor: appColor,
             onChanged:
                 profile.mealSchedule.isNotEmpty ? onToggleNotifications : null,
           ),
