@@ -326,17 +326,21 @@ class _AboutMeScreenState extends State<AboutMeScreen> {
                 const SizedBox(height: 16),
                 Text(l10n.preferredIntensity, style: AppTextStyles.body1),
                 const SizedBox(height: 8),
-                ...TrainingIntensity.values.map((i) {
-                  return RadioListTile<TrainingIntensity>(
-                    title: Text(i.name.capitalize()),
-                    subtitle: Text(_getIntensityDescription(i, l10n)),
-                    value: i,
-                    groupValue: _intensity,
-                    onChanged: (v) => setState(() => _intensity = v),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  );
-                }),
+                RadioGroup<TrainingIntensity>(
+                  groupValue: _intensity,
+                  onChanged: (v) => setState(() => _intensity = v),
+                  child: Column(
+                    children: TrainingIntensity.values.map((i) {
+                      return RadioListTile<TrainingIntensity>(
+                        title: Text(i.name.capitalize()),
+                        subtitle: Text(_getIntensityDescription(i, l10n)),
+                        value: i,
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
