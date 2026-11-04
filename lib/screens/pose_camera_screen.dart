@@ -32,6 +32,7 @@ class _PoseCameraScreenState extends State<PoseCameraScreen>
   CameraController? _controller;
   CameraLensDirection _lens = CameraLensDirection.front;
   bool _isSwitching = false;
+  bool _cameraStarting = false;
   String? _cameraError;
 
   PoseDetector? _detector;
@@ -90,7 +91,9 @@ class _PoseCameraScreenState extends State<PoseCameraScreen>
         await _disposeController();
         if (mounted) setState(() {});
       }();
-    } else if (state == AppLifecycleState.resumed && _controller == null) {
+    } else if (state == AppLifecycleState.resumed &&
+        _controller == null &&
+        !_cameraStarting) {
       _startCamera();
     }
   }
@@ -184,7 +187,16 @@ class _PoseCameraScreenState extends State<PoseCameraScreen>
   }
 
   Future<void> _startCamera() async {
-    if (_cameras.isEmpty) return;
+    if (_cameras.isEmpty || _cameraStarting) return;
+    _cameraStarting = true;
+    try {
+      await _openCamera();
+    } finally {
+      _cameraStarting = false;
+    }
+  }
+
+  Future<void> _openCamera() async {
     final description = _cameras.firstWhere(
       (c) => c.lensDirection == _lens,
       orElse: () => _cameras.first,
