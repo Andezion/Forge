@@ -535,11 +535,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
                         bottom: 16 + MediaQuery.of(context).padding.bottom,
                       ),
                       itemCount: _workoutExercises.length,
-                      onReorder: (oldIndex, newIndex) {
+                      onReorderItem: (oldIndex, newIndex) {
                         setState(() {
-                          if (newIndex > oldIndex) {
-                            newIndex -= 1;
-                          }
                           final item = _workoutExercises.removeAt(oldIndex);
                           _workoutExercises.insert(newIndex, item);
                         });
