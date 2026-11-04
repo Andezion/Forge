@@ -122,41 +122,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionTitle(l10n.language),
               const SizedBox(height: 12),
               _buildCard(
-                child: Column(
-                  children: [
-                    _buildRadioTile<AppLanguage>(
-                      title: l10n.english,
-                      value: AppLanguage.english,
-                      groupValue: settings.language,
-                      icon: Icons.language,
-                      iconColor: appColor.color,
-                      onChanged: (value) {
-                        if (value != null) settings.setLanguage(value);
-                      },
-                    ),
-                    const Divider(height: 1),
-                    _buildRadioTile<AppLanguage>(
-                      title: l10n.russian,
-                      value: AppLanguage.russian,
-                      groupValue: settings.language,
-                      icon: Icons.language,
-                      iconColor: appColor.color,
-                      onChanged: (value) {
-                        if (value != null) settings.setLanguage(value);
-                      },
-                    ),
-                    const Divider(height: 1),
-                    _buildRadioTile<AppLanguage>(
-                      title: l10n.polish,
-                      value: AppLanguage.polish,
-                      groupValue: settings.language,
-                      icon: Icons.language,
-                      iconColor: appColor.color,
-                      onChanged: (value) {
-                        if (value != null) settings.setLanguage(value);
-                      },
-                    ),
-                  ],
+                child: RadioGroup<AppLanguage>(
+                  groupValue: settings.language,
+                  onChanged: (value) {
+                    if (value != null) settings.setLanguage(value);
+                  },
+                  child: Column(
+                    children: [
+                      _buildRadioTile<AppLanguage>(
+                        title: l10n.english,
+                        value: AppLanguage.english,
+                        icon: Icons.language,
+                        iconColor: appColor.color,
+                      ),
+                      const Divider(height: 1),
+                      _buildRadioTile<AppLanguage>(
+                        title: l10n.russian,
+                        value: AppLanguage.russian,
+                        icon: Icons.language,
+                        iconColor: appColor.color,
+                      ),
+                      const Divider(height: 1),
+                      _buildRadioTile<AppLanguage>(
+                        title: l10n.polish,
+                        value: AppLanguage.polish,
+                        icon: Icons.language,
+                        iconColor: appColor.color,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -173,26 +167,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildRadioTile<WeightUnit>(
-                      title: l10n.kilograms,
-                      value: WeightUnit.kg,
+                    RadioGroup<WeightUnit>(
                       groupValue: settings.weightUnit,
-                      icon: Icons.monitor_weight,
-                      iconColor: appColor.color,
                       onChanged: (value) {
                         if (value != null) settings.setWeightUnit(value);
                       },
-                    ),
-                    const Divider(height: 1),
-                    _buildRadioTile<WeightUnit>(
-                      title: l10n.pounds,
-                      value: WeightUnit.lb,
-                      groupValue: settings.weightUnit,
-                      icon: Icons.monitor_weight,
-                      iconColor: appColor.color,
-                      onChanged: (value) {
-                        if (value != null) settings.setWeightUnit(value);
-                      },
+                      child: Column(
+                        children: [
+                          _buildRadioTile<WeightUnit>(
+                            title: l10n.kilograms,
+                            value: WeightUnit.kg,
+                            icon: Icons.monitor_weight,
+                            iconColor: appColor.color,
+                          ),
+                          const Divider(height: 1),
+                          _buildRadioTile<WeightUnit>(
+                            title: l10n.pounds,
+                            value: WeightUnit.lb,
+                            icon: Icons.monitor_weight,
+                            iconColor: appColor.color,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -202,26 +198,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildRadioTile<DistanceUnit>(
-                      title: l10n.centimeters,
-                      value: DistanceUnit.meters,
+                    RadioGroup<DistanceUnit>(
                       groupValue: settings.distanceUnit,
-                      icon: Icons.straighten,
-                      iconColor: appColor.color,
                       onChanged: (value) {
                         if (value != null) settings.setDistanceUnit(value);
                       },
-                    ),
-                    const Divider(height: 1),
-                    _buildRadioTile<DistanceUnit>(
-                      title: l10n.feetInches,
-                      value: DistanceUnit.feet,
-                      groupValue: settings.distanceUnit,
-                      icon: Icons.straighten,
-                      iconColor: appColor.color,
-                      onChanged: (value) {
-                        if (value != null) settings.setDistanceUnit(value);
-                      },
+                      child: Column(
+                        children: [
+                          _buildRadioTile<DistanceUnit>(
+                            title: l10n.centimeters,
+                            value: DistanceUnit.meters,
+                            icon: Icons.straighten,
+                            iconColor: appColor.color,
+                          ),
+                          const Divider(height: 1),
+                          _buildRadioTile<DistanceUnit>(
+                            title: l10n.feetInches,
+                            value: DistanceUnit.feet,
+                            icon: Icons.straighten,
+                            iconColor: appColor.color,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -325,10 +323,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildRadioTile<T>({
     required String title,
     required T value,
-    required T groupValue,
     required IconData icon,
     required Color iconColor,
-    required ValueChanged<T?> onChanged,
   }) {
     return RadioListTile<T>(
       title: Row(
@@ -339,8 +335,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
       value: value,
-      groupValue: groupValue,
-      onChanged: onChanged,
       activeColor: iconColor,
       contentPadding: EdgeInsets.zero,
     );
@@ -376,7 +370,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: activeColor,
+      activeThumbColor: activeColor,
       contentPadding: EdgeInsets.zero,
     );
   }
