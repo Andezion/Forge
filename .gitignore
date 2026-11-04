@@ -47,3 +47,4 @@ web/
 .env
 functions/node_modules/
 functions/package-lock.json
+lib/l10n/generated/
