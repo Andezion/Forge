@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dyplom/l10n/generated/app_localizations.dart';
 
 import '../services/theme_service.dart';
 import '../services/profile_service.dart';
