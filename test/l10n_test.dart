@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dyplom/l10n/generated/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Map<String, dynamic> _arb(String lang) =>
