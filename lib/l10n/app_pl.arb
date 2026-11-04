@@ -933,5 +933,20 @@
   "achBirthdayTitle": "Urodzinowy progres",
   "achBirthdayDesc": "Trenuj w swoje urodziny",
   "achPerfectWeekTitle": "Idealny tydzień",
-  "achPerfectWeekDesc": "Ukończ wszystkie zaplanowane treningi w tygodniu"
+  "achPerfectWeekDesc": "Ukończ wszystkie zaplanowane treningi w tygodniu",
+  "measurements": "Pomiary",
+  "measurementShoulders": "Obręcz barkowa",
+  "measurementChest": "Klatka piersiowa",
+  "measurementBicepsRight": "Prawy biceps",
+  "measurementBicepsLeft": "Lewy biceps",
+  "measurementForearmRight": "Prawe przedramię",
+  "measurementForearmLeft": "Lewe przedramię",
+  "measurementThighRight": "Prawe udo",
+  "measurementThighLeft": "Lewe udo",
+  "measurementCalfRight": "Prawa łydka",
+  "measurementCalfLeft": "Lewa łydka",
+  "measurementsHint": "Dotknij pierścienia wokół ciała, aby wpisać obwód",
+  "measurementCircumference": "Obwód",
+  "measurementInvalid": "Wpisz wartość od {min} do {max}",
+  "measurementUpdated": "Ostatnia aktualizacja: {date}"
 }

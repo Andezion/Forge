@@ -933,5 +933,20 @@
   "achBirthdayTitle": "Прогресс на день рождения",
   "achBirthdayDesc": "Потренируйтесь в свой день рождения",
   "achPerfectWeekTitle": "Идеальная неделя",
-  "achPerfectWeekDesc": "Выполните все запланированные тренировки за неделю"
+  "achPerfectWeekDesc": "Выполните все запланированные тренировки за неделю",
+  "measurements": "Замеры",
+  "measurementShoulders": "Плечевой пояс",
+  "measurementChest": "Грудь",
+  "measurementBicepsRight": "Правый бицепс",
+  "measurementBicepsLeft": "Левый бицепс",
+  "measurementForearmRight": "Правое предплечье",
+  "measurementForearmLeft": "Левое предплечье",
+  "measurementThighRight": "Правое бедро",
+  "measurementThighLeft": "Левое бедро",
+  "measurementCalfRight": "Правая икра",
+  "measurementCalfLeft": "Левая икра",
+  "measurementsHint": "Нажмите на кольцо вокруг тела, чтобы указать обхват",
+  "measurementCircumference": "Обхват",
+  "measurementInvalid": "Введите значение от {min} до {max}",
+  "measurementUpdated": "Последнее обновление: {date}"
 }

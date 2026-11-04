@@ -3017,5 +3017,31 @@
   "achBirthdayTitle": "Birthday Gains",
   "achBirthdayDesc": "Train on your birthday",
   "achPerfectWeekTitle": "Perfect Week",
-  "achPerfectWeekDesc": "Complete all planned workouts in a week"
+  "achPerfectWeekDesc": "Complete all planned workouts in a week",
+  "measurements": "Measurements",
+  "measurementShoulders": "Shoulders",
+  "measurementChest": "Chest",
+  "measurementBicepsRight": "Right biceps",
+  "measurementBicepsLeft": "Left biceps",
+  "measurementForearmRight": "Right forearm",
+  "measurementForearmLeft": "Left forearm",
+  "measurementThighRight": "Right thigh",
+  "measurementThighLeft": "Left thigh",
+  "measurementCalfRight": "Right calf",
+  "measurementCalfLeft": "Left calf",
+  "measurementsHint": "Tap a ring around the body to enter its circumference",
+  "measurementCircumference": "Circumference",
+  "measurementInvalid": "Enter a value between {min} and {max}",
+  "@measurementInvalid": {
+    "placeholders": {
+      "min": {"type": "String"},
+      "max": {"type": "String"}
+    }
+  },
+  "measurementUpdated": "Last updated: {date}",
+  "@measurementUpdated": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  }
 }
