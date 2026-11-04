@@ -3043,5 +3043,35 @@
     "placeholders": {
       "date": {"type": "String"}
     }
-  }
+  },
+  "challengesSocial": "Social",
+  "challengesPersonal": "Personal",
+  "challengeYourself": "Challenge yourself",
+  "challengeYourselfHint": "Leave everyone unselected to challenge only yourself.",
+  "personalChallengesIntro": "System challenges verified by the camera. Put your phone so that your whole body is visible.",
+  "exercisePushUps": "Push-ups",
+  "repsCount": "{count, plural, =1{1 rep} other{{count} reps}}",
+  "@repsCount": {"placeholders": {"count": {"type": "int"}}},
+  "personalBest": "Best: {count}",
+  "@personalBest": {"placeholders": {"count": {"type": "int"}}},
+  "personalChallengeDone": "Done",
+  "startAttempt": "Start",
+  "poseCameraTitle": "Pose tracking",
+  "poseSwitchCamera": "Switch camera",
+  "poseStartRecording": "Start recording",
+  "poseStopRecording": "Stop recording",
+  "poseLoadingModel": "Loading pose model…",
+  "poseNoPerson": "Step back so your whole body is in the frame",
+  "poseLandmarksVisible": "Points: {count}/33",
+  "@poseLandmarksVisible": {"placeholders": {"count": {"type": "int"}}},
+  "poseCameraError": "Camera error: {error}",
+  "@poseCameraError": {"placeholders": {"error": {"type": "String"}}},
+  "poseNoCamera": "No camera available on this device",
+  "poseCameraPermissionDenied": "Camera access denied. Allow it in system settings.",
+  "poseRepCounterSoon": "Automatic rep counting is coming soon",
+  "poseTarget": "Goal: {count}",
+  "@poseTarget": {"placeholders": {"count": {"type": "int"}}},
+  "poseRecordingSaved": "Recording saved",
+  "poseDeleteRecording": "Delete",
+  "poseKeepRecording": "Keep"
 }
