@@ -458,24 +458,26 @@ class _WorkoutPickerDialogState extends State<_WorkoutPickerDialog> {
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 220),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.workouts.length,
-                  itemBuilder: (ctx, i) {
-                    final w = widget.workouts[i];
-                    return RadioListTile<Workout>(
-                      title: Text(w.name, style: const TextStyle(fontSize: 14)),
-                      subtitle: Text(
-                        AppLocalizations.of(context)!.exercisesCount(w.exercises.length),
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      value: w,
-                      groupValue: _selected,
-                      onChanged: (v) => setState(() => _selected = v),
-                      dense: true,
-                      activeColor: AppColors.primary,
-                    );
-                  },
+                child: RadioGroup<Workout>(
+                  groupValue: _selected,
+                  onChanged: (v) => setState(() => _selected = v),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: widget.workouts.length,
+                    itemBuilder: (ctx, i) {
+                      final w = widget.workouts[i];
+                      return RadioListTile<Workout>(
+                        title: Text(w.name, style: const TextStyle(fontSize: 14)),
+                        subtitle: Text(
+                          AppLocalizations.of(context)!.exercisesCount(w.exercises.length),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        value: w,
+                        dense: true,
+                        activeColor: AppColors.primary,
+                      );
+                    },
+                  ),
                 ),
               ),
               const Divider(),
