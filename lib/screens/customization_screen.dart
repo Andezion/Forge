@@ -98,7 +98,7 @@ class CustomizationScreen extends StatelessWidget {
                             );
                           }
                         },
-                        activeColor: appColor.color,
+                        activeThumbColor: appColor.color,
                       ),
                     ],
                   ),
