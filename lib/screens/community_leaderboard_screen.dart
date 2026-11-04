@@ -120,7 +120,7 @@ class _CommunityLeaderboardScreenState
 
   Widget _buildScopeChip() {
     return DropdownButtonFormField<String>(
-      value: _selectedScope,
+      initialValue: _selectedScope,
       dropdownColor: AppColors.primary,
       decoration: InputDecoration(
         isDense: true,
@@ -173,7 +173,8 @@ class _CommunityLeaderboardScreenState
   Widget _buildFilterDropdown(
       String value, List<String> options, void Function(String) onChanged) {
     return DropdownButtonFormField<String>(
-      value: value,
+      key: ValueKey(value),
+      initialValue: value,
       dropdownColor: AppColors.primary,
       decoration: InputDecoration(
         isDense: true,
@@ -295,7 +296,8 @@ class _CommunityLeaderboardScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: DropdownButtonFormField<Exercise>(
-                  value: _selectedExercise,
+                  key: ValueKey(_selectedExercise?.id),
+                  initialValue: _selectedExercise,
                   dropdownColor: AppColors.surface,
                   decoration: InputDecoration(
                     isDense: true,
