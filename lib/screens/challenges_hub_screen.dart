@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/app_colors.dart';
+import '../dev_test/dev_test_screen.dart'; // DEV-TEST
 import '../constants/app_text_styles.dart';
 import '../models/personal_challenge.dart';
 import '../services/personal_challenge_service.dart';
@@ -27,6 +28,15 @@ class ChallengesHubScreen extends StatelessWidget {
             l10n.challenges,
             style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
           ),
+          actions: [
+            IconButton(
+              tooltip: 'Тест',
+              icon: const Icon(Icons.science_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const DevTestScreen()),
+              ),
+            ),
+          ],
           bottom: TabBar(
             labelColor: AppColors.textOnPrimary,
             unselectedLabelColor:
