@@ -9,6 +9,7 @@ import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/workout_session.dart';
 import '../utils/units.dart';
+import '../utils/workout_format.dart';
 import 'workout_execution_screen.dart';
 
 class FullCalendarScreen extends StatefulWidget {
@@ -475,7 +476,8 @@ class _WorkoutCardWidgetState extends State<_WorkoutCardWidget> {
                               const SizedBox(width: 12),
                               Flexible(
                                 child: Text(
-                                  '${l10n.repsCount(set.actualReps)} × ${units.weight(set.weight)}',
+                                  formatSetResult(l10n, units, set,
+                                      result.exercise.exerciseType),
                                   style: AppTextStyles.body2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
