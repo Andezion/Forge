@@ -15,7 +15,9 @@ import '../services/settings_service.dart';
 import '../services/profile_service.dart';
 import '../l10n/l10n.dart';
 import '../utils/units.dart';
+import '../utils/workout_format.dart';
 import '../widgets/fix_set_dialog.dart';
+import '../widgets/set_input_fields.dart';
 import '../widgets/workout_note_field.dart';
 import 'exercise_library_screen.dart';
 
@@ -39,8 +41,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
 
   WorkoutExercise? _currentWorkoutExercise;
   ExerciseResult? _currentExerciseResult;
-  List<TextEditingController> _repsControllers = [];
-  List<TextEditingController> _weightControllers = [];
+  List<SetEntry> _setEntries = [];
   List<bool> _setCompleted = [];
 
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
@@ -88,15 +89,16 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
   }
 
   void _disposeControllers() {
-    for (final c in _repsControllers) {
-      c.dispose();
+    for (final e in _setEntries) {
+      e.dispose();
     }
-    for (final c in _weightControllers) {
-      c.dispose();
-    }
-    _repsControllers = [];
-    _weightControllers = [];
+    _setEntries = [];
   }
+
+  SetEntry _newSetEntry(WorkoutExercise we) => SetEntry(
+        weightText: _weightFieldText(we.weight),
+        minutesText: we.targetDurationMinutes?.toString() ?? '',
+      );
 
   void _startTimer() {
     _timer?.cancel();
@@ -141,7 +143,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
   }
 
   Future<void> _showConfigureExerciseSheet(Exercise exercise) async {
-    final result = await showModalBottomSheet<(int, double)>(
+    final result = await showModalBottomSheet<WorkoutExercise>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -151,18 +153,14 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     );
 
     if (result != null && mounted) {
-      _startExercise(exercise, result.$1, result.$2);
+      _startExercise(result);
     }
   }
 
-  void _startExercise(Exercise exercise, int sets, double weight) {
+  void _startExercise(WorkoutExercise workoutExercise) {
     _disposeControllers();
-    final workoutExercise = WorkoutExercise(
-      exercise: exercise,
-      sets: sets,
-      targetReps: 0,
-      weight: weight,
-    );
+    final exercise = workoutExercise.exercise;
+    final sets = workoutExercise.sets;
 
     setState(() {
       _currentWorkoutExercise = workoutExercise;
@@ -170,17 +168,11 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
         exercise: exercise,
         targetSets: sets,
         targetReps: 0,
-        targetWeight: weight,
+        targetWeight: workoutExercise.weight,
         setResults: [],
       );
-      _repsControllers =
-          List.generate(sets, (_) => TextEditingController());
-      _weightControllers = List.generate(
-        sets,
-        (_) => TextEditingController(
-          text: _weightFieldText(weight),
-        ),
-      );
+      _setEntries =
+          List.generate(sets, (_) => _newSetEntry(workoutExercise));
       _setTimers = List.filled(sets, 0, growable: true);
       _setCompleted = List.filled(sets, false, growable: true);
       _activeSetIndex = null;
@@ -217,10 +209,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
     setState(() {
       final current = _currentWorkoutExercise!;
       _currentWorkoutExercise = current.copyWith(sets: current.sets + 1);
-      _repsControllers.add(TextEditingController());
-      _weightControllers.add(TextEditingController(
-        text: _weightFieldText(current.weight),
-      ));
+      _setEntries.add(_newSetEntry(current));
       _setTimers.add(0);
       _setCompleted.add(false);
       _currentExerciseResult = _currentExerciseResult!.copyWith(
@@ -230,17 +219,20 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
   }
 
   void _completeSetAtIndex(int index) {
-    final actualReps =
-        int.tryParse(_repsControllers[index].text) ?? 0;
-    final actualWeight =
-        _units.parseWeight(_weightControllers[index].text,
-                originalKg: _currentWorkoutExercise!.weight) ??
-            _currentExerciseResult!.targetWeight;
+    final current = _currentWorkoutExercise!;
+    final parsed = readSetEntry(
+      _setEntries[index],
+      current.exercise.exerciseType,
+      l10n: _l10n,
+      units: _units,
+      originalKg: current.weight,
+      fallbackWeightKg: _currentExerciseResult!.targetWeight,
+    );
 
-    if (actualReps <= 0) {
+    if (parsed.values == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_l10n.pleaseEnterReps),
+          content: Text(parsed.error ?? _l10n.pleaseEnterReps),
           backgroundColor: AppColors.warning,
           duration: const Duration(seconds: 2),
         ),
@@ -256,11 +248,8 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
       _setCompleted[index] = true;
       _activeSetIndex = null;
       _activeSetStartTime = null;
-      _currentExerciseResult!.setResults.add(ExerciseSetResult(
+      _currentExerciseResult!.setResults.add(parsed.values!.toSetResult(
         setNumber: index + 1,
-        actualReps: actualReps,
-        weight: actualWeight,
-        timestamp: DateTime.now(),
         durationSeconds: elapsedSeconds,
       ));
     });
@@ -275,23 +264,22 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
 
     final fixed = await showFixSetDialog(
       context,
-      setNumber: old.setNumber,
-      reps: old.actualReps,
-      weight: old.weight,
+      set: old,
+      type: _currentWorkoutExercise!.exercise.exerciseType,
     );
     if (fixed == null || !mounted) return;
-    final (reps, weight) = fixed;
 
     setState(() {
-      setResults[resultIndex] = ExerciseSetResult(
+      setResults[resultIndex] = fixed.toSetResult(
         setNumber: old.setNumber,
-        actualReps: reps,
-        weight: weight,
-        timestamp: DateTime.now(),
         durationSeconds: old.durationSeconds,
       );
-      _repsControllers[index].text = reps.toString();
-      _weightControllers[index].text = _weightFieldText(weight);
+      final entry = _setEntries[index];
+      entry.reps.text = fixed.reps > 0 ? fixed.reps.toString() : '';
+      entry.weight.text = _weightFieldText(fixed.weight);
+      entry.minutes.text = fixed.minutes?.toString() ?? '';
+      entry.withCalories = fixed.calories != null;
+      entry.calories.text = fixed.calories?.round().toString() ?? '';
     });
   }
 
@@ -527,6 +515,8 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
       );
       if (estimatedCalories == null) {
         calorieEstimateError = groq.lastError ?? L10n.current.aiCalorieUnavailable;
+      } else {
+        DataManager().updateWorkoutHistoryCalories(history.id, estimatedCalories);
       }
     } catch (e) {
       debugPrint('[QUICK_WORKOUT] Post-save error: $e');
@@ -712,16 +702,23 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        exercise.weight > 0
-                            ? _l10n.targetWeight(_units.weight(exercise.weight))
-                            : _l10n.bodyweight,
+                        switch (exercise.exercise.exerciseType) {
+                          ExerciseType.cardio => _l10n.targetValue(
+                              _l10n.minutesShort(
+                                  exercise.targetDurationMinutes ?? 0)),
+                          ExerciseType.repsOnly => _l10n.bodyweight,
+                          ExerciseType.weightAndReps => exercise.weight > 0
+                              ? _l10n.targetWeight(
+                                  _units.weight(exercise.weight))
+                              : _l10n.bodyweight,
+                        },
                         style: AppTextStyles.caption
                             .copyWith(color: AppColors.textSecondary),
                       ),
                       if (prevSet != null)
                         Text(
-                          '${_l10n.lastTimeReps(prevSet.actualReps)}'
-                          '${prevSet.weight > 0 ? " × ${_units.weight(prevSet.weight)}" : ""}',
+                          _l10n.lastTimeValue(formatSetResult(_l10n, _units,
+                              prevSet, exercise.exercise.exerciseType)),
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.textSecondary,
                             fontStyle: FontStyle.italic,
@@ -750,54 +747,16 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
             Row(
               children: [
                 Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: TextField(
-                      controller: _repsControllers[index],
-                      keyboardType: TextInputType.number,
-                      enabled: !isCompleted,
-                      decoration: InputDecoration(
-                        hintText: _l10n.reps,
-                        labelText: _l10n.reps,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      style: AppTextStyles.body2,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: TextField(
-                      controller: _weightControllers[index],
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      enabled: !isCompleted,
-                      decoration: InputDecoration(
-                        hintText: exercise.weight > 0
-                            ? _units.weightValue(exercise.weight)
-                            : '0',
-                        labelText: _units.weightLabel,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      style: AppTextStyles.body2,
-                    ),
+                  child: SetInputFields(
+                    key: ObjectKey(_setEntries[index]),
+                    entry: _setEntries[index],
+                    type: exercise.exercise.exerciseType,
+                    enabled: !isCompleted,
+                    repsHint: _l10n.reps,
+                    weightHint: exercise.weight > 0
+                        ? _units.weightValue(exercise.weight)
+                        : '0',
+                    minutesHint: exercise.targetDurationMinutes?.toString(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1014,11 +973,26 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
       _ => (AppColors.textHint, '—'),
     };
 
-    final totalReps = result.setResults.fold(0, (s, r) => s + r.actualReps);
-    final weights = result.setResults.map((r) => r.weight).toSet();
-    final weightStr = weights.length == 1
-        ? (weights.first > 0 ? '× ${_units.weight(weights.first)}' : '')
-        : '';
+    final String summary;
+    if (result.exercise.exerciseType == ExerciseType.cardio) {
+      final minutes = result.setResults
+          .fold<int>(0, (s, r) => s + (r.durationMinutes ?? 0));
+      final kcal =
+          result.setResults.fold<double>(0, (s, r) => s + (r.calories ?? 0));
+      summary = kcal > 0
+          ? '${_l10n.minutesShort(minutes)} · ${_l10n.kcalValue(kcal.round().toString())}'
+          : _l10n.minutesShort(minutes);
+    } else {
+      final totalReps =
+          result.setResults.fold(0, (s, r) => s + r.actualReps);
+      final weights = result.setResults.map((r) => r.weight).toSet();
+      final weightStr = weights.length == 1
+          ? (weights.first > 0 ? '× ${_units.weight(weights.first)}' : '')
+          : '';
+      summary =
+          '${_l10n.setsCount(result.setResults.length)} · ${_l10n.repsCount(totalReps)}'
+          '${weightStr.isNotEmpty ? " $weightStr" : ""}';
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1051,8 +1025,7 @@ class _QuickWorkoutScreenState extends State<QuickWorkoutScreen>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${_l10n.setsCount(result.setResults.length)} · ${_l10n.repsCount(totalReps)}'
-                    '${weightStr.isNotEmpty ? " $weightStr" : ""}',
+                    summary,
                     style: AppTextStyles.caption
                         .copyWith(color: AppColors.textSecondary),
                   ),
@@ -1208,22 +1181,62 @@ class _ExerciseConfigSheet extends StatefulWidget {
 class _ExerciseConfigSheetState extends State<_ExerciseConfigSheet> {
   late final TextEditingController _setsController;
   late final TextEditingController _weightController;
+  late final TextEditingController _minutesController;
+
+  ExerciseType get _type => widget.exercise.exerciseType;
 
   @override
   void initState() {
     super.initState();
     _setsController = TextEditingController(text: '3');
-    _weightController = TextEditingController(
-      text: widget.exercise.exerciseType == ExerciseType.repsOnly ? '0' : '',
-    );
+    _weightController = TextEditingController();
+    _minutesController = TextEditingController(text: '20');
   }
 
   @override
   void dispose() {
     _setsController.dispose();
     _weightController.dispose();
+    _minutesController.dispose();
     super.dispose();
   }
+
+  void _submit(Units units) {
+    final WorkoutExercise result;
+    if (_type == ExerciseType.cardio) {
+      final minutes =
+          (int.tryParse(_minutesController.text) ?? 20).clamp(1, 600);
+      result = WorkoutExercise(
+        exercise: widget.exercise,
+        sets: 1,
+        targetReps: 0,
+        weight: 0,
+        targetDurationMinutes: minutes,
+      );
+    } else {
+      final sets = (int.tryParse(_setsController.text) ?? 3).clamp(1, 20);
+      final weight = _type == ExerciseType.weightAndReps
+          ? (units.parseWeight(_weightController.text) ?? 0.0)
+              .clamp(0.0, 9999.0)
+              .toDouble()
+          : 0.0;
+      result = WorkoutExercise(
+        exercise: widget.exercise,
+        sets: sets,
+        targetReps: 0,
+        weight: weight,
+      );
+    }
+    Navigator.of(context).pop(result);
+  }
+
+  InputDecoration _decoration(String label, {String? hint}) => InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -1252,49 +1265,44 @@ class _ExerciseConfigSheetState extends State<_ExerciseConfigSheet> {
             ),
           ],
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _setsController,
-                  keyboardType: TextInputType.number,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: l10n.sets,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+          if (_type == ExerciseType.cardio)
+            TextField(
+              controller: _minutesController,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              decoration: _decoration(l10n.durationMinutes),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _setsController,
+                    keyboardType: TextInputType.number,
+                    autofocus: true,
+                    decoration: _decoration(l10n.sets),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextField(
-                  controller: _weightController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: l10n.weightWithUnit(units.weightLabel),
-                    hintText: '0',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                if (_type == ExerciseType.weightAndReps) ...[
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: _weightController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: _decoration(
+                        l10n.weightWithUnit(units.weightLabel),
+                        hint: '0',
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                ],
+              ],
+            ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              final sets =
-                  (int.tryParse(_setsController.text) ?? 3).clamp(1, 20);
-              final weight =
-                  (units.parseWeight(_weightController.text) ?? 0.0)
-                      .clamp(0.0, 9999.0);
-              Navigator.of(context).pop((sets, weight));
-            },
+            onPressed: () => _submit(units),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
