@@ -24,7 +24,9 @@ import '../services/progression_service.dart';
 import '../utils/exercise_sequence.dart';
 import '../utils/units.dart';
 import '../widgets/fix_set_dialog.dart';
+import '../utils/workout_format.dart';
 import '../widgets/rank_event_popup.dart';
+import '../widgets/set_input_fields.dart';
 import '../widgets/workout_note_field.dart';
 import 'exercise_library_screen.dart';
 
@@ -62,8 +64,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
 
   int? _activeSetIndex;
   DateTime? _activeSetStartTime;
-  List<TextEditingController> _repsControllers = [];
-  List<TextEditingController> _weightControllers = [];
+  List<SetEntry> _setEntries = [];
   List<int> _setTimers = [];
   List<bool> _setCompleted = [];
 
@@ -110,15 +111,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
   }
 
   void _disposeControllers() {
-    for (final c in _repsControllers) {
-      c.dispose();
+    for (final e in _setEntries) {
+      e.dispose();
     }
-    for (final c in _weightControllers) {
-      c.dispose();
-    }
-    _repsControllers = [];
-    _weightControllers = [];
+    _setEntries = [];
   }
+
+  static WorkoutExercise _normalized(WorkoutExercise we) =>
+      we.sets < 1 ? we.copyWith(sets: 1) : we;
+
+  SetEntry _newSetEntry(WorkoutExercise we) => SetEntry(
+        weightText: _weightFieldText(we.weight),
+        minutesText: we.targetDurationMinutes?.toString() ?? '',
+      );
 
   void _initializeSession() {
     _session = WorkoutSession(
@@ -131,7 +136,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
       totalDurationSeconds: 0,
     );
 
-    _exerciseQueue = List<WorkoutExercise>.from(widget.workout.exercises);
+    _exerciseQueue =
+        widget.workout.exercises.map(_normalized).toList(growable: true);
     _totalExerciseCount = _exerciseQueue.length;
 
     if (_exerciseQueue.isEmpty) {
@@ -156,16 +162,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
   void _initSetControllers(WorkoutExercise workoutExercise) {
     _disposeControllers();
     final numSets = workoutExercise.sets;
-    _repsControllers = List.generate(
-      numSets,
-      (_) => TextEditingController(),
-    );
-    _weightControllers = List.generate(
-      numSets,
-      (_) => TextEditingController(
-        text: _weightFieldText(workoutExercise.weight),
-      ),
-    );
+    _setEntries =
+        List.generate(numSets, (_) => _newSetEntry(workoutExercise));
     _setTimers = List.filled(numSets, 0, growable: true);
     _setCompleted = List.filled(numSets, false, growable: true);
     _activeSetIndex = null;
@@ -225,10 +223,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
       final current = _exerciseQueue[_currentExerciseIndex];
       _exerciseQueue[_currentExerciseIndex] =
           current.copyWith(sets: current.sets + 1);
-      _repsControllers.add(TextEditingController());
-      _weightControllers.add(TextEditingController(
-        text: _weightFieldText(current.weight),
-      ));
+      _setEntries.add(_newSetEntry(current));
       _setTimers.add(0);
       _setCompleted.add(false);
       _currentExerciseResult = _currentExerciseResult!.copyWith(
@@ -237,18 +232,24 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     });
   }
 
-  void _completeSetAtIndex(int index) {
-    final repsText = _repsControllers[index].text;
-    final weightText = _weightControllers[index].text;
-    final actualReps = int.tryParse(repsText) ?? 0;
-    final actualWeight = _units.parseWeight(weightText,
-            originalKg: _exerciseQueue[_currentExerciseIndex].weight) ??
-        _currentExerciseResult!.targetWeight.clamp(0.0, double.infinity);
+  ExerciseType get _currentType =>
+      _exerciseQueue[_currentExerciseIndex].exercise.exerciseType;
 
-    if (actualReps <= 0) {
+  void _completeSetAtIndex(int index) {
+    final current = _exerciseQueue[_currentExerciseIndex];
+    final parsed = readSetEntry(
+      _setEntries[index],
+      current.exercise.exerciseType,
+      l10n: _l10n,
+      units: _units,
+      originalKg: current.weight,
+      fallbackWeightKg: _currentExerciseResult!.targetWeight,
+    );
+
+    if (parsed.values == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_l10n.pleaseEnterReps),
+          content: Text(parsed.error ?? _l10n.pleaseEnterReps),
           backgroundColor: AppColors.warning,
           duration: const Duration(seconds: 2),
         ),
@@ -265,15 +266,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
       _activeSetIndex = null;
       _activeSetStartTime = null;
 
-      final setResult = ExerciseSetResult(
+      _currentExerciseResult!.setResults.add(parsed.values!.toSetResult(
         setNumber: index + 1,
-        actualReps: actualReps,
-        weight: actualWeight,
-        timestamp: DateTime.now(),
         durationSeconds: elapsedSeconds,
-      );
-
-      _currentExerciseResult!.setResults.add(setResult);
+      ));
     });
   }
 
@@ -286,23 +282,22 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
 
     final fixed = await showFixSetDialog(
       context,
-      setNumber: old.setNumber,
-      reps: old.actualReps,
-      weight: old.weight,
+      set: old,
+      type: _currentType,
     );
     if (fixed == null || !mounted) return;
-    final (reps, weight) = fixed;
 
     setState(() {
-      setResults[resultIndex] = ExerciseSetResult(
+      setResults[resultIndex] = fixed.toSetResult(
         setNumber: old.setNumber,
-        actualReps: reps,
-        weight: weight,
-        timestamp: DateTime.now(),
         durationSeconds: old.durationSeconds,
       );
-      _repsControllers[index].text = reps.toString();
-      _weightControllers[index].text = _weightFieldText(weight);
+      final entry = _setEntries[index];
+      entry.reps.text = fixed.reps > 0 ? fixed.reps.toString() : '';
+      entry.weight.text = _weightFieldText(fixed.weight);
+      entry.minutes.text = fixed.minutes?.toString() ?? '';
+      entry.withCalories = fixed.calories != null;
+      entry.calories.text = fixed.calories?.round().toString() ?? '';
     });
   }
 
@@ -340,10 +335,10 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           .toList()
                         ..add(currentWorkoutExercise.exercise);
                       _exerciseQueue[_currentExerciseIndex] =
-                          currentWorkoutExercise.copyWith(
+                          _normalized(currentWorkoutExercise.copyWith(
                         exercise: alt,
                         alternativeExercises: newAlts,
-                      );
+                      ));
                       _currentExerciseResult = ExerciseResult(
                         exercise: alt,
                         targetSets: currentWorkoutExercise.sets,
@@ -553,9 +548,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           final config = await _showInsertConfigSheet(
                               dialogContext, exercise);
                           if (config == null) return;
-                          final (sets, reps, weight) = config;
-                          final inserted = _insertLibraryExercise(
-                              exercise, sets, reps, weight);
+                          final inserted = _insertLibraryExercise(config);
                           setDialogState(() {
                             chosenNextExercise = inserted;
                           });
@@ -579,9 +572,7 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                           final config = await _showInsertConfigSheet(
                               dialogContext, exercise);
                           if (config == null) return;
-                          final (sets, reps, weight) = config;
-                          final inserted = _insertLibraryExercise(
-                              exercise, sets, reps, weight);
+                          final inserted = _insertLibraryExercise(config);
                           setDialogState(() {
                             addedExercises.add(inserted);
                           });
@@ -795,9 +786,9 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     );
   }
 
-  Future<(int, int, double)?> _showInsertConfigSheet(
+  Future<WorkoutExercise?> _showInsertConfigSheet(
       BuildContext ctx, Exercise exercise) {
-    return showModalBottomSheet<(int, int, double)>(
+    return showModalBottomSheet<WorkoutExercise>(
       context: ctx,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -808,14 +799,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
   }
 
   
-  WorkoutExercise _insertLibraryExercise(
-      Exercise exercise, int sets, int reps, double weight) {
-    final workoutExercise = WorkoutExercise(
-      exercise: exercise,
-      sets: sets,
-      targetReps: reps,
-      weight: weight,
-    );
+  WorkoutExercise _insertLibraryExercise(WorkoutExercise configured) {
+    final workoutExercise = _normalized(configured);
     setState(() {
       _exerciseQueue = insertExerciseAhead(
         queue: _exerciseQueue,
@@ -952,6 +937,8 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
       );
       if (estimatedCalories == null) {
         calorieEstimateError = groq.lastError ?? L10n.current.aiCalorieUnavailable;
+      } else {
+        DataManager().updateWorkoutHistoryCalories(history.id, estimatedCalories);
       }
 
       if (!mounted) return;
@@ -1201,6 +1188,22 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
     );
   }
 
+  String? _targetLabel(WorkoutExercise we) {
+    switch (we.exercise.exerciseType) {
+      case ExerciseType.cardio:
+        final minutes = we.targetDurationMinutes;
+        return minutes != null && minutes > 0
+            ? _l10n.targetValue(_l10n.minutesShort(minutes))
+            : null;
+      case ExerciseType.repsOnly:
+        return we.targetReps > 0 ? _l10n.targetReps(we.targetReps) : null;
+      case ExerciseType.weightAndReps:
+        if (we.targetReps <= 0) return null;
+        return '${_l10n.targetReps(we.targetReps)}'
+            '${we.weight > 0 ? " × ${_units.weight(we.weight)}" : ""}';
+    }
+  }
+
   Widget _buildSetRow(int index, WorkoutExercise currentExercise) {
     final isActive = _activeSetIndex == index;
     final isCompleted = _setCompleted[index];
@@ -1257,17 +1260,17 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${_l10n.targetReps(currentExercise.targetReps)}'
-                        '${currentExercise.weight > 0 ? " × ${_units.weight(currentExercise.weight)}" : ""}',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.textSecondary,
+                      if (_targetLabel(currentExercise) case final target?)
+                        Text(
+                          target,
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                      ),
                       if (prevSet != null)
                         Text(
-                          '${_l10n.lastTimeReps(prevSet.actualReps)}'
-                          '${prevSet.weight > 0 ? " × ${_units.weight(prevSet.weight)}" : ""}',
+                          _l10n.lastTimeValue(formatSetResult(_l10n, _units,
+                              prevSet, currentExercise.exercise.exerciseType)),
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.textSecondary,
                             fontStyle: FontStyle.italic,
@@ -1296,53 +1299,19 @@ class _WorkoutExecutionScreenState extends State<WorkoutExecutionScreen>
             Row(
               children: [
                 Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: TextField(
-                      controller: _repsControllers[index],
-                      keyboardType: TextInputType.number,
-                      enabled: !isCompleted,
-                      decoration: InputDecoration(
-                        hintText: '${currentExercise.targetReps}',
-                        labelText: _l10n.reps,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      style: AppTextStyles.body2,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: TextField(
-                      controller: _weightControllers[index],
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      enabled: !isCompleted,
-                      decoration: InputDecoration(
-                        hintText: currentExercise.weight > 0
-                            ? _units.weightValue(currentExercise.weight)
-                            : '0',
-                        labelText: _units.weightLabel,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      style: AppTextStyles.body2,
-                    ),
+                  child: SetInputFields(
+                    key: ObjectKey(_setEntries[index]),
+                    entry: _setEntries[index],
+                    type: currentExercise.exercise.exerciseType,
+                    enabled: !isCompleted,
+                    repsHint: currentExercise.targetReps > 0
+                        ? '${currentExercise.targetReps}'
+                        : null,
+                    weightHint: currentExercise.weight > 0
+                        ? _units.weightValue(currentExercise.weight)
+                        : '0',
+                    minutesHint:
+                        currentExercise.targetDurationMinutes?.toString(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1718,15 +1687,17 @@ class _InsertExerciseConfigSheetState
   late final TextEditingController _setsController;
   late final TextEditingController _repsController;
   late final TextEditingController _weightController;
+  late final TextEditingController _minutesController;
+
+  ExerciseType get _type => widget.exercise.exerciseType;
 
   @override
   void initState() {
     super.initState();
     _setsController = TextEditingController(text: '3');
     _repsController = TextEditingController(text: '10');
-    _weightController = TextEditingController(
-      text: widget.exercise.exerciseType == ExerciseType.repsOnly ? '0' : '',
-    );
+    _weightController = TextEditingController();
+    _minutesController = TextEditingController(text: '20');
   }
 
   @override
@@ -1734,7 +1705,61 @@ class _InsertExerciseConfigSheetState
     _setsController.dispose();
     _repsController.dispose();
     _weightController.dispose();
+    _minutesController.dispose();
     super.dispose();
+  }
+
+  Widget _numberField(
+    TextEditingController controller,
+    String label, {
+    bool decimal = false,
+    bool autofocus = false,
+    String? hint,
+  }) {
+    return TextField(
+      controller: controller,
+      autofocus: autofocus,
+      keyboardType: decimal
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : TextInputType.number,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  void _submit(Units units) {
+    final WorkoutExercise result;
+    if (_type == ExerciseType.cardio) {
+      final minutes =
+          (int.tryParse(_minutesController.text) ?? 20).clamp(1, 600);
+      result = WorkoutExercise(
+        exercise: widget.exercise,
+        sets: 1,
+        targetReps: 0,
+        weight: 0,
+        targetDurationMinutes: minutes,
+      );
+    } else {
+      final sets = (int.tryParse(_setsController.text) ?? 3).clamp(1, 20);
+      final reps = (int.tryParse(_repsController.text) ?? 10).clamp(1, 999);
+      final weight = _type == ExerciseType.weightAndReps
+          ? (units.parseWeight(_weightController.text) ?? 0.0)
+              .clamp(0.0, 9999.0)
+              .toDouble()
+          : 0.0;
+      result = WorkoutExercise(
+        exercise: widget.exercise,
+        sets: sets,
+        targetReps: reps,
+        weight: weight,
+      );
+    }
+    Navigator.of(context).pop(result);
   }
 
   @override
@@ -1765,62 +1790,34 @@ class _InsertExerciseConfigSheetState
             ),
           ],
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _setsController,
-                  keyboardType: TextInputType.number,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: l10n.sets,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+          if (_type == ExerciseType.cardio)
+            _numberField(_minutesController, l10n.durationMinutes,
+                autofocus: true)
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _numberField(_setsController, l10n.sets,
+                      autofocus: true),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: _numberField(_repsController, l10n.reps)),
+                if (_type == ExerciseType.weightAndReps) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _numberField(
+                      _weightController,
+                      units.weightLabel,
+                      decimal: true,
+                      hint: '0',
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _repsController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: l10n.reps,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _weightController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: units.weightLabel,
-                    hintText: '0',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+                ],
+              ],
+            ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              final sets =
-                  (int.tryParse(_setsController.text) ?? 3).clamp(1, 20);
-              final reps =
-                  (int.tryParse(_repsController.text) ?? 10).clamp(1, 999);
-              final weight = (units.parseWeight(_weightController.text) ?? 0.0)
-                  .clamp(0.0, 9999.0);
-              Navigator.of(context).pop((sets, reps, weight));
-            },
+            onPressed: () => _submit(units),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
