@@ -503,6 +503,49 @@ class ProgressAnalyticsService {
     );
   }
 
+  CaloriesData analyzeCalories(
+    List<WorkoutHistory> histories, {
+    int lookbackDays = 90,
+  }) {
+    final cutoffDate = DateTime.now().subtract(Duration(days: lookbackDays));
+
+    final relevant = histories
+        .where((h) => h.date.isAfter(cutoffDate))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final withCalories = relevant.where((h) => h.hasCalories).toList();
+
+    final perWorkout = withCalories
+        .map((h) => ChartDataPoint(date: h.date, value: h.estimatedCalories!))
+        .toList();
+
+    final weekly = <DateTime, double>{};
+    for (final h in withCalories) {
+      final weekStart = _getWeekStart(h.date);
+      weekly[weekStart] = (weekly[weekStart] ?? 0) + h.estimatedCalories!;
+    }
+    final weeklyPoints = weekly.entries
+        .map((e) => ChartDataPoint(date: e.key, value: e.value))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final total = perWorkout.fold<double>(0, (s, p) => s + p.value);
+    final thisWeek = _getWeekStart(DateTime.now());
+    final lastWeek = thisWeek.subtract(const Duration(days: 7));
+
+    return CaloriesData(
+      perWorkoutData: perWorkout,
+      weeklyData: weeklyPoints,
+      totalPeriodCalories: total,
+      averagePerWorkout:
+          perWorkout.isNotEmpty ? total / perWorkout.length : 0,
+      currentWeekCalories: weekly[thisWeek] ?? 0,
+      previousWeekCalories: weekly[lastWeek] ?? 0,
+      workoutsWithEstimate: withCalories.length,
+      totalWorkouts: relevant.length,
+    );
+  }
+
   DateTime _getWeekStart(DateTime date) {
     final weekday = date.weekday;
     return DateTime(date.year, date.month, date.day)
