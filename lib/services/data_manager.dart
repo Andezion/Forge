@@ -1046,6 +1046,7 @@ class DataManager extends ChangeNotifier {
   void addExercise(Exercise exercise) {
     _exercises.add(exercise);
     _scheduleSave();
+    notifyListeners();
   }
 
   void updateExercise(Exercise exercise) {
@@ -1192,6 +1193,16 @@ class DataManager extends ChangeNotifier {
     final trimmed = note?.trim();
     _workoutHistory[index] = _workoutHistory[index]
         .copyWithNote(trimmed == null || trimmed.isEmpty ? null : trimmed);
+    _scheduleSave();
+    notifyListeners();
+  }
+
+  void updateWorkoutHistoryCalories(String historyId, double? calories) {
+    final index = _workoutHistory.indexWhere((h) => h.id == historyId);
+    if (index == -1) return;
+
+    _workoutHistory[index] = _workoutHistory[index].copyWithCalories(
+        calories != null && calories > 0 ? calories : null);
     _scheduleSave();
     notifyListeners();
   }
