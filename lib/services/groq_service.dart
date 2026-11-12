@@ -253,10 +253,21 @@ Rules:
     try {
       final summary = session.exerciseResults.map((er) {
         final sets = er.setResults;
+        if (er.exercise.exerciseType == ExerciseType.cardio) {
+          final minutes =
+              sets.fold<int>(0, (s, r) => s + (r.durationMinutes ?? 0));
+          final userKcal =
+              sets.fold<double>(0, (s, r) => s + (r.calories ?? 0));
+          return '${er.exercise.name} (cardio): $minutes min'
+              '${userKcal > 0 ? ', user-reported ${userKcal.round()} kcal (trust this value for this exercise)' : ''}';
+        }
         if (sets.isEmpty) {
           return '${er.exercise.name}: ${er.targetSets}x${er.targetReps} @ ${er.targetWeight}kg';
         }
         final totalReps = sets.map((s) => s.actualReps).reduce((a, b) => a + b);
+        if (er.exercise.exerciseType == ExerciseType.repsOnly) {
+          return '${er.exercise.name}: ${sets.length} sets, $totalReps total reps (bodyweight)';
+        }
         final avgWeight =
             sets.map((s) => s.weight).reduce((a, b) => a + b) / sets.length;
         return '${er.exercise.name}: ${sets.length}x$totalReps total reps @ ${avgWeight.toStringAsFixed(1)}kg';
@@ -265,7 +276,7 @@ Rules:
       final durationMin = session.totalDurationSeconds ~/ 60;
 
       final prompt = '''
-Estimate the total calories burned during the following strength training workout.
+Estimate the total calories burned during the following workout (strength and/or cardio).
 Athlete body weight: ${bodyWeightKg.toStringAsFixed(1)} kg
 Workout duration: $durationMin minutes
 
