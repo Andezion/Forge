@@ -31,6 +31,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
   WorkoutVolumeData? _volumeData;
   WorkoutFrequencyData? _frequencyData;
   ConsistencyData? _consistencyData;
+  CaloriesData? _caloriesData;
 
   Exercise? _selectedExercise;
   List<Exercise> _availableExercises = [];
@@ -165,6 +166,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       await Future.delayed(const Duration(milliseconds: 10));
 
       _consistencyData = _analyticsService.analyzeConsistency(
+        histories,
+        lookbackDays: _lookbackDays,
+      );
+
+      _caloriesData = _analyticsService.analyzeCalories(
         histories,
         lookbackDays: _lookbackDays,
       );
@@ -317,6 +323,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             _buildTabButton('frequency', l10n.frequency, Icons.calendar_month),
             _buildTabButton(
                 'consistency', l10n.consistency, Icons.check_circle),
+            _buildTabButton(
+                'calories', l10n.caloriesTab, Icons.local_fire_department),
             _buildTabButton('exercise', l10n.exerciseProgress, Icons.list),
           ],
         ),
@@ -375,6 +383,8 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
         return _buildFrequencyView();
       case 'consistency':
         return _buildConsistencyView();
+      case 'calories':
+        return _buildCaloriesView();
       case 'exercise':
         return _buildExerciseView();
       default:
@@ -527,22 +537,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
       return Center(child: Text(l10n.noData));
     }
 
-    String periodLabel;
-    if (_customDateRange != null) {
-      final fmt = DateFormat('dd.MM.yy');
-      periodLabel =
-          '${fmt.format(_customDateRange!.start)} – ${fmt.format(_customDateRange!.end)}';
-    } else if (_lookbackDays <= 7) {
-      periodLabel = _l10n.periodThisWeek;
-    } else if (_lookbackDays <= 30) {
-      periodLabel = _l10n.periodLast30Days;
-    } else if (_lookbackDays <= 90) {
-      periodLabel = _l10n.periodLast90Days;
-    } else if (_lookbackDays <= 180) {
-      periodLabel = _l10n.periodLast180Days;
-    } else {
-      periodLabel = _l10n.periodLastYear;
-    }
+    final periodLabel = _periodLabel();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -591,6 +586,152 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
             yScale: _weightScale,
           ),
         ),
+      ],
+    );
+  }
+
+  String _periodLabel() {
+    if (_customDateRange != null) {
+      final fmt = DateFormat('dd.MM.yy');
+      return '${fmt.format(_customDateRange!.start)} – ${fmt.format(_customDateRange!.end)}';
+    } else if (_lookbackDays <= 7) {
+      return _l10n.periodThisWeek;
+    } else if (_lookbackDays <= 30) {
+      return _l10n.periodLast30Days;
+    } else if (_lookbackDays <= 90) {
+      return _l10n.periodLast90Days;
+    } else if (_lookbackDays <= 180) {
+      return _l10n.periodLast180Days;
+    }
+    return _l10n.periodLastYear;
+  }
+
+  String _formatKcal(double kcal) => _l10n.kcalValue(kcal.round().toString());
+
+  Widget _buildCaloriesView() {
+    final data = _caloriesData;
+    if (data == null) {
+      return Center(child: Text(_l10n.noData));
+    }
+
+    final infoCard = Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.info_outline, size: 20, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _l10n.caloriesEstimateInfoTitle,
+                    style: AppTextStyles.body1
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _l10n.caloriesEstimateInfo,
+              style:
+                  AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (data.workoutsWithEstimate == 0) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  const Icon(Icons.local_fire_department,
+                      size: 48, color: Colors.orange),
+                  const SizedBox(height: 12),
+                  Text(
+                    _l10n.noCalorieData,
+                    style: AppTextStyles.body1,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          infoCard,
+        ],
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+      children: [
+        _buildStatsCard(
+          _l10n.caloriesBurnedFor(_periodLabel()),
+          _formatKcal(data.totalPeriodCalories),
+          data.previousWeekCalories > 0
+              ? ((data.currentWeekCalories - data.previousWeekCalories) /
+                      data.previousWeekCalories) *
+                  100
+              : 0,
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildMiniStatsCard(
+                _l10n.avgPerWorkout,
+                _formatKcal(data.averagePerWorkout),
+                Icons.local_fire_department,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildMiniStatsCard(
+                _l10n.periodThisWeek,
+                _formatKcal(data.currentWeekCalories),
+                Icons.calendar_today,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow(_l10n.workoutsWithEstimate,
+                    '${data.workoutsWithEstimate} / ${data.totalWorkouts}'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildChartCard(
+          _l10n.caloriesPerWorkout,
+          _buildLineChart(
+            data.perWorkoutData,
+            color: Colors.orange,
+            minY: 0,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildChartCard(
+          _l10n.weeklyCalories,
+          _buildBarChart(data.weeklyData, color: Colors.deepOrange),
+        ),
+        const SizedBox(height: 16),
+        infoCard,
       ],
     );
   }
@@ -1110,7 +1251,11 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
     );
   }
 
-  Widget _buildBarChart(List<ChartDataPoint> data, {double yScale = 1}) {
+  Widget _buildBarChart(
+    List<ChartDataPoint> data, {
+    double yScale = 1,
+    Color? color,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     if (data.isEmpty) {
       return Center(child: Text(l10n.noDataToDisplay));
@@ -1129,7 +1274,7 @@ class _ProgressChartsScreenState extends State<ProgressChartsScreen> {
               barRods: [
                 BarChartRodData(
                   toY: e.value.value * yScale,
-                  color: AppColors.primary,
+                  color: color ?? AppColors.primary,
                   width: barWidth,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),
