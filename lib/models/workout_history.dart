@@ -6,11 +6,14 @@ class WorkoutHistory {
   final WorkoutSession session;
   final String? note;
 
+  final double? estimatedCalories;
+
   WorkoutHistory({
     required this.id,
     required this.date,
     required this.session,
     this.note,
+    this.estimatedCalories,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,6 +22,7 @@ class WorkoutHistory {
       'date': date.toIso8601String(),
       'session': session.toJson(),
       'note': note,
+      'estimatedCalories': estimatedCalories,
     };
   }
 
@@ -28,6 +32,7 @@ class WorkoutHistory {
       date: DateTime.parse(json['date']),
       session: WorkoutSession.fromJson(json['session']),
       note: json['note'],
+      estimatedCalories: (json['estimatedCalories'] as num?)?.toDouble(),
     );
   }
 
@@ -37,10 +42,23 @@ class WorkoutHistory {
       date: date,
       session: session,
       note: note,
+      estimatedCalories: estimatedCalories,
+    );
+  }
+
+  WorkoutHistory copyWithCalories(double? calories) {
+    return WorkoutHistory(
+      id: id,
+      date: date,
+      session: session,
+      note: note,
+      estimatedCalories: calories,
     );
   }
 
   DateTime get dateOnly => DateTime(date.year, date.month, date.day);
 
   bool get hasNote => note != null && note!.trim().isNotEmpty;
+
+  bool get hasCalories => estimatedCalories != null && estimatedCalories! > 0;
 }
