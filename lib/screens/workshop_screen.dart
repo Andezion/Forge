@@ -10,6 +10,7 @@ import '../services/workout_recommendation_service.dart';
 import '../utils/muscle_group_utils.dart';
 import '../widgets/workout_ai_evaluation.dart';
 import 'create_workout_screen.dart';
+import 'exercise_library_screen.dart';
 import 'workout_execution_screen.dart';
 
 class _MuscleStats {
@@ -24,6 +25,8 @@ class _MuscleStats {
   });
 }
 
+enum _WorkshopView { workouts, exercises }
+
 class WorkshopScreen extends StatefulWidget {
   const WorkshopScreen({super.key});
 
@@ -35,6 +38,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   final _dataManager = DataManager();
   final _expandedWorkouts = <String>{};
   final _searchController = TextEditingController();
+  _WorkshopView _view = _WorkshopView.workouts;
 
   @override
   void dispose() {
@@ -53,19 +57,21 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   void _navigateToCreateWorkout() async {
     debugPrint('[WORKSHOP_SCREEN] Navigating to CreateWorkoutScreen...');
     final result = await Navigator.of(context).push<Workout>(
-      MaterialPageRoute(
-        builder: (context) => const CreateWorkoutScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const CreateWorkoutScreen()),
     );
 
-    debugPrint('[WORKSHOP_SCREEN] Returned from CreateWorkoutScreen with: '
-        '${result != null ? result.name : 'null'}');
+    debugPrint(
+      '[WORKSHOP_SCREEN] Returned from CreateWorkoutScreen with: '
+      '${result != null ? result.name : 'null'}',
+    );
     if (result != null) {
       setState(() {
         debugPrint('[WORKSHOP_SCREEN] Calling addWorkout for: ${result.name}');
         _dataManager.addWorkout(result);
-        debugPrint('[WORKSHOP_SCREEN] Workouts after add: '
-            '${_dataManager.workouts.map((w) => w.name).toList()}');
+        debugPrint(
+          '[WORKSHOP_SCREEN] Workouts after add: '
+          '${_dataManager.workouts.map((w) => w.name).toList()}',
+        );
       });
 
       if (mounted) {
@@ -82,7 +88,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
 
   void _navigateToEditWorkout(Workout workout, int index) async {
     debugPrint(
-        '[WORKSHOP_SCREEN] Navigating to edit workout: ${workout.name} (index: $index)');
+      '[WORKSHOP_SCREEN] Navigating to edit workout: ${workout.name} (index: $index)',
+    );
     final result = await Navigator.of(context).push<Workout>(
       MaterialPageRoute(
         builder: (context) => CreateWorkoutScreen(existingWorkout: workout),
@@ -90,28 +97,34 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     );
 
     debugPrint(
-        '[WORKSHOP_SCREEN] Returned from edit with: ${result != null ? result.name : 'null'}');
+      '[WORKSHOP_SCREEN] Returned from edit with: ${result != null ? result.name : 'null'}',
+    );
     if (result != null) {
       setState(() {
         debugPrint(
-            '[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}');
+          '[WORKSHOP_SCREEN] Calling updateWorkout for: ${result.name}',
+        );
         _dataManager.updateWorkout(index, result);
-        debugPrint('[WORKSHOP_SCREEN] Workouts after update: '
-            '${_dataManager.workouts.map((w) => w.name).toList()}');
+        debugPrint(
+          '[WORKSHOP_SCREEN] Workouts after update: '
+          '${_dataManager.workouts.map((w) => w.name).toList()}',
+        );
       });
     }
   }
 
   void _deleteWorkout(int index) {
     debugPrint(
-        '[WORKSHOP_SCREEN] Request to delete workout at index $index: ${_dataManager.workouts[index].name}');
+      '[WORKSHOP_SCREEN] Request to delete workout at index $index: ${_dataManager.workouts[index].name}',
+    );
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.deleteWorkout),
-        content:
-            Text(l10n.deleteWorkoutConfirm(_dataManager.workouts[index].name)),
+        content: Text(
+          l10n.deleteWorkoutConfirm(_dataManager.workouts[index].name),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -121,15 +134,20 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             onPressed: () {
               setState(() {
                 debugPrint(
-                    '[WORKSHOP_SCREEN] Calling removeWorkout for: ${_dataManager.workouts[index].name}');
+                  '[WORKSHOP_SCREEN] Calling removeWorkout for: ${_dataManager.workouts[index].name}',
+                );
                 _dataManager.removeWorkout(index);
-                debugPrint('[WORKSHOP_SCREEN] Workouts after remove: '
-                    '${_dataManager.workouts.map((w) => w.name).toList()}');
+                debugPrint(
+                  '[WORKSHOP_SCREEN] Workouts after remove: '
+                  '${_dataManager.workouts.map((w) => w.name).toList()}',
+                );
               });
               Navigator.of(context).pop();
             },
-            child: Text(l10n.delete,
-                style: const TextStyle(color: AppColors.error)),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
@@ -141,8 +159,9 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       context,
       listen: false,
     );
-    final adjustedWorkout =
-        await recommendationService.getAdjustedWorkout(workout);
+    final adjustedWorkout = await recommendationService.getAdjustedWorkout(
+      workout,
+    );
 
     if (!mounted) return;
     final result = await Navigator.of(context).push(
@@ -172,119 +191,155 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         title: Text(
-          AppLocalizations.of(context)!.workshop,
+          l10n.workshop,
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          Text(
-            l10n.createYourWorkout,
-            style: AppTextStyles.h3.copyWith(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.customizeTrainingProgram,
-            style: AppTextStyles.body2.copyWith(
-              color: Theme.of(context).textTheme.bodySmall?.color,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: _navigateToCreateWorkout,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 48,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.createNewWorkout,
-                      style: AppTextStyles.h4.copyWith(
-                        color: AppColors.primary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.searchWorkouts,
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.myWorkouts,
-            style: AppTextStyles.h4.copyWith(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (_dataManager.workouts.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Text(
-                  l10n.noWorkoutsYet,
-                  style: AppTextStyles.body2.copyWith(
-                    color: Theme.of(context).textTheme.bodySmall?.color,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<_WorkshopView>(
+                segments: [
+                  ButtonSegment(
+                    value: _WorkshopView.workouts,
+                    icon: const Icon(Icons.fitness_center),
+                    label: Text(l10n.workshopViewWorkouts),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            )
-          else if (_filteredWorkouts.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Text(
-                  AppLocalizations.of(context)!.noWorkoutsFound,
-                  style: AppTextStyles.body2.copyWith(
-                    color: Theme.of(context).textTheme.bodySmall?.color,
+                  ButtonSegment(
+                    value: _WorkshopView.exercises,
+                    icon: const Icon(Icons.list_alt),
+                    label: Text(l10n.workshopViewExercises),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                ],
+                selected: {_view},
+                showSelectedIcon: false,
+                onSelectionChanged: (selection) {
+                  FocusScope.of(context).unfocus();
+                  setState(() => _view = selection.first);
+                },
               ),
-            )
-          else
-            ..._filteredWorkouts.map((workout) {
-              final index = _dataManager.workouts.indexOf(workout);
-              return _buildWorkoutCard(workout, index);
-            }),
+            ),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: _view.index,
+              children: [
+                _buildWorkoutsView(l10n),
+                const ExerciseLibraryScreen(embedded: true),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWorkoutsView(AppLocalizations l10n) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          l10n.createYourWorkout,
+          style: AppTextStyles.h3.copyWith(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.customizeTrainingProgram,
+          style: AppTextStyles.body2.copyWith(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: _navigateToCreateWorkout,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.add, size: 48, color: AppColors.primary),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.createNewWorkout,
+                    style: AppTextStyles.h4.copyWith(color: AppColors.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _searchController,
+          onChanged: (_) => setState(() {}),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.searchWorkouts,
+            prefixIcon: const Icon(Icons.search),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          l10n.myWorkouts,
+          style: AppTextStyles.h4.copyWith(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (_dataManager.workouts.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                l10n.noWorkoutsYet,
+                style: AppTextStyles.body2.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          )
+        else if (_filteredWorkouts.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                AppLocalizations.of(context)!.noWorkoutsFound,
+                style: AppTextStyles.body2.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          )
+        else
+          ..._filteredWorkouts.map((workout) {
+            final index = _dataManager.workouts.indexOf(workout);
+            return _buildWorkoutCard(workout, index);
+          }),
+      ],
     );
   }
 
@@ -347,10 +402,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+          top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
       ),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
@@ -386,20 +438,21 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(
-                        5,
-                        (i) => Container(
-                              width: 18,
-                              height: 9,
-                              margin: const EdgeInsets.only(right: 2),
-                              decoration: BoxDecoration(
-                                color: i < level
-                                    ? color
-                                    : Theme.of(context)
-                                        .dividerColor
-                                        .withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            )),
+                      5,
+                      (i) => Container(
+                        width: 18,
+                        height: 9,
+                        margin: const EdgeInsets.only(right: 2),
+                        decoration: BoxDecoration(
+                          color: i < level
+                              ? color
+                              : Theme.of(
+                                  context,
+                                ).dividerColor.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -425,9 +478,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
           InkWell(
@@ -448,8 +499,11 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.fitness_center,
-                        color: AppColors.primary, size: 28),
+                    child: Icon(
+                      Icons.fitness_center,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -458,13 +512,15 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                       children: [
                         Text(
                           workout.name,
-                          style: AppTextStyles.body1
-                              .copyWith(fontWeight: FontWeight.w600),
+                          style: AppTextStyles.body1.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          AppLocalizations.of(context)!
-                              .exercisesCount(workout.exercises.length),
+                          AppLocalizations.of(
+                            context,
+                          )!.exercisesCount(workout.exercises.length),
                           style: AppTextStyles.caption.copyWith(
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
@@ -485,7 +541,9 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                         ),
                         onTap: () {
                           Future.delayed(
-                              Duration.zero, () => _startWorkout(workout));
+                            Duration.zero,
+                            () => _startWorkout(workout),
+                          );
                         },
                       ),
                       PopupMenuItem(
@@ -497,23 +555,32 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           ],
                         ),
                         onTap: () {
-                          Future.delayed(Duration.zero,
-                              () => _navigateToEditWorkout(workout, index));
+                          Future.delayed(
+                            Duration.zero,
+                            () => _navigateToEditWorkout(workout, index),
+                          );
                         },
                       ),
                       PopupMenuItem(
                         child: Row(
                           children: [
-                            const Icon(Icons.delete,
-                                size: 20, color: AppColors.error),
+                            const Icon(
+                              Icons.delete,
+                              size: 20,
+                              color: AppColors.error,
+                            ),
                             const SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.delete,
-                                style: const TextStyle(color: AppColors.error)),
+                            Text(
+                              AppLocalizations.of(context)!.delete,
+                              style: const TextStyle(color: AppColors.error),
+                            ),
                           ],
                         ),
                         onTap: () {
                           Future.delayed(
-                              Duration.zero, () => _deleteWorkout(index));
+                            Duration.zero,
+                            () => _deleteWorkout(index),
+                          );
                         },
                       ),
                     ],
