@@ -249,17 +249,30 @@ Rules:
     required double bodyWeightKg,
   }) async {
     lastError = null;
+
+    double userKcal = 0;
+    int userKcalMinutes = 0;
+    final toEstimate = <ExerciseResult>[];
+    for (final er in session.exerciseResults) {
+      final kcal = er.setResults.fold<double>(0, (s, r) => s + (r.calories ?? 0));
+      if (er.exercise.exerciseType == ExerciseType.cardio && kcal > 0) {
+        userKcal += kcal;
+        userKcalMinutes +=
+            er.setResults.fold<int>(0, (s, r) => s + (r.durationMinutes ?? 0));
+      } else {
+        toEstimate.add(er);
+      }
+    }
+    if (toEstimate.isEmpty) return userKcal > 0 ? userKcal : null;
+
     if (!_hasApiKey()) return null;
     try {
-      final summary = session.exerciseResults.map((er) {
+      final summary = toEstimate.map((er) {
         final sets = er.setResults;
         if (er.exercise.exerciseType == ExerciseType.cardio) {
           final minutes =
               sets.fold<int>(0, (s, r) => s + (r.durationMinutes ?? 0));
-          final userKcal =
-              sets.fold<double>(0, (s, r) => s + (r.calories ?? 0));
-          return '${er.exercise.name} (cardio): $minutes min'
-              '${userKcal > 0 ? ', user-reported ${userKcal.round()} kcal (trust this value for this exercise)' : ''}';
+          return '${er.exercise.name} (cardio): $minutes min';
         }
         if (sets.isEmpty) {
           return '${er.exercise.name}: ${er.targetSets}x${er.targetReps} @ ${er.targetWeight}kg';
@@ -273,7 +286,8 @@ Rules:
         return '${er.exercise.name}: ${sets.length}x$totalReps total reps @ ${avgWeight.toStringAsFixed(1)}kg';
       }).join('\n');
 
-      final durationMin = session.totalDurationSeconds ~/ 60;
+      final durationMin =
+          (session.totalDurationSeconds ~/ 60 - userKcalMinutes).clamp(1, 1 << 20);
 
       final prompt = '''
 Estimate the total calories burned during the following workout (strength and/or cardio).
@@ -324,7 +338,7 @@ Return ONLY a JSON object (no markdown, no extra text):
             .trim();
       }
       final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
-      return (parsed['caloriesBurned'] as num).toDouble();
+      return (parsed['caloriesBurned'] as num).toDouble() + userKcal;
     } on TimeoutException {
       lastError = 'Groq request timed out. Check your connection and try again.';
       debugPrint('[GROQ] estimateWorkoutCalories error: timeout');
