@@ -98,6 +98,29 @@ class WorkoutFrequencyData {
   });
 }
 
+class CaloriesData {
+  final List<ChartDataPoint> perWorkoutData;
+
+  final List<ChartDataPoint> weeklyData;
+  final double totalPeriodCalories;
+  final double averagePerWorkout;
+  final double currentWeekCalories;
+  final double previousWeekCalories;
+  final int workoutsWithEstimate;
+  final int totalWorkouts;
+
+  CaloriesData({
+    required this.perWorkoutData,
+    required this.weeklyData,
+    required this.totalPeriodCalories,
+    required this.averagePerWorkout,
+    required this.currentWeekCalories,
+    required this.previousWeekCalories,
+    required this.workoutsWithEstimate,
+    required this.totalWorkouts,
+  });
+}
+
 class ConsistencyData {
   final List<ChartDataPoint> completionRateData;
   final double overallCompletionRate;
