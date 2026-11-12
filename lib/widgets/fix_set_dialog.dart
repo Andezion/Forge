@@ -2,73 +2,70 @@ import 'package:flutter/material.dart';
 import 'package:dyplom/l10n/generated/app_localizations.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../models/exercise.dart';
+import '../models/workout_session.dart';
 import '../utils/units.dart';
+import '../utils/workout_format.dart';
+import 'set_input_fields.dart';
 
-Future<(int, double)?> showFixSetDialog(
+Future<SetEntryValues?> showFixSetDialog(
   BuildContext context, {
-  required int setNumber,
-  required int reps,
-  required double weight,
+  required ExerciseSetResult set,
+  required ExerciseType type,
 }) {
-  return showDialog<(int, double)>(
+  return showDialog<SetEntryValues>(
     context: context,
-    builder: (_) => _FixSetDialog(
-      setNumber: setNumber,
-      reps: reps,
-      weight: weight,
-    ),
+    builder: (_) => _FixSetDialog(set: set, type: type),
   );
 }
 
 class _FixSetDialog extends StatefulWidget {
-  final int setNumber;
-  final int reps;
-  final double weight;
+  final ExerciseSetResult set;
+  final ExerciseType type;
 
-  const _FixSetDialog({
-    required this.setNumber,
-    required this.reps,
-    required this.weight,
-  });
+  const _FixSetDialog({required this.set, required this.type});
 
   @override
   State<_FixSetDialog> createState() => _FixSetDialogState();
 }
 
 class _FixSetDialogState extends State<_FixSetDialog> {
-  late final TextEditingController _repsController;
-  late final TextEditingController _weightController;
+  late final SetEntry _entry;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _repsController = TextEditingController(text: widget.reps.toString());
-    _weightController = TextEditingController(
-      text: widget.weight > 0
-          ? Units.of(context, listen: false).weightValue(widget.weight)
-          : '',
+    final s = widget.set;
+    final units = Units.of(context, listen: false);
+    _entry = SetEntry(
+      repsText: s.actualReps > 0 ? s.actualReps.toString() : '',
+      weightText: s.weight > 0 ? units.weightValue(s.weight) : '',
+      minutesText: s.durationMinutes?.toString() ?? '',
+      caloriesText: s.calories != null ? s.calories!.round().toString() : '',
+      withCalories: s.calories != null && s.calories! > 0,
     );
   }
 
   @override
   void dispose() {
-    _repsController.dispose();
-    _weightController.dispose();
+    _entry.dispose();
     super.dispose();
   }
 
   void _save() {
-    final reps = int.tryParse(_repsController.text) ?? 0;
-    if (reps <= 0) {
-      setState(() => _error = AppLocalizations.of(context)!.pleaseEnterReps);
+    final result = readSetEntry(
+      _entry,
+      widget.type,
+      l10n: AppLocalizations.of(context)!,
+      units: Units.of(context, listen: false),
+      originalKg: widget.set.weight,
+    );
+    if (result.values == null) {
+      setState(() => _error = result.error);
       return;
     }
-    final weight = (Units.of(context, listen: false)
-                .parseWeight(_weightController.text, originalKg: widget.weight) ??
-            0.0)
-        .clamp(0.0, double.infinity);
-    Navigator.of(context).pop((reps, weight));
+    Navigator.of(context).pop(result.values);
   }
 
   @override
@@ -76,52 +73,33 @@ class _FixSetDialogState extends State<_FixSetDialog> {
     final l10n = AppLocalizations.of(context)!;
     final units = Units.of(context);
     return AlertDialog(
-      title: Text(l10n.fixSetTitle(widget.setNumber)),
+      title: Text(l10n.fixSetTitle(widget.set.setNumber)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '${l10n.recordedReps(widget.reps)}'
-            '${widget.weight > 0 ? " × ${units.weight(widget.weight)}" : ""}',
+            l10n.recordedValue(
+              formatSetResult(l10n, units, widget.set, widget.type),
+            ),
             style: AppTextStyles.caption.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _repsController,
-                  keyboardType: TextInputType.number,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: l10n.reps,
-                    errorText: _error,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _weightController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: units.weightLabel,
-                    hintText: '0',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          SetInputFields(
+            entry: _entry,
+            type: widget.type,
+            fieldHeight: 48,
+            autofocus: true,
           ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: AppTextStyles.caption.copyWith(color: AppColors.error),
+            ),
+          ],
         ],
       ),
       actions: [
@@ -168,9 +146,7 @@ class FixSetButton extends StatelessWidget {
           side: BorderSide(
             color: enabled ? AppColors.warning : AppColors.divider,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: EdgeInsets.zero,
           textStyle: const TextStyle(fontSize: 12),
         ),
