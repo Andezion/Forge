@@ -8,11 +8,14 @@ import '../utils/muscle_group_utils.dart';
 import 'create_exercise_screen.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
-  final Function(Exercise) onExerciseSelected;
+  final Function(Exercise)? onExerciseSelected;
+
+  final bool embedded;
 
   const ExerciseLibraryScreen({
     super.key,
-    required this.onExerciseSelected,
+    this.onExerciseSelected,
+    this.embedded = false,
   });
 
   @override
@@ -31,12 +34,18 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   void initState() {
     super.initState();
     _loadExercises();
+    _dataManager.addListener(_onDataChanged);
   }
 
   @override
   void dispose() {
+    _dataManager.removeListener(_onDataChanged);
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onDataChanged() {
+    if (mounted) _applyFilters();
   }
 
   void _loadExercises() {
@@ -52,21 +61,27 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           return false;
         }
         if (_primaryFilter != null) {
-          final hasPrimary = exercise.muscleGroups.any((mg) =>
-              mg.intensity == MuscleGroupIntensity.primary &&
-              mg.group == _primaryFilter);
+          final hasPrimary = exercise.muscleGroups.any(
+            (mg) =>
+                mg.intensity == MuscleGroupIntensity.primary &&
+                mg.group == _primaryFilter,
+          );
           if (!hasPrimary) return false;
         }
         if (_secondaryFilter != null) {
-          final hasSecondary = exercise.muscleGroups.any((mg) =>
-              mg.intensity == MuscleGroupIntensity.secondary &&
-              mg.group == _secondaryFilter);
+          final hasSecondary = exercise.muscleGroups.any(
+            (mg) =>
+                mg.intensity == MuscleGroupIntensity.secondary &&
+                mg.group == _secondaryFilter,
+          );
           if (!hasSecondary) return false;
         }
         if (_stabilizerFilter != null) {
-          final hasStabilizer = exercise.muscleGroups.any((mg) =>
-              mg.intensity == MuscleGroupIntensity.stabilizer &&
-              mg.group == _stabilizerFilter);
+          final hasStabilizer = exercise.muscleGroups.any(
+            (mg) =>
+                mg.intensity == MuscleGroupIntensity.stabilizer &&
+                mg.group == _stabilizerFilter,
+          );
           if (!hasStabilizer) return false;
         }
         return true;
@@ -94,14 +109,13 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   Widget _buildMuscleGroupFilters() {
     final l10n = AppLocalizations.of(context)!;
     final items = [
-      DropdownMenuItem<MuscleGroup>(
-        value: null,
-        child: Text(l10n.any),
+      DropdownMenuItem<MuscleGroup>(value: null, child: Text(l10n.any)),
+      ...MuscleGroup.values.map(
+        (g) => DropdownMenuItem<MuscleGroup>(
+          value: g,
+          child: Text(MuscleGroupUtils.getLabel(g)),
+        ),
       ),
-      ...MuscleGroup.values.map((g) => DropdownMenuItem<MuscleGroup>(
-            value: g,
-            child: Text(MuscleGroupUtils.getLabel(g)),
-          )),
     ];
 
     return Container(
@@ -219,6 +233,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final content = _buildContent();
+    if (widget.embedded) return content;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -229,62 +245,66 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
         ),
       ),
-      body: Column(
-        children: [
-          _buildCreateExerciseButton(),
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            color: AppColors.surface,
-            child: TextField(
-              controller: _searchController,
-              onChanged: _filterExercises,
-              decoration: InputDecoration(
-                hintText: '${AppLocalizations.of(context)!.search}...',
-                hintStyle: AppTextStyles.body2,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: AppColors.background,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      body: content,
+    );
+  }
+
+  Widget _buildContent() {
+    return Column(
+      children: [
+        _buildCreateExerciseButton(),
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          color: AppColors.surface,
+          child: TextField(
+            controller: _searchController,
+            onChanged: _filterExercises,
+            decoration: InputDecoration(
+              hintText: '${AppLocalizations.of(context)!.search}...',
+              hintStyle: AppTextStyles.body2,
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
+              filled: true,
+              fillColor: AppColors.background,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
           ),
-          _buildMuscleGroupFilters(),
-          Expanded(
-            child: _filteredExercises.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.fitness_center_outlined,
-                          size: 64,
+        ),
+        _buildMuscleGroupFilters(),
+        Expanded(
+          child: _filteredExercises.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.fitness_center_outlined,
+                        size: 64,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.noExercisesFound,
+                        style: AppTextStyles.body1.copyWith(
                           color: AppColors.textSecondary,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          AppLocalizations.of(context)!.noExercisesFound,
-                          style: AppTextStyles.body1.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filteredExercises.length,
-                    itemBuilder: (context, index) {
-                      final exercise = _filteredExercises[index];
-                      return _buildExerciseCard(exercise);
-                    },
+                      ),
+                    ],
                   ),
-          ),
-        ],
-      ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _filteredExercises.length,
+                  itemBuilder: (context, index) {
+                    final exercise = _filteredExercises[index];
+                    return _buildExerciseCard(exercise);
+                  },
+                ),
+        ),
+      ],
     );
   }
 
@@ -301,7 +321,11 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(AppLocalizations.of(context)!.exerciseUpdated(updatedExercise.name)),
+                  content: Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.exerciseUpdated(updatedExercise.name),
+                  ),
                   backgroundColor: AppColors.success,
                   duration: const Duration(seconds: 2),
                 ),
@@ -321,7 +345,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(AppLocalizations.of(context)!.exerciseInUse),
-          content: Text(AppLocalizations.of(context)!.exerciseInUseConfirm(exercise.name)),
+          content: Text(
+            AppLocalizations.of(context)!.exerciseInUseConfirm(exercise.name),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -329,9 +355,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
@@ -344,7 +368,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(AppLocalizations.of(context)!.deleteExerciseTitle),
-          content: Text(AppLocalizations.of(context)!.deleteExerciseConfirm(exercise.name)),
+          content: Text(
+            AppLocalizations.of(context)!.deleteExerciseConfirm(exercise.name),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -352,9 +378,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
@@ -372,7 +396,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.exerciseDeleted(exercise.name)),
+          content: Text(
+            AppLocalizations.of(context)!.exerciseDeleted(exercise.name),
+          ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -396,9 +422,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
         leading: Container(
@@ -407,20 +431,13 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             color: difficultyColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            Icons.fitness_center,
-            color: difficultyColor,
-            size: 24,
-          ),
+          child: Icon(Icons.fitness_center, color: difficultyColor, size: 24),
         ),
         title: Text(
           exercise.name,
           style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(
-          exercise.description,
-          style: AppTextStyles.body2,
-        ),
+        subtitle: Text(exercise.description, style: AppTextStyles.body2),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -436,14 +453,19 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               onPressed: () => _deleteExercise(exercise),
               tooltip: AppLocalizations.of(context)!.delete,
             ),
-            const Icon(Icons.add_circle_outline),
+            if (widget.onExerciseSelected != null)
+              const Icon(Icons.add_circle_outline),
           ],
         ),
         onTap: () {
-          widget.onExerciseSelected(exercise);
+          final onSelected = widget.onExerciseSelected;
+          if (onSelected != null) {
+            onSelected(exercise);
+          } else {
+            _showEditExerciseDialog(exercise);
+          }
         },
       ),
     );
   }
 }
-
