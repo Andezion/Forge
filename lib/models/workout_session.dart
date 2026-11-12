@@ -8,12 +8,18 @@ class ExerciseSetResult {
   final DateTime timestamp;
   final int durationSeconds;
 
+  final int? durationMinutes;
+
+  final double? calories;
+
   ExerciseSetResult({
     required this.setNumber,
     required this.actualReps,
     required this.weight,
     required this.timestamp,
     required this.durationSeconds,
+    this.durationMinutes,
+    this.calories,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +29,8 @@ class ExerciseSetResult {
       'weight': weight,
       'timestamp': timestamp.toIso8601String(),
       'durationSeconds': durationSeconds,
+      if (durationMinutes != null) 'durationMinutes': durationMinutes,
+      if (calories != null) 'calories': calories,
     };
   }
 
@@ -33,6 +41,8 @@ class ExerciseSetResult {
       weight: (json['weight'] as num).toDouble(),
       timestamp: DateTime.parse(json['timestamp']),
       durationSeconds: json['durationSeconds'],
+      durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
+      calories: (json['calories'] as num?)?.toDouble(),
     );
   }
 }
