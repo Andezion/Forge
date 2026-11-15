@@ -76,12 +76,15 @@ class Workout {
   final DateTime createdAt;
   final String? userId;
 
+  final String? sourcePublicId;
+
   Workout({
     required this.id,
     required this.name,
     required this.exercises,
     required this.createdAt,
     this.userId,
+    this.sourcePublicId,
   });
 
   Map<String, dynamic> toJson() {
@@ -91,6 +94,7 @@ class Workout {
       'exercises': exercises.map((e) => e.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'userId': userId,
+      if (sourcePublicId != null) 'sourcePublicId': sourcePublicId,
     };
   }
 
@@ -103,6 +107,7 @@ class Workout {
           .toList(),
       createdAt: DateTime.parse(json['createdAt']),
       userId: json['userId'],
+      sourcePublicId: json['sourcePublicId'] as String?,
     );
   }
 
@@ -112,6 +117,7 @@ class Workout {
     List<WorkoutExercise>? exercises,
     DateTime? createdAt,
     String? userId,
+    String? sourcePublicId,
   }) {
     return Workout(
       id: id ?? this.id,
@@ -119,6 +125,7 @@ class Workout {
       exercises: exercises ?? this.exercises,
       createdAt: createdAt ?? this.createdAt,
       userId: userId ?? this.userId,
+      sourcePublicId: sourcePublicId ?? this.sourcePublicId,
     );
   }
 }
