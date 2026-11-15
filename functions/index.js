@@ -1,7 +1,11 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest } = require("firebase-functions/v2/https");
+const {
+  onDocumentUpdated,
+  onDocumentDeleted,
+} = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore, Timestamp } = require("firebase-admin/firestore");
+const { getFirestore, Timestamp, FieldValue } = require("firebase-admin/firestore");
 const fetch = require("node-fetch");
 
 initializeApp();
@@ -142,5 +146,34 @@ exports.triggerWorldRecordsUpdate = onRequest(
       console.error("[WR] Manual trigger error:", err);
       res.status(500).json({ error: err.message });
     }
+  }
+);
+
+exports.onProgramReviewed = onDocumentUpdated(
+  "public_programs/{programId}",
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+    if (!before || !after || before.status === after.status) return;
+    if (!["approved", "rejected"].includes(after.status)) return;
+
+    const update = {
+      reviewedAt: FieldValue.serverTimestamp(),
+      authorNotified: false,
+    };
+    if (after.status === "approved") update.rejectionReason = null;
+    console.log(`[STORE] ${event.params.programId} -> ${after.status}`);
+    await event.data.after.ref.update(update);
+  }
+);
+
+exports.onProgramDeleted = onDocumentDeleted(
+  "public_programs/{programId}",
+  async (event) => {
+    await db.recursiveDelete(
+      db.collection("public_programs")
+        .doc(event.params.programId)
+        .collection("downloads")
+    );
   }
 );
