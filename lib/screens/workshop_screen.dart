@@ -3,29 +3,22 @@ import 'package:dyplom/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
-import '../models/exercise.dart';
+import '../models/public_program.dart';
 import '../models/workout.dart';
 import '../services/data_manager.dart';
+import '../services/public_program_service.dart';
 import '../services/workout_recommendation_service.dart';
-import '../utils/muscle_group_utils.dart';
+import '../utils/program_category_ui.dart';
+import '../widgets/muscle_load_panel.dart';
+import '../widgets/publish_program_sheet.dart';
 import '../widgets/workout_ai_evaluation.dart';
 import 'create_workout_screen.dart';
 import 'exercise_library_screen.dart';
 import 'workout_execution_screen.dart';
 
-class _MuscleStats {
-  final int exerciseCount;
-  final int setsCount;
-  final double loadScore;
-
-  const _MuscleStats({
-    required this.exerciseCount,
-    required this.setsCount,
-    required this.loadScore,
-  });
-}
-
 enum _WorkshopView { workouts, exercises }
+
+enum _StoreAction { publish, resubmit, update, remove }
 
 class WorkshopScreen extends StatefulWidget {
   const WorkshopScreen({super.key});
@@ -39,6 +32,143 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   final _expandedWorkouts = <String>{};
   final _searchController = TextEditingController();
   _WorkshopView _view = _WorkshopView.workouts;
+  final _storeService = PublicProgramService();
+
+  Map<String, PublicProgram> _publications = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPublications();
+  }
+
+  Future<void> _loadPublications() async {
+    final mine = await _storeService.fetchMyPublications();
+    if (!mounted) return;
+    setState(() {
+      _publications = {for (final p in mine) p.sourceWorkoutId: p};
+    });
+  }
+
+  List<_StoreAction> _storeActionsFor(Workout workout) {
+    if (_dataManager.isBuiltInWorkout(workout) ||
+        workout.sourcePublicId != null) {
+      return const [];
+    }
+    switch (_publications[workout.id]?.status) {
+      case null:
+        return const [_StoreAction.publish];
+      case PublicProgramStatus.pending:
+        return const [_StoreAction.remove];
+      case PublicProgramStatus.rejected:
+        return const [_StoreAction.resubmit, _StoreAction.remove];
+      case PublicProgramStatus.approved:
+        return const [_StoreAction.update, _StoreAction.remove];
+    }
+  }
+
+  Future<void> _onStoreAction(_StoreAction action, Workout workout) async {
+    final l10n = AppLocalizations.of(context)!;
+    final existing = _publications[workout.id];
+
+    if (action == _StoreAction.remove) {
+      if (existing != null) await _removeFromStore(existing);
+      return;
+    }
+
+    if (workout.exercises.isEmpty) {
+      _showSnack(l10n.publishEmptyWorkout, AppColors.error);
+      return;
+    }
+    if (workout.exercises.length > PublicProgram.maxExercises) {
+      _showSnack(l10n.publishTooManyExercises(PublicProgram.maxExercises),
+          AppColors.error);
+      return;
+    }
+
+    final sent = await PublishProgramSheet.show(
+      context,
+      workout: workout,
+      existing: existing,
+    );
+    if (!sent || !mounted) return;
+    _showSnack(l10n.publishSubmitted, AppColors.success);
+    _loadPublications();
+  }
+
+  Future<void> _removeFromStore(PublicProgram program) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(program.status == PublicProgramStatus.pending
+            ? l10n.withdrawSubmission
+            : l10n.removeFromStore),
+        content: Text(l10n.unpublishConfirm(program.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.delete,
+                style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await _storeService.remove(program.id);
+      if (!mounted) return;
+      setState(() => _publications.remove(program.sourceWorkoutId));
+      _showSnack(l10n.unpublished, AppColors.success);
+    } on StoreOfflineException {
+      if (mounted) _showSnack(l10n.noInternetAction, AppColors.error);
+    } catch (e) {
+      debugPrint('[WORKSHOP_SCREEN] remove from store failed: $e');
+      if (mounted) _showSnack(l10n.publishFailed, AppColors.error);
+    }
+  }
+
+  void _showSnack(String text, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text), backgroundColor: color),
+    );
+  }
+
+  PopupMenuItem<void> _storeMenuItem(_StoreAction action, Workout workout) {
+    final l10n = AppLocalizations.of(context)!;
+    final (IconData icon, String label, Color? color) = switch (action) {
+      _StoreAction.publish => (Icons.cloud_upload_outlined, l10n.publishToStore, null),
+      _StoreAction.resubmit => (Icons.replay, l10n.resubmitProgram, null),
+      _StoreAction.update => (Icons.update, l10n.submitUpdate, null),
+      _StoreAction.remove => (
+          Icons.cloud_off,
+          _publications[workout.id]?.status == PublicProgramStatus.pending
+              ? l10n.withdrawSubmission
+              : l10n.removeFromStore,
+          AppColors.error,
+        ),
+    };
+    return PopupMenuItem(
+      onTap: () => Future.delayed(
+        Duration.zero,
+        () => _onStoreAction(action, workout),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(label, style: TextStyle(color: color)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -343,136 +473,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     );
   }
 
-  Map<MuscleGroup, _MuscleStats> _calculateMuscleData(Workout workout) {
-    final result = <MuscleGroup, _MuscleStats>{};
-    for (final we in workout.exercises) {
-      for (final tag in we.exercise.muscleGroups) {
-        final existing = result[tag.group];
-        result[tag.group] = _MuscleStats(
-          exerciseCount: (existing?.exerciseCount ?? 0) + 1,
-          setsCount: (existing?.setsCount ?? 0) + we.sets,
-          loadScore: (existing?.loadScore ?? 0.0) + tag.score * we.sets,
-        );
-      }
-    }
-    return result;
-  }
-
-  int _getIntensityLevel(double score) {
-    if (score <= 3) return 1;
-    if (score <= 8) return 2;
-    if (score <= 15) return 3;
-    if (score <= 24) return 4;
-    return 5;
-  }
-
-  Color _getIntensityColor(int level) {
-    switch (level) {
-      case 1:
-        return const Color(0xFF4CAF50);
-      case 2:
-        return const Color(0xFFFFEB3B);
-      case 3:
-        return const Color(0xFFFF9800);
-      case 4:
-        return const Color(0xFFF44336);
-      case 5:
-        return const Color(0xFF212121);
-      default:
-        return Colors.grey;
-    }
-  }
-
-  Widget _buildMusclePanel(Map<MuscleGroup, _MuscleStats> muscleData) {
-    if (muscleData.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        child: Text(
-          AppLocalizations.of(context)!.noMuscleDataAvailable,
-          style: AppTextStyles.caption.copyWith(
-            color: Theme.of(context).textTheme.bodySmall?.color,
-          ),
-        ),
-      );
-    }
-
-    final sorted = muscleData.entries.toList()
-      ..sort((a, b) => b.value.loadScore.compareTo(a.value.loadScore));
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.muscleLoad,
-            style: AppTextStyles.caption.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.bodySmall?.color,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...sorted.map((entry) {
-            final stats = entry.value;
-            final level = _getIntensityLevel(stats.loadScore);
-            final color = _getIntensityColor(level);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 88,
-                    child: Text(
-                      MuscleGroupUtils.getLabel(entry.key),
-                      style: AppTextStyles.caption,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: List.generate(
-                      5,
-                      (i) => Container(
-                        width: 18,
-                        height: 9,
-                        margin: const EdgeInsets.only(right: 2),
-                        decoration: BoxDecoration(
-                          color: i < level
-                              ? color
-                              : Theme.of(
-                                  context,
-                                ).dividerColor.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppLocalizations.of(context)!.setsCount(stats.setsCount),
-                    style: AppTextStyles.caption.copyWith(
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
   Widget _buildWorkoutCard(Workout workout, int index) {
     final isExpanded = _expandedWorkouts.contains(workout.id);
-    final muscleData = _calculateMuscleData(workout);
+    final publication = _publications[workout.id];
+    final storeActions = _storeActionsFor(workout);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -525,6 +529,15 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
+                        if (publication != null) ...[
+                          const SizedBox(height: 6),
+                          StoreChip(
+                            label: publication.status
+                                .label(AppLocalizations.of(context)!),
+                            icon: publication.status.icon,
+                            color: publication.status.color,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -561,6 +574,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           );
                         },
                       ),
+                      for (final action in storeActions)
+                        _storeMenuItem(action, workout),
                       PopupMenuItem(
                         child: Row(
                           children: [
@@ -602,7 +617,18 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             secondChild: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildMusclePanel(muscleData),
+                if (publication?.status == PublicProgramStatus.rejected &&
+                    publication?.rejectionReason != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                    child: Text(
+                      AppLocalizations.of(context)!
+                          .rejectionReasonLabel(publication!.rejectionReason!),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.error),
+                    ),
+                  ),
+                MuscleLoadPanel(workout: workout),
                 WorkoutAiEvaluation(workout: workout),
               ],
             ),
