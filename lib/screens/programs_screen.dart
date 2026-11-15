@@ -12,6 +12,7 @@ import '../models/ai_suggested_workout.dart';
 import '../utils/units.dart';
 import '../utils/workout_format.dart';
 import 'ai_direction_screen.dart';
+import 'store_screen.dart';
 
 class ProgramsScreen extends StatefulWidget {
   const ProgramsScreen({super.key});
@@ -73,17 +74,48 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         .where((w) => w.id.startsWith('powerlifting_'))
         .toList();
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        title: Text(
-          AppLocalizations.of(context)!.programs,
-          style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+    final l10n = AppLocalizations.of(context)!;
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textOnPrimary,
+          title: Text(
+            l10n.programs,
+            style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+          ),
+          bottom: TabBar(
+            indicatorColor: AppColors.textOnPrimary,
+            labelColor: AppColors.textOnPrimary,
+            unselectedLabelColor:
+                AppColors.textOnPrimary.withValues(alpha: 0.7),
+            tabs: [
+              Tab(icon: const Icon(Icons.fitness_center), text: l10n.programs),
+              Tab(icon: const Icon(Icons.storefront), text: l10n.storeTab),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildProgramsList(context, dataManager, armwrestlingWorkouts,
+                streetliftingWorkouts, powerliftingWorkouts),
+            const StoreView(),
+          ],
         ),
       ),
-      body: ListView(
+    );
+  }
+
+  Widget _buildProgramsList(
+    BuildContext context,
+    DataManager dataManager,
+    List<Workout> armwrestlingWorkouts,
+    List<Workout> streetliftingWorkouts,
+    List<Workout> powerliftingWorkouts,
+  ) {
+    return ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
@@ -120,7 +152,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             powerliftingWorkouts,
           ),
         ],
-      ),
     );
   }
 
