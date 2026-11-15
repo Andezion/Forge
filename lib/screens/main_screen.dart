@@ -8,6 +8,8 @@ import '../services/leaderboard_service.dart';
 import '../services/data_manager.dart';
 import '../services/settings_service.dart';
 import '../services/profile_service.dart';
+import '../services/public_program_service.dart';
+import '../widgets/moderation_result_dialog.dart';
 import '../widgets/tour_overlay.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
@@ -44,7 +46,22 @@ class _MainScreenState extends State<MainScreen> {
 
       if (!mounted) return;
       _syncStatsOnStartup();
+      _showModerationResults();
     });
+  }
+
+  Future<void> _showModerationResults() async {
+    final service = PublicProgramService();
+    final reviews = await service.fetchUnseenReviews();
+    for (final program in reviews) {
+      if (!mounted) return;
+      if (Provider.of<TourService>(context, listen: false).isActive) return;
+      await showDialog<void>(
+        context: context,
+        builder: (_) => ModerationResultDialog(program: program),
+      );
+      await service.markAuthorNotified(program.id);
+    }
   }
 
   @override
