@@ -7,6 +7,7 @@ import '../models/workout.dart';
 import '../models/workout_history.dart';
 import '../models/training_plan.dart';
 import '../models/ai_suggested_workout.dart';
+import '../utils/workout_import.dart';
 import 'challenge_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
@@ -1090,12 +1091,7 @@ class DataManager extends ChangeNotifier {
         }).toList();
 
         if (workoutUpdated) {
-          _workouts[i] = Workout(
-            id: workout.id,
-            name: workout.name,
-            exercises: updatedExercises,
-            createdAt: workout.createdAt,
-          );
+          _workouts[i] = workout.copyWith(exercises: updatedExercises);
         }
       }
 
@@ -1149,6 +1145,38 @@ class DataManager extends ChangeNotifier {
       _scheduleSave();
       notifyListeners();
     }
+  }
+
+  static const _builtInWorkoutPrefixes = [
+    'armwrestling_',
+    'streetlifting_',
+    'powerlifting_',
+  ];
+
+  bool isBuiltInWorkout(Workout workout) =>
+      _builtInWorkoutPrefixes.any(workout.id.startsWith);
+
+  bool hasImportedPublicProgram(String publicId) =>
+      _workouts.any((w) => w.sourcePublicId == publicId);
+
+  int _importIdCounter = 0;
+
+  WorkoutImportPlan planPublicWorkoutImport(
+      Workout source, String publicId) {
+    final stamp = DateTime.now().microsecondsSinceEpoch;
+    return planWorkoutImport(
+      source: source,
+      existing: _exercises,
+      sourcePublicId: publicId,
+      newId: () => 'imp_${stamp}_${_importIdCounter++}',
+    );
+  }
+
+  void applyWorkoutImport(WorkoutImportPlan plan) {
+    _exercises.addAll(plan.newExercises);
+    _workouts.add(plan.workout);
+    _scheduleSave();
+    notifyListeners();
   }
 
   Workout? getWorkoutById(String id) {
