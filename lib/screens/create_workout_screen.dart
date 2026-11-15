@@ -428,6 +428,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         name: _nameController.text,
         exercises: _workoutExercises,
         createdAt: widget.existingWorkout?.createdAt ?? DateTime.now(),
+        userId: widget.existingWorkout?.userId,
+        sourcePublicId: widget.existingWorkout?.sourcePublicId,
       );
 
       await _clearDraft();
