@@ -324,7 +324,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: AppColors.surface.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: AppColors.primary.withValues(alpha: 0.3),
