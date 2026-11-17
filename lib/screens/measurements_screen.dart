@@ -211,7 +211,7 @@ class _MeasurementSheetState extends State<_MeasurementSheet> {
                     onPressed: () => _save(l10n),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.black),
+                        foregroundColor: AppColors.textOnPrimary),
                     child: Text(l10n.save),
                   ),
                 ),
