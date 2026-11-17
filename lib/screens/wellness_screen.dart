@@ -386,7 +386,7 @@ class _WellnessScreenState extends State<WellnessScreen> {
                           exercise.reason,
                           style: AppTextStyles.caption.copyWith(
                             fontStyle: FontStyle.italic,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
