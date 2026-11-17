@@ -148,11 +148,11 @@ class _AiConfigScreenState extends State<AiConfigScreen> {
                       ),
                     ),
                     child: _isSaving
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
+                                strokeWidth: 2, color: AppColors.textOnPrimary),
                           )
                         : Text(AppLocalizations.of(context)!.save, style: AppTextStyles.button),
                   ),
