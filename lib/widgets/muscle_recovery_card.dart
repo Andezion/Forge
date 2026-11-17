@@ -29,7 +29,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.fitness_center,
-                    color: Theme.of(context).primaryColor),
+                    color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   AppLocalizations.of(context)!.muscleRecovery,
