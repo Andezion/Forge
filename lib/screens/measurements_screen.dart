@@ -59,8 +59,10 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.measurements, style: AppTextStyles.h4),
+        title: Text(l10n.measurements,
+            style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary)),
         backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
       ),
       body: SafeArea(
         child: Padding(
