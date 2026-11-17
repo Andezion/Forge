@@ -135,17 +135,17 @@ class _CommunityLeaderboardScreenState
           borderSide: BorderSide(color: AppColors.textOnPrimary),
         ),
       ),
-      style: AppTextStyles.body2.copyWith(color: Colors.black),
+      style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary),
       items: _scopes.map((scope) {
         return DropdownMenuItem<String>(
           value: scope,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(_scopeIcons[scope], size: 16, color: AppColors.primary),
+              Icon(_scopeIcons[scope], size: 16, color: AppColors.textOnPrimary),
               const SizedBox(width: 6),
               Text(_optionLabel(scope),
-                  style: AppTextStyles.body2.copyWith(color: Colors.black)),
+                  style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary)),
             ],
           ),
         );
@@ -189,12 +189,12 @@ class _CommunityLeaderboardScreenState
           borderSide: BorderSide(color: AppColors.textOnPrimary),
         ),
       ),
-      style: AppTextStyles.body2.copyWith(color: Colors.black),
+      style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary),
       items: options
           .map((o) => DropdownMenuItem<String>(
               value: o,
               child:
-                  Text(_optionLabel(o), style: AppTextStyles.body2.copyWith(color: Colors.black))))
+                  Text(_optionLabel(o), style: AppTextStyles.body2.copyWith(color: AppColors.textOnPrimary))))
           .toList(),
       onChanged: (v) { if (v != null) onChanged(v); },
     );
@@ -312,13 +312,13 @@ class _CommunityLeaderboardScreenState
                       borderSide: BorderSide(color: AppColors.primary),
                     ),
                   ),
-                  style: AppTextStyles.body2.copyWith(color: Colors.black),
+                  style: AppTextStyles.body2.copyWith(color: AppColors.textPrimary),
                   items: exercises
                       .map((ex) => DropdownMenuItem<Exercise>(
                           value: ex,
                           child: Text(ex.name,
                               style: AppTextStyles.body2
-                                  .copyWith(color: Colors.black))))
+                                  .copyWith(color: AppColors.textPrimary))))
                       .toList(),
                   onChanged: (ex) {
                     if (ex != null) setState(() => _selectedExercise = ex);
