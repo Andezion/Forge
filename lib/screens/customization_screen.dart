@@ -7,6 +7,7 @@ import 'package:dyplom/l10n/generated/app_localizations.dart';
 
 import '../services/theme_service.dart';
 import '../services/profile_service.dart';
+import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
 class CustomizationScreen extends StatelessWidget {
@@ -30,9 +31,10 @@ class CustomizationScreen extends StatelessWidget {
     return Consumer<AppColor>(
       builder: (context, appColor, _) => Scaffold(
         appBar: AppBar(
-          title: Text(l10n.customization, style: AppTextStyles.h4),
+          title: Text(l10n.customization,
+              style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary)),
           backgroundColor: appColor.color,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textOnPrimary,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -161,7 +163,7 @@ class CustomizationScreen extends StatelessWidget {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColor.color,
-                              foregroundColor: Colors.black,
+                              foregroundColor: AppColors.textOnPrimary,
                             ),
                             child: Text(l10n.choosePhoto),
                           ),
@@ -200,7 +202,11 @@ class CustomizationScreen extends StatelessWidget {
                             height: 80,
                             decoration: decor.copyWith(
                                 border: selected
-                                    ? Border.all(color: Colors.black, width: 3)
+                                    ? Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        width: 3)
                                     : decor.border),
                             child: Center(
                               child: Text('F${idx + 1}',
@@ -235,7 +241,7 @@ class CustomizationScreen extends StatelessWidget {
   Widget _buildColorTile(BuildContext context, Color color) {
     final appColor = Provider.of<AppColor>(context, listen: false);
     final l10n = AppLocalizations.of(context)!;
-    final isSelected = appColor.color == color;
+    final isSelected = appColor.isCurrentColor(color);
 
     return GestureDetector(
       onTap: () async {
@@ -256,7 +262,10 @@ class CustomizationScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
-          border: isSelected ? Border.all(color: Colors.black, width: 3) : null,
+          border: isSelected
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.onSurface, width: 3)
+              : null,
         ),
       ),
     );
