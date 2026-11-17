@@ -208,17 +208,17 @@ class _PublishProgramSheetState extends State<PublishProgramSheet> {
               onPressed:
                   _sending || _name.text.trim().isEmpty ? null : _submit,
               icon: _sending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                          strokeWidth: 2, color: AppColors.textOnPrimary),
                     )
-                  : const Icon(Icons.send, color: Colors.white),
+                  : Icon(Icons.send, color: AppColors.textOnPrimary),
               label: Text(l10n.publishSubmit),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textOnPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
