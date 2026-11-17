@@ -184,9 +184,9 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange.shade50,
+        color: AppColors.warningBackground,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange.shade200),
+        border: Border.all(color: AppColors.warningBorder),
       ),
       child: Row(
         children: [
@@ -196,7 +196,7 @@ class _ProgressionSummaryCardState extends State<ProgressionSummaryCard> {
             child: Text(
               AppLocalizations.of(context)!.recommendedDeloadWeek,
               style: AppTextStyles.body2.copyWith(
-                color: Colors.orange.shade900,
+                color: AppColors.warningText,
                 fontWeight: FontWeight.w600,
               ),
             ),
