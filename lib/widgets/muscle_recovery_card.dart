@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dyplom/l10n/generated/app_localizations.dart';
 import '../models/exercise.dart';
 import '../services/muscle_recovery_tracker.dart';
+import '../constants/app_colors.dart';
 
 class MuscleRecoveryCard extends StatelessWidget {
   final Map<MuscleGroup, int> daysSinceTraining;
@@ -163,7 +164,7 @@ class MuscleRecoveryCard extends StatelessWidget {
             width: 60,
             child: LinearProgressIndicator(
               value: priority.clamp(0.0, 1.0),
-              backgroundColor: Colors.grey[300],
+              backgroundColor: AppColors.divider,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
