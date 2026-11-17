@@ -59,6 +59,19 @@ class AppColors {
     return Theme.of(context).colorScheme.onPrimary;
   }
 
+  static Color onColor(Color color) =>
+      color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+
+  static void setPrimary(Color color) {
+    primary = color;
+    final hsl = HSLColor.fromColor(color);
+    primaryDark =
+        hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0)).toColor();
+    primaryLight =
+        hsl.withLightness((hsl.lightness + 0.15).clamp(0.0, 1.0)).toColor();
+    textOnPrimary = onColor(color);
+  }
+
   static void setDarkMode(bool isDark) {
     if (isDark) {
       background = const Color(0xFF121212);
@@ -66,7 +79,6 @@ class AppColors {
       textPrimary = const Color(0xFFFFFFFF);
       textSecondary = const Color(0xFFB0B0B0);
       textHint = const Color(0xFF757575);
-      textOnPrimary = const Color(0xFFFFFFFF);
       divider = const Color(0xFF303030);
     } else {
       background = const Color(0xFFF5F5F5);
@@ -74,7 +86,6 @@ class AppColors {
       textPrimary = const Color(0xFF000000);
       textSecondary = const Color(0xFF5F6368);
       textHint = const Color(0xFF9E9E9E);
-      textOnPrimary = const Color(0xFFFFFFFF);
       divider = const Color(0xFFE0E0E0);
     }
   }
