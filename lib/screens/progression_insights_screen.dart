@@ -126,7 +126,7 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
 
   Widget _buildDeloadWarning() {
     return Card(
-      color: Colors.orange.shade50,
+      color: AppColors.warningBackground,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -140,14 +140,14 @@ class _ProgressionInsightsScreenState extends State<ProgressionInsightsScreen> {
                   Text(
                     AppLocalizations.of(context)!.recommendedDeloadWeek,
                     style: AppTextStyles.h2.copyWith(
-                      color: Colors.orange.shade900,
+                      color: AppColors.warningText,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     AppLocalizations.of(context)!.recommendedDeloadDesc,
                     style: AppTextStyles.body2.copyWith(
-                      color: Colors.orange.shade800,
+                      color: AppColors.warningTextSecondary,
                     ),
                   ),
                 ],
