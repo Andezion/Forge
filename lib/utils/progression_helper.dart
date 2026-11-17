@@ -166,13 +166,13 @@ class _OptimizationDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
+                  color: AppColors.warningBackground,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   'Recent workouts have been intense. We recommend reducing the load for recovery.',
                   style: AppTextStyles.body2.copyWith(
-                    color: Colors.orange.shade900,
+                    color: AppColors.warningText,
                   ),
                 ),
               ),
@@ -201,7 +201,7 @@ class _OptimizationDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.textOnPrimary,
           ),
           child: const Text('Apply Recommendations'),
         ),
