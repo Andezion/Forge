@@ -109,6 +109,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final tourService = Provider.of<TourService>(context);
+    final colorScheme = Theme.of(context).colorScheme;
     return Stack(
       children: [
         Scaffold(
@@ -119,9 +120,9 @@ class _MainScreenState extends State<MainScreen> {
               setState(() => _currentIndex = index);
             },
             type: BottomNavigationBarType.fixed,
-            backgroundColor: AppColors.surface,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: AppColors.textSecondary,
+            backgroundColor: colorScheme.surface,
+            selectedItemColor: colorScheme.primary,
+            unselectedItemColor: AppColors.getTextSecondary(context),
             selectedFontSize: 12,
             unselectedFontSize: 12,
             items: [
