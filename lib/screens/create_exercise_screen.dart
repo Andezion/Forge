@@ -263,11 +263,11 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         actions: [
           TextButton.icon(
             onPressed: _save,
-            icon: const Icon(Icons.check, color: Colors.white),
+            icon: Icon(Icons.check, color: AppColors.textOnPrimary),
             label: Text(
               _isEditing ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.create,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: AppColors.textOnPrimary, fontWeight: FontWeight.w600),
             ),
           ),
         ],
