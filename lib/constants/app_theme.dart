@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData lightTheme(Color primaryColor) {
@@ -8,6 +9,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         primary: primaryColor,
+        onPrimary: AppColors.onColor(primaryColor),
         brightness: Brightness.light,
         surface: const Color(0xFFFFFFFF),
         onSurface: const Color(0xFF000000),
@@ -16,8 +18,7 @@ class AppTheme {
       scaffoldBackgroundColor: const Color(0xFFF5F5F5),
       appBarTheme: AppBarTheme(
         backgroundColor: primaryColor,
-        foregroundColor:
-            primaryColor.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+        foregroundColor: AppColors.onColor(primaryColor),
         elevation: 0,
       ),
       cardTheme: CardThemeData(
@@ -62,6 +63,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         primary: primaryColor,
+        onPrimary: AppColors.onColor(primaryColor),
         brightness: Brightness.dark,
         surface: const Color(0xFF1E1E1E),
         onSurface: const Color(0xFFFFFFFF),
@@ -70,8 +72,7 @@ class AppTheme {
       scaffoldBackgroundColor: const Color(0xFF121212),
       appBarTheme: AppBarTheme(
         backgroundColor: primaryColor,
-        foregroundColor:
-            primaryColor.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+        foregroundColor: AppColors.onColor(primaryColor),
         elevation: 0,
       ),
       cardTheme: CardThemeData(
