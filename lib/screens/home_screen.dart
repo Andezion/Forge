@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.play_arrow, color: Colors.white),
+                          Icon(Icons.play_arrow, color: AppColors.textOnPrimary),
                           const SizedBox(width: 8),
                           Text(
                             AppLocalizations.of(context)!.startWorkout,
@@ -705,7 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     MaterialPageRoute(
                         builder: (_) => const PlanEditorScreen()),
                   ),
-                  icon: const Icon(Icons.add, color: Colors.white),
+                  icon: Icon(Icons.add, color: AppColors.textOnPrimary),
                   label: Text(AppLocalizations.of(context)!.createPlan),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
