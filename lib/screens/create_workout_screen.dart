@@ -738,7 +738,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen>
         width: double.infinity,
         child: ElevatedButton.icon(
           onPressed: _addExercise,
-          icon: const Icon(Icons.add, color: Colors.white),
+          icon: Icon(Icons.add, color: AppColors.textOnPrimary),
           label: Text(AppLocalizations.of(context)!.addExercise),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
