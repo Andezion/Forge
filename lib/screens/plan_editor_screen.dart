@@ -237,14 +237,14 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _save,
-                icon: const Icon(Icons.save, color: Colors.white),
+                icon: Icon(Icons.save, color: AppColors.textOnPrimary),
                 label: Text(
                   AppLocalizations.of(context)!.save,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textOnPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
