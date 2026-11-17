@@ -96,8 +96,37 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppColor _appColor;
+
+  @override
+  void initState() {
+    super.initState();
+    _appColor = Provider.of<AppColor>(context, listen: false);
+    _appColor.addListener(_onAppearanceChanged);
+  }
+
+  @override
+  void dispose() {
+    _appColor.removeListener(_onAppearanceChanged);
+    super.dispose();
+  }
+
+  void _onAppearanceChanged() {
+    void rebuild(Element element) {
+      element.markNeedsBuild();
+      element.visitChildren(rebuild);
+    }
+
+    (context as Element).visitChildren(rebuild);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +136,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: appColor.getTheme(),
+      theme: appColor.lightTheme,
+      darkTheme: appColor.darkTheme,
+      themeMode: appColor.themeMode,
+      themeAnimationDuration: Duration.zero,
       locale: Locale(settings.language.code),
       localizationsDelegates: const [
         AppLocalizations.delegate,
