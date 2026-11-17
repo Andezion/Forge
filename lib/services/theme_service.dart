@@ -12,14 +12,16 @@ class AppColor extends ChangeNotifier {
 
   Color get color => _color;
   bool get isDarkMode => _isDarkMode;
+  ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
   AppColor();
 
-  ThemeData getTheme() {
-    return _isDarkMode
-        ? AppTheme.darkTheme(_color)
-        : AppTheme.lightTheme(_color);
-  }
+  ThemeData get lightTheme => AppTheme.lightTheme(_color);
+  ThemeData get darkTheme => AppTheme.darkTheme(_color);
+
+  ThemeData getTheme() => _isDarkMode ? darkTheme : lightTheme;
+
+  bool isCurrentColor(Color other) => _color.toARGB32() == other.toARGB32();
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -29,37 +31,30 @@ class AppColor extends ChangeNotifier {
 
     final value = prefs.getInt(_prefsKey);
     if (value != null) {
-      try {
-        final loadedColor = Color(value);
-
-        if (loadedColor.a > 100 &&
-            (loadedColor.r > 0 || loadedColor.g > 0 || loadedColor.b > 0)) {
-          _color = loadedColor;
-          AppColors.primary = _color;
-          notifyListeners();
-        } else {
-          await prefs.remove(_prefsKey);
-        }
-      } catch (e) {
+      final alpha = (value >> 24) & 0xFF;
+      final rgb = value & 0xFFFFFF;
+      if (alpha > 100 && rgb != 0) {
+        _color = Color(value);
+      } else {
         await prefs.remove(_prefsKey);
       }
     }
+    AppColors.setPrimary(_color);
+    notifyListeners();
   }
 
   Future<void> setColor(Color newColor) async {
-    _color = newColor;
-    AppColors.primary = newColor;
+    final normalized = Color(newColor.toARGB32());
+    if (isCurrentColor(normalized)) return;
+    _color = normalized;
+    AppColors.setPrimary(normalized);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-
-    final colorValue = (newColor.a.toInt() << 24) |
-        (newColor.r.toInt() << 16) |
-        (newColor.g.toInt() << 8) |
-        newColor.b.toInt();
-    await prefs.setInt(_prefsKey, colorValue);
+    await prefs.setInt(_prefsKey, normalized.toARGB32());
   }
 
   Future<void> setDarkMode(bool isDark) async {
+    if (_isDarkMode == isDark) return;
     _isDarkMode = isDark;
     AppColors.setDarkMode(isDark);
     notifyListeners();
