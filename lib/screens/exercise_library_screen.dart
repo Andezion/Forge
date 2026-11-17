@@ -216,7 +216,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         width: double.infinity,
         child: ElevatedButton.icon(
           onPressed: _showCreateExerciseDialog,
-          icon: const Icon(Icons.add, color: Colors.white),
+          icon: Icon(Icons.add, color: AppColors.textOnPrimary),
           label: Text(AppLocalizations.of(context)!.createExercise),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
