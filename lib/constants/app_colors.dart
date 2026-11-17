@@ -72,7 +72,20 @@ class AppColors {
     textOnPrimary = onColor(color);
   }
 
+  static bool isDark = false;
+
+  static Color get warningBackground => isDark
+      ? Colors.orange.withValues(alpha: 0.15)
+      : Colors.orange.shade50;
+  static Color get warningBorder =>
+      isDark ? Colors.orange.withValues(alpha: 0.4) : Colors.orange.shade200;
+  static Color get warningText =>
+      isDark ? Colors.orange.shade200 : Colors.orange.shade900;
+  static Color get warningTextSecondary =>
+      isDark ? Colors.orange.shade100 : Colors.orange.shade800;
+
   static void setDarkMode(bool isDark) {
+    AppColors.isDark = isDark;
     if (isDark) {
       background = const Color(0xFF121212);
       surface = const Color(0xFF1E1E1E);
