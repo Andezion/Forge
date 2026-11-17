@@ -65,8 +65,10 @@ class _WeightScreenState extends State<WeightScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.weight, style: AppTextStyles.h4),
+        title: Text(l10n.weight,
+            style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary)),
         backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
       ),
       body: Column(
         children: [
