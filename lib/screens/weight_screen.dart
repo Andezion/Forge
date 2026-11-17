@@ -94,7 +94,7 @@ class _WeightScreenState extends State<WeightScreen> {
                     },
                   ),
                 ),
-                Container(width: 1, color: Colors.grey.shade200),
+                Container(width: 1, color: AppColors.divider),
                 Expanded(
                   child: CupertinoPicker.builder(
                     itemExtent: 40,
@@ -127,7 +127,7 @@ class _WeightScreenState extends State<WeightScreen> {
                         });
                       },
                       style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.black),
+                          foregroundColor: AppColors.textPrimary),
                       child: Text(l10n.reset),
                     ),
                   ),
@@ -142,7 +142,7 @@ class _WeightScreenState extends State<WeightScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.black),
+                          foregroundColor: AppColors.textOnPrimary),
                       child: Text(l10n.save),
                     ),
                   ),
