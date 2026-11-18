@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import '../models/user_stats.dart';
 import '../models/workout_history.dart';
+import 'avatar_cache.dart';
 
 
 class LeaderboardService extends ChangeNotifier {
@@ -10,6 +11,12 @@ class LeaderboardService extends ChangeNotifier {
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
 
   String? get _currentUserId => _auth.currentUser?.uid;
+
+  UserStats _parse(Map<String, dynamic> data) {
+    final stats = UserStats.fromJson(data);
+    AvatarCache.instance.putFromStats(stats.userId, data);
+    return stats;
+  }
 
   Future<List<String>> getFriendIds() async {
     final userId = _currentUserId;
@@ -211,7 +218,7 @@ class LeaderboardService extends ChangeNotifier {
         .snapshots()
         .map((s) => s.docs
             .map((d) {
-              try { return UserStats.fromJson(d.data()); } catch (_) { return null; }
+              try { return _parse(d.data()); } catch (_) { return null; }
             })
             .whereType<UserStats>()
             .toList());
@@ -299,7 +306,7 @@ class LeaderboardService extends ChangeNotifier {
     return q.limit(limit * 2).snapshots().map((snapshot) {
       final users = snapshot.docs
           .map((doc) {
-            try { return UserStats.fromJson(doc.data()); } catch (_) { return null; }
+            try { return _parse(doc.data()); } catch (_) { return null; }
           })
           .whereType<UserStats>()
           .where((u) => !u.isProfileHidden)
@@ -320,7 +327,7 @@ class LeaderboardService extends ChangeNotifier {
     try {
       final doc = await _db.collection('user_stats').doc(userId).get();
       if (doc.exists) {
-        return UserStats.fromJson(doc.data()!);
+        return _parse(doc.data()!);
       }
     } catch (e) {
       debugPrint('[LEADERBOARD] Error fetching current user stats: $e');
@@ -332,7 +339,7 @@ class LeaderboardService extends ChangeNotifier {
     try {
       final doc = await _db.collection('user_stats').doc(userId).get();
       if (doc.exists) {
-        final stats = UserStats.fromJson(doc.data()!);
+        final stats = _parse(doc.data()!);
         if (stats.isProfileHidden) {
           debugPrint('[LEADERBOARD] User profile is hidden: $userId');
           return null;
@@ -368,7 +375,7 @@ class LeaderboardService extends ChangeNotifier {
         .snapshots()
         .map((s) => s.docs
             .map((d) {
-              try { return UserStats.fromJson(d.data()); } catch (_) { return null; }
+              try { return _parse(d.data()); } catch (_) { return null; }
             })
             .whereType<UserStats>()
             .where((u) => !u.isProfileHidden)
