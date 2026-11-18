@@ -7,6 +7,7 @@ import '../constants/app_text_styles.dart';
 import '../services/friends_service.dart';
 import '../models/friend.dart';
 import '../widgets/friend_rank_badge.dart';
+import '../widgets/user_avatar.dart';
 import 'community_leaderboard_screen.dart';
 import 'challenges_screen.dart';
 import 'user_profile_screen.dart';
@@ -237,10 +238,11 @@ class _FriendsScreenState extends State<FriendsScreen>
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
-        leading: CircleAvatar(
+        leading: UserAvatar(
+          userId: friend.userId,
           radius: 28,
           backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          child: Text(
+          fallback: Text(
             friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?',
             style: AppTextStyles.h3.copyWith(
               color: AppColors.primary,
@@ -360,10 +362,11 @@ class _FriendsScreenState extends State<FriendsScreen>
           children: [
             Row(
               children: [
-                CircleAvatar(
+                UserAvatar(
+                  userId: request.fromUserId,
                   radius: 24,
                   backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
+                  fallback: Text(
                     request.fromUserName.isNotEmpty
                         ? request.fromUserName[0].toUpperCase()
                         : '?',
