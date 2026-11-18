@@ -24,6 +24,26 @@ class CustomizationScreen extends StatelessWidget {
     Colors.blue,
   ];
 
+  Future<void> _pickAvatar(BuildContext context) async {
+    final profile = Provider.of<ProfileService>(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: ProfileService.avatarPickSize,
+      maxHeight: ProfileService.avatarPickSize,
+      imageQuality: ProfileService.avatarPickQuality,
+    );
+    if (file == null) return;
+    final ok = await profile.setAvatar(await file.readAsBytes());
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(
+        content: Text(l10n.avatarTooLarge),
+        backgroundColor: AppColors.error,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -111,16 +131,7 @@ class CustomizationScreen extends StatelessWidget {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () async {
-                        final profile = Provider.of<ProfileService>(context,
-                            listen: false);
-                        final picker = ImagePicker();
-                        final file = await picker.pickImage(
-                            source: ImageSource.gallery, maxWidth: 1200);
-                        if (file != null) {
-                          await profile.setImagePath(file.path);
-                        }
-                      },
+                      onTap: () => _pickAvatar(context),
                       child: Container(
                         width: 96,
                         height: 96,
@@ -150,17 +161,7 @@ class CustomizationScreen extends StatelessWidget {
                           Text(l10n.profileImage, style: AppTextStyles.body1),
                           const SizedBox(height: 8),
                           ElevatedButton(
-                            onPressed: () async {
-                              final profile = Provider.of<ProfileService>(
-                                  context,
-                                  listen: false);
-                              final picker = ImagePicker();
-                              final file = await picker.pickImage(
-                                  source: ImageSource.gallery, maxWidth: 1200);
-                              if (file != null) {
-                                await profile.setImagePath(file.path);
-                              }
-                            },
+                            onPressed: () => _pickAvatar(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColor.color,
                               foregroundColor: AppColors.textOnPrimary,
@@ -173,7 +174,7 @@ class CustomizationScreen extends StatelessWidget {
                               final profile = Provider.of<ProfileService>(
                                   context,
                                   listen: false);
-                              await profile.setImagePath(null);
+                              await profile.removeAvatar();
                             },
                             child: Text(l10n.deletePhoto),
                           ),
