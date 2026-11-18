@@ -13,6 +13,7 @@ import '../models/friend.dart';
 import '../models/strength_rank.dart';
 import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
+import '../widgets/user_avatar.dart';
 import 'user_profile_screen.dart';
 
 class CommunityLeaderboardScreen extends StatefulWidget {
@@ -456,11 +457,12 @@ class _CommunityLeaderboardScreenState
               children: [
                 _buildRankBadge(rank),
                 const SizedBox(width: 12),
-                CircleAvatar(
+                UserAvatar(
+                  userId: user.userId,
                   radius: 24,
                   backgroundColor:
                       _getRankColor(rank).withValues(alpha: 0.2),
-                  child: Icon(Icons.person, color: _getRankColor(rank)),
+                  fallback: Icon(Icons.person, color: _getRankColor(rank)),
                 ),
               ],
             ),
