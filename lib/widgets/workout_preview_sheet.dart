@@ -27,17 +27,17 @@ class _WorkoutPreviewSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.35,
-      maxChildSize: 0.9,
-      expand: false,
-      builder: (_, scrollController) => Container(
+    final media = MediaQuery.of(context);
+    final bottomInset = media.viewPadding.bottom + 16;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: media.size.height * 0.9),
+      child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
@@ -60,9 +60,10 @@ class _WorkoutPreviewSheet extends StatelessWidget {
               ),
             ),
             Divider(height: 1, color: AppColors.divider),
-            Expanded(
+            Flexible(
               child: exercises.isEmpty
-                  ? Center(
+                  ? Padding(
+                      padding: EdgeInsets.fromLTRB(16, 32, 16, bottomInset + 16),
                       child: Text(
                         l10n.noExercisesInWorkout,
                         style: AppTextStyles.body2
@@ -71,8 +72,8 @@ class _WorkoutPreviewSheet extends StatelessWidget {
                       ),
                     )
                   : ListView.separated(
-                      controller: scrollController,
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomInset),
                       itemCount: exercises.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) =>
