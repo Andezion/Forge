@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:path_provider/path_provider.dart';
 import '../models/body_measurement.dart';
 import '../models/chart_data.dart';
+import 'avatar_cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileService extends ChangeNotifier {
+  static const double avatarPickSize = 192;
+  static const int avatarPickQuality = 75;
+
+  static const int maxAvatarBytes = 100 * 1024;
+
   static const _keyImagePath = 'profile_image_path';
+  static const _keyAvatarVersion = 'profile_avatar_version';
+  static const _keyAvatarOwner = 'profile_avatar_owner';
   static const _keyFrameIndex = 'profile_frame_index';
   static const _keyWeight = 'profile_weight';
   static const _keyGoals = 'profile_goals';
@@ -25,6 +39,7 @@ class ProfileService extends ChangeNotifier {
   static const _keyMeasurements = 'profile_measurements';
 
   String? _imagePath;
+  int _avatarVersion = 0;
   int _frameIndex = 0;
   double? _weightKg;
   final List<ChartDataPoint> _weightHistory = [];
@@ -66,6 +81,7 @@ class ProfileService extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     _imagePath = prefs.getString(_keyImagePath);
+    _avatarVersion = prefs.getInt(_keyAvatarVersion) ?? 0;
     _frameIndex = prefs.getInt(_keyFrameIndex) ?? 0;
     _weightKg =
         prefs.containsKey(_keyWeight) ? prefs.getDouble(_keyWeight) : null;
@@ -133,14 +149,140 @@ class ProfileService extends ChangeNotifier {
     );
   }
 
-  Future<void> setImagePath(String? path) async {
+  Future<bool> setAvatar(Uint8List picked) async {
+    final bytes = await _shrinkAvatar(picked);
+    if (bytes == null) return false;
+    final version = DateTime.now().millisecondsSinceEpoch;
+    final path = await _writeAvatarFile(bytes, version);
+    await _setLocalAvatar(path, version);
+    _uploadAvatar(bytes, version);
+    return true;
+  }
+
+  Future<void> removeAvatar() async {
+    final version = DateTime.now().millisecondsSinceEpoch;
+    await _deleteAvatarFiles();
+    await _setLocalAvatar(null, version);
+    _uploadAvatar(null, version);
+  }
+
+  Future<void> syncAvatar() async {
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      final owner = prefs.getString(_keyAvatarOwner);
+      if (owner != null && owner != uid) {
+        await _deleteAvatarFiles();
+        await _setLocalAvatar(null, 0);
+      }
+      await prefs.setString(_keyAvatarOwner, uid);
+
+      if (_avatarVersion == 0 && _imagePath != null) {
+        final file = File(_imagePath!);
+        if (await file.exists() && await setAvatar(await file.readAsBytes())) {
+          return;
+        }
+        await _setLocalAvatar(null, 0);
+      }
+
+      final doc = await FirebaseFirestore.instance
+          .collection('user_stats')
+          .doc(uid)
+          .get();
+      final data = doc.data();
+      final remoteVersion = (data?['avatarVersion'] as num?)?.toInt() ?? 0;
+      final remoteAvatar = data?['avatar'] as String?;
+
+      if (remoteVersion > _avatarVersion) {
+        if (remoteAvatar != null && remoteAvatar.isNotEmpty) {
+          final bytes = base64Decode(remoteAvatar);
+          final path = await _writeAvatarFile(bytes, remoteVersion);
+          await _setLocalAvatar(path, remoteVersion);
+        } else {
+          await _deleteAvatarFiles();
+          await _setLocalAvatar(null, remoteVersion);
+        }
+        AvatarCache.instance.put(uid, remoteAvatar, remoteVersion);
+      } else if (_avatarVersion > remoteVersion) {
+        final path = _imagePath;
+        final bytes = path != null && await File(path).exists()
+            ? await File(path).readAsBytes()
+            : null;
+        _uploadAvatar(bytes, _avatarVersion);
+      }
+    } catch (e) {
+      debugPrint('[AVATAR] Sync error: $e');
+    }
+  }
+
+  Future<void> _setLocalAvatar(String? path, int version) async {
     _imagePath = path;
+    _avatarVersion = version;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     if (path == null) {
       await prefs.remove(_keyImagePath);
     } else {
       await prefs.setString(_keyImagePath, path);
+    }
+    await prefs.setInt(_keyAvatarVersion, version);
+  }
+
+  void _uploadAvatar(Uint8List? bytes, int version) {
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final encoded = bytes == null ? null : base64Encode(bytes);
+    AvatarCache.instance.put(uid, encoded, version);
+    FirebaseFirestore.instance.collection('user_stats').doc(uid).set({
+      'avatar': encoded ?? FieldValue.delete(),
+      'avatarVersion': version,
+    }, SetOptions(merge: true)).catchError((Object e) {
+      debugPrint('[AVATAR] Upload error: $e');
+    });
+  }
+
+  Future<Uint8List?> _shrinkAvatar(Uint8List bytes) async {
+    if (bytes.length <= maxAvatarBytes) return bytes;
+    for (final size in [128, 96]) {
+      try {
+        final codec = await ui.instantiateImageCodec(bytes,
+            targetWidth: size, targetHeight: size);
+        final frame = await codec.getNextFrame();
+        final data =
+            await frame.image.toByteData(format: ui.ImageByteFormat.png);
+        frame.image.dispose();
+        if (data != null && data.lengthInBytes <= maxAvatarBytes) {
+          return data.buffer.asUint8List();
+        }
+      } catch (e) {
+        debugPrint('[AVATAR] Shrink error: $e');
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<String> _writeAvatarFile(Uint8List bytes, int version) async {
+    await _deleteAvatarFiles();
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/avatar_$version.img');
+    await file.writeAsBytes(bytes, flush: true);
+    return file.path;
+  }
+
+  Future<void> _deleteAvatarFiles() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      await for (final entity in dir.list()) {
+        final name = entity.uri.pathSegments.last;
+        if (entity is File && name.startsWith('avatar_')) {
+          await entity.delete();
+        }
+      }
+    } catch (e) {
+      debugPrint('[AVATAR] Cleanup error: $e');
     }
   }
 
