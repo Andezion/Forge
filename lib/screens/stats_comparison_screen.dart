@@ -7,6 +7,7 @@ import '../constants/app_text_styles.dart';
 import '../models/user_stats.dart';
 import '../services/leaderboard_service.dart';
 import '../services/auth_service.dart';
+import '../widgets/user_avatar.dart';
 
 class StatsComparisonScreen extends StatefulWidget {
   final String otherUserId;
@@ -132,25 +133,29 @@ class _StatsComparisonScreenState extends State<StatsComparisonScreen> {
     return Row(
       children: [
         Expanded(
-          child: _buildUserHeader(currentUserName, AppColors.primary, true),
+          child: _buildUserHeader(_currentUserStats?.userId ?? '',
+              currentUserName, AppColors.primary, true),
         ),
         const SizedBox(width: 16),
         Icon(Icons.compare_arrows, color: AppColors.textSecondary),
         const SizedBox(width: 16),
         Expanded(
-          child: _buildUserHeader(otherUserName, AppColors.accent, false),
+          child: _buildUserHeader(
+              widget.otherUserId, otherUserName, AppColors.accent, false),
         ),
       ],
     );
   }
 
-  Widget _buildUserHeader(String name, Color color, bool isCurrentUser) {
+  Widget _buildUserHeader(
+      String userId, String name, Color color, bool isCurrentUser) {
     return Column(
       children: [
-        CircleAvatar(
+        UserAvatar(
+          userId: userId,
           radius: 40,
           backgroundColor: color.withValues(alpha: 0.2),
-          child: Icon(Icons.person, size: 40, color: color),
+          fallback: Icon(Icons.person, size: 40, color: color),
         ),
         const SizedBox(height: 8),
         Text(
