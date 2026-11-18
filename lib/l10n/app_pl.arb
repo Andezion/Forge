@@ -165,6 +165,7 @@
   "profileImage": "Zdjęcie profilowe",
   "choosePhoto": "Wybierz zdjęcie",
   "deletePhoto": "Usuń zdjęcie",
+  "avatarTooLarge": "Obraz jest za duży. Wybierz inne zdjęcie.",
   "profileFrame": "Ramka profilu",
   "programs": "Programy",
   "openProgram": "Otwórz program: {program}",
