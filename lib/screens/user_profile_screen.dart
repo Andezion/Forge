@@ -12,6 +12,7 @@ import '../services/auth_service.dart';
 import '../models/challenge.dart';
 import '../utils/units.dart';
 import '../widgets/rank_badge_widget.dart';
+import '../widgets/user_avatar.dart';
 import 'stats_comparison_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -94,10 +95,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              CircleAvatar(
+              UserAvatar(
+                userId: widget.friend.userId,
                 radius: 50,
                 backgroundColor: AppColors.surface,
-                child: Icon(Icons.person, size: 50, color: AppColors.primary),
+                fallback:
+                    Icon(Icons.person, size: 50, color: AppColors.primary),
               ),
             ],
           ),
