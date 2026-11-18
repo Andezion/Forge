@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
 import '../models/friend.dart';
 import '../models/user_stats.dart';
+import 'avatar_cache.dart';
 
 class FriendsService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -51,6 +52,25 @@ class FriendsService extends ChangeNotifier {
     } finally {
       _loading = false;
       notifyListeners();
+    }
+    _loadFriendAvatars();
+  }
+  
+  Future<void> _loadFriendAvatars() async {
+    final ids = _friends.map((f) => f.userId).toList();
+    for (var i = 0; i < ids.length; i += 30) {
+      final chunk = ids.sublist(i, i + 30 > ids.length ? ids.length : i + 30);
+      try {
+        final snap = await _db
+            .collection('user_stats')
+            .where(FieldPath.documentId, whereIn: chunk)
+            .get();
+        for (final doc in snap.docs) {
+          AvatarCache.instance.putFromStats(doc.id, doc.data());
+        }
+      } catch (e) {
+        debugPrint('Error loading friend avatars: $e');
+      }
     }
   }
 
@@ -325,6 +345,7 @@ class FriendsService extends ChangeNotifier {
     try {
       final doc = await _db.collection('user_stats').doc(userId).get();
       if (doc.exists) {
+        AvatarCache.instance.putFromStats(userId, doc.data());
         return UserStats.fromJson(doc.data()!);
       }
     } catch (e) {
