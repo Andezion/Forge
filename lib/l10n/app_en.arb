@@ -724,6 +724,10 @@
   "@deletePhoto": {
     "description": "Delete photo button"
   },
+  "avatarTooLarge": "This image is too large. Please choose another photo.",
+  "@avatarTooLarge": {
+    "description": "Shown when the picked avatar can't be compressed small enough"
+  },
   "profileFrame": "Profile Frame",
   "@profileFrame": {
     "description": "Profile frame label"
