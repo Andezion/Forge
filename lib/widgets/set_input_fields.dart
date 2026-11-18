@@ -145,7 +145,12 @@ class _SetInputFieldsState extends State<SetInputFields> {
       labelText: label,
       isDense: true,
       suffixIcon: suffix,
-      suffixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      suffixIconConstraints: const BoxConstraints(
+        minWidth: 28,
+        maxWidth: 28,
+        minHeight: 20,
+        maxHeight: 20,
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     );
@@ -165,6 +170,10 @@ class _SetInputFieldsState extends State<SetInputFields> {
         controller: controller,
         autofocus: autofocus,
         enabled: widget.enabled,
+        expands: true,
+        maxLines: null,
+        minLines: null,
+        textAlignVertical: TextAlignVertical.center,
         keyboardType: decimal
             ? const TextInputType.numberWithOptions(decimal: true)
             : TextInputType.number,
@@ -232,15 +241,16 @@ class _SetInputFieldsState extends State<SetInputFields> {
                       label: l10n.kcalLabel,
                       decimal: true,
                       suffix: widget.enabled
-                          ? IconButton(
-                              tooltip: l10n.removeCalories,
-                              icon: const Icon(Icons.close, size: 16),
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                              onPressed: () => setState(() {
-                                entry.withCalories = false;
-                                entry.calories.clear();
-                              }),
+                          ? Tooltip(
+                              message: l10n.removeCalories,
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+                                onTap: () => setState(() {
+                                  entry.withCalories = false;
+                                  entry.calories.clear();
+                                }),
+                                child: const Icon(Icons.close, size: 16),
+                              ),
                             )
                           : null,
                     )
@@ -251,9 +261,16 @@ class _SetInputFieldsState extends State<SetInputFields> {
                         onPressed: () =>
                             setState(() => entry.withCalories = true),
                         icon: const Icon(Icons.local_fire_department, size: 16),
-                        label: Text(l10n.addCaloriesButton),
+                        label: Text(
+                          l10n.addCaloriesButton,
+                          style: AppTextStyles.body2
+                              .copyWith(color: AppColors.warning),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.warning,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           side: BorderSide(
                             color: AppColors.warning.withValues(alpha: 0.6),
                           ),
