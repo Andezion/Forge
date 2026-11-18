@@ -191,6 +191,7 @@ class _StoreViewState extends State<StoreView>
         avatar: Icon(icon, size: 16, color: c?.color ?? AppColors.primary),
         label: Text(label),
         selected: _category == c,
+        showCheckmark: false,
         onSelected: (_) {
           if (_category == c) return;
           setState(() => _category = c);
