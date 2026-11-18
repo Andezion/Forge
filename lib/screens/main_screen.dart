@@ -90,6 +90,7 @@ class _MainScreenState extends State<MainScreen> {
         city: profileService.city,
         displayName: settingsService.nickname,
       );
+      await profileService.syncAvatar();
     } catch (e) {
       debugPrint('[MAIN] Error syncing stats on startup: $e');
     }
